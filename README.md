@@ -1,4 +1,4 @@
-# Sashakt web app
+# Sashakt Admin Portal
 
 This builds the frontend interface for managing Sashakt platform.
 

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
 	import type { PageData } from './$types.js';
-	import LoginForm from './login-form.svelte';
-	let { data }: { data: PageData } = $props();
+	import LoginForm from './LoginForm.svelte';
+	let { data, event }: { data: PageData; event } = $props();
 </script>
 
 <div class="flex h-screen items-center justify-center">

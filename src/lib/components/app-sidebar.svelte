@@ -11,7 +11,7 @@ import User  from '@lucide/svelte/icons/user';
   const items = [
     {
       title: "Dashboard",
-      url: "#",
+      url: "/dashboard",
       icon: LayoutGrid,
     },
     {

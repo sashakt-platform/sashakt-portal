@@ -5,11 +5,7 @@
     import FileUp from "@lucide/svelte/icons/file-up";
     import Info from "@lucide/svelte/icons/info";
 </script>
-<style>
-    :global(body) {
-        background-color: #F0F9FF;
-    }
-</style>
+
 <div class='mt-10 ml-10 w-full  flex align-middle items-center'>
 <span class="flex flex-row">
 <h2

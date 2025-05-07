@@ -5,7 +5,13 @@
 	import Label from "$lib/components/ui/label/label.svelte";
 
     let { children } = $props();
+    
    </script>
+   <style>
+    :global(body) {
+        background-color: #F0F9FF;
+    }
+</style>
     
    <Sidebar.Provider>
     <AppSidebar />

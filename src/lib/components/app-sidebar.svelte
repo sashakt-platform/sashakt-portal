@@ -1,11 +1,11 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import FileQuestion from '@lucide/svelte/icons/file-question';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
+	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import User from '@lucide/svelte/icons/user';
-
-	// Menu items.
 
 	// Menu items.
 	const items = [
@@ -58,4 +58,33 @@
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
+	<Sidebar.Footer>
+		<Sidebar.Menu>
+			<Sidebar.MenuItem>
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger>
+						{#snippet child({ props })}
+							<Sidebar.MenuButton
+								{...props}
+								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+							>
+								Super Admin
+								<ChevronUp class="ml-auto" />
+							</Sidebar.MenuButton>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content side="top" class="w-[--bits-dropdown-menu-anchor-width]">
+						<DropdownMenu.Item>
+							<span>My Account</span>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>
+							<a href="/logout">
+								<span>Sign out</span>
+							</a>
+						</DropdownMenu.Item>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</Sidebar.MenuItem>
+		</Sidebar.Menu>
+	</Sidebar.Footer>
 </Sidebar.Root>

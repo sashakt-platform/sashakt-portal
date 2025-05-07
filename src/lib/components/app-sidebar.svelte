@@ -30,6 +30,8 @@
 			icon: User
 		}
 	];
+
+	let { data } = $props();
 </script>
 
 <Sidebar.Root>
@@ -68,7 +70,7 @@
 								{...props}
 								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 							>
-								Super Admin
+								{data.user.full_name}
 								<ChevronUp class="ml-auto" />
 							</Sidebar.MenuButton>
 						{/snippet}

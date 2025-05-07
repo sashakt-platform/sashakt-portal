@@ -3,11 +3,11 @@
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <Sidebar.Provider>
-	<AppSidebar />
+	<AppSidebar {data} />
 	<main>
 		<div class="my-4 flex">
 			<Sidebar.Trigger class="mx-4 w-14 rounded-none border-r-2" />

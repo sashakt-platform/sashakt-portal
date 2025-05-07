@@ -16,17 +16,17 @@ import User  from '@lucide/svelte/icons/user';
     },
     {
       title: "Question Bank",
-    url: "/QuestionBank",
+    url: "/questionbank",
       icon: FileQuestion,
     },
     {
       title: "Tests",
-      url: "#",
+      url: "/tests",
       icon: ClipboardList,
     },
     {
       title: "User Management",
-      url: "#",
+      url: "/user",
       icon: User,
     },
 

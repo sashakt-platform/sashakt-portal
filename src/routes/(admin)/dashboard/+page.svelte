@@ -37,7 +37,7 @@
 	];
 </script>
 
-<Dialog.Root open={true}>
+<Dialog.Root open={false}>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Welcome to Sashakt!</Dialog.Title>

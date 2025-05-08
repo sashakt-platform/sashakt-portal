@@ -34,18 +34,20 @@
 	let { data } = $props();
 </script>
 
-<Sidebar.Root>
+<Sidebar.Root class="bg-white p-3">
 	<Sidebar.Content>
 		<Sidebar.Group>
 			<Sidebar.GroupLabel
-				><h4 class="w-ful scroll-m-20 pb-4 text-xl font-extrabold tracking-tighter text-black">
+				><h4
+					class="w-ful text-primary scroll-m-20 pb-4 text-xl font-extrabold tracking-tighter uppercase"
+				>
 					Sashakt
 				</h4></Sidebar.GroupLabel
 			>
-			<Sidebar.GroupContent>
+			<Sidebar.GroupContent class="pt-4 text-base leading-1 ">
 				<Sidebar.Menu>
 					{#each items as item (item.title)}
-						<Sidebar.MenuItem>
+						<Sidebar.MenuItem class="text-secondary-foreground m-1">
 							<Sidebar.MenuButton>
 								{#snippet child({ props })}
 									<a href={item.url} {...props}>
@@ -60,7 +62,7 @@
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
-	<Sidebar.Footer>
+	<Sidebar.Footer class="border-t-primary">
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
 				<DropdownMenu.Root>

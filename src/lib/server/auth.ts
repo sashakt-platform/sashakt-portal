@@ -37,6 +37,11 @@ export function deleteSessionTokenCookie(event: RequestEvent) {
 	});
 }
 
+export function getSessionTokenCookie() {
+	const { locals } = getRequestEvent();
+	return locals.session;
+}
+
 export function requireLogin() {
 	const { locals, url } = getRequestEvent();
 

@@ -1,6 +1,10 @@
 <script lang="ts">
+	import * as Table from '$lib/components/ui/table/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
+
+	const { data } = $props();
+	console.log(data);
 </script>
 
 <div class="mt-10 ml-10 flex w-full items-center align-middle">
@@ -16,3 +20,31 @@
 <Label class="my-auto ml-10 align-middle text-sm font-extralight"
 	>Create, edit and update all the Users</Label
 >
+<div class="m-10 h-screen w-3/4 rounded-2xl bg-white text-center align-top shadow-2xl">
+	<div class="flex h-full flex-col items-center">
+		{#if data.users.data}
+			<Table.Root>
+				<Table.Header>
+					<Table.Row>
+						<Table.Head>Name</Table.Head>
+						<Table.Head>Email</Table.Head>
+						<Table.Head>Phone</Table.Head>
+						<Table.Head></Table.Head>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{#each data.users.data as user}
+						<Table.Row>
+							<Table.Cell>{user.full_name}</Table.Cell>
+							<Table.Cell>{user.email}</Table.Cell>
+							<Table.Cell>{user.phone}</Table.Cell>
+							<Table.Cell>Edit | Delete</Table.Cell>
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		{:else}
+			<span>No users.</span>
+		{/if}
+	</div>
+</div>

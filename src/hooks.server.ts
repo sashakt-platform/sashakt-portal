@@ -7,6 +7,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 	if (!sessionToken) {
 		event.locals.user = null;
+		event.locals.session = null;
 		return resolve(event);
 	}
 
@@ -18,6 +19,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	}
 
 	event.locals.user = user;
+	event.locals.session = sessionToken;
 	return resolve(event);
 };
 

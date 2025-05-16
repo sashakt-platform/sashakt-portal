@@ -5,7 +5,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Questions from '$lib/data/questions.json';
-	let { TagSelect, StateSelect } = $props();
+	let { TagSelect, StateSelect, open } = $props();
 
 	const data = Questions.map((question) => {
 		return {
@@ -19,10 +19,10 @@
 	console.log(data);
 </script>
 
-<Dialog.Root open>
-	<Dialog.Content class=" p-0  sm:h-[90%] sm:max-w-[95%]">
+<Dialog.Root bind:open>
+	<Dialog.Content class=" overflow-auto  p-0 sm:h-[90%] sm:max-w-[95%]" preventScroll={false}>
 		<div class="flex h-full flex-col">
-			<Dialog.Header class="p- m-0 h-fit border-b-2">
+			<Dialog.Header class="  border-b-2 ">
 				<Dialog.Title class="h-fit"
 					><div class="ml-6 flex py-4 text-xl">
 						<p>Select questions from question bank</p>
@@ -43,7 +43,9 @@
 						<Input type="search" placeholder="Search questions..."></Input>
 					</div>
 				</div>
-				<div class="h-5/6"><DataTable {data} {columns} /></div>
+				<div class="flex h-5/6 flex-col">
+					<DataTable {data} {columns} />
+				</div>
 			</div>
 		</div>
 	</Dialog.Content>

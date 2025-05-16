@@ -10,12 +10,9 @@
 	import TagList from '$lib/data/tags.json';
 	import StateList from '$lib/data/states.json';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import { render } from 'svelte/server';
-	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
-	import Sidebar from '$lib/components/ui/sidebar/sidebar.svelte';
+
 	import Button from '$lib/components/ui/button/button.svelte';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import DialogDescription from '$lib/components/ui/dialog/dialog-description.svelte';
+
 	import QuestionDialog from './QuestionDialog.svelte';
 	type modes = 'main' | 'primary' | 'questions' | 'settings';
 	let mode: modes = $state('questions');
@@ -90,7 +87,7 @@
 	</Select.Root>
 {/snippet}
 
-<QuestionDialog {TagSelect} {StateSelect} />
+<QuestionDialog open={dialogOpen} {TagSelect} {StateSelect} />
 
 {#if mode === 'main'}
 	<div id="mainpage">

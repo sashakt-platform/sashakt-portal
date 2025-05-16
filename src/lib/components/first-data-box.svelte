@@ -64,6 +64,7 @@
 				<Button
 					variant="outline"
 					class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+					onclick={rightButton.click}
 				>
 					<FileUp />{rightButton.title}
 				</Button></a

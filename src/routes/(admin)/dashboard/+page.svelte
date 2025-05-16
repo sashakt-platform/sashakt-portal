@@ -31,9 +31,9 @@
 	];
 
 	const stats_box = [
-		{ title: 'Total Questions', description: 'Stats and Generated Insights' },
-		{ title: 'Tests', description: 'Stats and Generated Insights' },
-		{ title: 'Users', description: 'Stats and Generated Insights' }
+		{ title: 'Total Questions', description: 'Stats and Generated Insights', count: 117 },
+		{ title: 'Tests', description: 'Stats and Generated Insights', count: 0 },
+		{ title: 'Users', description: 'Stats and Generated Insights', count: 2 }
 	];
 </script>
 
@@ -65,9 +65,6 @@
 		<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 	</span>
 </div>
-<Label class="my-auto ml-10 align-middle text-sm font-extralight"
-	>View Data related to Tests and Questions
-</Label>
 
 <div>
 	<div class="mt-4 ml-10 flex w-3/4 flex-row justify-between">
@@ -75,16 +72,16 @@
 			<div class="m-4 w-1/3 rounded-xl bg-white p-4">
 				<p class="font-semibold">{stat.title}</p>
 				<p class="text-sm">{stat.description}</p>
-				<div class="h-24 w-24"></div>
+				<div class="p-12 text-5xl">{stat.count}</div>
 			</div>
 		{/each}
 	</div>
-	<div class="mt-4 ml-10 flex w-3/4 flex-row justify-between">
-		<div class="m-4 mb-10 h-1/2 w-1/2 rounded-xl bg-white p-4">
-			<div class="h-screen w-full"></div>
-		</div>
-		<div class="m-4 h-1/2 w-1/2 rounded-xl bg-white p-4">
-			<div class="h-screen w-full"></div>
-		</div>
-	</div>
+	<!-- <div class="mt-4 ml-10 flex w-3/4 flex-row justify-between"> -->
+	<!-- 	<div class="m-4 mb-10 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
+	<!-- 		<div class="h-screen w-full"></div> -->
+	<!-- 	</div> -->
+	<!-- 	<div class="m-4 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
+	<!-- 		<div class="h-screen w-full"></div> -->
+	<!-- 	</div> -->
+	<!-- </div> -->
 </div>

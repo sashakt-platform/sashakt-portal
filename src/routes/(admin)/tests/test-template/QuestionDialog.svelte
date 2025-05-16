@@ -46,6 +46,12 @@
 				<div class="flex h-5/6 flex-col">
 					<DataTable {data} {columns} />
 				</div>
+				<div class="sticky bottom-0 mt-4 flex border-t-1 bg-white p-4 shadow-md">
+					<button class="bg-primary hover:bg-primary/90 rounded px-4 py-2 text-white">
+						Add to Test Template
+					</button>
+					<div class="ml-auto flex items-center"><p>Questions per page</p></div>
+				</div>
 			</div>
 		</div>
 	</Dialog.Content>

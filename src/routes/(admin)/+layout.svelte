@@ -3,14 +3,16 @@
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
+	let isSidebarOpen = $state(true);
+
 	let { children, data } = $props();
 </script>
 
-<Sidebar.Provider>
+<Sidebar.Provider bind:open={isSidebarOpen}>
 	<AppSidebar {data} />
 	<main>
 		<div class="shadow-lg">
-			<div class="my-4 flex">
+			<div class={['my-4', isSidebarOpen ? 'flex' : 'hidden']}>
 				<Sidebar.Trigger class="mx-4 w-14 rounded-none border-r-2" />
 				<span class="my-auto align-middle text-sm"
 					>... <ChevronRight class="inline w-4 text-sm" /></span

@@ -10,12 +10,15 @@
 	import TagList from '$lib/data/tags.json';
 	import StateList from '$lib/data/states.json';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 
 	import Button from '$lib/components/ui/button/button.svelte';
 
 	import QuestionDialog from './QuestionDialog.svelte';
 	type modes = 'main' | 'primary' | 'questions' | 'settings';
-	let mode: modes = $state('questions');
+	let mode: modes = $state('primary');
+	$effect(() => (mode == 'main' ? useSidebar().setOpen(true) : useSidebar().setOpen(false)));
+
 	let tags = $state<string[]>([]);
 	let states = $state<string[]>([]);
 	let dialogOpen = $state(false);
@@ -89,6 +92,12 @@
 
 <QuestionDialog open={dialogOpen} {TagSelect} {StateSelect} />
 
+{#if mode !== 'main'}
+<div class='flex'>
+	<Button variant='link'>Back to test templates</Button>
+</div>
+{/if}
+
 {#if mode === 'main'}
 	<div id="mainpage">
 		<div class="mt-10 ml-10 flex w-full items-center align-middle">
@@ -112,6 +121,7 @@
 				title: 'Create Template',
 				link: '#',
 				click: () => {
+					console.log('Left button clicked');
 					mode = 'primary';
 				}
 			}}
@@ -221,5 +231,21 @@
 				</div>
 			</div>
 		</div>
+	</div>
+{/if}
+
+{#if mode != 'main'}
+	<div class="sticky bottom-0 my-4 flex w-full justify-between border-t-4 bg-white p-4">
+		<Button variant="outline" onclick={() => (mode = 'main')}>Cancel</Button>
+		<Button
+			class="bg-primary"
+			onclick={() => {
+				if (mode === 'primary') {
+					mode = 'questions';
+				} else if (mode === 'questions') {
+					dialogOpen = true;
+				}
+			}}>Continue</Button
+		>
 	</div>
 {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Info from '@lucide/svelte/icons/info';
-	import DataTable from './data-table.svelte';
-	import { columns } from './columns.js';
+	import DataTable from './question_table/data-table.svelte';
+	import { columns } from './question_table/columns.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Questions from '$lib/data/questions.json';

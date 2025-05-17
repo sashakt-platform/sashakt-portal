@@ -1,3 +1,4 @@
+
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
@@ -7,6 +8,7 @@
 	import Info from '@lucide/svelte/icons/info';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash from '@lucide/svelte/icons/trash';
+	import WhiteEmptyBox from "$lib/components/white-empty-box.svelte";
 
 	const { data } = $props();
 </script>
@@ -25,8 +27,7 @@
 	<Label class="my-auto ml-10 align-middle text-sm font-extralight">Manage questions</Label>
 
 	{#if !data.questions}
-		<div class="m-10 h-screen w-3/4 rounded-2xl bg-white text-center align-middle shadow-2xl">
-			<div class="flex h-full flex-col items-center justify-center">
+<WhiteEmptyBox>
 				<svg
 					width="100"
 					height="100"
@@ -73,8 +74,7 @@
 						</Button></a
 					>
 				</div>
-			</div>
-		</div>
+</WhiteEmptyBox>
 	{:else}
 		<div class="m-10 w-3/4 rounded-2xl bg-white text-center align-top shadow-2xl">
 			<div class="flex h-full flex-col">

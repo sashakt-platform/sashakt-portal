@@ -1,6 +1,11 @@
 <script lang="ts">
+	import EmptyBox from '$lib/components/first-data-box.svelte';
+	import { Link } from '$lib/components/ui/breadcrumb';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import FileUp from '@lucide/svelte/icons/file-up';
 	import Info from '@lucide/svelte/icons/info';
+	import Plus from '@lucide/svelte/icons/plus';
 </script>
 
 <div class="mt-10 ml-10 flex w-full items-center align-middle">
@@ -15,6 +20,9 @@
 </div>
 <Label class="my-auto ml-10 align-middle text-sm font-extralight">Manage Tests</Label>
 
-<div class="m-10 h-20 w-3/4 rounded-2xl bg-white pt-6 text-center shadow-2xl">
-	There are no tests.
-</div>
+<EmptyBox
+	title="Create your first test template"
+	subtitle="Define the structure and content of your test template"
+	leftButton={{ title: 'Create Template', link: '/test-template', click: () => {} }}
+	rightButton={null}
+/>

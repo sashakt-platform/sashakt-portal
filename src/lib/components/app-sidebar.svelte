@@ -1,38 +1,67 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import FileQuestion from '@lucide/svelte/icons/file-question';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import User from '@lucide/svelte/icons/user';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
 	// Menu items.
-	const items = [
-		{
+	const menu_items = {
+		dashboard: {
 			title: 'Dashboard',
 			url: '/dashboard',
 			icon: LayoutGrid
 		},
-		{
+		question: {
 			title: 'Question Bank',
 			url: '/questionbank',
 			icon: FileQuestion
 		},
-		{
-			title: 'Tests',
+		tests: {
+			title: 'Test Management',
 			url: '/tests',
-			icon: ClipboardList
+			icon: ClipboardList,
+			submenu: {
+				test_template: {
+					title: 'Test Template',
+					url: '/tests/test-template'
+				},
+				test_sessions: {
+					title: 'Test Sessions',
+					url: 'tests/test-sessions'
+				}
+			}
 		},
-		{
+		user: {
 			title: 'User Management',
 			url: '/user',
 			icon: User
 		}
-	];
+	};
 
+	let currentitem = $state(menu_items.dashboard.title);
 	let { data } = $props();
 </script>
+
+{#snippet sidebaritems(item: any)}
+	<Sidebar.MenuItem class="text-secondary-foreground m-1">
+		<Sidebar.MenuButton
+			isActive={currentitem == item.title}
+			onclick={() => (currentitem = item.title)}
+		>
+			{#snippet child({ props })}
+				<a href={item.url} {...props}>
+					<item.icon />
+					<span>{item.title}</span>
+				</a>
+			{/snippet}
+		</Sidebar.MenuButton>
+	</Sidebar.MenuItem>
+{/snippet}
 
 <Sidebar.Root class="bg-white p-3">
 	<Sidebar.Content>
@@ -46,18 +75,56 @@
 			>
 			<Sidebar.GroupContent class="pt-4 text-base leading-1 ">
 				<Sidebar.Menu>
-					{#each items as item (item.title)}
-						<Sidebar.MenuItem class="text-secondary-foreground m-1">
-							<Sidebar.MenuButton>
-								{#snippet child({ props })}
-									<a href={item.url} {...props}>
-										<item.icon />
-										<span>{item.title}</span>
-									</a>
-								{/snippet}
-							</Sidebar.MenuButton>
+					{@render sidebaritems(menu_items.dashboard)}
+					{@render sidebaritems(menu_items.question)}
+
+					<!---- Collapsible menu for Tests ---->
+					<Collapsible.Root class="group/collapsible m-1 ">
+						<Sidebar.MenuItem>
+							<Collapsible.Trigger>
+								<Sidebar.MenuButton
+									onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
+								>
+									{#snippet child({ props })}
+										<a href={menu_items.tests.submenu.test_template.url} {...props}>
+											<ClipboardList />
+											<span>{menu_items.tests.title}</span>
+											<ChevronRight
+												class="ml-auto items-end transition-transform group-data-[state=open]/collapsible:rotate-90 "
+											/>
+										</a>
+									{/snippet}
+								</Sidebar.MenuButton>
+							</Collapsible.Trigger>
+							<Collapsible.Content>
+								<Sidebar.MenuSub>
+									<Sidebar.MenuButton
+										isActive={currentitem == menu_items.tests.submenu.test_template.title}
+										onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
+									>
+										{#snippet child({ props })}
+											<a href={menu_items.tests.submenu.test_template.url} {...props}>
+												<span>{menu_items.tests.submenu.test_template.title}</span>
+											</a>
+										{/snippet}
+									</Sidebar.MenuButton>
+									<Sidebar.MenuButton
+										isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
+										onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
+									>
+										{#snippet child({ props })}
+											<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
+												<span>{menu_items.tests.submenu.test_sessions.title}</span>
+											</a>
+										{/snippet}
+									</Sidebar.MenuButton>
+								</Sidebar.MenuSub>
+							</Collapsible.Content>
 						</Sidebar.MenuItem>
-					{/each}
+					</Collapsible.Root>
+					<!---- Collapsible menu for Tests ---->
+
+					{@render sidebaritems(menu_items.user)}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>

@@ -3,6 +3,8 @@
 	import WhiteEmptyBox from '$lib/components/white-empty-box.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
+	import CircleChevronLeft from '@lucide/svelte/icons/circle-chevron-left';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
@@ -15,9 +17,14 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 
 	import QuestionDialog from './QuestionDialog.svelte';
+
+	const typeOfMode = { main: 0, primary: 1, questions: 2, settings: 3 };
+
 	type modes = 'main' | 'primary' | 'questions' | 'settings';
-	let mode: modes = $state('primary');
-	$effect(() => (mode == 'main' ? useSidebar().setOpen(true) : useSidebar().setOpen(false)));
+	let currentMode: number = $state(typeOfMode.main);
+	$effect(() =>
+		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
+	);
 
 	let tags = $state<string[]>([]);
 	let states = $state<string[]>([]);
@@ -92,13 +99,46 @@
 
 <QuestionDialog open={dialogOpen} {TagSelect} {StateSelect} />
 
-{#if mode !== 'main'}
-<div class='flex'>
-	<Button variant='link'>Back to test templates</Button>
-</div>
+{#if currentMode !== typeOfMode.main}
+	<div class="flex border-b-2 py-2">
+		<div class="flex justify-start">
+			<Button variant="link" class=" text-gray-500" onclick={() => (currentMode = typeOfMode.main)}
+				><CircleChevronLeft />Back to test templates</Button
+			>
+		</div>
+		<div class="mx-auto flex">
+			{#snippet headerNumbers(number: number, text: string, mode: number)}
+				{@const isActive = mode === currentMode}
+				{@const isCompleted = mode <= currentMode}
+				<Button
+					variant="ghost"
+					class={[
+						'justify-left',
+						isActive ? 'border-primary text-primary border-1 font-bold' : isCompleted ? 'text-primary' : '',
+						'mx-4'
+					]}
+					><span
+						class={[
+							isActive
+								? 'bg-primary text-white'
+								: isCompleted
+									? 'text-primary border-primary border-1'
+									: 'border-gray-600 border-1 text-gray-500',
+							'mr-2 flex h-6 w-6 items-center justify-center rounded-full '
+						]}>{number}</span
+					>{text}</Button
+				>
+			{/snippet}
+			{@render headerNumbers(1, 'Primary Details', typeOfMode.primary)}
+			<ChevronRight class="my-auto w-4" />
+			{@render headerNumbers(2, 'Select Questions', typeOfMode.questions)}
+			<ChevronRight class="my-auto w-4" />
+			{@render headerNumbers(3, 'Configuration Settings', typeOfMode.settings)}
+		</div>
+	</div>
 {/if}
 
-{#if mode === 'main'}
+{#if currentMode === typeOfMode.main}
 	<div id="mainpage">
 		<div class="mt-10 ml-10 flex w-full items-center align-middle">
 			<span class="flex flex-row">
@@ -122,60 +162,62 @@
 				link: '#',
 				click: () => {
 					console.log('Left button clicked');
-					mode = 'primary';
+					currentMode = typeOfMode.primary;
 				}
 			}}
 			rightButton={null}
 		/>
 	</div>
-{:else if mode === 'primary'}
-	<WhiteEmptyBox>
-		<div class="h-full w-full text-left">
-			<div>
-				<div class="flex align-middle">
-					<Label for="template-name" class="text-2xl">Test template name</Label><span
-						><Info class=" m-2  w-4 text-xs text-gray-600" /></span
-					>
-				</div>
-				<Input type="text" id="template-name" placeholder="Enter the test name" class="h-12" />
-				<span class="text-xs text-gray-500"
-					>Enter a unique test name to differentiate from the other tests</span
-				>
-			</div>
-
-			<div class="mt-10">
-				<div class="flex align-middle">
-					<Label for="template-name" class="text-2xl">Description</Label><span
-						><Info class=" m-2  w-4 text-xs text-gray-600" /></span
-					>
-				</div>
-				<Textarea placeholder="Enter the test description here..." />
-			</div>
-
-			<div class="flex">
-				<div class="mt-10 mr-24 w-1/2">
+{:else if currentMode === typeOfMode.primary}
+	<div class="mx-auto flex items-center justify-center">
+		<WhiteEmptyBox>
+			<div class="h-full w-full text-left">
+				<div>
 					<div class="flex align-middle">
-						<Label for="template-name" class="text-2xl">Tags</Label><span
+						<Label for="template-name" class="text-2xl">Test template name</Label><span
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					{@render TagSelect()}
+					<Input type="text" id="template-name" placeholder="Enter the test name" class="h-12" />
+					<span class="text-xs text-gray-500"
+						>Enter a unique test name to differentiate from the other tests</span
+					>
 				</div>
 
-				<div class="mt-10 w-1/2">
+				<div class="mt-10">
 					<div class="flex align-middle">
-						<Label for="template-name" class="text-2xl">States</Label><span
+						<Label for="template-name" class="text-2xl">Description</Label><span
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					{@render StateSelect()}
+					<Textarea placeholder="Enter the test description here..." />
+				</div>
+
+				<div class="flex">
+					<div class="mt-10 mr-24 w-1/2">
+						<div class="flex align-middle">
+							<Label for="template-name" class="text-2xl">Tags</Label><span
+								><Info class=" m-2  w-4 text-xs text-gray-600" /></span
+							>
+						</div>
+						{@render TagSelect()}
+					</div>
+
+					<div class="mt-10 w-1/2">
+						<div class="flex align-middle">
+							<Label for="template-name" class="text-2xl">States</Label><span
+								><Info class=" m-2  w-4 text-xs text-gray-600" /></span
+							>
+						</div>
+						{@render StateSelect()}
+					</div>
 				</div>
 			</div>
-		</div>
-	</WhiteEmptyBox>
-{:else if mode === 'questions'}
+		</WhiteEmptyBox>
+	</div>
+{:else if currentMode === typeOfMode.questions}
 	<div class="mx-auto flex h-dvh">
-		<div class="ml-20 w-3/4 p-20">
+		<div class=" mx-auto w-3/4 p-20">
 			<div
 				class=" mb-2 flex h-1/6 items-center rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg"
 			>
@@ -234,15 +276,15 @@
 	</div>
 {/if}
 
-{#if mode != 'main'}
+{#if currentMode != typeOfMode.main}
 	<div class="sticky bottom-0 my-4 flex w-full justify-between border-t-4 bg-white p-4">
-		<Button variant="outline" onclick={() => (mode = 'main')}>Cancel</Button>
+		<Button variant="outline" onclick={() => (currentMode = typeOfMode.main)}>Cancel</Button>
 		<Button
 			class="bg-primary"
 			onclick={() => {
-				if (mode === 'primary') {
-					mode = 'questions';
-				} else if (mode === 'questions') {
+				if (currentMode === typeOfMode.primary) {
+					currentMode = typeOfMode.questions;
+				} else if (currentMode === typeOfMode.questions) {
 					dialogOpen = true;
 				}
 			}}>Continue</Button

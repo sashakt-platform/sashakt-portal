@@ -5,7 +5,9 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Questions from '$lib/data/questions.json';
-	let { TagSelect, StateSelect, open } = $props();
+	import TagsSelection from './TagsSelection.svelte';
+	import StateSelection from './StateSelection.svelte';
+	let { open } = $props();
 
 	const data = Questions.map((question) => {
 		return {
@@ -34,10 +36,10 @@
 			<div class="m-4 h-full">
 				<div class="flex h-1/6 flex-row">
 					<div class="mx-2 w-1/5">
-						{@render TagSelect()}
+						<TagsSelection />
 					</div>
 					<div class="mx-2 w-1/5">
-						{@render StateSelect()}
+						<StateSelection />
 					</div>
 					<div class="ml-auto flex w-1/5 items-start">
 						<Input type="search" placeholder="Search questions..."></Input>

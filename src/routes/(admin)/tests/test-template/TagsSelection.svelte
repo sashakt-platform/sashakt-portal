@@ -3,7 +3,7 @@
 
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
-	let tags = $state<string[]>([]);
+	let { tags = $bindable() } = $props();
 	const selectedTags = $derived(
 		tags.length
 			? TagList.filter((tag) => tags.includes(String(tag.id))).map((tag) => tag.name)

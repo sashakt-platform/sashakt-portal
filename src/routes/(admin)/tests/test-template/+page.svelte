@@ -22,7 +22,7 @@
 	type modes = 'main' | 'primary' | 'questions' | 'settings';
 	let currentMode: number = $state(typeOfMode.main);
 	let testData = $state({
-		name: 's',
+		name: '',
 		description: '',
 		start_time: '',
 		end_time: '',
@@ -48,24 +48,14 @@
 		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
 
-	$inspect(() => {
-		console.log('testTemplateCreate-->', testData);
+	$effect(() => {
+		console.log(
+			'tags are ',
+			$state.snapshot(testData.tags),
+			' and states',
+			$state.snapshot(testData.states)
+		);
 	});
-
-	let tags = $state<string[]>([]);
-	let states = $state<string[]>([]);
-
-	const selectedTags = $derived(
-		tags.length
-			? TagList.filter((tag) => tags.includes(String(tag.id))).map((tag) => tag.name)
-			: 'Select relevant tags'
-	);
-
-	const selectedStates = $derived(
-		states.length
-			? StateList.filter((state) => states.includes(String(state.id))).map((state) => state.name)
-			: 'Select relevant states'
-	);
 </script>
 
 {#snippet myBadge(children: any)}
@@ -73,54 +63,6 @@
 		>{children}</Badge
 	>
 {/snippet}
-
-<!-- {#snippet TagSelect()}
-	<Select.Root type="multiple" bind:value={tags}>
-		<Select.Trigger>
-			{#if tags.length === 0}
-				{selectedTags}
-			{:else}
-				<span class="truncate text-start">
-					{#each selectedTags as tag}
-						{@render myBadge(tag)}
-					{/each}
-				</span>
-			{/if}
-		</Select.Trigger>
-		<Select.Content>
-			<Select.Group>
-				<Select.GroupHeading>Select Relavant Tags</Select.GroupHeading>
-				{#each TagList as tag}
-					<Select.Item value={String(tag.id)} label={tag.name} />
-				{/each}
-			</Select.Group>
-		</Select.Content>
-	</Select.Root>
-{/snippet}
-
-{#snippet StateSelect()}
-	<Select.Root type="multiple" bind:value={states}>
-		<Select.Trigger>
-			{#if states.length === 0}
-				{selectedStates}
-			{:else}
-				<span class="truncate text-start">
-					{#each selectedStates as state}
-						{@render myBadge(state)}
-					{/each}
-				</span>
-			{/if}
-		</Select.Trigger>
-		<Select.Content>
-			<Select.Group>
-				<Select.GroupHeading>Select Relavant States</Select.GroupHeading>
-				{#each StateList as state}
-					<Select.Item value={String(state.id)} label={state.name} />
-				{/each}
-			</Select.Group>
-		</Select.Content>
-	</Select.Root>
-{/snippet} -->
 
 {#if currentMode !== typeOfMode.main}
 	<div class="flex border-b-2 py-2">

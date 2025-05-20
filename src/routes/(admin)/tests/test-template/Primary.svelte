@@ -49,7 +49,7 @@
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					<TagsSelection />
+					<TagsSelection bind:tags={testData.tags} />
 				</div>
 
 				<div class="mt-10 w-1/2">
@@ -58,7 +58,7 @@
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					<StateSelection />
+					<StateSelection bind:states={testData.states} />
 				</div>
 			</div>
 		</div>

@@ -1,8 +1,9 @@
 <script lang="ts">
 	import StateList from '$lib/data/states.json';
-	let states = $state<string[]>([]);
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	let { states = $bindable() } = $props();
+
 	const selectedStates = $derived(
 		states.length
 			? StateList.filter((state) => states.includes(String(state.id))).map((state) => state.name)

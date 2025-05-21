@@ -17,15 +17,28 @@
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
 		data: TData[];
+		questions: Number[];
+		open: boolean;
 	};
 
-	let { data, columns }: DataTableProps<TData, TValue> = $props();
+	let {
+		columns,
+		data,
+		questions = $bindable(),
+		open = $bindable()
+	}: DataTableProps<TData, TValue> = $props();
 
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 	let sorting = $state<SortingState>([]);
 	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = $state<VisibilityState>({});
 	let rowSelection = $state<RowSelectionState>({});
+
+	$effect(() => {
+		console.log('rowSelection->', $state.snapshot(rowSelection));
+		console.log('table data is -->', data);
+		console.log('table data columns -->');
+	});
 
 	const table = createSvelteTable({
 		get data() {
@@ -85,9 +98,15 @@
 				return columnVisibility;
 			},
 			get rowSelection() {
+				console.log('rowSelectionn function is -->', $state.snapshot(rowSelection));
 				return rowSelection;
 			}
 		}
+	});
+
+	$effect(() => {
+		console.log('table selected rows is -->', table.getFilteredSelectedRowModel().rows);
+		console.log('table filtered row model is -->', table.getFilteredRowModel().rows);
 	});
 </script>
 
@@ -134,4 +153,22 @@
 			{/each}
 		</Table.Body>
 	</Table.Root>
+	<div class="sticky bottom-0 mt-4 flex border-t-1 bg-white p-4 shadow-md">
+		<button
+			class="bg-primary hover:bg-primary/90 rounded px-4 py-2 text-white"
+			onclick={() => {
+				questions.length = 0;
+				table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
+					console.log('element is -->', element);
+					questions.push(element.original?.id);
+				});
+
+				console.log('Selected questions:', $state.snapshot(questions));
+				open = false;
+			}}
+		>
+			Add to Test Templates
+		</button>
+		<div class="ml-auto flex items-center"><p>Questions per page</p></div>
+	</div>
 </div>

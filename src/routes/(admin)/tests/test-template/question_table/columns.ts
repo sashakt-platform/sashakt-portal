@@ -2,7 +2,7 @@ import type { ColumnDef } from "@tanstack/table-core";
 
 import Eye from '@lucide/svelte/icons/eye';
 import { renderComponent } from "$lib/components/ui/data-table/index.js";
-import { Checkbox } from "$lib/components/ui/checkbox";
+import Checkbox  from "./data-table-checkbox.svelte";
 
  
 // This type is used to define the shape of our data.
@@ -34,7 +34,18 @@ export const columns: ColumnDef<Question>[] = [
     cell: ({ row }) =>
       renderComponent(Checkbox, {
         checked: row.getIsSelected(),
-        onCheckedChange: (value) => row.toggleSelected(!!value),
+        onCheckedChange: (value) => {
+          row.toggleSelected(!!value);
+          // const questionId = row.original.id;
+          // if (value) {            
+          //   console.log("Selected question ID:", questionId);
+          //   return questionId;
+          // }
+          // else
+          // {
+          //   console.log("UnSelected question ID:", questionId);
+          //   }
+        },
         "aria-label": "Select row",
       }),
     enableSorting: false,

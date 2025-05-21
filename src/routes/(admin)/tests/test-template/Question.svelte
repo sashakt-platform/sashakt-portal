@@ -3,9 +3,10 @@
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import QuestionDialog from './QuestionDialog.svelte';
 	let dialogOpen = $state(false);
+	let { questions = $bindable() } = $props();
 </script>
 
-<QuestionDialog open={dialogOpen} />
+<QuestionDialog bind:open={dialogOpen} bind:questions />
 
 <div class="mx-auto flex h-dvh">
 	<div class=" mx-auto w-3/4 p-20">

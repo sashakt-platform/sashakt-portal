@@ -3,7 +3,7 @@
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 
 	let {
-		checked = false,
+		checked = true,
 		onCheckedChange = (v) => (checked = v),
 		...restProps
 	}: ComponentProps<typeof Checkbox> = $props();

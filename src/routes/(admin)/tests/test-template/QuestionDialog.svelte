@@ -7,8 +7,9 @@
 	import Questions from '$lib/data/questions.json';
 	import TagsSelection from './TagsSelection.svelte';
 	import StateSelection from './StateSelection.svelte';
-	let { open } = $props();
-
+	let { open = $bindable(), questions = $bindable() } = $props();
+	let tags = $state<String[]>([]);
+	let states = $state<String[]>([]);
 	const data = Questions.map((question) => {
 		return {
 			id: question.id,
@@ -18,7 +19,10 @@
 			answer: question.correct_answer
 		};
 	});
-	console.log(data);
+
+	$effect(() => {
+		console.log('questions-->', $state.snapshot(questions));
+	});
 </script>
 
 <Dialog.Root bind:open>
@@ -36,23 +40,17 @@
 			<div class="m-4 h-full">
 				<div class="flex h-1/6 flex-row">
 					<div class="mx-2 w-1/5">
-						<TagsSelection />
+						<TagsSelection bind:tags />
 					</div>
 					<div class="mx-2 w-1/5">
-						<StateSelection />
+						<StateSelection bind:states />
 					</div>
 					<div class="ml-auto flex w-1/5 items-start">
 						<Input type="search" placeholder="Search questions..."></Input>
 					</div>
 				</div>
 				<div class="flex h-5/6 flex-col">
-					<DataTable {data} {columns} />
-				</div>
-				<div class="sticky bottom-0 mt-4 flex border-t-1 bg-white p-4 shadow-md">
-					<button class="bg-primary hover:bg-primary/90 rounded px-4 py-2 text-white">
-						Add to Test Template
-					</button>
-					<div class="ml-auto flex items-center"><p>Questions per page</p></div>
+					<DataTable {data} {columns} bind:questions bind:open />
 				</div>
 			</div>
 		</div>

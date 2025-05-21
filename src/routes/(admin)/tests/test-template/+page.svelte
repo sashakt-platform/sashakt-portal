@@ -4,10 +4,6 @@
 	import Info from '@lucide/svelte/icons/info';
 	import CircleChevronLeft from '@lucide/svelte/icons/circle-chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-
-	import * as Select from '$lib/components/ui/select/index.js';
-	import TagList from '$lib/data/tags.json';
-	import StateList from '$lib/data/states.json';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 
@@ -15,15 +11,14 @@
 
 	import Primary from './Primary.svelte';
 	import Question from './Question.svelte';
-	import { boolean } from 'zod';
 
 	const typeOfMode = { main: 0, primary: 1, questions: 2, settings: 3 };
 
 	type modes = 'main' | 'primary' | 'questions' | 'settings';
 	let currentMode: number = $state(typeOfMode.main);
 	let testData = $state({
-		name: '',
-		description: '',
+		name: 'Test Name',
+		description: 'Test Description',
 		start_time: '',
 		end_time: '',
 		time_limit: 1,
@@ -49,12 +44,14 @@
 	);
 
 	$effect(() => {
-		console.log(
-			'tags are ',
-			$state.snapshot(testData.tags),
-			' and states',
-			$state.snapshot(testData.states)
-		);
+		// console.log(
+		// 	'tags are ',
+		// 	$state.snapshot(testData.tags),
+		// 	' and states',
+		// 	$state.snapshot(testData.states)
+		// );
+
+		console.log('questions are -->', $state.snapshot(testData.question_revision_ids));
 	});
 </script>
 
@@ -154,7 +151,7 @@
 {:else if currentMode === typeOfMode.primary}
 	<Primary bind:testData />
 {:else if currentMode === typeOfMode.questions}
-	<Question />
+	<Question bind:questions={testData.question_revision_ids} />
 {/if}
 
 {#if currentMode != typeOfMode.main}

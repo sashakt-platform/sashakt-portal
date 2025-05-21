@@ -759,5 +759,75 @@
 				"organization_id": 209
 			}
 		]
+	},
+	{
+		"id": 287,
+		"organization_id": 209,
+		"created_date": "2025-05-19T14:45:10.123456",
+		"modified_date": "2025-05-19T14:45:10.123456",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "SHG समूह में न्यूनतम और अधिकतम कितने सदस्य हो सकते हैं?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "5-10 सदस्य"
+			},
+			{
+				"text": "10-15 सदस्य"
+			},
+			{
+				"text": "10-20 सदस्य"
+			},
+			{
+				"text": "15-25 सदस्य"
+			}
+		],
+		"correct_answer": [2],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": "आमतौर पर SHG में 10-20 सदस्य होते हैं, जो सामान्यतः एक ही सामाजिक-आर्थिक पृष्ठभूमि से आते हैं।",
+		"media": null,
+		"created_by_id": 120,
+		"locations": [
+			{
+				"id": 726,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 727,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 35,
+				"name": "SHG Management",
+				"description": "Tag for SHG Management related questions",
+				"created_by_id": 120,
+				"id": 49,
+				"created_date": "2025-05-19T14:45:10.123000",
+				"modified_date": "2025-05-19T14:45:10.123010",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
 	}
 ]

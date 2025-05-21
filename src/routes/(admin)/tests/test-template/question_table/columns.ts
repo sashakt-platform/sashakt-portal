@@ -36,15 +36,7 @@ export const columns: ColumnDef<Question>[] = [
         checked: row.getIsSelected(),
         onCheckedChange: (value) => {
           row.toggleSelected(!!value);
-          // const questionId = row.original.id;
-          // if (value) {            
-          //   console.log("Selected question ID:", questionId);
-          //   return questionId;
-          // }
-          // else
-          // {
-          //   console.log("UnSelected question ID:", questionId);
-          //   }
+
         },
         "aria-label": "Select row",
       }),
@@ -52,11 +44,7 @@ export const columns: ColumnDef<Question>[] = [
     enableHiding: false,
     maxSize:1
   },
-//  {
-//   accessorKey: "id",
-//     header: "ID",
-//   enableHiding:true
-//   },
+
   {
   accessorKey: "question",
     header: "Question",

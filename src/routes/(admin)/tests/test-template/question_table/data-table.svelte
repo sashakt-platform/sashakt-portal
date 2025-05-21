@@ -34,12 +34,6 @@
 	let columnVisibility = $state<VisibilityState>({});
 	let rowSelection = $state<RowSelectionState>({});
 
-	$effect(() => {
-		console.log('rowSelection->', $state.snapshot(rowSelection));
-		console.log('table data is -->', data);
-		console.log('table data columns -->');
-	});
-
 	const table = createSvelteTable({
 		get data() {
 			return data;
@@ -98,16 +92,21 @@
 				return columnVisibility;
 			},
 			get rowSelection() {
-				console.log('rowSelectionn function is -->', $state.snapshot(rowSelection));
+				// console.log('rowSelectionn function is -->', $state.snapshot(rowSelection));
 				return rowSelection;
 			}
 		}
 	});
 
-	$effect(() => {
-		console.log('table selected rows is -->', table.getFilteredSelectedRowModel().rows);
-		console.log('table filtered row model is -->', table.getFilteredRowModel().rows);
-	});
+	if (open) {
+		questions.forEach((element: any) => {
+			table.getFilteredRowModel().rows.filter((row: any) => {
+				if (row.original?.id == element) {
+					row.toggleSelected(true);
+				}
+			});
+		});
+	}
 </script>
 
 <div class="text-muted-foreground flex-1 text-sm">
@@ -159,11 +158,9 @@
 			onclick={() => {
 				questions.length = 0;
 				table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
-					console.log('element is -->', element);
 					questions.push(element.original?.id);
 				});
 
-				console.log('Selected questions:', $state.snapshot(questions));
 				open = false;
 			}}
 		>

@@ -2,11 +2,26 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import QuestionDialog from './QuestionDialog.svelte';
+	import DataTable from './question_table/data-table.svelte';
+	import { columns } from './question_table/columns.js';
+	import GripVertical from '@lucide/svelte/icons/grip-vertical';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Eye from '@lucide/svelte/icons/eye';
+	import Questions from '$lib/data/questions.json';
 	let dialogOpen = $state(false);
 	let { questions = $bindable() } = $props();
+	const data = Questions.map((question) => {
+		return {
+			id: question.id,
+			question: question.question_text,
+			tags: question.tags.map((tag) => tag.name),
+			options: question.options.map((option) => option.text),
+			answer: question.correct_answer
+		};
+	});
 </script>
 
-<QuestionDialog bind:open={dialogOpen} bind:questions />
+<QuestionDialog bind:open={dialogOpen} bind:questions {data} {columns} />
 
 <div class="mx-auto flex h-dvh">
 	<div class=" mx-auto w-3/4 p-20">
@@ -63,7 +78,7 @@
 			</div>
 		</div>
 		<div
-			class="my-auto flex h-5/6 justify-center rounded-t-sm rounded-b-xl border bg-white p-4 shadow-lg"
+			class="my-auto flex h-full justify-center rounded-t-sm rounded-b-xl border bg-white p-4 shadow-lg"
 		>
 			{#if questions.length == 0}
 				<div class="my-auto text-center">
@@ -74,7 +89,33 @@
 					>
 				</div>
 			{:else}
-				<p>Question Table</p>
+				<div class="flex h-full w-full flex-col overflow-auto">
+					{#each data.filter((row) => questions.includes(row.id)) as d (d.id)}
+						<div class="m-4 flex cursor-pointer flex-row">
+							<div class="my-auto">
+								<GripVertical />
+							</div>
+							<div
+								class="hover:bg-primary-foreground my-auto flex w-full flex-row items-center rounded-lg border-1 p-4 text-sm"
+							>
+								<p class="w-4/6">
+									{d.question}
+								</p>
+								<span class="mx-4 w-fit rounded-full border p-1"><Eye class="mx-auto" /></span>
+								<span class="w-2/6"><p>Leadership, Visioning & Planning Exercise</p></span>
+							</div>
+							<div class="my-auto ml-2 hidden group-hover:block">
+								<Trash2 />
+							</div>
+						</div>
+					{/each}
+					<!--  <DataTable
+						data={data.filter((row) => questions.includes(row.id))}
+						{columns}
+						bind:questions
+						bind:open={dialogOpen}
+					/> -->
+				</div>
 			{/if}
 		</div>
 	</div>

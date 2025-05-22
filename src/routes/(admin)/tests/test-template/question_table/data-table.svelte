@@ -119,9 +119,9 @@
 			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
 				<Table.Row class="my-auto flex rounded-lg bg-[#0369A1]  hover:bg-[#0369A1]">
 					{#each headerGroup.headers as header (header.id)}
-						<Table.Head class="flex-1 text-white">
+						<Table.Head class="flex-1 text-white ">
 							{#if !header.isPlaceholder}
-								<Table.Cell>
+								<Table.Cell class="flex  w-fit">
 									<FlexRender
 										content={header.column.columnDef.header}
 										context={header.getContext()}
@@ -136,11 +136,12 @@
 		<Table.Body>
 			{#each table.getRowModel().rows as row (row.id)}
 				<Table.Row
-					class="my-2 flex cursor-pointer rounded-lg border-1"
+					class="my-2 grid cursor-pointer grid-cols-4 rounded-lg border-1"
 					data-state={row.getIsSelected() && 'selected'}
 				>
 					{#each row.getVisibleCells() as cell (cell.id)}
-						<Table.Cell class="flex-1">
+						{console.log('cellidd->', cell.id)}
+						<Table.Cell class={['text-left', cell.id.includes('select') && "w-1",cell.id.includes('question') && "w-3/4"]}>
 							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 						</Table.Cell>
 					{/each}

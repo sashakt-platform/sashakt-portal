@@ -28,7 +28,7 @@ export const columns: ColumnDef<Question>[] = [
           !table.getIsAllPageRowsSelected(),
         onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
         "aria-label": "Select all",
-        class: "bg-white mx-auto", // Added white background
+        class: "bg-white", // Added white background
         maxSize:1
       }),
     cell: ({ row }) =>
@@ -42,14 +42,18 @@ export const columns: ColumnDef<Question>[] = [
       }),
     enableSorting: false,
     enableHiding: false,
-    maxSize:1
+    size: -1,
+    maxSize: 1,
+    
   },
 
   {
   accessorKey: "question",
     header: "Question",
-    size: -1,
-    maxSize:1
+    size: 200,
+    maxSize: 2,
+
+      
  },
 //  {
 //   accessorKey: "options",
@@ -62,6 +66,8 @@ export const columns: ColumnDef<Question>[] = [
       // You can pass whatever you need from `row.original` to the component
       return renderComponent(Eye, { class: "text-gray-400 border rounded-4xl" });
     },
+    size: -1,
+    maxSize: 1,
 
   },
 //   {
@@ -70,7 +76,9 @@ export const columns: ColumnDef<Question>[] = [
 //  },
  {
   accessorKey: "tags",
-  header: "Tags",
+   header: "Tags",
+   size: 1,
+  maxSize: 1,
   },
  
 

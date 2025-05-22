@@ -11,11 +11,13 @@
 
 	import Primary from './Primary.svelte';
 	import Question from './Question.svelte';
+	import Settings from './Configuration.svelte';
+	import Configuration from './Configuration.svelte';
 
-	const typeOfMode = { main: 0, primary: 1, questions: 2, settings: 3 };
+	const typeOfMode = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
-	type modes = 'main' | 'primary' | 'questions' | 'settings';
-	let currentMode: number = $state(typeOfMode.main);
+	type modes = 'main' | 'primary' | 'questions' | 'configuration';
+	let currentMode: number = $state(typeOfMode.configuration);
 	let testData = $state({
 		name: 'Test Name',
 		description: 'Test Description',
@@ -113,7 +115,7 @@
 			<ChevronRight class="my-auto w-4" />
 			{@render headerNumbers(2, 'Select Questions', typeOfMode.questions, false)}
 			<ChevronRight class="my-auto w-4" />
-			{@render headerNumbers(3, 'Configuration Settings', typeOfMode.settings, false)}
+			{@render headerNumbers(3, 'Configuration Settings', typeOfMode.configuration, false)}
 		</div>
 	</div>
 {/if}
@@ -152,6 +154,8 @@
 	<Primary bind:testData />
 {:else if currentMode === typeOfMode.questions}
 	<Question bind:questions={testData.question_revision_ids} />
+{:else if currentMode === typeOfMode.configuration}
+	<Configuration />
 {/if}
 
 {#if currentMode != typeOfMode.main}
@@ -167,8 +171,8 @@
 			disabled={currentMode == typeOfMode.primary &&
 				(testData.name.trim() == '' || testData.description.trim() == '')}
 			onclick={() => {
-				currentMode < typeOfMode.settings && currentMode++;
-			}}>{currentMode != typeOfMode.settings ? 'Continue' : 'Save test template'}</Button
+				currentMode < typeOfMode.configuration && currentMode++;
+			}}>{currentMode != typeOfMode.configuration ? 'Continue' : 'Save test template'}</Button
 		>
 	</div>
 {/if}

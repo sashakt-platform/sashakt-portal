@@ -49,7 +49,9 @@
 				</div>
 				<div class="flex flex-row items-center text-sm">
 					<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold">Test Template</span>
-					<span class="text-gray-500">0 questions (0pts)</span>
+					<span class="text-gray-500"
+						>{questions.length} {questions.length == 1 ? 'question' : 'questions'} (0pts)</span
+					>
 				</div>
 			</div>
 		</div>

@@ -42,29 +42,40 @@
 					</g>
 				</svg>
 			</div>
-			<div class="flex h-full w-full flex-col">
-				<div class="flex">
-					<p class="font-bold">Sashakt Sample Test</p>
-					<PenLine class="p-1" />
+			<div class="flex h-full w-full flex-row">
+				<div class="flex w-fit flex-col">
+					<div class="flex">
+						<p class="font-bold">Sashakt Sample Test</p>
+						<PenLine class="p-1" />
+					</div>
+					<div class="flex flex-row items-center text-sm">
+						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold">Test Template</span>
+						<span class="text-gray-500"
+							>{questions.length} {questions.length == 1 ? 'question' : 'questions'} (0pts)</span
+						>
+					</div>
 				</div>
-				<div class="flex flex-row items-center text-sm">
-					<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold">Test Template</span>
-					<span class="text-gray-500"
-						>{questions.length} {questions.length == 1 ? 'question' : 'questions'} (0pts)</span
-					>
-				</div>
+				{#if questions.length != 0}
+					<div class="my-auto ml-auto flex">
+						<Button onclick={() => (dialogOpen = true)}>Select More Questions</Button>
+					</div>
+				{/if}
 			</div>
 		</div>
 		<div
 			class="my-auto flex h-5/6 justify-center rounded-t-sm rounded-b-xl border bg-white p-4 shadow-lg"
 		>
-			<div class="my-auto text-center">
-				<p class="text-lg font-bold">Shortlist your Questions</p>
-				<p class="text-sm text-gray-400">Add the relevant questions to your test template</p>
-				<Button class="mt-6 bg-[#0369A1]" onclick={() => (dialogOpen = true)}
-					>Select from question bank</Button
-				>
-			</div>
+			{#if questions.length == 0}
+				<div class="my-auto text-center">
+					<p class="text-lg font-bold">Shortlist your Questions</p>
+					<p class="text-sm text-gray-400">Add the relevant questions to your test template</p>
+					<Button class="mt-6 bg-[#0369A1]" onclick={() => (dialogOpen = true)}
+						>Select from question bank</Button
+					>
+				</div>
+			{:else}
+				<p>Question Table</p>
+			{/if}
 		</div>
 	</div>
 </div>

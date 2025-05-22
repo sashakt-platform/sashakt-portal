@@ -13,6 +13,9 @@
 	} from '@tanstack/table-core';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
@@ -141,7 +144,13 @@
 				>
 					{#each row.getVisibleCells() as cell (cell.id)}
 						{console.log('cellidd->', cell.id)}
-						<Table.Cell class={['text-left', cell.id.includes('select') && "w-1",cell.id.includes('question') && "w-3/4"]}>
+						<Table.Cell
+							class={[
+								'text-left',
+								cell.id.includes('select') && 'w-1',
+								cell.id.includes('question') && 'w-3/4'
+							]}
+						>
 							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 						</Table.Cell>
 					{/each}
@@ -154,8 +163,8 @@
 		</Table.Body>
 	</Table.Root>
 	<div class="sticky bottom-0 mt-4 flex border-t-1 bg-white p-4 shadow-md">
-		<button
-			class="bg-primary hover:bg-primary/90 rounded px-4 py-2 text-white"
+		<Button
+			class="bg-primary hover:bg-primary/90 rounded px-4 my-auto text-white"
 			onclick={() => {
 				questions.length = 0;
 				table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
@@ -166,7 +175,30 @@
 			}}
 		>
 			Add to Test Templates
-		</button>
-		<div class="ml-auto flex items-center"><p>Questions per page</p></div>
+		</Button>
+		<div class="ml-auto flex items-center">
+			<!-- <p>Questions per page</p> -->
+			<p class="mx-4">
+				Page {table.getState().pagination.pageIndex + 1} out of {table.getPageCount()}
+			</p>
+		</div>
+		<div class="flex items-center justify-end space-x-2 py-4">
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => table.previousPage()}
+				disabled={!table.getCanPreviousPage()}
+			>
+				<ChevronLeft />
+			</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => table.nextPage()}
+				disabled={!table.getCanNextPage()}
+			>
+				<ChevronRight />
+			</Button>
+		</div>
 	</div>
 </div>

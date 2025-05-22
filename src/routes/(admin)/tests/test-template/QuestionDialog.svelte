@@ -1,24 +1,14 @@
 <script lang="ts">
 	import Info from '@lucide/svelte/icons/info';
 	import DataTable from './question_table/data-table.svelte';
-	import { columns } from './question_table/columns.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Questions from '$lib/data/questions.json';
 	import TagsSelection from './TagsSelection.svelte';
 	import StateSelection from './StateSelection.svelte';
-	let { open = $bindable(), questions = $bindable() } = $props();
+	let { open = $bindable(), questions = $bindable(), data, columns } = $props();
 	let tags = $state<String[]>([]);
 	let states = $state<String[]>([]);
-	const data = Questions.map((question) => {
-		return {
-			id: question.id,
-			question: question.question_text,
-			tags: question.tags.map((tag) => tag.name),
-			options: question.options.map((option) => option.text),
-			answer: question.correct_answer
-		};
-	});
 
 	$effect(() => {
 		console.log('questions-->', $state.snapshot(questions));

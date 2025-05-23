@@ -4,7 +4,6 @@
 	import Info from '@lucide/svelte/icons/info';
 	import CircleChevronLeft from '@lucide/svelte/icons/circle-chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -16,8 +15,7 @@
 
 	const typeOfMode = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
-	type modes = 'main' | 'primary' | 'questions' | 'configuration';
-	let currentMode: number = $state(typeOfMode.configuration);
+	let currentMode: number = $state(typeOfMode.main);
 	let testData = $state({
 		name: 'Test Name',
 		description: 'Test Description',
@@ -46,22 +44,9 @@
 	);
 
 	$effect(() => {
-		// console.log(
-		// 	'tags are ',
-		// 	$state.snapshot(testData.tags),
-		// 	' and states',
-		// 	$state.snapshot(testData.states)
-		// );
-
 		console.log('questions are -->', $state.snapshot(testData.question_revision_ids));
 	});
 </script>
-
-{#snippet myBadge(children: any)}
-	<Badge variant="default" style={'background-color:#3587B4'} class="m-1 rounded-sm  p-2"
-		>{children}</Badge
-	>
-{/snippet}
 
 {#if currentMode !== typeOfMode.main}
 	<div class="flex border-b-2 py-2">
@@ -143,7 +128,6 @@
 				title: 'Create Template',
 				link: '#',
 				click: () => {
-					console.log('Left button clicked');
 					currentMode = typeOfMode.primary;
 				}
 			}}

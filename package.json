@@ -56,5 +56,9 @@
 		"onlyBuiltDependencies": [
 			"esbuild"
 		]
+	},
+	"dependencies": {
+		"@tanstack/table-core": "^8.21.3",
+		"svelte-headless-table": "^0.18.3"
 	}
 }

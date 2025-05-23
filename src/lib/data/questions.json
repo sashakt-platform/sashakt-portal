@@ -1,0 +1,833 @@
+[
+	{
+		"id": 276,
+		"organization_id": 209,
+		"created_date": "2025-05-08T06:39:05.962386",
+		"modified_date": "2025-05-08T06:04:46.038645",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "क्लस्टर लेवल फेडरेशन में अध्यक्ष की अनुपस्थिति में आरजीबी बैठक का अध्यक्ष कौन होता है?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "ग्राम सरपंच"
+			},
+			{
+				"text": "बाहरी व्यक्ति"
+			},
+			{
+				"text": "सीएलएफ- RGB द्वारा चुना गया आज की बैठक का अध्यक्ष"
+			},
+			{
+				"text": "बीपीएम"
+			}
+		],
+		"correct_answer": [3],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 119,
+		"locations": [
+			{
+				"id": 705,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 706,
+				"state_id": 234,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Rajasthan",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 707,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 34,
+				"name": "Leadership, Visioning & Planning Exercise",
+				"description": "Tag for Leadership, Visioning & Planning Exercise",
+				"created_by_id": 119,
+				"id": 48,
+				"created_date": "2025-05-08T06:39:05.961912",
+				"modified_date": "2025-05-08T06:39:05.961919",
+				"is_active": null,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+
+	{
+		"id": 277,
+		"organization_id": 209,
+		"created_date": "2025-05-09T07:15:22.124586",
+		"modified_date": "2025-05-09T07:15:22.124586",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "स्वयं सहायता समूह की बैठक कितने दिनों के अंतराल पर होनी चाहिए?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "15 दिन"
+			},
+			{
+				"text": "30 दिन"
+			},
+			{
+				"text": "45 दिन"
+			},
+			{
+				"text": "60 दिन"
+			}
+		],
+		"correct_answer": [0],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 119,
+		"locations": [
+			{
+				"id": 708,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 709,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 35,
+				"name": "SHG Management",
+				"description": "Tag for SHG Management related questions",
+				"created_by_id": 119,
+				"id": 49,
+				"created_date": "2025-05-09T07:15:22.124012",
+				"modified_date": "2025-05-09T07:15:22.124019",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 278,
+		"organization_id": 209,
+		"created_date": "2025-05-10T09:30:45.762345",
+		"modified_date": "2025-05-10T09:30:45.762345",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "वीएलएफ (Village Level Federation) का पूरा नाम क्या है?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "विलेज लेवल फार्मर्स"
+			},
+			{
+				"text": "विलेज लेवल फेडरेशन"
+			},
+			{
+				"text": "विलेज लाइवलीहुड फाउंडेशन"
+			},
+			{
+				"text": "विलेज लेवल फंडिंग"
+			}
+		],
+		"correct_answer": [1],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 120,
+		"locations": [
+			{
+				"id": 710,
+				"state_id": 234,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Rajasthan",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 36,
+				"name": "Federation Knowledge",
+				"description": "Tag for Federation related knowledge",
+				"created_by_id": 120,
+				"id": 50,
+				"created_date": "2025-05-10T09:30:45.762100",
+				"modified_date": "2025-05-10T09:30:45.762108",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 279,
+		"organization_id": 209,
+		"created_date": "2025-05-11T14:22:18.452890",
+		"modified_date": "2025-05-11T14:22:18.452890",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "स्वयं सहायता समूह के नियमित बचत के लिए न्यूनतम राशि क्या है?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "₹10"
+			},
+			{
+				"text": "₹50"
+			},
+			{
+				"text": "₹100"
+			},
+			{
+				"text": "कोई निश्चित राशि नहीं है"
+			}
+		],
+		"correct_answer": [3],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": "स्वयं सहायता समूह अपने सदस्यों द्वारा निर्धारित राशि के अनुसार बचत करते हैं, कोई निश्चित राशि नहीं है।",
+		"media": null,
+		"created_by_id": 119,
+		"locations": [
+			{
+				"id": 711,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 712,
+				"state_id": 234,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Rajasthan",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 35,
+				"name": "SHG Management",
+				"description": "Tag for SHG Management related questions",
+				"created_by_id": 119,
+				"id": 49,
+				"created_date": "2025-05-11T14:22:18.452500",
+				"modified_date": "2025-05-11T14:22:18.452508",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 280,
+		"organization_id": 209,
+		"created_date": "2025-05-12T11:05:33.234567",
+		"modified_date": "2025-05-12T11:05:33.234567",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "लिवलीहुड विकास के लिए कौनसी योजना है?",
+		"instructions": "सही विकल्प चुनें",
+		"question_type": "multi-choice",
+		"options": [
+			{
+				"text": "आजीविका"
+			},
+			{
+				"text": "प्रधानमंत्री आवास योजना"
+			},
+			{
+				"text": "स्वच्छ भारत मिशन"
+			},
+			{
+				"text": "दीनदयाल अंत्योदय योजना"
+			}
+		],
+		"correct_answer": [0, 3],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 121,
+		"locations": [
+			{
+				"id": 713,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 37,
+				"name": "Government Schemes",
+				"description": "Tag for Government Schemes related questions",
+				"created_by_id": 121,
+				"id": 51,
+				"created_date": "2025-05-12T11:05:33.234000",
+				"modified_date": "2025-05-12T11:05:33.234010",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 281,
+		"organization_id": 209,
+		"created_date": "2025-05-13T16:45:27.891234",
+		"modified_date": "2025-05-13T16:45:27.891234",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "आंतरिक ऋण के लिए ब्याज दर कितनी होनी चाहिए?",
+		"instructions": null,
+		"question_type": "subjective",
+		"options": [],
+		"correct_answer": [],
+		"subjective_answer_limit": 200,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": "आंतरिक ऋण के लिए ब्याज दर SHG सदस्यों द्वारा सामूहिक रूप से तय की जाती है, लेकिन आमतौर पर 12% से 24% प्रति वर्ष के बीच होती है।",
+		"media": null,
+		"created_by_id": 119,
+		"locations": [
+			{
+				"id": 714,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 715,
+				"state_id": 234,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Rajasthan",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 716,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 38,
+				"name": "Financial Literacy",
+				"description": "Tag for Financial Literacy related questions",
+				"created_by_id": 119,
+				"id": 52,
+				"created_date": "2025-05-13T16:45:27.890900",
+				"modified_date": "2025-05-13T16:45:27.890910",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 282,
+		"organization_id": 209,
+		"created_date": "2025-05-14T10:12:55.456789",
+		"modified_date": "2025-05-14T10:12:55.456789",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "SHG की किताबें कौन रखता है?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "अध्यक्ष"
+			},
+			{
+				"text": "सचिव"
+			},
+			{
+				"text": "कोषाध्यक्ष"
+			},
+			{
+				"text": "बुक कीपर"
+			}
+		],
+		"correct_answer": [1],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 120,
+		"locations": [
+			{
+				"id": 717,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 35,
+				"name": "SHG Management",
+				"description": "Tag for SHG Management related questions",
+				"created_by_id": 120,
+				"id": 49,
+				"created_date": "2025-05-14T10:12:55.456400",
+				"modified_date": "2025-05-14T10:12:55.456410",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 283,
+		"organization_id": 209,
+		"created_date": "2025-05-15T13:25:41.123456",
+		"modified_date": "2025-05-15T13:25:41.123456",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "विलेज ऑर्गनाइजेशन (VO) में कितने SHG शामिल होते हैं?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "5-10 SHG"
+			},
+			{
+				"text": "10-20 SHG"
+			},
+			{
+				"text": "20-30 SHG"
+			},
+			{
+				"text": "30-40 SHG"
+			}
+		],
+		"correct_answer": [1],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 121,
+		"locations": [
+			{
+				"id": 718,
+				"state_id": 234,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Rajasthan",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 719,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 36,
+				"name": "Federation Knowledge",
+				"description": "Tag for Federation related knowledge",
+				"created_by_id": 121,
+				"id": 50,
+				"created_date": "2025-05-15T13:25:41.123000",
+				"modified_date": "2025-05-15T13:25:41.123010",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 284,
+		"organization_id": 209,
+		"created_date": "2025-05-16T09:18:32.987654",
+		"modified_date": "2025-05-16T09:18:32.987654",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "स्वयं सहायता समूह के बचत खाते को क्या कहते हैं?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "चालू खाता"
+			},
+			{
+				"text": "बचत खाता"
+			},
+			{
+				"text": "SHG खाता"
+			},
+			{
+				"text": "संयुक्त खाता"
+			}
+		],
+		"correct_answer": [2],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 119,
+		"locations": [
+			{
+				"id": 720,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 721,
+				"state_id": 234,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Rajasthan",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 38,
+				"name": "Financial Literacy",
+				"description": "Tag for Financial Literacy related questions",
+				"created_by_id": 119,
+				"id": 52,
+				"created_date": "2025-05-16T09:18:32.987200",
+				"modified_date": "2025-05-16T09:18:32.987210",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 285,
+		"organization_id": 209,
+		"created_date": "2025-05-17T15:42:19.654321",
+		"modified_date": "2025-05-17T15:42:19.654321",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "महिला किसानों के लिए महत्वपूर्ण फसल क्या है?",
+		"instructions": "एक से अधिक उत्तर सही हो सकते हैं",
+		"question_type": "multi-choice",
+		"options": [
+			{
+				"text": "गेहूं"
+			},
+			{
+				"text": "धान"
+			},
+			{
+				"text": "सब्जियां"
+			},
+			{
+				"text": "मसाले"
+			}
+		],
+		"correct_answer": [2, 3],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": "महिला किसानों के लिए सब्जियां और मसाले महत्वपूर्ण फसलें हैं क्योंकि इनमें कम जगह में अधिक उत्पादन और आय की संभावना होती है।",
+		"media": null,
+		"created_by_id": 120,
+		"locations": [
+			{
+				"id": 722,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 39,
+				"name": "Agriculture",
+				"description": "Tag for Agriculture related questions",
+				"created_by_id": 120,
+				"id": 53,
+				"created_date": "2025-05-17T15:42:19.654000",
+				"modified_date": "2025-05-17T15:42:19.654010",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 286,
+		"organization_id": 209,
+		"created_date": "2025-05-18T12:30:00.000000",
+		"modified_date": "2025-05-18T12:30:00.000000",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "ग्राम संगठन की कार्यकारिणी समिति का कार्यकाल कितना होता है?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "1 वर्ष"
+			},
+			{
+				"text": "2 वर्ष"
+			},
+			{
+				"text": "3 वर्ष"
+			},
+			{
+				"text": "5 वर्ष"
+			}
+		],
+		"correct_answer": [1],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": null,
+		"media": null,
+		"created_by_id": 121,
+		"locations": [
+			{
+				"id": 723,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 724,
+				"state_id": 234,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Rajasthan",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 725,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 36,
+				"name": "Federation Knowledge",
+				"description": "Tag for Federation related knowledge",
+				"created_by_id": 121,
+				"id": 50,
+				"created_date": "2025-05-18T12:30:00.000000",
+				"modified_date": "2025-05-18T12:30:00.000000",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			},
+			{
+				"tag_type_id": 34,
+				"name": "Leadership, Visioning & Planning Exercise",
+				"description": "Tag for Leadership, Visioning & Planning Exercise",
+				"created_by_id": 121,
+				"id": 48,
+				"created_date": "2025-05-18T12:30:00.000000",
+				"modified_date": "2025-05-18T12:30:00.000000",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	},
+	{
+		"id": 287,
+		"organization_id": 209,
+		"created_date": "2025-05-19T14:45:10.123456",
+		"modified_date": "2025-05-19T14:45:10.123456",
+		"is_active": true,
+		"is_deleted": false,
+		"question_text": "SHG समूह में न्यूनतम और अधिकतम कितने सदस्य हो सकते हैं?",
+		"instructions": null,
+		"question_type": "single-choice",
+		"options": [
+			{
+				"text": "5-10 सदस्य"
+			},
+			{
+				"text": "10-15 सदस्य"
+			},
+			{
+				"text": "10-20 सदस्य"
+			},
+			{
+				"text": "15-25 सदस्य"
+			}
+		],
+		"correct_answer": [2],
+		"subjective_answer_limit": null,
+		"is_mandatory": true,
+		"marking_scheme": {
+			"correct": 1,
+			"wrong": 0,
+			"skipped": 0
+		},
+		"solution": "आमतौर पर SHG में 10-20 सदस्य होते हैं, जो सामान्यतः एक ही सामाजिक-आर्थिक पृष्ठभूमि से आते हैं।",
+		"media": null,
+		"created_by_id": 120,
+		"locations": [
+			{
+				"id": 726,
+				"state_id": 218,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Haryana",
+				"district_name": null,
+				"block_name": null
+			},
+			{
+				"id": 727,
+				"state_id": 219,
+				"district_id": null,
+				"block_id": null,
+				"state_name": "Himachal Pradesh",
+				"district_name": null,
+				"block_name": null
+			}
+		],
+		"tags": [
+			{
+				"tag_type_id": 35,
+				"name": "SHG Management",
+				"description": "Tag for SHG Management related questions",
+				"created_by_id": 120,
+				"id": 49,
+				"created_date": "2025-05-19T14:45:10.123000",
+				"modified_date": "2025-05-19T14:45:10.123010",
+				"is_active": true,
+				"is_deleted": false,
+				"organization_id": 209
+			}
+		]
+	}
+]

@@ -113,62 +113,51 @@
 	}
 </script>
 
-{#if open}
-	<div class="text-muted-foreground flex-1 text-sm">
-		{table.getFilteredSelectedRowModel().rows.length} of{' '}
-		{table.getFilteredRowModel().rows.length} row(s) selected.
-	</div>
-{/if}
+<div class="text-muted-foreground flex-1 text-sm">
+	{table.getFilteredSelectedRowModel().rows.length} of{' '}
+	{table.getFilteredRowModel().rows.length} row(s) selected.
+</div>
+
 <div>
 	<Table.Root>
-		{#if open}
-			<Table.Header>
-				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-					<Table.Row class="my-auto flex rounded-lg bg-[#0369A1]  hover:bg-[#0369A1]">
-						{#each headerGroup.headers as header (header.id)}
-							<Table.Head class="flex-1 text-white ">
-								{#if !header.isPlaceholder}
-									<Table.Cell class="flex  w-fit ">
-										<FlexRender
-											content={header.column.columnDef.header}
-											context={header.getContext()}
-										/>
-									</Table.Cell>
-								{/if}
-							</Table.Head>
-						{/each}
-					</Table.Row>
-				{/each}
-			</Table.Header>
-		{/if}
-		<Table.Body class="grid">
-			{#each table.getRowModel().rows as row (row.id)}
-				{#if !open}
-					<span class="flex w-full items-center">
-						<GripVertical class="my-auto mr-2" />
-					</span>
-				{/if}
-					<Table.Row
-						class=" my-2 grid cursor-pointer grid-cols-8 rounded-lg border-1 "
-						data-state={row.getIsSelected() && 'selected'}
-					>
-						{#each row.getVisibleCells() as cell (cell.id)}
-							{#if (open == false && !cell.id.includes('select')) || open == true}
-								<Table.Cell
-									class={[
-										'text-left',
-										cell.id.includes('select') && 'col-span-1',
-										cell.id.includes('question') && 'col-span-3',
-										cell.id.includes('tags') && 'col-span-3',
-										cell.id.includes('answers') && 'col-span-1'
-									]}
-								>
-									<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+		<Table.Header>
+			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+				<Table.Row class="my-auto flex rounded-lg bg-[#0369A1]  hover:bg-[#0369A1]">
+					{#each headerGroup.headers as header (header.id)}
+						<Table.Head class="flex-1 text-white ">
+							{#if !header.isPlaceholder}
+								<Table.Cell class="flex  w-fit ">
+									<FlexRender
+										content={header.column.columnDef.header}
+										context={header.getContext()}
+									/>
 								</Table.Cell>
 							{/if}
-						{/each}
-					</Table.Row>
-				<!-- </div> -->
+						</Table.Head>
+					{/each}
+				</Table.Row>
+			{/each}
+		</Table.Header>
+		<Table.Body class="grid">
+			{#each table.getRowModel().rows as row (row.id)}
+				<Table.Row
+					class=" my-2 grid cursor-pointer grid-cols-8 rounded-lg border-1 "
+					data-state={row.getIsSelected() && 'selected'}
+				>
+					{#each row.getVisibleCells() as cell (cell.id)}
+						<Table.Cell
+							class={[
+								'text-left',
+								cell.id.includes('select') && 'col-span-1',
+								cell.id.includes('question') && 'col-span-3',
+								cell.id.includes('tags') && 'col-span-3',
+								cell.id.includes('answers') && 'col-span-1'
+							]}
+						>
+							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+						</Table.Cell>
+					{/each}
+				</Table.Row>
 			{:else}
 				<Table.Row>
 					<Table.Cell colspan={columns.length} class="h-24 text-center">No results.</Table.Cell>
@@ -176,45 +165,43 @@
 			{/each}
 		</Table.Body>
 	</Table.Root>
-	{#if open}
-		<div class="sticky bottom-0 mt-4 flex border-t-1 bg-white p-4 shadow-md">
-			<Button
-				class="bg-primary hover:bg-primary/90 my-auto rounded px-4 text-white"
-				onclick={() => {
-					questions.length = 0;
-					table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
-						questions.push(element.original?.id);
-					});
+	<div class="sticky bottom-0 mt-4 flex border-t-1 bg-white p-4 shadow-md">
+		<Button
+			class="bg-primary hover:bg-primary/90 my-auto rounded px-4 text-white"
+			onclick={() => {
+				questions.length = 0;
+				table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
+					questions.push(element.original?.id);
+				});
 
-					open = false;
-				}}
-			>
-				Add to Test Templates
-			</Button>
-			<div class="ml-auto flex items-center">
-				<!-- <p>Questions per page</p> -->
-				<p class="mx-4">
-					Page {table.getState().pagination.pageIndex + 1} out of {table.getPageCount()}
-				</p>
-			</div>
-			<div class="flex items-center justify-end space-x-2 py-4">
-				<Button
-					variant="outline"
-					size="sm"
-					onclick={() => table.previousPage()}
-					disabled={!table.getCanPreviousPage()}
-				>
-					<ChevronLeft />
-				</Button>
-				<Button
-					variant="outline"
-					size="sm"
-					onclick={() => table.nextPage()}
-					disabled={!table.getCanNextPage()}
-				>
-					<ChevronRight />
-				</Button>
-			</div>
+				open = false;
+			}}
+		>
+			Add to Test Templates
+		</Button>
+		<div class="ml-auto flex items-center">
+			<!-- <p>Questions per page</p> -->
+			<p class="mx-4">
+				Page {table.getState().pagination.pageIndex + 1} out of {table.getPageCount()}
+			</p>
 		</div>
-	{/if}
+		<div class="flex items-center justify-end space-x-2 py-4">
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => table.previousPage()}
+				disabled={!table.getCanPreviousPage()}
+			>
+				<ChevronLeft />
+			</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				onclick={() => table.nextPage()}
+				disabled={!table.getCanNextPage()}
+			>
+				<ChevronRight />
+			</Button>
+		</div>
+	</div>
 </div>

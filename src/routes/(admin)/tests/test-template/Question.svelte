@@ -2,7 +2,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import QuestionDialog from './QuestionDialog.svelte';
-	import DataTable from './question_table/data-table.svelte';
 	import { columns } from './question_table/columns.js';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -109,12 +108,6 @@
 							</div>
 						</div>
 					{/each}
-					<!--  <DataTable
-						data={data.filter((row) => questions.includes(row.id))}
-						{columns}
-						bind:questions
-						bind:open={dialogOpen}
-					/> -->
 				</div>
 			{/if}
 		</div>

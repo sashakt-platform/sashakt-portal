@@ -12,7 +12,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 </script>
 
-<div class="mx-auto flex h-dvh">
+<div class="mx-auto flex h-dvh overflow-auto">
 	<div class="mx-auto mt-10 flex w-1/2 flex-col">
 		{#snippet headingSubheading(heading: string, subheading: string)}
 			<p class="font-bold">{heading}</p>
@@ -66,7 +66,7 @@
 					{@render headingSubheading('Time limit', 'Set the maximum time allowed for the test')}
 				</div>
 				<div class=" flex w-3/5 flex-row gap-4">
-					<Input placeholder="Enter Time Limit in Minutes..." class="w-1/2" />
+					<Input placeholder="Enter in Minutes..." class="w-1/2" type="number" />
 				</div>
 			</div>
 		</ConfigureBox>

@@ -10,6 +10,8 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+
+	let { testData = $bindable() } = $props();
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
@@ -21,27 +23,35 @@
 			</p>
 		{/snippet}
 
-		{#snippet textWithArea(heading: string, subheading: string, lowerBorder: boolean = true)}
-			<div class={['flex flex-row py-8', lowerBorder && 'border-b-1']}>
+		<ConfigureBox title="Instructions" Icon={Info}>
+			<div class={['flex flex-row py-8', 'border-b-1']}>
 				<div class="w-2/5">
-					{@render headingSubheading(heading, subheading)}
+					{@render headingSubheading(
+						'Pre-test guidelines',
+						'Detailed instructions before attempting the test'
+					)}
 				</div>
-				<div class=" w-3/5">
-					<Textarea placeholder="Enter your instructions here..." />
+				<div class="w-3/5">
+					<Textarea
+						placeholder="Enter your instructions here..."
+						bind:value={testData.start_instructions}
+					/>
 				</div>
 			</div>
-		{/snippet}
-
-		<ConfigureBox title="Instructions" Icon={Info}>
-			{@render textWithArea(
-				'Pre-test guidelines',
-				'Detailed instructions before attempting the test'
-			)}
-			{@render textWithArea(
-				'Custom message (opt.)',
-				'Message content after the test completion',
-				false
-			)}
+			<div class={['flex flex-row py-8']}>
+				<div class="w-2/5">
+					{@render headingSubheading(
+						'Completion message',
+						'Message content after the test completion'
+					)}
+				</div>
+				<div class="w-3/5">
+					<Textarea
+						placeholder="Enter your instructions here..."
+						bind:value={testData.completion_message}
+					/>
+				</div>
+			</div>
 		</ConfigureBox>
 
 		<ConfigureBox title="Timer Settings" Icon={Timer}>
@@ -52,11 +62,11 @@
 				<div class=" flex w-3/5 flex-row gap-4">
 					<div class="flex w-1/2 flex-col gap-2">
 						<Label for="dateStart" class="my-auto font-extralight">Start Time</Label>
-						<Input type="datetime-local" id="dateStart" />
+						<Input type="datetime-local" id="dateStart" bind:value={testData.start_time} />
 					</div>
 					<div class="flex w-1/2 flex-col gap-2">
 						<Label for="dateEnd" class="my-auto font-extralight">End Time</Label>
-						<Input type="datetime-local" id="dateEnd" />
+						<Input type="datetime-local" id="dateEnd" bind:value={testData.end_time} />
 					</div>
 				</div>
 			</div>
@@ -66,7 +76,7 @@
 					{@render headingSubheading('Time limit', 'Set the maximum time allowed for the test')}
 				</div>
 				<div class=" flex w-3/5 flex-row gap-4">
-					<Input placeholder="Enter in Minutes..." class="w-1/2" type="number" />
+					<Input placeholder="Enter in Minutes..." class="w-1/2" type="number" bind:value={testData.time_limit} />
 				</div>
 			</div>
 		</ConfigureBox>

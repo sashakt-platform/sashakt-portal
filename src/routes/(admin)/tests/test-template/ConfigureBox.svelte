@@ -6,11 +6,11 @@
 	let visibility: boolean = $state(false);
 </script>
 
-<div class="py-1">
+<div class=" py-1">
 	<button
 		type="button"
 		class={[
-			'hover: hover:bg-secondary mt-2 flex w-full cursor-pointer flex-row px-4 py-5 shadow',
+			'hover: hover:bg-secondary mt-2 flex w-full cursor-pointer flex-row border px-4 py-5 shadow',
 			visibility ? 'bg-secondary rounded-t-2xl' : 'rounded-2xl bg-white'
 		]}
 		onclick={() => (visibility = !visibility)}
@@ -24,7 +24,11 @@
 		</span>
 	</button>
 	<div
-		class={[!visibility && 'hidden', 'flex flex-col gap-6 rounded-b-2xl bg-white p-8 pr-8 pl-12']}
+		class={[
+			!visibility && 'hidden',
+			'flex flex-col gap-6 rounded-b-2xl bg-white p-8 pr-8 pl-12',
+			'border'
+		]}
 	>
 		{@render children()}
 	</div>

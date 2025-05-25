@@ -10,7 +10,6 @@
 
 	import Primary from './Primary.svelte';
 	import Question from './Question.svelte';
-	import Settings from './Configuration.svelte';
 	import Configuration from './Configuration.svelte';
 
 	const typeOfMode = { main: 0, primary: 1, questions: 2, configuration: 3 };
@@ -44,7 +43,11 @@
 	);
 
 	$effect(() => {
-		console.log('questions are -->', $state.snapshot(testData.question_revision_ids));
+		console.log('start_instructions are -->', $state.snapshot(testData.start_instructions));
+		console.log('completion_message are -->', $state.snapshot(testData.completion_message));
+		console.log('start time are -->', $state.snapshot(testData.start_time));
+		console.log('end time are -->', $state.snapshot(testData.end_time));
+		console.log('end time are -->', $state.snapshot(testData.time_limit));
 	});
 </script>
 
@@ -139,7 +142,7 @@
 {:else if currentMode === typeOfMode.questions}
 	<Question bind:questions={testData.question_revision_ids} />
 {:else if currentMode === typeOfMode.configuration}
-	<Configuration />
+	<Configuration bind:testData />
 {/if}
 
 {#if currentMode != typeOfMode.main}

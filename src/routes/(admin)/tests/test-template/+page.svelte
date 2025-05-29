@@ -12,12 +12,16 @@
 	import Question from './Question.svelte';
 	import Configuration from './Configuration.svelte';
 
+	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { testTemplateSchema, type FormSchema } from './schema';
+
 	const typeOfMode = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
 	let currentMode: number = $state(typeOfMode.main);
 	let testData = $state({
-		name: 'Test Name',
-		description: 'Test Description',
+		name: '',
+		description: '',
 		start_time: '',
 		end_time: '',
 		time_limit: 1,
@@ -42,13 +46,13 @@
 		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
 
-	$effect(() => {
-		console.log('start_instructions are -->', $state.snapshot(testData.start_instructions));
-		console.log('completion_message are -->', $state.snapshot(testData.completion_message));
-		console.log('start time are -->', $state.snapshot(testData.start_time));
-		console.log('end time are -->', $state.snapshot(testData.end_time));
-		console.log('end time are -->', $state.snapshot(testData.time_limit));
+	let { data }: { testData: any; data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
+
+	const form = superForm(data.form, {
+		validators: zodClient(testTemplateSchema)
 	});
+
+	const { form: formData, enhance } = form;
 </script>
 
 {#if currentMode !== typeOfMode.main}
@@ -138,9 +142,9 @@
 		/>
 	</div>
 {:else if currentMode === typeOfMode.primary}
-	<Primary bind:testData />
+	<Primary {formData} />
 {:else if currentMode === typeOfMode.questions}
-	<Question bind:questions={testData.question_revision_ids} />
+	<Question {formData} />
 {:else if currentMode === typeOfMode.configuration}
 	<Configuration bind:testData />
 {/if}
@@ -156,7 +160,7 @@
 		<Button
 			class="bg-primary"
 			disabled={currentMode == typeOfMode.primary &&
-				(testData.name.trim() == '' || testData.description.trim() == '')}
+				($formData.name.trim() == '' || $formData.description.trim() == '')}
 			onclick={() => {
 				currentMode < typeOfMode.configuration && currentMode++;
 			}}>{currentMode != typeOfMode.configuration ? 'Continue' : 'Save test template'}</Button

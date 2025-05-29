@@ -8,7 +8,7 @@
 	import Eye from '@lucide/svelte/icons/eye';
 	import Questions from '$lib/data/questions.json';
 	let dialogOpen = $state(false);
-	let { questions = $bindable() } = $props();
+	let { formData } = $props();
 	const data = Questions.map((question) => {
 		return {
 			id: question.id,
@@ -20,7 +20,7 @@
 	});
 </script>
 
-<QuestionDialog bind:open={dialogOpen} bind:questions {data} {columns} />
+<QuestionDialog bind:open={dialogOpen} {data} {columns} {formData} />
 
 <div class="mx-auto flex h-dvh">
 	<div class=" mx-auto w-3/4 p-20">
@@ -65,11 +65,12 @@
 					<div class="flex flex-row items-center text-sm">
 						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold">Test Template</span>
 						<span class="text-gray-500"
-							>{questions.length} {questions.length == 1 ? 'question' : 'questions'} (0pts)</span
+							>{$formData.question_revision_ids.length}
+							{$formData.question_revision_ids.length == 1 ? 'question' : 'questions'} (0pts)</span
 						>
 					</div>
 				</div>
-				{#if questions.length != 0}
+				{#if $formData.question_revision_ids.length != 0}
 					<div class="my-auto ml-auto flex">
 						<Button onclick={() => (dialogOpen = true)}>Select More Questions</Button>
 					</div>
@@ -79,7 +80,7 @@
 		<div
 			class="my-auto flex h-full justify-center rounded-t-sm rounded-b-xl border bg-white p-4 shadow-lg"
 		>
-			{#if questions.length == 0}
+			{#if $formData.question_revision_ids.length == 0}
 				<div class="my-auto text-center">
 					<p class="text-lg font-bold">Shortlist your Questions</p>
 					<p class="text-sm text-gray-400">Add the relevant questions to your test template</p>
@@ -89,7 +90,7 @@
 				</div>
 			{:else}
 				<div class="flex h-full w-full flex-col overflow-auto">
-					{#each data.filter((row) => questions.includes(row.id)) as d (d.id)}
+					{#each data.filter((row) => $formData.question_revision_ids.includes(row.id)) as d (d.id)}
 						<div class="m-4 flex cursor-pointer flex-row">
 							<div class="my-auto">
 								<GripVertical />

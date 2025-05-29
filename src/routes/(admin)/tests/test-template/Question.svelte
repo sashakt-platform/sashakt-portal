@@ -59,7 +59,7 @@
 			<div class="flex h-full w-full flex-row">
 				<div class="flex w-fit flex-col">
 					<div class="flex">
-						<p class="font-bold">Sashakt Sample Test</p>
+						<p class="font-bold">{$formData.name}</p>
 						<PenLine class="p-1" />
 					</div>
 					<div class="flex flex-row items-center text-sm">

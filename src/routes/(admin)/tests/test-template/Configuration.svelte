@@ -11,7 +11,7 @@
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 
-	let { testData = $bindable() } = $props();
+	let { formData } = $props();
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
@@ -34,7 +34,7 @@
 				<div class="w-3/5">
 					<Textarea
 						placeholder="Enter your instructions here..."
-						bind:value={testData.start_instructions}
+						bind:value={$formData.start_instructions}
 					/>
 				</div>
 			</div>
@@ -48,7 +48,7 @@
 				<div class="w-3/5">
 					<Textarea
 						placeholder="Enter your instructions here..."
-						bind:value={testData.completion_message}
+						bind:value={$formData.completion_message}
 					/>
 				</div>
 			</div>
@@ -62,11 +62,11 @@
 				<div class=" flex w-3/5 flex-row gap-4">
 					<div class="flex w-1/2 flex-col gap-2">
 						<Label for="dateStart" class="my-auto font-extralight">Start Time</Label>
-						<Input type="datetime-local" id="dateStart" bind:value={testData.start_time} />
+						<Input type="datetime-local" id="dateStart" bind:value={$formData.start_time} />
 					</div>
 					<div class="flex w-1/2 flex-col gap-2">
 						<Label for="dateEnd" class="my-auto font-extralight">End Time</Label>
-						<Input type="datetime-local" id="dateEnd" bind:value={testData.end_time} />
+						<Input type="datetime-local" id="dateEnd" bind:value={$formData.end_time} />
 					</div>
 				</div>
 			</div>
@@ -76,7 +76,12 @@
 					{@render headingSubheading('Time limit', 'Set the maximum time allowed for the test')}
 				</div>
 				<div class=" flex w-3/5 flex-row gap-4">
-					<Input placeholder="Enter in Minutes..." class="w-1/2" type="number" bind:value={testData.time_limit} />
+					<Input
+						placeholder="Enter in Minutes..."
+						class="w-1/2"
+						type="number"
+						bind:value={$formData.time_limit}
+					/>
 				</div>
 			</div>
 		</ConfigureBox>

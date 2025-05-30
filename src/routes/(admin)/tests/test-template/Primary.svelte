@@ -40,6 +40,7 @@
 				</div>
 				<Textarea
 					placeholder="Enter the test description here..."
+					name="description"
 					bind:value={$formData.description}
 				/>
 			</div>

@@ -8,27 +8,27 @@ export const loginSchema = z.object({
 });
 */
 export const testTemplateSchema = z.object({
-	name: z.string().min(3).max(100),
-	description: z.string().min(10).max(500),
-	start_time: z.string().min(10).max(100),
-	end_time: z.string().min(10).max(100),
-	time_limit: z.number().min(1).optional(),
+	name: z.string(),
+	description: z.string(),
+	start_time: z.string().optional(),
+	end_time: z.string().optional(),
+	time_limit: z.number().optional(),
 	marks_level: z.enum(['question', 'test']).optional(),
-	marks: z.number().min(0).optional(),
-	completion_message: z.string().min(10).max(500).optional(),
-	start_instructions: z.string().min(10).max(500).optional(),
+	marks: z.number().optional(),
+	completion_message: z.string().optional(),
+	start_instructions: z.string().optional(),
 	link: z.string().url().optional(),
-	no_of_attempts: z.number().min(1).optional(),
+	no_of_attempts: z.number().optional(),
 	shuffle: z.boolean().optional(),
 	random_questions: z.boolean().optional(),
-	no_of_random_questions: z.number().min(1).optional(),
-	question_pagination: z.number().min(1).optional(),
+	no_of_random_questions: z.number().optional(),
+	question_pagination: z.number().optional(),
 	is_template: z.boolean().optional(),
-	template_id: z.number().min(1).optional(),
-	created_by_id: z.number().min(1).optional(),
-	tags: z.array(z.string()).default([]),
-	question_revision_ids: z.array(z.number()).default([]),
-	states: z.array(z.string()).default([])
+	template_id: z.number().optional(),
+	created_by_id: z.number(),
+	tags: z.array(z.string()).default([]).optional(),
+	question_revision_ids: z.array(z.number()).default([]).optional(),
+	states: z.array(z.string()).default([]).optional()
 });
 
 export type FormSchema = typeof testTemplateSchema;

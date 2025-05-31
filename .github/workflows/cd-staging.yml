@@ -84,14 +84,14 @@ jobs:
 
       - name: Deploy to S3
         run: |
-          aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET_NAME }} \
+          aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET_NAME }}/portal/ \
             --delete \
             --exact-timestamps \
             --cache-control "public,max-age=31536000,immutable" \
             --exclude "*.html" \
             --exclude "service-worker.js"
             
-          aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET_NAME }} \
+          aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET_NAME }}/portal/ \
             --delete \
             --exact-timestamps \
             --cache-control "public,max-age=0,must-revalidate" \

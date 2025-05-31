@@ -5,8 +5,12 @@
 
 	const tagList = page.data.tags;
 	let { tags = $bindable() } = $props();
+
+	$effect(() => {
+		console.log('tags changed:', tags);
+	});
 	const selectedTags = $derived(
-		tags.length
+		tags?.length
 			? tagList.filter((tag) => tags.includes(String(tag.id))).map((tag) => tag.name)
 			: 'Select relevant tags'
 	);
@@ -20,7 +24,7 @@
 
 <Select.Root type="multiple" bind:value={tags} name="tags">
 	<Select.Trigger>
-		{#if tags.length === 0}
+		{#if tags?.length === 0}
 			{selectedTags}
 		{:else}
 			<span class="truncate text-start">

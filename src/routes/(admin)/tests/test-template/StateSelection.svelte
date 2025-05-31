@@ -7,7 +7,7 @@
 	const stateList = page.data.states;
 
 	const selectedStates = $derived(
-		states.length
+		states?.length
 			? stateList
 					.filter((state: { id: any }) => states.includes(String(state.id)))
 					.map((state: { name: any }) => state.name)
@@ -23,7 +23,7 @@
 
 <Select.Root type="multiple" bind:value={states} name="states">
 	<Select.Trigger>
-		{#if states.length === 0}
+		{#if states?.length === 0}
 			{selectedStates}
 		{:else}
 			<span class="truncate text-start">

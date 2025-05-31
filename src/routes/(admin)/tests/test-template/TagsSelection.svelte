@@ -1,12 +1,13 @@
 <script lang="ts">
-	import TagList from '$lib/data/tags.json';
-
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { page } from '$app/state';
+
+	const tagList = page.data.tags;
 	let { tags = $bindable() } = $props();
 	const selectedTags = $derived(
 		tags.length
-			? TagList.filter((tag) => tags.includes(String(tag.id))).map((tag) => tag.name)
+			? tagList.filter((tag) => tags.includes(String(tag.id))).map((tag) => tag.name)
 			: 'Select relevant tags'
 	);
 </script>
@@ -17,7 +18,7 @@
 	>
 {/snippet}
 
-<Select.Root type="multiple" bind:value={tags}>
+<Select.Root type="multiple" bind:value={tags} name="tags">
 	<Select.Trigger>
 		{#if tags.length === 0}
 			{selectedTags}
@@ -32,7 +33,7 @@
 	<Select.Content>
 		<Select.Group>
 			<Select.GroupHeading>Select Relavant Tags</Select.GroupHeading>
-			{#each TagList as tag}
+			{#each tagList as tag}
 				<Select.Item value={String(tag.id)} label={tag.name} />
 			{/each}
 		</Select.Group>

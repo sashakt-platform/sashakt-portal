@@ -46,7 +46,7 @@
 			</div>
 
 			<div class="flex">
-				<div class="mt-10 mr-24 w-1/2">
+				<div class="mt-10 mr-6 w-1/2">
 					<div class="flex align-middle">
 						<Label for="template-name" class="text-2xl">Tags</Label><span
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span

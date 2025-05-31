@@ -17,7 +17,10 @@ const config = {
 			fallback: 'index.html',
 			precompress: false,
 			strict: true
-		})
+		}),
+		paths: {
+			base: '/portal' // base path to match the S3 folder
+		}
 	}
 };
 

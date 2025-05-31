@@ -9,8 +9,25 @@ import { getSessionTokenCookie } from '$lib/server/auth';
 // const token = getSessionTokenCookie();
 
 export const load: PageServerLoad = async () => {
+
+    const token = getSessionTokenCookie();
+	const res = await fetch(`${BACKEND_URL}/api/v1/test`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!res.ok) {
+		console.error('Failed to fetch tests:', res.status, res.statusText);
+		return { tests: null };
+	}
+
+	const tests = await res.json();
+
     return {
-        form: await superValidate(zod(testTemplateSchema))
+        form: await superValidate(zod(testTemplateSchema)),
+        tests: tests
     };
 };
 
@@ -27,6 +44,7 @@ export const actions: Actions = {
             return fail(400, { form });
         }
 
+        console.log('Form data:', JSON.stringify(form.data));
         const response= await fetch(`${BACKEND_URL}/api/v1/test`, {
             method: 'POST',
             headers: {

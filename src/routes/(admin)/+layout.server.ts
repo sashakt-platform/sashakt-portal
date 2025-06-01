@@ -46,10 +46,26 @@ export const load: PageServerLoad = async () => {
 
 	const tags = await responseTags.json();
 
+	const responseQuestions = await fetch(`${BACKEND_URL}/api/v1/questions/?skip=0&limit=100&organization_id=${locals.user.organization_id}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!responseQuestions.ok) {
+		return { states: null };
+	}
+
+	const questions = await responseQuestions.json();
+
+
+
 	return {
 		// tests: tests,
 		user: locals.user,
 		states: states,
-		tags: tags
+		tags: tags,
+		questions: questions
 	};
 };

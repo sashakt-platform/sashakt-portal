@@ -18,16 +18,16 @@ export const testTemplateSchema = z.object({
 	completion_message: z.string().optional(),
 	start_instructions: z.string().optional(),
 	link: z.string().url().optional(),
-	no_of_attempts: z.number().optional(),
-	shuffle: z.boolean().optional(),
-	random_questions: z.boolean().optional(),
+	no_of_attempts: z.number().optional().default(1),
+	shuffle: z.boolean().optional().default(false),
+	random_questions: z.boolean().optional().default(false),
 	no_of_random_questions: z.number().optional(),
-	question_pagination: z.number().optional(),
-	is_template: z.boolean().optional(),
+	question_pagination: z.number().optional().default(1),
+	is_template: z.boolean().optional().default(false),
 	template_id: z.number().optional(),
 	created_by_id: z.number(),
 	tag_ids: z.array(z.string()).default([]),
-	question_revision_ids: z.array(z.string()).default([]),
+	question_revision_ids: z.array(z.number()).default([]),
 	state_ids: z.array(z.string()).default([])
 });
 

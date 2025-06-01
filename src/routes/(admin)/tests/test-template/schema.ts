@@ -26,9 +26,9 @@ export const testTemplateSchema = z.object({
 	is_template: z.boolean().optional(),
 	template_id: z.number().optional(),
 	created_by_id: z.number(),
-	tags: z.array(z.string()).default([]).optional(),
-	question_revision_ids: z.array(z.number()).default([]).optional(),
-	states: z.array(z.string()).default([]).optional()
+	tag_ids: z.array(z.string()).default([]),
+	question_revision_ids: z.array(z.string()).default([]),
+	state_ids: z.array(z.string()).default([])
 });
 
 export type FormSchema = typeof testTemplateSchema;

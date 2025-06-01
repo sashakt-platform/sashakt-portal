@@ -52,7 +52,7 @@
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					<TagsSelection bind:tags={$formData.tags} />
+					<TagsSelection bind:tags={$formData.tag_ids} />
 				</div>
 
 				<div class="mt-10 w-1/2">
@@ -61,7 +61,7 @@
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					<StateSelection bind:states={$formData.states} />
+					<StateSelection bind:states={$formData.state_ids} />
 				</div>
 			</div>
 		</div>

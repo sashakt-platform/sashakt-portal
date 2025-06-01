@@ -180,7 +180,13 @@
 									<Table.Row class=" my-4 table-row gap-10 space-y-7 bg-white ">
 										<Table.Cell class="w-1/12 ">{index + 1}</Table.Cell>
 										<Table.Cell class="w-5/12">{test.name}</Table.Cell>
-										<Table.Cell class="w-3/12">{test.tags.join(', ') || 'None'}</Table.Cell>
+										<Table.Cell class="w-3/12">
+											{#if test.tags && test.tags.length > 0}
+												{test.tags.map((tag: { name: string }) => tag.name).join(', ')}
+											{:else}
+												None
+											{/if}
+										</Table.Cell>
 										<Table.Cell class="w-2/12">
 											{#if test.modified_date}
 												{new Date(test.modified_date).toLocaleDateString('en-US', {
@@ -232,7 +238,7 @@
 			{/if}
 		</div>
 	{:else if currentMode === typeOfMode.primary}
-		<Primary {formData} {data} />
+		<Primary {formData} />
 	{:else if currentMode === typeOfMode.questions}
 		<Question {formData} />
 	{:else if currentMode === typeOfMode.configuration}

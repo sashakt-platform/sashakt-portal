@@ -41,13 +41,17 @@
 
 	const form = superForm(data.form, {
 		validators: zodClient(testTemplateSchema),
-		onSubmit: (formData) => {
-			formData.formData.set('created_by_id', data.user.id); // Example of setting a field
-			// You can handle the form submission here, e.g., send it to an API
+		dataType: 'json',
+		onSubmit: () => {
+			$formData.created_by_id = data.user.id;
+		},
+		onError: ({ result }) => {
+			console.error('error->', result);
+			// Handle form submission error
 		}
 	});
 
-	const { form: formData, enhance, submit } = form;
+	const { form: formData, enhance, submit, isTainted } = form;
 </script>
 
 <form method="POST" use:enhance>

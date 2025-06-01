@@ -90,7 +90,6 @@
 				return columnVisibility;
 			},
 			get rowSelection() {
-				// console.log('rowSelectionn function is -->', $state.snapshot(rowSelection));
 				return rowSelection;
 			}
 		}

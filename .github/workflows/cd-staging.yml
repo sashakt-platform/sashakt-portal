@@ -5,15 +5,12 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     environment: staging
-    outputs:
-      build-exists: ${{ steps.build-check.outputs.build-exists }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -21,72 +18,33 @@ jobs:
           node-version: '22'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 10
-          run_install: false
-
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Set env file
-        run: echo "BACKEND_URL=${{ vars.BACKEND_URL }}" > .env
-      
-      - name: Build SvelteKit app
+      - name: Build application
         run: pnpm run build
 
-      - name: Check build output
-        id: build-check
-        run: |
-          if [ -d "./build" ]; then
-            echo "build-exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "build-exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        if: steps.build-check.outputs.build-exists == 'true'
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.2
         with:
-          name: sveltekit-build
-          path: ./build
-          retention-days: 1
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: staging
-    if: needs.build.outputs.build-exists == 'true'
+            cd /home/ubuntu/sashakt-portal
 
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: sveltekit-build
-          path: ./build
+            git pull origin main
+            pnpm install --production
+            pnpm run build
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Deploy to S3
-        run: |
-          aws s3 sync ./build s3://${{ secrets.AWS_S3_BUCKET_NAME }}/portal/ \
-            --delete \
-            --exact-timestamps
+            if [ -f "build/index.js" ]; then
+              pm2 restart sashakt-portal --update-env || pm2 start build/index.js --name sashakt-portal
+            else
+              echo "Build output not found: build/index.js"
+              exit 1
+            fi

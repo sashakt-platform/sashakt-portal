@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { testTemplateSchema } from './schema';
+import { testTemplateSchema,individualTestSchema } from './schema';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
@@ -35,7 +35,7 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 
   
-    default: async ({ request, cookies }) => {
+    default: async ({ request }) => {
 
 
         const token = getSessionTokenCookie();
@@ -68,5 +68,37 @@ export const actions: Actions = {
                     return fail(500, { form });
                 }
             });
-    }
+    },
+
+    // deleteAction: async ({ request }) => {
+    //     const token = getSessionTokenCookie();
+
+    //     const form = await superValidate(request, zod(individualTestSchema));
+    //     if (!form.valid) {
+    //         return fail(400, { form });
+    //     }
+
+    //     const response= await fetch(`${BACKEND_URL}/api/v1/test/${form.data.id}`, {
+    //         method: 'DELETE',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             Authorization: `Bearer ${token}`
+    //         }
+    //     });
+
+    //     if (!response.ok) {
+    //         return fail(500, { response });
+    //     }
+
+    //     return response
+    //         .json()
+    //         .then((data) => {
+    //             if (response.ok) {
+    //                 return redirect(303, '/tests/test-template');
+
+    //             } else {
+    //                 return fail(500, { response });
+    //             }
+    //         });
+    // }
 }

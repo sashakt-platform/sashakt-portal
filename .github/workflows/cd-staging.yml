@@ -10,17 +10,7 @@ jobs:
     environment: staging
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
+      - uses: actions/checkout@v3
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
@@ -32,12 +22,33 @@ jobs:
 
             cd /home/ubuntu/sashakt-portal
 
+            echo "Ensuring pnpm is installed..."
+            if ! command -v pnpm &> /dev/null; then
+              npm install -g pnpm
+            fi
+
+            echo "Ensuring pm2 is installed..."
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+
+            echo "Setting up environment variables..."
+            if [ -z "${{ vars.BACKEND_URL }}" ]; then
+              echo "Error: BACKEND_URL is not defined."
+              exit 1
+            fi
             echo "BACKEND_URL=${{ vars.BACKEND_URL }}" > .env
 
-            git pull origin main
+            echo "Pulling latest changes from main branch..."
+            git pull origin main || { echo "git pull failed"; exit 1; }
+
+            echo "Installing dependencies..."
             pnpm install --production
+
+            echo "Building the project..."
             pnpm run build
 
+            echo "Restarting or starting the application with pm2..."
             if [ -f "build/index.js" ]; then
               pm2 restart sashakt-portal --update-env || pm2 start build/index.js --name sashakt-portal
             else

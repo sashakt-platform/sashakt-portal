@@ -22,12 +22,6 @@ jobs:
         with:
           version: 10
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build application
-        run: pnpm run build
-
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -37,6 +31,8 @@ jobs:
           script: |
 
             cd /home/ubuntu/sashakt-portal
+
+            echo "BACKEND_URL=${{ vars.BACKEND_URL }}" > .env
 
             git pull origin main
             pnpm install --production

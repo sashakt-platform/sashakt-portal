@@ -66,7 +66,9 @@
 						<PenLine class="p-1" />
 					</div>
 					<div class="flex flex-row items-center text-sm">
-						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold">Test Template</span>
+						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold"
+							>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
+						>
 						<span class="text-gray-500"
 							>{$formData.question_revision_ids.length}
 							{$formData.question_revision_ids.length == 1 ? 'question' : 'questions'} (0pts)</span
@@ -86,7 +88,9 @@
 			{#if $formData.question_revision_ids.length == 0}
 				<div class="my-auto text-center">
 					<p class="text-lg font-bold">Shortlist your Questions</p>
-					<p class="text-sm text-gray-400">Add the relevant questions to your test template</p>
+					<p class="text-sm text-gray-400">
+						Add the relevant questions to your test {$formData.is_template ? 'template' : ''}
+					</p>
 					<Button class="mt-6 bg-[#0369A1]" onclick={() => (dialogOpen = true)}
 						>Select from question bank</Button
 					>

@@ -14,7 +14,7 @@
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { testTemplateSchema, type FormSchema } from './schema';
+	import { testSchema, type FormSchema } from './schema';
 	import Plus from '@lucide/svelte/icons/plus';
 	import TagsSelection from './TagsSelection.svelte';
 	import StateSelection from './StateSelection.svelte';
@@ -36,15 +36,19 @@
 		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
 
-	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
+	let { data }: { data: { form: SuperValidated<Infer<FormSchema>>; user: any } } = $props();
 
 	$effect(() => {
-		console.log('Form Data->', $inspect($formData.shuffle));
-		console.log('Data is -->', $inspect(data));
+		console.log('data->', data);
 	});
 
-	const form = superForm(data.form, {
-		validators: zodClient(testTemplateSchema),
+	const {
+		form: formData,
+		enhance,
+		submit,
+		isTainted
+	} = superForm(data.form, {
+		validators: zodClient(testSchema),
 		dataType: 'json',
 		onSubmit: () => {
 			$formData.created_by_id = data.user.id;
@@ -54,8 +58,6 @@
 			// Handle form submission error
 		}
 	});
-
-	const { form: formData, enhance, submit, isTainted } = form;
 </script>
 
 <form method="POST" use:enhance>
@@ -66,7 +68,9 @@
 					variant="link"
 					class=" text-gray-500"
 					onclick={() => (currentMode = typeOfMode.main)}
-					><CircleChevronLeft />Back to test templates</Button
+					><CircleChevronLeft />Back to test {$formData.is_template
+						? 'templates'
+						: 'sessions'}</Button
 				>
 			</div>
 			<div class="mx-auto flex">
@@ -128,19 +132,23 @@
 							<h2
 								class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
 							>
-								Test templates
+								{$formData.is_template ? 'Test templates' : 'Test sessions'}
 							</h2>
 							<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 						</div>
 					</div>
 					<Label class="my-auto align-middle text-sm font-extralight"
-						>Create, edit and update all the tests</Label
+						>{$formData.is_template
+							? 'Create, edit and update all the test templates'
+							: 'Create, edit,conduct and update all the test session'}</Label
 					>
 				</div>
 				<div class="my-auto ml-auto p-4">
 					{#if data.tests.length > 0}
 						<Button class="font-bold" onclick={() => (currentMode = typeOfMode.primary)}
-							><Plus />Create a test template</Button
+							><Plus />{$formData.is_template
+								? 'Create a test template'
+								: 'Create a test session'}</Button
 						>
 					{/if}
 				</div>
@@ -148,16 +156,29 @@
 
 			{#if data.tests.length < 1}
 				<EmptyBox
-					title="Create your first test template"
-					subtitle="Click on create a test template to create test templates to be assigned"
+					title={$formData.is_template
+						? 'Create your first test template'
+						: 'Create your first test session'}
+					subtitle={$formData.is_template
+						? 'Click on create a test template to create test templates to be assigned'
+						: 'Click on create a test to create tests to be conducted'}
 					leftButton={{
-						title: 'Create Template',
+						title: `${$formData.is_template ? 'Create Test Template' : 'Create Custom Test'}`,
 						link: '#',
 						click: () => {
 							currentMode = typeOfMode.primary;
 						}
 					}}
-					rightButton={null}
+					rightButton={!$formData.is_template
+						? {
+								title: `Create from test Template`,
+								link: '/tests/test-templates',
+								click: () => {
+									$formData.is_template = true;
+									currentMode = typeOfMode.primary;
+								}
+							}
+						: null}
 				/>
 			{:else}
 				<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
@@ -169,7 +190,12 @@
 							<StateSelection />
 						</div>
 						<div class="ml-auto w-1/5">
-							<Input type="search" placeholder="Search test templates..." />
+							<Input
+								type="search"
+								placeholder={$formData.is_template
+									? 'Search test templates...'
+									: 'Search test sessions...'}
+							/>
 						</div>
 					</div>
 					<div>
@@ -177,7 +203,9 @@
 							<Table.Header>
 								<Table.Row class="bg-primary-foreground font-bold text-black">
 									<Table.Head class="w-1/12 ">No.</Table.Head>
-									<Table.Head class="w-5/12 ">Test Template</Table.Head>
+									<Table.Head class="w-5/12 "
+										>Test {$formData.is_template ? 'Template' : 'Name'}</Table.Head
+									>
 									<Table.Head class="w-3/12">Tags</Table.Head>
 									<Table.Head class="w-2/12">Updated</Table.Head>
 									<Table.Head class="w-1/12"></Table.Head>
@@ -271,7 +299,9 @@
 						: currentMode++;
 					// Submit the form data
 				}}
-				>{currentMode != typeOfMode.configuration ? 'Continue' : 'Save test template'}
+				>{currentMode != typeOfMode.configuration
+					? 'Continue'
+					: `${$formData.is_template ? 'Save test template' : 'Create Test'}`}
 			</Button>
 		</div>
 	{/if}

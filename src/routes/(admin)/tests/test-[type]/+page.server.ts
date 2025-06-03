@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { testTemplateSchema,individualTestSchema } from './schema.js';
+import { testSchema,individualTestSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
@@ -10,8 +10,11 @@ import { getSessionTokenCookie } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({params}) => {
 
+
+    const is_template = params.type === 'template';
+
     const token = getSessionTokenCookie();
-	const res = await fetch(`${BACKEND_URL}/api/v1/test`, {
+	const res = await fetch(`${BACKEND_URL}/api/v1/test/?is_template=${is_template}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -23,12 +26,18 @@ export const load: PageServerLoad = async ({params}) => {
 		return { tests: null };
 	}
 
-	const tests = await res.json();
+    const tests = await res.json();
+
+
+    // Create a form with the default values
+    const form = await superValidate(zod(testSchema));
+    
+    // Update is_template property based on params.type
+    form.data.is_template = is_template;
 
     return {
-        form: await superValidate(zod(testTemplateSchema)),
+        form,
         tests: tests,
-        type:params.type
     };
 };
 
@@ -36,16 +45,14 @@ export const load: PageServerLoad = async ({params}) => {
 export const actions: Actions = {
 
   
-    default: async ({ request }) => {
-
+    default: async ({ request, params }) => {
 
         const token = getSessionTokenCookie();
-        const form = await superValidate(request, zod(testTemplateSchema));
+        const form = await superValidate(request, zod(testSchema));
         if (!form.valid) {
             return fail(400, { form });
         }
 
-        console.log('Form data:', JSON.stringify(form.data));
         const response= await fetch(`${BACKEND_URL}/api/v1/test`, {
             method: 'POST',
             headers: {
@@ -63,7 +70,7 @@ export const actions: Actions = {
             .json()
             .then((data) => {
                 if (response.ok) {
-                    return redirect(303, '/tests/test-template');
+                    return redirect(303, `/tests/test-${params.type}`);
                     
                 } else {
                     return fail(500, { form });

@@ -15,9 +15,9 @@
 		<div class="h-full w-full text-left">
 			<div>
 				<div class="flex align-middle">
-					<Label for="template-name" class="text-2xl">Test template name</Label><span
-						><Info class=" m-2  w-4 text-xs text-gray-600" /></span
-					>
+					<Label for="template-name" class="text-2xl"
+						>{$formData.is_template ? 'Test template name' : 'Test name'}</Label
+					><span><Info class=" m-2  w-4 text-xs text-gray-600" /></span>
 				</div>
 				<Input
 					type="text"

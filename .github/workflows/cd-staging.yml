@@ -20,7 +20,6 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-
             cd /home/ubuntu
             rm -rf sashakt-portal
 
@@ -50,7 +49,7 @@ jobs:
             sudo corepack prepare pnpm@latest --activate
 
             echo "Installing dependencies..."
-            pnpm install --production
+            pnpm install
 
             echo "Building the project..."
             pnpm run build

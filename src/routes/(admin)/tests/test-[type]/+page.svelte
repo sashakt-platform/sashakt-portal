@@ -8,7 +8,6 @@
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
-
 	import Primary from './Primary.svelte';
 	import Question from './Question.svelte';
 	import Configuration from './Configuration.svelte';
@@ -27,6 +26,7 @@
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import CopyPlus from '@lucide/svelte/icons/copy-plus';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
+	import { Item } from '$lib/components/ui/select';
 
 	const typeOfMode = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
@@ -36,8 +36,12 @@
 		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
 
-	let { data, event }: { data: { form: SuperValidated<Infer<FormSchema>> }; event: Event } =
-		$props();
+	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
+
+	$effect(() => {
+		console.log('Form Data->', $inspect($formData.shuffle));
+		console.log('Data is -->', $inspect(data));
+	});
 
 	const form = superForm(data.form, {
 		validators: zodClient(testTemplateSchema),
@@ -219,7 +223,7 @@
 														</DropdownMenu.Item>
 														<DropdownMenu.Item>
 															<Trash_2 />
-															<span>Delete</span>
+															Delete
 														</DropdownMenu.Item>
 														<DropdownMenu.Item>
 															<CopyPlus />

@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { testTemplateSchema,individualTestSchema } from './schema';
+import { testTemplateSchema,individualTestSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
@@ -8,7 +8,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 // const token = getSessionTokenCookie();
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({params}) => {
 
     const token = getSessionTokenCookie();
 	const res = await fetch(`${BACKEND_URL}/api/v1/test`, {
@@ -27,7 +27,8 @@ export const load: PageServerLoad = async () => {
 
     return {
         form: await superValidate(zod(testTemplateSchema)),
-        tests: tests
+        tests: tests,
+        type:params.type
     };
 };
 

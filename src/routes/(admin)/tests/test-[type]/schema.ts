@@ -31,7 +31,13 @@ export const testTemplateSchema = z.object({
 	state_ids: z.array(z.string()).default([])
 });
 
+export const individualTestSchema = z.object({
+	id: z.number(),
+});
+
 export type FormSchema = typeof testTemplateSchema;
+
+export type IndividualTestSchema = typeof individualTestSchema;
 
 
 /*

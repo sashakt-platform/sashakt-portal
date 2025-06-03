@@ -1,29 +1,43 @@
 <script lang="ts">
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import FileUp from '@lucide/svelte/icons/file-up';
 	import Info from '@lucide/svelte/icons/info';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash from '@lucide/svelte/icons/trash';
 	import WhiteEmptyBox from '$lib/components/white-empty-box.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import Ellipsis from '@lucide/svelte/icons/ellipsis';
+	import Trash_2 from '@lucide/svelte/icons/trash-2';
+	import CopyPlus from '@lucide/svelte/icons/copy-plus';
+	import FilePlus from '@lucide/svelte/icons/file-plus';
+
 	const { data } = $props();
 </script>
 
 <div>
-	<div class="mt-10 ml-10 flex w-full items-center align-middle">
-		<span class="flex flex-row">
-			<h2
-				class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-			>
-				Question Bank
-			</h2>
-			<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
-		</span>
+	<div class="mx-10 flex flex-row py-4 sm:w-[80%]">
+		<div class="my-auto flex flex-col">
+			<div class=" flex w-full items-center align-middle">
+				<div class="flex flex-row">
+					<h2
+						class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+					>
+						Question Bank
+					</h2>
+					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+				</div>
+			</div>
+			<Label class="my-auto align-middle text-sm font-extralight">Manage questions</Label>
+		</div>
+		<div class={['my-auto ml-auto gap-3 p-4', data.questions ? 'flex' : 'hidden']}>
+			<Button class="font-bold" variant="outline"><Plus />Create a Question</Button>
+			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
+		</div>
 	</div>
-	<Label class="my-auto ml-10 align-middle text-sm font-extralight">Manage questions</Label>
-
 	{#if !data.questions}
 		<WhiteEmptyBox>
 			<svg
@@ -63,7 +77,7 @@
 					class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
 					><Plus /> Create a Question</Button
 				>
-				<a href="/questionbank/bulk-upload"
+				<a href="/questionbank/import"
 					><Button
 						variant="outline"
 						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
@@ -74,47 +88,79 @@
 			</div>
 		</WhiteEmptyBox>
 	{:else}
-		<div class="m-10 w-3/4 rounded-2xl bg-white text-center align-top shadow-2xl">
-			<div class="flex h-full flex-col">
-				{#if data.questions}
-					<Table.Root>
-						<Table.Header class="">
-							<Table.Row class="uppercase">
-								<Table.Head>Question</Table.Head>
-								<Table.Head>Answer</Table.Head>
-								<Table.Head>Tags</Table.Head>
-								<Table.Head>Updated</Table.Head>
-								<Table.Head>Actions</Table.Head>
+		<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
+			<div class="flex flex-row gap-2">
+				<div class="w-1/5">
+					<!-- <TagsSelection /> -->
+				</div>
+				<div class="w-1/5">
+					<!-- <StateSelection /> -->
+				</div>
+				<div class="ml-auto w-1/5">
+					<Input type="search" placeholder="Search by question name, tags, or ID" />
+				</div>
+			</div>
+			<div>
+				<Table.Root>
+					<Table.Header>
+						<Table.Row class="bg-primary-foreground font-bold text-black">
+							<Table.Head class="w-1/12 ">No.</Table.Head>
+							<Table.Head class="w-5/12 ">Question</Table.Head>
+							<Table.Head class="w-3/12">Tags</Table.Head>
+							<Table.Head class="w-2/12">Updated</Table.Head>
+							<Table.Head class="w-1/12"></Table.Head>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body>
+						{#each data.questions as question, index (question.id)}
+							<Table.Row class=" my-4 table-row gap-10 space-y-7 bg-white ">
+								<Table.Cell class="w-1/12 ">{index + 1}</Table.Cell>
+								<Table.Cell class="w-5/12">{question.question_text}</Table.Cell>
+								<Table.Cell class="w-3/12">
+									{#if question.tags && question.tags.length > 0}
+										{question.tags.map((tag: { name: string }) => tag.name).join(', ')}
+									{:else}
+										None
+									{/if}
+								</Table.Cell>
+								<Table.Cell class="w-2/12">
+									{#if question.modified_date}
+										{new Date(question.modified_date).toLocaleDateString('en-US', {
+											day: 'numeric',
+											month: 'short',
+											year: 'numeric'
+										})}
+										{new Date(question.modified_date).toLocaleTimeString('en-US', {
+											hour: 'numeric',
+											minute: '2-digit',
+											hour12: true
+										})}
+									{/if}
+								</Table.Cell>
+								<Table.Cell>
+									<!--  <Button variant="secondary" class="cursor-pointer"><Ellipsis /></Button> -->
+									<DropdownMenu.Root>
+										<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}
+											><Ellipsis /></DropdownMenu.Trigger
+										>
+										<DropdownMenu.Content class="w-56">
+											<DropdownMenu.Group>
+												<DropdownMenu.Item>
+													<Pencil />
+													<span>Edit</span>
+												</DropdownMenu.Item>
+												<DropdownMenu.Item>
+													<Trash_2 />
+													Delete
+												</DropdownMenu.Item>
+											</DropdownMenu.Group>
+										</DropdownMenu.Content>
+									</DropdownMenu.Root>
+								</Table.Cell>
 							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{#each data.questions as question}
-								<Table.Row>
-									<Table.Cell class="text-left">{question.question_text}</Table.Cell>
-									<Table.Cell class="text-left"></Table.Cell>
-									<Table.Cell class="text-left">
-										{#if question.tags}
-											{#each question.tags as tag}
-												<span
-													class="mr-2 rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800"
-												>
-													{tag.name}
-												</span>
-											{/each}
-										{/if}
-									</Table.Cell>
-									<Table.Cell class="text-left">{question.modified_date}</Table.Cell>
-									<Table.Cell
-										><a href="/question/edit"><Pencil /></a>
-										<a href="/question/delete"><Trash /></a></Table.Cell
-									>
-								</Table.Row>
-							{/each}
-						</Table.Body>
-					</Table.Root>
-				{:else}
-					<span>No users.</span>
-				{/if}
+						{/each}
+					</Table.Body>
+				</Table.Root>
 			</div>
 		</div>
 	{/if}

@@ -2,6 +2,20 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { superForm, fileProxy } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { schema } from './schema.js';
+
+	let { data } = $props();
+	const { form, enhance, errors } = superForm(data.form, {
+		validators: zodClient(schema),
+		dataType: 'json',
+		onSubmit: () => {
+			$form.user_id = data.user.id;
+		}
+	});
+
+	const file = fileProxy(form, 'file');
 </script>
 
 <div class="ml-10">
@@ -37,10 +51,13 @@
 			</ol>
 		</div>
 		<div class="w-3/4 bg-white">
-			<Input type="file" />
+			<form method="POST" enctype="multipart/form-data" use:enhance>
+				<input type="file" name="file" bind:files={$file} />
+				{#if $errors.file}<span>{$errors.file}</span>{/if}
+				<button>Submit</button>
+			</form>
 			<div
 				class="m-6 cursor-pointer items-center rounded-xl border-2 border-dotted border-blue-400 p-6 text-center"
-				style="#404040"
 			>
 				<div class="flex items-center justify-center text-center">
 					<svg

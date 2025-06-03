@@ -63,7 +63,7 @@
 			<a href={rightButton.link}>
 				<Button
 					variant="outline"
-					class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+					class="bg-primary mr-4 h-12 cursor-pointer text-white"
 					onclick={rightButton.click}
 				>
 					<FileUp />{rightButton.title}

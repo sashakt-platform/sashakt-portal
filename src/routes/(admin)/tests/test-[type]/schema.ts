@@ -7,7 +7,7 @@ export const loginSchema = z.object({
 	password: z.string().min(6, { message: 'Password must be at least 6 characters' })
 });
 */
-export const testTemplateSchema = z.object({
+export const testSchema = z.object({
 	name: z.string(),
 	description: z.string(),
 	start_time: z.string().optional(),
@@ -35,7 +35,7 @@ export const individualTestSchema = z.object({
 	id: z.number(),
 });
 
-export type FormSchema = typeof testTemplateSchema;
+export type FormSchema = typeof testSchema;
 
 export type IndividualTestSchema = typeof individualTestSchema;
 

@@ -33,12 +33,12 @@
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight">Manage questions</Label>
 		</div>
-		<div class={['my-auto ml-auto gap-3 p-4', data.questions ? 'flex' : 'hidden']}>
+		<div class={['my-auto ml-auto gap-3 p-4', data.questions.length == 0 ? 'hidden' : 'flex']}>
 			<Button class="font-bold" variant="outline"><Plus />Create a Question</Button>
 			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
 		</div>
 	</div>
-	{#if !data.questions}
+	{#if data.questions.length == 0}
 		<WhiteEmptyBox>
 			<svg
 				width="100"
@@ -103,27 +103,31 @@
 			<div>
 				<Table.Root>
 					<Table.Header>
-						<Table.Row class="bg-primary-foreground font-bold text-black">
-							<Table.Head class="w-1/12 ">No.</Table.Head>
-							<Table.Head class="w-5/12 ">Question</Table.Head>
-							<Table.Head class="w-3/12">Tags</Table.Head>
-							<Table.Head class="w-2/12">Updated</Table.Head>
-							<Table.Head class="w-1/12"></Table.Head>
+						<Table.Row
+							class=" bg-primary-foreground my-2 flex items-center rounded-lg font-bold  text-black"
+						>
+							<Table.Head class="flex w-1/12 items-center">No.</Table.Head>
+							<Table.Head class="flex w-5/12 items-center">Question</Table.Head>
+							<Table.Head class="flex w-3/12 items-center">Tags</Table.Head>
+							<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
+							<Table.Head class="flex w-1/12 items-center"></Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
 						{#each data.questions as question, index (question.id)}
-							<Table.Row class=" my-4 table-row gap-10 space-y-7 bg-white ">
-								<Table.Cell class="w-1/12 ">{index + 1}</Table.Cell>
-								<Table.Cell class="w-5/12">{question.question_text}</Table.Cell>
-								<Table.Cell class="w-3/12">
+							<Table.Row
+								class="my-2 flex items-center rounded-lg border-t border-gray-200  bg-white  font-medium "
+							>
+								<Table.Cell class="w-1/12  items-center">{index + 1}</Table.Cell>
+								<Table.Cell class="w-5/12  items-center">{question.question_text}</Table.Cell>
+								<Table.Cell class="w-3/12  items-center">
 									{#if question.tags && question.tags.length > 0}
 										{question.tags.map((tag: { name: string }) => tag.name).join(', ')}
 									{:else}
 										None
 									{/if}
 								</Table.Cell>
-								<Table.Cell class="w-2/12">
+								<Table.Cell class="w-2/12  items-center">
 									{#if question.modified_date}
 										{new Date(question.modified_date).toLocaleDateString('en-US', {
 											day: 'numeric',
@@ -137,7 +141,7 @@
 										})}
 									{/if}
 								</Table.Cell>
-								<Table.Cell>
+								<Table.Cell class="w-1/12  items-center">
 									<!--  <Button variant="secondary" class="cursor-pointer"><Ellipsis /></Button> -->
 									<DropdownMenu.Root>
 										<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}

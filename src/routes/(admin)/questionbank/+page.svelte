@@ -12,8 +12,6 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
-	import CopyPlus from '@lucide/svelte/icons/copy-plus';
-	import FilePlus from '@lucide/svelte/icons/file-plus';
 
 	const { data } = $props();
 </script>
@@ -116,7 +114,7 @@
 					<Table.Body>
 						{#each data.questions as question, index (question.id)}
 							<Table.Row
-								class="my-2 flex items-center rounded-lg border-t border-gray-200  bg-white  font-medium "
+								class="my-2 flex items-center  rounded-lg border border-gray-200  bg-white  font-medium "
 							>
 								<Table.Cell class="w-1/12  items-center">{index + 1}</Table.Cell>
 								<Table.Cell class="w-5/12  items-center">{question.question_text}</Table.Cell>

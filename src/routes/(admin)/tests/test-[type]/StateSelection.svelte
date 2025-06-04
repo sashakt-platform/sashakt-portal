@@ -1,12 +1,16 @@
 <script lang="ts">
-	import StateList from '$lib/data/states.json';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import { page } from '$app/state';
 	let { states = $bindable() } = $props();
 
+	const stateList = page.data.states;
+
 	const selectedStates = $derived(
-		states.length
-			? StateList.filter((state) => states.includes(String(state.id))).map((state) => state.name)
+		states?.length
+			? stateList
+					.filter((state: { id: any }) => states.includes(String(state.id)))
+					.map((state: { name: any }) => state.name)
 			: 'Select relevant states'
 	);
 </script>
@@ -17,9 +21,9 @@
 	>
 {/snippet}
 
-<Select.Root type="multiple" bind:value={states}>
+<Select.Root type="multiple" bind:value={states} name="states">
 	<Select.Trigger>
-		{#if states.length === 0}
+		{#if states?.length === 0}
 			{selectedStates}
 		{:else}
 			<span class="truncate text-start">
@@ -32,7 +36,7 @@
 	<Select.Content>
 		<Select.Group>
 			<Select.GroupHeading>Select Relavant States</Select.GroupHeading>
-			{#each StateList as state}
+			{#each stateList as state}
 				<Select.Item value={String(state.id)} label={state.name} />
 			{/each}
 		</Select.Group>

@@ -16,21 +16,15 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
 		data: TData[];
-		questions: Number[];
 		open: boolean;
+		formData: any;
 	};
 
-	let {
-		columns,
-		data,
-		questions = $bindable(),
-		open = $bindable()
-	}: DataTableProps<TData, TValue> = $props();
+	let { columns, data, open = $bindable(), formData }: DataTableProps<TData, TValue> = $props();
 
 	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
 	let sorting = $state<SortingState>([]);
@@ -96,14 +90,13 @@
 				return columnVisibility;
 			},
 			get rowSelection() {
-				// console.log('rowSelectionn function is -->', $state.snapshot(rowSelection));
 				return rowSelection;
 			}
 		}
 	});
 
 	if (open) {
-		questions.forEach((element: any) => {
+		$formData.question_revision_ids.forEach((element: any) => {
 			table.getFilteredRowModel().rows.filter((row: any) => {
 				if (row.original?.id == element) {
 					row.toggleSelected(true);
@@ -169,9 +162,9 @@
 		<Button
 			class="bg-primary hover:bg-primary/90 my-auto rounded px-4 text-white"
 			onclick={() => {
-				questions.length = 0;
+				$formData.question_revision_ids.length = 0;
 				table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
-					questions.push(element.original?.id);
+					$formData.question_revision_ids.push(element.original?.id);
 				});
 
 				open = false;

@@ -6,13 +6,9 @@
 	import Questions from '$lib/data/questions.json';
 	import TagsSelection from './TagsSelection.svelte';
 	import StateSelection from './StateSelection.svelte';
-	let { open = $bindable(), questions = $bindable(), data, columns } = $props();
+	let { open = $bindable(), data, columns, formData } = $props();
 	let tags = $state<String[]>([]);
 	let states = $state<String[]>([]);
-
-	$effect(() => {
-		console.log('questions-->', $state.snapshot(questions));
-	});
 </script>
 
 <Dialog.Root bind:open>
@@ -40,7 +36,7 @@
 					</div>
 				</div>
 				<div class="flex h-5/6 flex-col">
-					<DataTable {data} {columns} bind:questions bind:open />
+					<DataTable {data} {columns} bind:open {formData} />
 				</div>
 			</div>
 		</div>

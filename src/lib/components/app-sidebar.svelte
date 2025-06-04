@@ -32,7 +32,7 @@
 				},
 				test_sessions: {
 					title: 'Test Sessions',
-					url: 'tests/test-sessions'
+					url: '/tests/test-session'
 				}
 			}
 		},
@@ -139,7 +139,7 @@
 								{...props}
 								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 							>
-								{data.user.full_name}
+								{data.user && data.user.full_name}
 								<ChevronUp class="ml-auto" />
 							</Sidebar.MenuButton>
 						{/snippet}

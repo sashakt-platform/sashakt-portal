@@ -40,7 +40,7 @@ export const load: PageServerLoad = async () => {
 	});
 
 	if (!responseTags.ok) {
-		console.error('Failed to fetch states:', responseTags.status, responseTags.statusText);
+		console.error('Failed to fetch tags:', responseTags.status, responseTags.statusText);
 		return { states: null };
 	}
 

@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { testSchema,individualTestSchema } from './schema.js';
+import { testSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';

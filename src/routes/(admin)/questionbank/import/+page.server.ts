@@ -24,7 +24,6 @@ export const actions = {
          const token = getSessionTokenCookie();
         const form = await superValidate(request, zod(schema));
 
-        console.log("the form is-->",form)
         if (!form.valid) {
             return fail(400, { form });
         }
@@ -33,9 +32,8 @@ export const actions = {
         const file = form.data.file;
 
         // For demonstration, we just log the file name
-        console.log('File uploaded:', file.name);
 
-                const formData = new FormData();
+        const formData = new FormData();
         formData.append('file', file);
         formData.append('user_id', String(form.data.user_id));
                 
@@ -56,8 +54,6 @@ export const actions = {
                     .json()
                     .then((data) => {
                         if (response.ok) {
-                            // return redirect(303, `/tests/test-${params.type}`);
-                             console.log('File uploaded successfully:->', response);
                             return message(form, 'File uploaded successfully');
                            
                         } else {

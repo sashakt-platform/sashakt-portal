@@ -6,7 +6,6 @@
 	import Trash from '@lucide/svelte/icons/trash';
 
 	const { data } = $props();
-	console.log(data);
 </script>
 
 <div class="mt-10 ml-10 flex w-full items-center align-middle">

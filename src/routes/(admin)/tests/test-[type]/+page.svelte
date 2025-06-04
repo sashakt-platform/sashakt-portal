@@ -38,10 +38,6 @@
 
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>>; user: any } } = $props();
 
-	$effect(() => {
-		console.log('data->', data);
-	});
-
 	const {
 		form: formData,
 		enhance,
@@ -52,10 +48,6 @@
 		dataType: 'json',
 		onSubmit: () => {
 			$formData.created_by_id = data.user.id;
-		},
-		onError: ({ result }) => {
-			console.error('error->', result);
-			// Handle form submission error
 		}
 	});
 </script>

@@ -6,9 +6,6 @@
 	const tagList = page.data.tags;
 	let { tags = $bindable() } = $props();
 
-	$effect(() => {
-		console.log('tags changed:', tags);
-	});
 	const selectedTags = $derived(
 		tags?.length
 			? tagList.filter((tag) => tags.includes(String(tag.id))).map((tag) => tag.name)

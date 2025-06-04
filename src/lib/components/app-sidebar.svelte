@@ -32,7 +32,7 @@
 				},
 				test_sessions: {
 					title: 'Test Sessions',
-					url: '/tests/test-session	'
+					url: '/tests/test-session'
 				}
 			}
 		},

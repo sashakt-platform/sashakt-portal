@@ -1,5 +1,5 @@
 {
-	"name": "sashakt-webapp",
+	"name": "sashakt-portal",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
@@ -21,7 +21,7 @@
 		"@eslint/js": "^9.18.0",
 		"@lucide/svelte": "^0.507.0",
 		"@playwright/test": "^1.49.1",
-		"@sveltejs/adapter-auto": "^4.0.0",
+		"@sveltejs/adapter-node": "^5.2.12",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@tailwindcss/typography": "^0.5.15",

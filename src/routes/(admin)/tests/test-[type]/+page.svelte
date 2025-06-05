@@ -14,7 +14,12 @@
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { testSchema, type FormSchema } from './schema';
+	import {
+		individualTestSchema,
+		testSchema,
+		type FormSchema,
+		type IndividualTestSchema
+	} from './schema';
 	import Plus from '@lucide/svelte/icons/plus';
 	import TagsSelection from './TagsSelection.svelte';
 	import StateSelection from './StateSelection.svelte';
@@ -36,13 +41,20 @@
 		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
 
-	let { data }: { data: { form: SuperValidated<Infer<FormSchema>>; user: any } } = $props();
-
+	let {
+		data
+	}: {
+		data: {
+			form: SuperValidated<Infer<FormSchema>>;
+			deleteForm: SuperValidated<Infer<IndividualTestSchema>>;
+			user: any;
+		};
+	} = $props();
+	console.log('data', data);
 	const {
 		form: formData,
 		enhance,
-		submit,
-		isTainted
+		submit
 	} = superForm(data.form, {
 		validators: zodClient(testSchema),
 		dataType: 'json',
@@ -50,9 +62,18 @@
 			$formData.created_by_id = data.user.id;
 		}
 	});
+
+	const {
+		form: deleteFormData,
+		enhance: enhanceDelete,
+		submit: submitDelete
+	} = superForm(data.deleteForm, {
+		validators: zodClient(individualTestSchema),
+		dataType: 'json'
+	});
 </script>
 
-<form method="POST" use:enhance>
+<form method="POST" action="?/saveAction" use:enhance>
 	{#if currentMode !== typeOfMode.main}
 		<div class="flex border-b-2 py-2">
 			<div class="flex justify-start">
@@ -167,7 +188,7 @@
 								link: '/tests/test-templates',
 								click: () => {
 									$formData.is_template = true;
-									currentMode = typeOfMode.primary;
+									currentMode = typeOfMode.main;
 								}
 							}
 						: null}
@@ -241,10 +262,18 @@
 															<Pencil />
 															<span>Edit</span>
 														</DropdownMenu.Item>
-														<DropdownMenu.Item>
-															<Trash_2 />
-															Delete
-														</DropdownMenu.Item>
+														<form action="?/deleteAction" method="POST" use:enhanceDelete>
+															<!-- <input type="hidden" name="id" value={test.id} /> -->
+															<DropdownMenu.Item
+																onclick={() => {
+																	$deleteFormData.test_id = test.id;
+																	submitDelete();
+																}}
+															>
+																<Trash_2 />
+																Delete
+															</DropdownMenu.Item>
+														</form>
 														<DropdownMenu.Item>
 															<CopyPlus />
 															<span>Clone</span>

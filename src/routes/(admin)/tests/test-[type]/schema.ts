@@ -32,7 +32,7 @@ export const testSchema = z.object({
 });
 
 export const individualTestSchema = z.object({
-	id: z.number(),
+	test_id: z.number(),
 });
 
 export type FormSchema = typeof testSchema;

@@ -5,7 +5,7 @@ import { BACKEND_URL } from '$env/static/private';
 export const sessionCookieName = 'sashakt-session';
 
 export async function validateSessionToken(token: string) {
-	const res = await fetch(`${BACKEND_URL}/api/v1/users/me`, {
+	const res = await fetch(`${BACKEND_URL}/users/me`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

@@ -40,30 +40,3 @@ export type FormSchema = typeof testSchema;
 export type IndividualTestSchema = typeof individualTestSchema;
 
 
-/*
-
-	let testData = $state({
-		name: '',
-		description: '',
-		start_time: '',
-		end_time: '',
-		time_limit: 1,
-		marks_level: 'question',
-		marks: 0,
-		completion_message: '',
-		start_instructions: '',
-		link: '',
-		no_of_attempts: 1,
-		shuffle: false,
-		random_questions: false,
-		no_of_random_questions: 0,
-		question_pagination: 1,
-		is_template: false,
-		template_id: 0,
-		created_by_id: 0,
-		tags: [],
-		question_revision_ids: [],
-		states: []
-	});
-
-    */

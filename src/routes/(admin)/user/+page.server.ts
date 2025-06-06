@@ -3,7 +3,7 @@ import { getSessionTokenCookie } from '$lib/server/auth';
 
 export const load = async () => {
 	const token = getSessionTokenCookie();
-	const res = await fetch(`${BACKEND_URL}/api/v1/users`, {
+	const res = await fetch(`${BACKEND_URL}/users`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

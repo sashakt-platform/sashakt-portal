@@ -56,7 +56,7 @@ jobs:
 
             echo "Restarting or starting the application with pm2..."
             if [ -f "build/index.js" ]; then
-              pm2 restart sashakt-portal --update-env || pm2 start build/index.js --name sashakt-portal
+              pm2 restart sashakt-portal --update-env || PORT=3001 pm2 start build/index.js --name sashakt-portal
             else
               echo "Build output not found: build/index.js"
               exit 1

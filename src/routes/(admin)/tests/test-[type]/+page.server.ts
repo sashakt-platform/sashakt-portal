@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({params}) => {
     const is_template = params.type === 'template';
 
     const token = getSessionTokenCookie();
-	const res = await fetch(`${BACKEND_URL}/api/v1/test/?is_template=${is_template}`, {
+	const res = await fetch(`${BACKEND_URL}/test/?is_template=${is_template}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -55,7 +55,7 @@ export const actions: Actions = {
             return fail(400, { form });
         }
 
-        const response= await fetch(`${BACKEND_URL}/api/v1/test`, {
+        const response= await fetch(`${BACKEND_URL}/test`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ export const actions: Actions = {
             return fail(400, { form });
         }
 
-        const response= await fetch(`${BACKEND_URL}/api/v1/test/${form.data.test_id}`, {
+        const response= await fetch(`${BACKEND_URL}/test/${form.data.test_id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -106,6 +106,43 @@ export const actions: Actions = {
                 if (response.ok) {
                     return redirect(303, `/tests/test-${params.type}`);
 
+                } else {
+                    return fail(500, { form });
+                }
+            });
+    },
+
+    editAction: async ({ request, params }) => {
+        console.log('editAction called', "params-->", params);
+        console.log("request formdata-->",request.formData())
+        const formData = await request.formData();
+        const test_id = formData.get('test_id');
+        console.log('test_id from request:', test_id);
+        const token = getSessionTokenCookie();
+        const form = await superValidate(request, zod(testSchema));
+        if (!form.valid) {
+            return fail(400, { form });
+        }
+
+        const response= await fetch(`${BACKEND_URL}/test/${form.data.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(form.data)
+        });
+
+        if (!response.ok) {
+            return fail(500, { form });
+        }
+
+        return response
+            .json()
+            .then((data) => {
+                if (response.ok) {
+                    return redirect(303, `/tests/test-${params.type}`);
+                    
                 } else {
                     return fail(500, { form });
                 }

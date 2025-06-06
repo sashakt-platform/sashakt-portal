@@ -10,14 +10,10 @@ import type { PageServerLoad } from '../$types';
 // 	};
 // }
 
-
-
-
 export const load: PageServerLoad = async () => {
-
 	const { locals } = getRequestEvent();
 	const token = getSessionTokenCookie();
-	const responseState = await fetch(`${BACKEND_URL}/api/v1/location/state/?skip=0&limit=100`, {
+	const responseState = await fetch(`${BACKEND_URL}/location/state/?skip=0&limit=100`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -29,10 +25,9 @@ export const load: PageServerLoad = async () => {
 		return { states: null };
 	}
 
-	const states = await responseState.json();	
+	const states = await responseState.json();
 
-
-	const responseTags = await fetch(`${BACKEND_URL}/api/v1/tag/?skip=0&limit=100`, {
+	const responseTags = await fetch(`${BACKEND_URL}/tag/?skip=0&limit=100`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -46,20 +41,21 @@ export const load: PageServerLoad = async () => {
 
 	const tags = await responseTags.json();
 
-	const responseQuestions = await fetch(`${BACKEND_URL}/api/v1/questions/?skip=0&limit=100&organization_id=${locals.user.organization_id}`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
+	const responseQuestions = await fetch(
+		`${BACKEND_URL}/questions/?skip=0&limit=100&organization_id=${locals.user.organization_id}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
 		}
-	});
+	);
 
 	if (!responseQuestions.ok) {
 		return { states: null };
 	}
 
 	const questions = await responseQuestions.json();
-
-
 
 	return {
 		// tests: tests,

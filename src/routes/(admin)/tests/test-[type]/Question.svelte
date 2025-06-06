@@ -14,7 +14,7 @@
 	let { formData } = $props();
 	const data = questionList.map((question) => {
 		return {
-			id: question.id,
+			id: question.latest_question_revision_id,
 			question: question.question_text,
 			tags: question.tags.map((tag) => tag.name),
 			options: question.options.map((option) => option.text),

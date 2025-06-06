@@ -31,14 +31,13 @@
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import CopyPlus from '@lucide/svelte/icons/copy-plus';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
-	import { Item } from '$lib/components/ui/select';
 
-	const typeOfMode = { main: 0, primary: 1, questions: 2, configuration: 3 };
+	const typeOfScreen = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
-	let currentMode: number = $state(typeOfMode.main);
+	let currentScreen: number = $state(typeOfScreen.main);
 
 	$effect(() =>
-		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
+		currentScreen == typeOfScreen.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
 
 	let {
@@ -54,7 +53,8 @@
 	const {
 		form: formData,
 		enhance,
-		submit
+		submit,
+		reset
 	} = superForm(data.form, {
 		validators: zodClient(testSchema),
 		dataType: 'json',
@@ -74,13 +74,13 @@
 </script>
 
 <form method="POST" action="?/saveAction" use:enhance>
-	{#if currentMode !== typeOfMode.main}
+	{#if currentScreen !== typeOfScreen.main}
 		<div class="flex border-b-2 py-2">
 			<div class="flex justify-start">
 				<Button
 					variant="link"
 					class=" text-gray-500"
-					onclick={() => (currentMode = typeOfMode.main)}
+					onclick={() => (currentScreen = typeOfScreen.main)}
 					><CircleChevronLeft />Back to test {$formData.is_template
 						? 'templates'
 						: 'sessions'}</Button
@@ -93,7 +93,7 @@
 					mode: number,
 					isCompleted: boolean = false
 				)}
-					{@const isActive = mode === currentMode}
+					{@const isActive = mode === currentScreen}
 					<Button
 						variant="ghost"
 						class={[
@@ -107,7 +107,7 @@
 						]}
 						onclick={() => {
 							if (isCompleted) {
-								currentMode = mode;
+								currentScreen = mode;
 							}
 						}}
 						><span
@@ -125,18 +125,18 @@
 				{@render headerNumbers(
 					1,
 					'Primary Details',
-					typeOfMode.primary,
+					typeOfScreen.primary,
 					$formData.name.trim() != '' && $formData.description.trim() != ''
 				)}
 				<ChevronRight class="my-auto w-4" />
-				{@render headerNumbers(2, 'Select Questions', typeOfMode.questions, false)}
+				{@render headerNumbers(2, 'Select Questions', typeOfScreen.questions, false)}
 				<ChevronRight class="my-auto w-4" />
-				{@render headerNumbers(3, 'Configuration Settings', typeOfMode.configuration, false)}
+				{@render headerNumbers(3, 'Configuration Settings', typeOfScreen.configuration, false)}
 			</div>
 		</div>
 	{/if}
 
-	{#if currentMode === typeOfMode.main}
+	{#if currentScreen === typeOfScreen.main}
 		<div id="mainpage" class="flex flex-col">
 			<div class="mx-10 flex flex-row py-4 sm:w-[80%]">
 				<div class="my-auto flex flex-col">
@@ -158,7 +158,9 @@
 				</div>
 				<div class="my-auto ml-auto p-4">
 					{#if data.tests.length > 0}
-						<Button class="font-bold" onclick={() => (currentMode = typeOfMode.primary)}
+						<Button
+							class="font-bold"
+							onclick={() => ((currentScreen = typeOfScreen.primary), reset())}
 							><Plus />{$formData.is_template
 								? 'Create a test template'
 								: 'Create a test session'}</Button
@@ -179,7 +181,7 @@
 						title: `${$formData.is_template ? 'Create Test Template' : 'Create Custom Test'}`,
 						link: '#',
 						click: () => {
-							currentMode = typeOfMode.primary;
+							currentScreen = typeOfScreen.primary;
 						}
 					}}
 					rightButton={!$formData.is_template
@@ -188,7 +190,7 @@
 								link: '/tests/test-templates',
 								click: () => {
 									$formData.is_template = true;
-									currentMode = typeOfMode.main;
+									currentScreen = typeOfScreen.main;
 								}
 							}
 						: null}
@@ -258,7 +260,41 @@
 												>
 												<DropdownMenu.Content class="w-56">
 													<DropdownMenu.Group>
-														<DropdownMenu.Item>
+														<DropdownMenu.Item
+															onclick={() => {
+																reset();
+																currentScreen = typeOfScreen.primary;
+																console.log('This is test', test);
+																console.log('This is formData earlier', $formData);
+
+																$formData.name = test.name;
+																$formData.description = test.description;
+																$formData.is_template = test.is_template;
+																$formData;
+																const {
+																	id,
+																	created_date,
+																	modified_date,
+																	tags,
+																	states,
+																	question_revisions,
+																	is_active,
+																	is_deleted,
+																	total_questions,
+																	...restTest
+																} = test;
+																$formData = { ...restTest };
+																$formData.test_id = id;
+																$formData.tag_ids =
+																	test.tags.map((tag: { id: String }) => String(tag.id)) || [];
+																$formData.state_ids =
+																	test.states.map((state: { id: String }) => String(state.id)) ||
+																	[];
+																$formData.question_revision_ids =
+																	test.question_revisions.map((q: { id: number }) => q.id) || [];
+																console.log('This is formData now', $formData);
+															}}
+														>
 															<Pencil />
 															<span>Edit</span>
 														</DropdownMenu.Item>
@@ -294,35 +330,35 @@
 				</div>
 			{/if}
 		</div>
-	{:else if currentMode === typeOfMode.primary}
+	{:else if currentScreen === typeOfScreen.primary}
 		<Primary {formData} />
-	{:else if currentMode === typeOfMode.questions}
+	{:else if currentScreen === typeOfScreen.questions}
 		<Question {formData} />
-	{:else if currentMode === typeOfMode.configuration}
+	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}
 
-	{#if currentMode != typeOfMode.main}
+	{#if currentScreen != typeOfScreen.main}
 		<div class="sticky bottom-0 my-4 flex w-full justify-between border-t-4 bg-white p-4">
 			<Button
 				variant="outline"
 				class="text-primary border-primary border-1"
-				onclick={() => (currentMode = typeOfMode.main)}>Cancel</Button
+				onclick={() => (currentScreen = typeOfScreen.main)}>Cancel</Button
 			>
 
 			<Button
 				class="bg-primary"
-				disabled={currentMode == typeOfMode.primary &&
+				disabled={currentScreen == typeOfScreen.primary &&
 					($formData.name.trim() == '' || $formData.description.trim() == '')}
 				onclick={() => {
-					currentMode == typeOfMode.configuration
-						? (submit(), (currentMode = typeOfMode.main))
-						: currentMode++;
+					currentScreen == typeOfScreen.configuration
+						? (submit(), (currentScreen = typeOfScreen.main))
+						: currentScreen++;
 					// Submit the form data
 				}}
-				>{currentMode != typeOfMode.configuration
+				>{currentScreen != typeOfScreen.configuration
 					? 'Continue'
-					: `${$formData.is_template ? 'Save test template' : 'Create Test'}`}
+					: `${$formData.is_template ? `${$formData.test_id ? 'Update' : 'Save'} test template` : `${$formData.test_id ? 'Update' : 'Save'} Test`}`}
 			</Button>
 		</div>
 	{/if}

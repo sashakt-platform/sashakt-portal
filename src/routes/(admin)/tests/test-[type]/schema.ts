@@ -1,38 +1,33 @@
 import { z } from 'zod';
 
 
-/*
-export const loginSchema = z.object({
-	username: z.string().email({ message: 'Invalid email address' }),
-	password: z.string().min(6, { message: 'Password must be at least 6 characters' })
-});
-*/
 export const testSchema = z.object({
+	test_id: z.number().int().optional(),
 	name: z.string(),
 	description: z.string(),
-	start_time: z.string().optional(),
-	end_time: z.string().optional(),
-	time_limit: z.number().optional(),
-	marks_level: z.enum(['question', 'test']).optional(),
-	marks: z.number().optional(),
-	completion_message: z.string().optional(),
-	start_instructions: z.string().optional(),
-	link: z.string().url().optional(),
+	start_time: z.string().nullable().optional(),
+	end_time: z.string().nullable().optional(),
+	time_limit: z.number().nullable().optional(),
+	marks_level: z.enum(['question', 'test']).nullable().optional(),
+	marks: z.number().nullable().optional(),
+	completion_message: z.string().nullable().optional(),
+	start_instructions: z.string().nullable().optional(),
+	link: z.string().nullable().optional(),
 	no_of_attempts: z.number().optional().default(1),
 	shuffle: z.boolean().optional().default(false),
 	random_questions: z.boolean().optional().default(false),
-	no_of_random_questions: z.number().optional(),
+	no_of_random_questions: z.number().nullable().optional(),
 	question_pagination: z.number().optional().default(1),
 	is_template: z.boolean().optional().default(false),
-	template_id: z.number().optional(),
-	created_by_id: z.number(),
+	template_id: z.number().nullable().optional(),
+	created_by_id: z.number().int(),
 	tag_ids: z.array(z.string()).default([]),
 	question_revision_ids: z.array(z.number()).default([]),
 	state_ids: z.array(z.string()).default([])
 });
 
 export const individualTestSchema = z.object({
-	test_id: z.number(),
+	test_id: z.number().int(),
 });
 
 export type FormSchema = typeof testSchema;

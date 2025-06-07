@@ -71,6 +71,29 @@
 		validators: zodClient(individualTestSchema),
 		dataType: 'json'
 	});
+
+	function copyForms(readArray: any, mode: 'create' | 'update') {
+		$formData;
+		const {
+			id,
+			created_date,
+			modified_date,
+			tags,
+			states,
+			question_revisions,
+			is_active,
+			is_deleted,
+			total_questions,
+			...restArray
+		} = readArray;
+		$formData = { ...restArray };
+		mode == 'update' && ($formData.test_id = id);
+		mode == 'create' && ($formData.name = 'Copy of ' + $formData.name);
+		$formData.tag_ids = readArray.tags.map((tag: { id: String }) => String(tag.id)) || [];
+		$formData.state_ids = readArray.states.map((state: { id: String }) => String(state.id)) || [];
+		$formData.question_revision_ids =
+			readArray.question_revisions.map((q: { id: number }) => q.id) || [];
+	}
 </script>
 
 <form method="POST" action="?/saveAction" use:enhance>
@@ -264,35 +287,7 @@
 															onclick={() => {
 																reset();
 																currentScreen = typeOfScreen.primary;
-																console.log('This is test', test);
-																console.log('This is formData earlier', $formData);
-
-																$formData.name = test.name;
-																$formData.description = test.description;
-																$formData.is_template = test.is_template;
-																$formData;
-																const {
-																	id,
-																	created_date,
-																	modified_date,
-																	tags,
-																	states,
-																	question_revisions,
-																	is_active,
-																	is_deleted,
-																	total_questions,
-																	...restTest
-																} = test;
-																$formData = { ...restTest };
-																$formData.test_id = id;
-																$formData.tag_ids =
-																	test.tags.map((tag: { id: String }) => String(tag.id)) || [];
-																$formData.state_ids =
-																	test.states.map((state: { id: String }) => String(state.id)) ||
-																	[];
-																$formData.question_revision_ids =
-																	test.question_revisions.map((q: { id: number }) => q.id) || [];
-																console.log('This is formData now', $formData);
+																copyForms(test, 'update');
 															}}
 														>
 															<Pencil />
@@ -310,7 +305,12 @@
 																Delete
 															</DropdownMenu.Item>
 														</form>
-														<DropdownMenu.Item>
+														<DropdownMenu.Item
+															onclick={() => {
+																copyForms(test, 'create');
+																submit();
+															}}
+														>
 															<CopyPlus />
 															<span>Clone</span>
 														</DropdownMenu.Item>

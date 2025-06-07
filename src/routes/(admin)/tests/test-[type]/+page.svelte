@@ -246,29 +246,33 @@
 					<div>
 						<Table.Root>
 							<Table.Header>
-								<Table.Row class="bg-primary-foreground font-bold text-black">
-									<Table.Head class="w-1/12 ">No.</Table.Head>
-									<Table.Head class="w-5/12 "
+								<Table.Row
+									class="bg-primary-foreground my-2 flex items-center rounded-lg font-extrabold  text-black"
+								>
+									<Table.Head class="flex w-1/12 items-center ">No.</Table.Head>
+									<Table.Head class="flex w-5/12 items-center"
 										>Test {$formData.is_template ? 'Template' : 'Name'}</Table.Head
 									>
-									<Table.Head class="w-3/12">Tags</Table.Head>
-									<Table.Head class="w-2/12">Updated</Table.Head>
-									<Table.Head class="w-1/12"></Table.Head>
+									<Table.Head class="flex w-3/12 items-center">Tags</Table.Head>
+									<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
+									<Table.Head class="flex w-1/12 items-center"></Table.Head>
 								</Table.Row>
 							</Table.Header>
 							<Table.Body>
 								{#each data.tests as test, index (test.id)}
-									<Table.Row class=" my-4 table-row gap-10 space-y-7 bg-white ">
-										<Table.Cell class="w-1/12 ">{index + 1}</Table.Cell>
-										<Table.Cell class="w-5/12">{test.name}</Table.Cell>
-										<Table.Cell class="w-3/12">
+									<Table.Row
+										class=" my-2 flex items-center  rounded-lg border border-gray-200  bg-white  font-medium "
+									>
+										<Table.Cell class="w-1/12 items-center">{index + 1}</Table.Cell>
+										<Table.Cell class="w-5/12 items-center">{test.name}</Table.Cell>
+										<Table.Cell class="w-3/12 items-center">
 											{#if test.tags && test.tags.length > 0}
 												{test.tags.map((tag: { name: string }) => tag.name).join(', ')}
 											{:else}
 												None
 											{/if}
 										</Table.Cell>
-										<Table.Cell class="w-2/12">
+										<Table.Cell class="w-2/12 items-center">
 											{#if test.modified_date}
 												{new Date(test.modified_date).toLocaleDateString('en-US', {
 													day: 'numeric',
@@ -282,7 +286,7 @@
 												})}
 											{/if}
 										</Table.Cell>
-										<Table.Cell>
+										<Table.Cell class="w-1/12 items-center">
 											<!--  <Button variant="secondary" class="cursor-pointer"><Ellipsis /></Button> -->
 											<DropdownMenu.Root>
 												<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}

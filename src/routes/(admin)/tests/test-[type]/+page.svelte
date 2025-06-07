@@ -72,7 +72,7 @@
 		dataType: 'json'
 	});
 
-	function copyForms(readArray: any, mode: 'create' | 'update') {
+	function copyForms(readArray: any, mode: 'clone' | 'update' | 'convert') {
 		$formData;
 		const {
 			id,
@@ -88,11 +88,18 @@
 		} = readArray;
 		$formData = { ...restArray };
 		mode == 'update' && ($formData.test_id = id);
-		mode == 'create' && ($formData.name = 'Copy of ' + $formData.name);
+		mode == 'clone' && ($formData.name = 'Copy of ' + $formData.name);
+		mode == 'convert' && ($formData.is_template = false);
 		$formData.tag_ids = readArray.tags.map((tag: { id: String }) => String(tag.id)) || [];
 		$formData.state_ids = readArray.states.map((state: { id: String }) => String(state.id)) || [];
 		$formData.question_revision_ids =
 			readArray.question_revisions.map((q: { id: number }) => q.id) || [];
+	}
+
+	function helpReset() {
+		const is_template = $formData.is_template;
+		reset();
+		$formData.is_template = is_template;
 	}
 </script>
 
@@ -183,7 +190,7 @@
 					{#if data.tests.length > 0}
 						<Button
 							class="font-bold"
-							onclick={() => ((currentScreen = typeOfScreen.primary), reset())}
+							onclick={() => ((currentScreen = typeOfScreen.primary), helpReset())}
 							><Plus />{$formData.is_template
 								? 'Create a test template'
 								: 'Create a test session'}</Button
@@ -285,7 +292,6 @@
 													<DropdownMenu.Group>
 														<DropdownMenu.Item
 															onclick={() => {
-																reset();
 																currentScreen = typeOfScreen.primary;
 																copyForms(test, 'update');
 															}}
@@ -307,14 +313,20 @@
 														</form>
 														<DropdownMenu.Item
 															onclick={() => {
-																copyForms(test, 'create');
+																copyForms(test, 'clone');
 																submit();
 															}}
 														>
 															<CopyPlus />
 															<span>Clone</span>
 														</DropdownMenu.Item>
-														<DropdownMenu.Item>
+														<DropdownMenu.Item
+															hidden={!test.is_template}
+															onclick={() => {
+																currentScreen = typeOfScreen.primary;
+																copyForms(test, 'convert');
+															}}
+														>
 															<FilePlus />
 															<span>Make a Test</span>
 														</DropdownMenu.Item>

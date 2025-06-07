@@ -45,11 +45,12 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod(testSchema));
 		if (!form.valid) {
 			return fail(400, { form });
-		}
+        }
 
-		if (!form.data.test_id) {
-			const response = await fetch(`${BACKEND_URL}/test`, {
-				method: 'POST',
+        const is_create = !form.data.test_id;
+
+			const response = await fetch(`${BACKEND_URL}/test${is_create ? '' : `/${form.data.test_id}`}`, {
+                method: `${is_create ? 'POST' : 'PUT'}`,
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
@@ -63,33 +64,12 @@ export const actions: Actions = {
 
 			return response.json().then((data) => {
 				if (response.ok) {
-					return redirect(303, `/tests/test-${params.type}`);
+					return redirect(303, `/tests/test-${form.data.is_template?'template':'session'}`);
 				} else {
 					return fail(500, { form });
 				}
 			});
-		} else {
-			const response = await fetch(`${BACKEND_URL}/test/${form.data.test_id}`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
-				},
-				body: JSON.stringify(form.data)
-			});
-
-			if (!response.ok) {
-				return fail(500, { form });
-			}
-
-			return response.json().then((data) => {
-				if (response.ok) {
-					return redirect(303, `/tests/test-${params.type}`);
-				} else {
-					return fail(500, { form });
-				}
-			});
-		}
+        
 	},
 
 	deleteAction: async ({ request, params }) => {

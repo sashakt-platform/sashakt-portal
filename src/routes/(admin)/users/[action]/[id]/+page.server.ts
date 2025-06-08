@@ -4,6 +4,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSchema } from './schema';
+import { getSessionTokenCookie } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async ({ params }) => {
 	return {
@@ -22,10 +23,14 @@ export const actions: Actions = {
 			});
 		}
 
+		const token = getSessionTokenCookie();
 		const res = await fetch(`${BACKEND_URL}/users`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: new URLSearchParams({
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify({
 				full_name: form.data.full_name,
 				email: form.data.email,
 				password: form.data.password,
@@ -42,7 +47,7 @@ export const actions: Actions = {
 			return fail(401, { form });
 		}
 
-		const { access_token } = await res.json();
+		await res.json();
 
 		throw redirect(303, '/users');
 	}

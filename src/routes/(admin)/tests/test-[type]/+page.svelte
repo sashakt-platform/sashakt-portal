@@ -49,7 +49,6 @@
 			user: any;
 		};
 	} = $props();
-	console.log('data', data);
 	const {
 		form: formData,
 		enhance,

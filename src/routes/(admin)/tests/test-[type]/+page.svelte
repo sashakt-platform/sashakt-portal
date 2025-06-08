@@ -71,8 +71,7 @@
 		dataType: 'json'
 	});
 
-	function copyForms(readArray: any, mode: 'clone' | 'update' | 'convert') {
-		$formData;
+	function prepareTestFormData(testData: any, mode: 'clone' | 'update' | 'convert') {
 		const {
 			id,
 			created_date,
@@ -84,17 +83,16 @@
 			is_deleted,
 			total_questions,
 			...restArray
-		} = readArray;
+		} = testData;
 		$formData = { ...restArray };
 		mode == 'update' && ($formData.test_id = id);
 		mode == 'clone' && ($formData.name = 'Copy of ' + $formData.name);
 		mode == 'convert' && ($formData.is_template = false);
-		$formData.tag_ids = readArray.tags.map((tag: { id: String }) => String(tag.id)) || [];
-		$formData.state_ids = readArray.states.map((state: { id: String }) => String(state.id)) || [];
+		$formData.tag_ids = testData.tags?.map((tag: { id: String }) => String(tag.id)) || [];
+		$formData.state_ids = testData.states?.map((state: { id: String }) => String(state.id)) || [];
 		$formData.question_revision_ids =
-			readArray.question_revisions.map((q: { id: number }) => q.id) || [];
+			testData.question_revisions?.map((q: { id: number }) => q.id) || [];
 	}
-
 	function helpReset() {
 		const is_template = $formData.is_template;
 		reset();

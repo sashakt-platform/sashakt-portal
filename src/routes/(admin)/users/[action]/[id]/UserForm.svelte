@@ -65,7 +65,7 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Organization</Form.Label>
-				<Input {...props} bind:value={$formData.organization_id} />
+				<Input {...props} type="number" bind:value={$formData.organization_id} />
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
@@ -74,7 +74,7 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Role</Form.Label>
-				<Input {...props} bind:value={$formData.role_id} />
+				<Input {...props} type="number" bind:value={$formData.role_id} />
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

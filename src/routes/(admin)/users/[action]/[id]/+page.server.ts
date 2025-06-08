@@ -22,18 +22,23 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${BACKEND_URL}/login/access-token`, {
+		const res = await fetch(`${BACKEND_URL}/users`, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			headers: { 'Content-Type': 'application/json' },
 			body: new URLSearchParams({
-				username: form.data.username,
-				password: form.data.password
+				full_name: form.data.full_name,
+				email: form.data.email,
+				password: form.data.password,
+				phone: form.data.phone || '',
+				organization_id: form.data.organization_id.toString(),
+				role_id: form.data.role_id.toString(),
+				is_active: form.data.is_active ? 'true' : 'false'
 			})
 		});
 
 		if (!res.ok) {
 			const err = await res.json();
-			form.errors = { username: [err.detail] };
+			form.errors = { full_name: [err.detail] };
 			return fail(401, { form });
 		}
 

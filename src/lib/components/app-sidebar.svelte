@@ -38,7 +38,7 @@
 		},
 		user: {
 			title: 'User Management',
-			url: '/user',
+			url: '/users',
 			icon: User
 		}
 	};

@@ -294,7 +294,7 @@
 														<DropdownMenu.Item
 															onclick={() => {
 																currentScreen = typeOfScreen.primary;
-																copyForms(test, 'update');
+																prepareTestFormData(test, 'update');
 															}}
 														>
 															<Pencil />
@@ -314,7 +314,7 @@
 														</form>
 														<DropdownMenu.Item
 															onclick={() => {
-																copyForms(test, 'clone');
+																prepareTestFormData(test, 'clone');
 																submit();
 															}}
 														>
@@ -325,7 +325,7 @@
 															hidden={!test.is_template}
 															onclick={() => {
 																currentScreen = typeOfScreen.primary;
-																copyForms(test, 'convert');
+																prepareTestFormData(test, 'convert');
 															}}
 														>
 															<FilePlus />

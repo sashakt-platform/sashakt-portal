@@ -61,14 +61,10 @@ export const actions: Actions = {
 			if (!response.ok) {
 				return fail(500, { form });
 			}
+			await response.json();
+			return redirect(303, `/tests/test-${form.data.is_template?'template':'session'}`);
 
-			return response.json().then((data) => {
-				if (response.ok) {
-					return redirect(303, `/tests/test-${form.data.is_template?'template':'session'}`);
-				} else {
-					return fail(500, { form });
-				}
-			});
+
         
 	},
 

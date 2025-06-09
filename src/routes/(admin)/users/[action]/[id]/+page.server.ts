@@ -28,7 +28,6 @@ export const load: PageServerLoad = async ({ params }) => {
 			}
 
 			userData = await userResponse.json();
-			console.log('userData', userData);
 		}
 	} catch (error) {
 		console.error('Error fetching user data:', error);

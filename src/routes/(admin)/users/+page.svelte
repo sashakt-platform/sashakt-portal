@@ -31,8 +31,6 @@
 	</div>
 </div>
 
-<div class="m-10 w-3/4 rounded-2xl bg-white align-top shadow-2xl">
-	<div class="flex h-full flex-col">
-		<DataTable data={tableData} {columns} />
-	</div>
+<div class="m-10 w-3/4 rounded-2xl align-top shadow-2xl">
+	<DataTable data={tableData} {columns} />
 </div>

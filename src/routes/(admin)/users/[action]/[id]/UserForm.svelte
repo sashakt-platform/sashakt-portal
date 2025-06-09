@@ -8,7 +8,9 @@
 
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
-	const form = superForm(data.form, {
+	let userData: Partial<Infer<FormSchema>> | null = data?.user || null;
+
+	const form = superForm(userData || data.form, {
 		validators: zodClient(userSchema)
 	});
 

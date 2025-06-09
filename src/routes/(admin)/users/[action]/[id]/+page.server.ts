@@ -7,10 +7,39 @@ import { userSchema } from './schema';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async ({ params }) => {
+	const token = getSessionTokenCookie();
+
+	let userData = null;
+
+	try {
+		if (params.id) {
+			// fetch user data from backend
+			const userResponse = await fetch(`${BACKEND_URL}/users/${params.id}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
+			});
+
+			if (!userResponse.ok) {
+				console.error(`Failed to fetch user data: ${userResponse.statusText}`);
+				throw new Error('Failed to fetch user data');
+			}
+
+			userData = await userResponse.json();
+			console.log('userData', userData);
+		}
+	} catch (error) {
+		console.error('Error fetching user data:', error);
+		userData = null;
+	}
+
 	return {
 		form: await superValidate(zod(userSchema)),
 		action: params.action,
-		id: params.id
+		id: params.id,
+		user: userData
 	};
 };
 
@@ -23,7 +52,6 @@ export const actions: Actions = {
 			});
 		}
 
-		const token = getSessionTokenCookie();
 		const res = await fetch(`${BACKEND_URL}/users`, {
 			method: 'POST',
 			headers: {

@@ -100,7 +100,7 @@
 	}
 </script>
 
-<form method="POST" action="?/saveAction" use:enhance>
+<form method="POST" action="?/save" use:enhance>
 	{#if currentScreen !== typeOfScreen.main}
 		<div class="flex border-b-2 py-2">
 			<div class="flex justify-start">
@@ -300,7 +300,7 @@
 															<Pencil />
 															<span>Edit</span>
 														</DropdownMenu.Item>
-														<form action="?/deleteAction" method="POST" use:enhanceDelete>
+														<form action="?/delete" method="POST" use:enhanceDelete>
 															<!-- <input type="hidden" name="id" value={test.id} /> -->
 															<DropdownMenu.Item
 																onclick={() => {

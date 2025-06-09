@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-	saveAction: async ({ request, params }) => {
+	save: async ({ request, params }) => {
 		const token = getSessionTokenCookie();
 		const form = await superValidate(request, zod(testSchema));
 		if (!form.valid) {
@@ -68,7 +68,7 @@ export const actions: Actions = {
         
 	},
 
-	deleteAction: async ({ request, params }) => {
+	delete: async ({ request, params }) => {
 		const token = getSessionTokenCookie();
 
 		const form = await superValidate(request, zod(individualTestSchema));

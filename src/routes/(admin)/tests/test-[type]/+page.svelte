@@ -374,9 +374,7 @@
 						: currentScreen++;
 					// Submit the form data
 				}}
-				>{currentScreen != typeOfScreen.configuration
-					? 'Continue'
-					: `${$formData.is_template ? `${$formData.test_id ? 'Update' : 'Save'} test template` : `${$formData.test_id ? 'Update' : 'Save'} Test`}`}
+				>{currentScreen != typeOfScreen.configuration ? 'Continue' : 'Save'}
 			</Button>
 		</div>
 	{/if}

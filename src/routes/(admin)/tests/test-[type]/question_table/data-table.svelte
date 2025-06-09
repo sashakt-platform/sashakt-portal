@@ -170,7 +170,7 @@
 				open = false;
 			}}
 		>
-			Add to Test Templates
+			Add to Test {$formData.is_template ? ' Template' : ''}
 		</Button>
 		<div class="ml-auto flex items-center">
 			<!-- <p>Questions per page</p> -->

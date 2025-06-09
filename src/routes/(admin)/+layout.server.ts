@@ -57,11 +57,46 @@ export const load: PageServerLoad = async () => {
 
 	const questions = await responseQuestions.json();
 
+
+	const responseUsers = await fetch(
+		`${BACKEND_URL}/users/`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		}
+	);
+
+	if (!responseUsers.ok) {
+		return { states: null };
+	}
+
+	const users = await responseUsers.json();
+
+
+	const responseTest = await fetch(
+		`${BACKEND_URL}/test/?is_template=0`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		}
+	);
+
+	if (!responseTest.ok) {
+		return { states: null };
+	}
+
+	const tests = await responseTest.json();
+
 	return {
-		// tests: tests,
+		tests: tests,
 		user: locals.user,
 		states: states,
 		tags: tags,
-		questions: questions
+		questions: questions,
+		users: users
 	};
 };

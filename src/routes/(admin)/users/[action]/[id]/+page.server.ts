@@ -44,7 +44,8 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, params }) => {
+		const token = getSessionTokenCookie();
 		const form = await superValidate(request, zod(userSchema));
 		if (!form.valid) {
 			return fail(400, {
@@ -52,22 +53,42 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${BACKEND_URL}/users`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
-			},
-			body: JSON.stringify({
-				full_name: form.data.full_name,
-				email: form.data.email,
-				password: form.data.password,
-				phone: form.data.phone || '',
-				organization_id: form.data.organization_id.toString(),
-				role_id: form.data.role_id.toString(),
-				is_active: form.data.is_active ? 'true' : 'false'
-			})
-		});
+		let res: Response;
+		if (params.action === 'edit' && params.id) {
+			res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: JSON.stringify({
+					full_name: form.data.full_name,
+					email: form.data.email,
+					password: form.data.password,
+					phone: form.data.phone || '',
+					organization_id: form.data.organization_id.toString(),
+					role_id: form.data.role_id.toString(),
+					is_active: form.data.is_active ? 'true' : 'false'
+				})
+			});
+		} else if (params.action === 'create') {
+			res = await fetch(`${BACKEND_URL}/users`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: JSON.stringify({
+					full_name: form.data.full_name,
+					email: form.data.email,
+					password: form.data.password,
+					phone: form.data.phone || '',
+					organization_id: form.data.organization_id.toString(),
+					role_id: form.data.role_id.toString(),
+					is_active: form.data.is_active ? 'true' : 'false'
+				})
+			});
+		}
 
 		if (!res.ok) {
 			const err = await res.json();

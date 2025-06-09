@@ -3,6 +3,9 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
+
+	let { data } = $props();
+
 	const information = [
 		{
 			title: 'Manage Question Banks',
@@ -31,9 +34,13 @@
 	];
 
 	const stats_box = [
-		{ title: 'Total Questions', description: 'Stats and Generated Insights', count: 117 },
-		{ title: 'Tests', description: 'Stats and Generated Insights', count: 0 },
-		{ title: 'Users', description: 'Stats and Generated Insights', count: 2 }
+		{
+			title: 'Total Questions',
+			description: 'Stats and Generated Insights',
+			count: data?.questions?.length
+		},
+		{ title: 'Tests', description: 'Stats and Generated Insights', count: data?.tests?.length },
+		{ title: 'Users', description: 'Stats and Generated Insights', count: data?.users?.count }
 	];
 </script>
 

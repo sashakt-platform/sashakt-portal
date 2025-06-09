@@ -14,7 +14,12 @@
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { testSchema, type FormSchema } from './schema';
+	import {
+		individualTestSchema,
+		testSchema,
+		type FormSchema,
+		type IndividualTestSchema
+	} from './schema';
 	import Plus from '@lucide/svelte/icons/plus';
 	import TagsSelection from './TagsSelection.svelte';
 	import StateSelection from './StateSelection.svelte';
@@ -26,23 +31,29 @@
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import CopyPlus from '@lucide/svelte/icons/copy-plus';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
-	import { Item } from '$lib/components/ui/select';
 
-	const typeOfMode = { main: 0, primary: 1, questions: 2, configuration: 3 };
+	const typeOfScreen = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
-	let currentMode: number = $state(typeOfMode.main);
+	let currentScreen: number = $state(typeOfScreen.main);
 
 	$effect(() =>
-		currentMode == typeOfMode.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
+		currentScreen == typeOfScreen.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
 
-	let { data }: { data: { form: SuperValidated<Infer<FormSchema>>; user: any } } = $props();
-
+	let {
+		data
+	}: {
+		data: {
+			form: SuperValidated<Infer<FormSchema>>;
+			deleteForm: SuperValidated<Infer<IndividualTestSchema>>;
+			user: any;
+		};
+	} = $props();
 	const {
 		form: formData,
 		enhance,
 		submit,
-		isTainted
+		reset
 	} = superForm(data.form, {
 		validators: zodClient(testSchema),
 		dataType: 'json',
@@ -50,16 +61,58 @@
 			$formData.created_by_id = data.user.id;
 		}
 	});
+
+	const {
+		form: deleteFormData,
+		enhance: enhanceDelete,
+		submit: submitDelete
+	} = superForm(data.deleteForm, {
+		validators: zodClient(individualTestSchema),
+		dataType: 'json'
+	});
+
+	function prepareTestFormData(testData: any, mode: 'clone' | 'update' | 'convert') {
+		if (!testData || typeof testData !== 'object') {
+			console.error('Invalid testData provided to prepareTestFormData');
+			return;
+		}
+		const {
+			id,
+			created_date,
+			modified_date,
+			tags,
+			states,
+			question_revisions,
+			is_active,
+			is_deleted,
+			total_questions,
+			...restArray
+		} = testData;
+		$formData = { ...restArray };
+		mode == 'update' && ($formData.test_id = id);
+		mode == 'clone' && ($formData.name = 'Copy of ' + $formData.name);
+		mode == 'convert' && ($formData.is_template = false);
+		$formData.tag_ids = testData.tags?.map((tag: { id: String }) => String(tag.id)) || [];
+		$formData.state_ids = testData.states?.map((state: { id: String }) => String(state.id)) || [];
+		$formData.question_revision_ids =
+			testData.question_revisions?.map((q: { id: number }) => q.id) || [];
+	}
+
+	function helpReset() {
+		const is_template = $formData.is_template;
+		reset();
+		$formData.is_template = is_template;
+	}
 </script>
 
-<form method="POST" use:enhance>
-	{#if currentMode !== typeOfMode.main}
+<form method="POST" action="?/save" use:enhance>
+	{#if currentScreen !== typeOfScreen.main}
 		<div class="flex border-b-2 py-2">
 			<div class="flex justify-start">
 				<Button
 					variant="link"
 					class=" text-gray-500"
-					onclick={() => (currentMode = typeOfMode.main)}
+					onclick={() => (currentScreen = typeOfScreen.main)}
 					><CircleChevronLeft />Back to test {$formData.is_template
 						? 'templates'
 						: 'sessions'}</Button
@@ -72,7 +125,7 @@
 					mode: number,
 					isCompleted: boolean = false
 				)}
-					{@const isActive = mode === currentMode}
+					{@const isActive = mode === currentScreen}
 					<Button
 						variant="ghost"
 						class={[
@@ -86,7 +139,7 @@
 						]}
 						onclick={() => {
 							if (isCompleted) {
-								currentMode = mode;
+								currentScreen = mode;
 							}
 						}}
 						><span
@@ -104,18 +157,18 @@
 				{@render headerNumbers(
 					1,
 					'Primary Details',
-					typeOfMode.primary,
+					typeOfScreen.primary,
 					$formData.name.trim() != '' && $formData.description.trim() != ''
 				)}
 				<ChevronRight class="my-auto w-4" />
-				{@render headerNumbers(2, 'Select Questions', typeOfMode.questions, false)}
+				{@render headerNumbers(2, 'Select Questions', typeOfScreen.questions, false)}
 				<ChevronRight class="my-auto w-4" />
-				{@render headerNumbers(3, 'Configuration Settings', typeOfMode.configuration, false)}
+				{@render headerNumbers(3, 'Configuration Settings', typeOfScreen.configuration, false)}
 			</div>
 		</div>
 	{/if}
 
-	{#if currentMode === typeOfMode.main}
+	{#if currentScreen === typeOfScreen.main}
 		<div id="mainpage" class="flex flex-col">
 			<div class="mx-10 flex flex-row py-4 sm:w-[80%]">
 				<div class="my-auto flex flex-col">
@@ -137,7 +190,9 @@
 				</div>
 				<div class="my-auto ml-auto p-4">
 					{#if data.tests.length > 0}
-						<Button class="font-bold" onclick={() => (currentMode = typeOfMode.primary)}
+						<Button
+							class="font-bold"
+							onclick={() => ((currentScreen = typeOfScreen.primary), helpReset())}
 							><Plus />{$formData.is_template
 								? 'Create a test template'
 								: 'Create a test session'}</Button
@@ -158,7 +213,7 @@
 						title: `${$formData.is_template ? 'Create Test Template' : 'Create Custom Test'}`,
 						link: '#',
 						click: () => {
-							currentMode = typeOfMode.primary;
+							currentScreen = typeOfScreen.primary;
 						}
 					}}
 					rightButton={!$formData.is_template
@@ -167,7 +222,7 @@
 								link: '/tests/test-templates',
 								click: () => {
 									$formData.is_template = true;
-									currentMode = typeOfMode.primary;
+									currentScreen = typeOfScreen.main;
 								}
 							}
 						: null}
@@ -193,29 +248,33 @@
 					<div>
 						<Table.Root>
 							<Table.Header>
-								<Table.Row class="bg-primary-foreground font-bold text-black">
-									<Table.Head class="w-1/12 ">No.</Table.Head>
-									<Table.Head class="w-5/12 "
+								<Table.Row
+									class="bg-primary-foreground my-2 flex items-center rounded-lg font-extrabold  text-black"
+								>
+									<Table.Head class="flex w-1/12 items-center ">No.</Table.Head>
+									<Table.Head class="flex w-5/12 items-center"
 										>Test {$formData.is_template ? 'Template' : 'Name'}</Table.Head
 									>
-									<Table.Head class="w-3/12">Tags</Table.Head>
-									<Table.Head class="w-2/12">Updated</Table.Head>
-									<Table.Head class="w-1/12"></Table.Head>
+									<Table.Head class="flex w-3/12 items-center">Tags</Table.Head>
+									<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
+									<Table.Head class="flex w-1/12 items-center"></Table.Head>
 								</Table.Row>
 							</Table.Header>
 							<Table.Body>
 								{#each data.tests as test, index (test.id)}
-									<Table.Row class=" my-4 table-row gap-10 space-y-7 bg-white ">
-										<Table.Cell class="w-1/12 ">{index + 1}</Table.Cell>
-										<Table.Cell class="w-5/12">{test.name}</Table.Cell>
-										<Table.Cell class="w-3/12">
+									<Table.Row
+										class=" my-2 flex items-center  rounded-lg border border-gray-200  bg-white  font-medium "
+									>
+										<Table.Cell class="w-1/12 items-center">{index + 1}</Table.Cell>
+										<Table.Cell class="w-5/12 items-center">{test.name}</Table.Cell>
+										<Table.Cell class="w-3/12 items-center">
 											{#if test.tags && test.tags.length > 0}
 												{test.tags.map((tag: { name: string }) => tag.name).join(', ')}
 											{:else}
 												None
 											{/if}
 										</Table.Cell>
-										<Table.Cell class="w-2/12">
+										<Table.Cell class="w-2/12 items-center">
 											{#if test.modified_date}
 												{new Date(test.modified_date).toLocaleDateString('en-US', {
 													day: 'numeric',
@@ -229,7 +288,7 @@
 												})}
 											{/if}
 										</Table.Cell>
-										<Table.Cell>
+										<Table.Cell class="w-1/12 items-center">
 											<!--  <Button variant="secondary" class="cursor-pointer"><Ellipsis /></Button> -->
 											<DropdownMenu.Root>
 												<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}
@@ -237,19 +296,43 @@
 												>
 												<DropdownMenu.Content class="w-56">
 													<DropdownMenu.Group>
-														<DropdownMenu.Item>
+														<DropdownMenu.Item
+															onclick={() => {
+																currentScreen = typeOfScreen.primary;
+																prepareTestFormData(test, 'update');
+															}}
+														>
 															<Pencil />
 															<span>Edit</span>
 														</DropdownMenu.Item>
-														<DropdownMenu.Item>
-															<Trash_2 />
-															Delete
-														</DropdownMenu.Item>
-														<DropdownMenu.Item>
+														<form action="?/delete" method="POST" use:enhanceDelete>
+															<!-- <input type="hidden" name="id" value={test.id} /> -->
+															<DropdownMenu.Item
+																onclick={() => {
+																	$deleteFormData.test_id = test.id;
+																	submitDelete();
+																}}
+															>
+																<Trash_2 />
+																Delete
+															</DropdownMenu.Item>
+														</form>
+														<DropdownMenu.Item
+															onclick={() => {
+																prepareTestFormData(test, 'clone');
+																submit();
+															}}
+														>
 															<CopyPlus />
 															<span>Clone</span>
 														</DropdownMenu.Item>
-														<DropdownMenu.Item>
+														<DropdownMenu.Item
+															hidden={!test.is_template}
+															onclick={() => {
+																currentScreen = typeOfScreen.primary;
+																prepareTestFormData(test, 'convert');
+															}}
+														>
 															<FilePlus />
 															<span>Make a Test</span>
 														</DropdownMenu.Item>
@@ -265,35 +348,33 @@
 				</div>
 			{/if}
 		</div>
-	{:else if currentMode === typeOfMode.primary}
+	{:else if currentScreen === typeOfScreen.primary}
 		<Primary {formData} />
-	{:else if currentMode === typeOfMode.questions}
+	{:else if currentScreen === typeOfScreen.questions}
 		<Question {formData} />
-	{:else if currentMode === typeOfMode.configuration}
+	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}
 
-	{#if currentMode != typeOfMode.main}
+	{#if currentScreen != typeOfScreen.main}
 		<div class="sticky bottom-0 my-4 flex w-full justify-between border-t-4 bg-white p-4">
 			<Button
 				variant="outline"
 				class="text-primary border-primary border-1"
-				onclick={() => (currentMode = typeOfMode.main)}>Cancel</Button
+				onclick={() => (currentScreen = typeOfScreen.main)}>Cancel</Button
 			>
 
 			<Button
 				class="bg-primary"
-				disabled={currentMode == typeOfMode.primary &&
+				disabled={currentScreen == typeOfScreen.primary &&
 					($formData.name.trim() == '' || $formData.description.trim() == '')}
 				onclick={() => {
-					currentMode == typeOfMode.configuration
-						? (submit(), (currentMode = typeOfMode.main))
-						: currentMode++;
+					currentScreen == typeOfScreen.configuration
+						? (submit(), (currentScreen = typeOfScreen.main))
+						: currentScreen++;
 					// Submit the form data
 				}}
-				>{currentMode != typeOfMode.configuration
-					? 'Continue'
-					: `${$formData.is_template ? 'Save test template' : 'Create Test'}`}
+				>{currentScreen != typeOfScreen.configuration ? 'Continue' : 'Save'}
 			</Button>
 		</div>
 	{/if}

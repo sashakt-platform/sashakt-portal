@@ -162,15 +162,15 @@
 		<Button
 			class="bg-primary hover:bg-primary/90 my-auto rounded px-4 text-white"
 			onclick={() => {
-				$formData.question_revision_ids.length = 0;
+				let tempArray: number[] = [];
 				table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
-					$formData.question_revision_ids.push(element.original?.id);
+					tempArray.push(element.original?.id);
 				});
-
+				$formData.question_revision_ids = tempArray;
 				open = false;
 			}}
 		>
-			Add to Test Templates
+			Add to Test {$formData.is_template ? ' Template' : ''}
 		</Button>
 		<div class="ml-auto flex items-center">
 			<!-- <p>Questions per page</p> -->

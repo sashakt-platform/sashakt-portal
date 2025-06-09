@@ -1,12 +1,12 @@
 <script lang="ts">
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 
-	let { title, Icon, children } = $props();
+	let { title, Icon, children, ...className } = $props();
 
 	let visibility: boolean = $state(false);
 </script>
 
-<div class=" py-1">
+<div class=" py-1" {...className}>
 	<button
 		type="button"
 		class={[

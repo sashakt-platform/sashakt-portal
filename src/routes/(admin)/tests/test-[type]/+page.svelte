@@ -72,6 +72,10 @@
 	});
 
 	function prepareTestFormData(testData: any, mode: 'clone' | 'update' | 'convert') {
+		if (!testData || typeof testData !== 'object') {
+			console.error('Invalid testData provided to prepareTestFormData');
+			return;
+		}
 		const {
 			id,
 			created_date,
@@ -93,6 +97,7 @@
 		$formData.question_revision_ids =
 			testData.question_revisions?.map((q: { id: number }) => q.id) || [];
 	}
+
 	function helpReset() {
 		const is_template = $formData.is_template;
 		reset();

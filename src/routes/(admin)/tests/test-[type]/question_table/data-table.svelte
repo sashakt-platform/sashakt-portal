@@ -115,11 +115,19 @@
 	<Table.Root>
 		<Table.Header>
 			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-				<Table.Row class="my-auto flex rounded-lg bg-[#0369A1]  hover:bg-[#0369A1]">
+				<Table.Row class="my-auto grid grid-cols-8 rounded-lg  bg-[#0369A1] hover:bg-[#0369A1]">
 					{#each headerGroup.headers as header (header.id)}
-						<Table.Head class="flex-1 text-white ">
+						<Table.Head
+							class={[
+								'pl-0 text-white',
+								header.id.includes('select') && 'col-span-1 ',
+								header.id.includes('question') && 'col-span-3',
+								header.id.includes('tags') && 'col-span-3',
+								header.id.includes('answers') && 'col-span-1'
+							]}
+						>
 							{#if !header.isPlaceholder}
-								<Table.Cell class="flex  w-fit ">
+								<Table.Cell class="">
 									<FlexRender
 										content={header.column.columnDef.header}
 										context={header.getContext()}

@@ -234,13 +234,14 @@
 				<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
 					<div class="flex flex-row gap-2">
 						<div class="w-1/5">
-							<TagsSelection />
+							<TagsSelection disabled />
 						</div>
 						<div class="w-1/5">
-							<StateSelection />
+							<StateSelection disabled />
 						</div>
 						<div class="ml-auto w-1/5">
 							<Input
+								disabled
 								type="search"
 								placeholder={$formData.is_template
 									? 'Search test templates...'

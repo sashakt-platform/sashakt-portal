@@ -2,7 +2,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { page } from '$app/state';
-	let { states = $bindable() } = $props();
+	let { states = $bindable(), ...rest } = $props();
 
 	const stateList = page.data.states;
 
@@ -21,7 +21,7 @@
 	>
 {/snippet}
 
-<Select.Root type="multiple" bind:value={states} name="states">
+<Select.Root type="multiple" bind:value={states} name="states" {...rest}>
 	<Select.Trigger>
 		{#if states?.length === 0}
 			{selectedStates}

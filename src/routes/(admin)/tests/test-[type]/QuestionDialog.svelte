@@ -26,13 +26,13 @@
 			<div class="m-4 h-full">
 				<div class="flex h-1/6 flex-row">
 					<div class="mx-2 w-1/5">
-						<TagsSelection bind:tags />
+						<TagsSelection bind:tags disabled />
 					</div>
 					<div class="mx-2 w-1/5">
-						<StateSelection bind:states />
+						<StateSelection bind:states disabled />
 					</div>
 					<div class="ml-auto flex w-1/5 items-start">
-						<Input type="search" placeholder="Search questions..."></Input>
+						<Input type="search" placeholder="Search questions..." disabled></Input>
 					</div>
 				</div>
 				<div class="flex h-5/6 flex-col">

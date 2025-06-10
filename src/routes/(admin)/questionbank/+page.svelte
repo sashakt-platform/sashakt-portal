@@ -32,7 +32,7 @@
 			<Label class="my-auto align-middle text-sm font-extralight">Manage questions</Label>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4', data.questions.length == 0 ? 'hidden' : 'flex']}>
-			<Button class="font-bold" variant="outline"><Plus />Create a Question</Button>
+			<Button disabled class="font-bold" variant="outline"><Plus />Create a Question</Button>
 			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
 		</div>
 	</div>
@@ -95,7 +95,7 @@
 					<!-- <StateSelection /> -->
 				</div>
 				<div class="ml-auto w-1/5">
-					<Input type="search" placeholder="Search by question name, tags, or ID" />
+					<Input type="search" disabled placeholder="Search by question name, tags, or ID" />
 				</div>
 			</div>
 			<div>

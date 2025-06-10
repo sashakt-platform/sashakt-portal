@@ -126,7 +126,7 @@ export const actions: Actions = {
 					is_active: form.data.is_active ? 'true' : 'false'
 				})
 			});
-		} else if (params.action === 'create') {
+		} else if (params.action === 'add') {
 			res = await fetch(`${BACKEND_URL}/users`, {
 				method: 'POST',
 				headers: {

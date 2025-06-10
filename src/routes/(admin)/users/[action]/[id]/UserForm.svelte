@@ -11,7 +11,7 @@
 
 	let userData: Partial<Infer<FormSchema>> | null = data?.user || null;
 
-	const form = superForm(userData || data.form, {
+	const form = superForm(data.form || userData, {
 		validators: zodClient(userSchema)
 	});
 

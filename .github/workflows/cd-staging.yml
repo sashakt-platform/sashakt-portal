@@ -43,7 +43,13 @@ jobs:
               exit 1
             fi
 
+            if [ -z "${{ vars.TEST_TAKER_URL }}" ]; then
+              echo "Error: TEST_TAKER_URL is not defined."
+              exit 1
+            fi
+
             echo "BACKEND_URL=${{ vars.BACKEND_URL }}" > .env
+            echo "TEST_TAKER_URL=${{ vars.TEST_TAKER_URL }}" >> .env
 
             corepack enable
             sudo corepack prepare pnpm@latest --activate

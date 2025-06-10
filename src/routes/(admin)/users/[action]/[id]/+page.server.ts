@@ -52,7 +52,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 		const { data: roleData } = await roleResponse.json();
 
-		formattedRoles = roleData.map((role: { id: string; name: string }) => ({
+		formattedRoles = roleData.map((role: { id: string; label: string }) => ({
 			id: role.id,
 			label: role.label
 		}));
@@ -60,12 +60,41 @@ export const load: PageServerLoad = async ({ params }) => {
 		console.error('Error fetching role data:', error);
 	}
 
+	// get organization from the backend
+	let formattedOrganizations = [];
+	try {
+		const organizationResponse = await fetch(`${BACKEND_URL}/organization`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			}
+		});
+
+		if (!organizationResponse.ok) {
+			console.error(`Failed to fetch organization data: ${organizationResponse.statusText}`);
+			throw new Error('Failed to fetch organization data');
+		}
+
+		// const { data: organizationData } = await organizationResponse.json();
+
+		const organizationData = await organizationResponse.json();
+
+		formattedOrganizations = organizationData.map((organization: { id: string; name: string }) => ({
+			id: organization.id,
+			name: organization.name
+		}));
+	} catch (error) {
+		console.error('Error fetching organization data:', error);
+	}
+
 	return {
 		form: await superValidate(zod(userSchema)),
 		action: params.action,
 		id: params.id,
 		user: userData,
-		roles: formattedRoles
+		roles: formattedRoles,
+		organizations: formattedOrganizations
 	};
 };
 

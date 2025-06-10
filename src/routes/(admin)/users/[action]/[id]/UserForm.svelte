@@ -68,7 +68,22 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Organization</Form.Label>
-				<Input {...props} type="number" bind:value={$formData.organization_id} />
+				<Select.Root type="single" bind:value={$formData.organization_id} name={props.name}>
+					<Select.Trigger class="w-[180px]" {...props}>
+						{#if $formData.organization_id}
+							{data.organizations.find(
+								(organization) => organization.id === $formData.organization_id
+							)?.name || '--select--'}
+						{:else}
+							--select--
+						{/if}
+					</Select.Trigger>
+					<Select.Content>
+						{#each data.organizations as organization (organization.id)}
+							<Select.Item value={organization.id} label={organization.name} />
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

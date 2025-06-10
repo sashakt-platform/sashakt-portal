@@ -53,7 +53,7 @@
 		</div>
 		<div class="w-3/4 bg-white">
 			<form method="POST" enctype="multipart/form-data" use:enhance>
-				<input type="file" hidden name="file" bind:files={$file} />
+				<input type="file" hidden name="file" bind:files={$file} accept=".csv" />
 				{#if $errors.file}<span>{$errors.file}</span>{/if}
 
 				<div class="flex flex-col px-6">
@@ -108,7 +108,16 @@
 									fill="#0369A1"
 								/>
 							</svg>
-							<div class="my-auto flex-row"><p class="font-bold">{$form.file?.name}</p></div>
+							<div class="my-auto flex-row">
+								<p class="font-bold">{$form.file?.name}</p>
+								<p class="text-sm font-light">
+									{#if $form.file?.size}
+										{$form.file.size < 1024 * 1024
+											? `${($form.file.size / 1024).toFixed(2)} KB`
+											: `${($form.file.size / (1024 * 1024)).toFixed(2)} MB`}
+									{/if}
+								</p>
+							</div>
 						</div>
 					{/if}
 					<div class="m-4 ml-auto space-x-3">

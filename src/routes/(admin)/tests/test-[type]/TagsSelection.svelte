@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 
 	const tagList = page.data.tags;
-	let { tags = $bindable() } = $props();
+	let { tags = $bindable(), ...rest } = $props();
 
 	const selectedTags = $derived(
 		tags?.length
@@ -19,7 +19,7 @@
 	>
 {/snippet}
 
-<Select.Root type="multiple" bind:value={tags} name="tags">
+<Select.Root type="multiple" bind:value={tags} name="tags" {...rest}>
 	<Select.Trigger>
 		{#if tags?.length === 0}
 			{selectedTags}

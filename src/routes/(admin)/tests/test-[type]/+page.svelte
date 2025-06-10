@@ -347,7 +347,7 @@
 															}}
 														>
 															<ExternalLink />
-															<span>Test Taker Portal</span>
+															<span>Conduct Test</span>
 														</DropdownMenu.Item>
 													</DropdownMenu.Group>
 												</DropdownMenu.Content>

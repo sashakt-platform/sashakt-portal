@@ -3,7 +3,7 @@ import { testSchema, individualTestSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
-import { BACKEND_URL } from '$env/static/private';
+import { BACKEND_URL,TEST_TAKER_URL } from '$env/static/private';
 
 import { getSessionTokenCookie } from '$lib/server/auth';
 
@@ -35,7 +35,8 @@ export const load: PageServerLoad = async ({ params }) => {
 	return {
 		form,
 		deleteForm,
-		tests
+		tests,
+		test_taker_url: TEST_TAKER_URL,
 	};
 };
 

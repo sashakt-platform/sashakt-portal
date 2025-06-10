@@ -31,6 +31,7 @@
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import CopyPlus from '@lucide/svelte/icons/copy-plus';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
+	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	const typeOfScreen = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
@@ -47,8 +48,10 @@
 			form: SuperValidated<Infer<FormSchema>>;
 			deleteForm: SuperValidated<Infer<IndividualTestSchema>>;
 			user: any;
+			test_taker_url: string;
 		};
 	} = $props();
+
 	const {
 		form: formData,
 		enhance,
@@ -335,6 +338,15 @@
 														>
 															<FilePlus />
 															<span>Make a Test</span>
+														</DropdownMenu.Item>
+														<DropdownMenu.Item
+															hidden={test.is_template}
+															onclick={() => {
+																window.open(`${data.test_taker_url}/test/${test.link}`, '_blank');
+															}}
+														>
+															<ExternalLink />
+															<span>Test Taker Portal</span>
 														</DropdownMenu.Item>
 													</DropdownMenu.Group>
 												</DropdownMenu.Content>

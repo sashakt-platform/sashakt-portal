@@ -17,6 +17,6 @@ export const load = async () => {
 	const users = await res.json();
 
 	return {
-		users: users
+		users
 	};
 };

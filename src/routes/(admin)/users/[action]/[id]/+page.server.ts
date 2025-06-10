@@ -11,9 +11,9 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	let userData = null;
 
+	// get user data in edit mode
 	try {
-		if (params.id) {
-			// fetch user data from backend
+		if (params.id && params.action === 'edit') {
 			const userResponse = await fetch(`${BACKEND_URL}/users/${params.id}`, {
 				method: 'GET',
 				headers: {
@@ -34,11 +34,38 @@ export const load: PageServerLoad = async ({ params }) => {
 		userData = null;
 	}
 
+	// get roles from the backend
+	let formattedRoles = [];
+	try {
+		const roleResponse = await fetch(`${BACKEND_URL}/roles`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			}
+		});
+
+		if (!roleResponse.ok) {
+			console.error(`Failed to fetch role data: ${roleResponse.statusText}`);
+			throw new Error('Failed to fetch role data');
+		}
+
+		const { data: roleData } = await roleResponse.json();
+
+		formattedRoles = roleData.map((role: { id: string; name: string }) => ({
+			id: role.id,
+			label: role.label
+		}));
+	} catch (error) {
+		console.error('Error fetching role data:', error);
+	}
+
 	return {
 		form: await superValidate(zod(userSchema)),
 		action: params.action,
 		id: params.id,
-		user: userData
+		user: userData,
+		roles: formattedRoles
 	};
 };
 

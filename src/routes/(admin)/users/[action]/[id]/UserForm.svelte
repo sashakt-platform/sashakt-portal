@@ -2,6 +2,7 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import { userSchema, type FormSchema } from './schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -76,7 +77,20 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Role</Form.Label>
-				<Input {...props} type="number" bind:value={$formData.role_id} />
+				<Select.Root type="single" bind:value={$formData.role_id} name={props.name}>
+					<Select.Trigger class="w-[180px]" {...props}>
+						{#if $formData.role_id}
+							{data.roles.find((role) => role.id === $formData.role_id)?.label || '--select--'}
+						{:else}
+							--select--
+						{/if}
+					</Select.Trigger>
+					<Select.Content>
+						{#each data.roles as role (role.id)}
+							<Select.Item value={role.id} label={role.label} />
+						{/each}
+					</Select.Content>
+				</Select.Root>
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

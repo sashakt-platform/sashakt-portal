@@ -1,11 +1,15 @@
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import { getRequestEvent } from '$app/server';
+import type { PageServerLoad } from './$types';
 
-export const load = async () => {
-	const { locals } = getRequestEvent();
+export const load: PageServerLoad = async ({ locals, cookies, fetch }) => {
 	const token = getSessionTokenCookie();
-	const res = await fetch(`${BACKEND_URL}/questions?organization_id=${locals.user.organization_id}`, {
+	const organizationId = locals.user?.organization_id;
+	const url = organizationId != null
+    ? `${BACKEND_URL}/questions?organization_id=${encodeURIComponent(organizationId)}`
+    : `${BACKEND_URL}/questions`;
+	const res = await fetch(url, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

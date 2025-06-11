@@ -2,13 +2,7 @@ import { getRequestEvent } from '$app/server';
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from '../$types';
-// export function load() {
-// 	const { locals } = getRequestEvent();
 
-// 	return {
-// 		user: locals.user
-// 	};
-// }
 
 export const load: PageServerLoad = async () => {
 	const { locals } = getRequestEvent();

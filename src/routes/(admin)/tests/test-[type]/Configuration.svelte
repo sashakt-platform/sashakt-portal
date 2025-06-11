@@ -98,7 +98,7 @@
 				</div>
 			</div>
 		</ConfigureBox>
-		<!-- <ConfigureBox title="Question settings" Icon={CircleHelp}>
+		<ConfigureBox title="Question settings" Icon={CircleHelp}>
 			<div class="flex flex-col gap-6">
 				{#snippet checkboxLabel(name: string, label: string, subLabel: string)}
 					<div class="flex w-2/5 items-center space-x-2">
@@ -108,8 +108,14 @@
 						</Label>
 					</div>
 				{/snippet}
-				{@render checkboxLabel('shuffle', 'Shuffle', 'Shuffle the selected questions in the test')}
-				<div class="flex flex-row">
+				<span hidden
+					>{@render checkboxLabel(
+						'shuffle',
+						'Shuffle',
+						'Shuffle the selected questions in the test'
+					)}</span
+				>
+				<div class="flex flex-row" hidden>
 					{@render checkboxLabel(
 						'random_questions',
 						'Randomize',
@@ -147,6 +153,8 @@
 				</div>
 			</div>
 		</ConfigureBox>
+		<!-- 
+		
 		<ConfigureBox title="Test settings" Icon={ClipboardPenLine}>
 			<div class="flex flex-row">
 				<div class="my-auto w-2/5 align-middle">

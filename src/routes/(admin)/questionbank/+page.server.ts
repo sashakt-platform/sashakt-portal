@@ -3,7 +3,7 @@ import { getSessionTokenCookie } from '$lib/server/auth';
 import { getRequestEvent } from '$app/server';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, cookies, fetch }) => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const token = getSessionTokenCookie();
 	const organizationId = locals.user?.organization_id;
 	const url = organizationId != null

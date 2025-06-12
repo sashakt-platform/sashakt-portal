@@ -32,7 +32,9 @@
 			<Label class="my-auto align-middle text-sm font-extralight">Manage questions</Label>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4', data.questions.length == 0 ? 'hidden' : 'flex']}>
-			<Button disabled class="font-bold" variant="outline"><Plus />Create a Question</Button>
+			<a href="/questionbank/single-question"
+				><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
+			>
 			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
 		</div>
 	</div>
@@ -70,10 +72,12 @@
 				Click on the button to create questions to be uploaded in the test template and tests
 			</p>
 			<div class="mt-4">
-				<Button
-					variant="outline"
-					class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
-					><Plus /> Create a Question</Button
+				<a href="/questionbank/single-question"
+					><Button
+						variant="outline"
+						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+						><Plus /> Create a Question</Button
+					></a
 				>
 				<a href="/questionbank/import"
 					><Button

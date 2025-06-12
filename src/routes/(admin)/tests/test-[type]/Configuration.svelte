@@ -56,8 +56,8 @@
 			</div>
 		</ConfigureBox>
 
-		<ConfigureBox title="Timer Settings" Icon={Timer} hidden={$formData.is_template}>
-			<div class="flex flex-row">
+		<ConfigureBox title="Timer Settings" Icon={Timer}>
+			<div class="flex flex-row" hidden={$formData.is_template}>
 				<div class="my-auto w-2/5 align-middle">
 					{@render headingSubheading('Start & end time', 'Set the start and end time of the test')}
 				</div>

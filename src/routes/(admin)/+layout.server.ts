@@ -36,7 +36,7 @@ export const load: PageServerLoad = async () => {
 	const tags = await responseTags.json();
 
 	const responseQuestions = await fetch(
-		`${BACKEND_URL}/questions/?skip=0&limit=100&organization_id=${locals.user.organization_id}`,
+		`${BACKEND_URL}/questions/?skip=0&limit=100`,
 		{
 			method: 'GET',
 			headers: {

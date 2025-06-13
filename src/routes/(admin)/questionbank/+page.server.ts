@@ -4,11 +4,8 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const token = getSessionTokenCookie();
-	const organizationId = locals.user?.organization_id;
-	const url = organizationId != null
-    ? `${BACKEND_URL}/questions?organization_id=${encodeURIComponent(organizationId)}`
-    : `${BACKEND_URL}/questions`;
-	const res = await fetch(url, {
+
+	const res = await fetch(`${BACKEND_URL}/questions`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

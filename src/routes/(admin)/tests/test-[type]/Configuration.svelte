@@ -56,8 +56,8 @@
 			</div>
 		</ConfigureBox>
 
-		<ConfigureBox title="Timer Settings" Icon={Timer} hidden={$formData.is_template}>
-			<div class="flex flex-row">
+		<ConfigureBox title="Timer Settings" Icon={Timer}>
+			<div class="flex flex-row" hidden={$formData.is_template}>
 				<div class="my-auto w-2/5 align-middle">
 					{@render headingSubheading('Start & end time', 'Set the start and end time of the test')}
 				</div>
@@ -98,37 +98,8 @@
 				</div>
 			</div>
 		</ConfigureBox>
-		<!-- <ConfigureBox title="Question settings" Icon={CircleHelp}>
+		<ConfigureBox title="Question settings" Icon={CircleHelp}>
 			<div class="flex flex-col gap-6">
-				{#snippet checkboxLabel(name: string, label: string, subLabel: string)}
-					<div class="flex w-2/5 items-center space-x-2">
-						<Checkbox id={name} {name} onCheckedChange={(value) => ($formData[name] = value)} />
-						<Label for={name} class="ml-2">
-							{@render headingSubheading(label, subLabel)}
-						</Label>
-					</div>
-				{/snippet}
-				{@render checkboxLabel('shuffle', 'Shuffle', 'Shuffle the selected questions in the test')}
-				<div class="flex flex-row">
-					{@render checkboxLabel(
-						'random_questions',
-						'Randomize',
-						'Add random questions to test based on selected tags and location'
-					)}
-					{#if $formData.random_questions}
-						<div class="my-auto ml-4 w-1/2">
-							<Input
-								placeholder="Enter total Expected Random Questions."
-								class="w-full"
-								type="number"
-								name="no_of_random_questions"
-								bind:value={$formData.no_of_random_questions}
-							/>
-							<small class="text-red-400">Random Questions Count should be greater than 0</small>
-						</div>
-					{/if}
-				</div>
-
 				<div class="flex flex-row pt-6">
 					<div class="w-1/2">
 						{@render headingSubheading(
@@ -147,6 +118,8 @@
 				</div>
 			</div>
 		</ConfigureBox>
+		<!-- 
+		TODO: Implement Marks Level
 		<ConfigureBox title="Test settings" Icon={ClipboardPenLine}>
 			<div class="flex flex-row">
 				<div class="my-auto w-2/5 align-middle">

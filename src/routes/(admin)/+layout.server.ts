@@ -2,13 +2,7 @@ import { getRequestEvent } from '$app/server';
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from '../$types';
-// export function load() {
-// 	const { locals } = getRequestEvent();
 
-// 	return {
-// 		user: locals.user
-// 	};
-// }
 
 export const load: PageServerLoad = async () => {
 	const { locals } = getRequestEvent();
@@ -42,7 +36,7 @@ export const load: PageServerLoad = async () => {
 	const tags = await responseTags.json();
 
 	const responseQuestions = await fetch(
-		`${BACKEND_URL}/questions/?skip=0&limit=100&organization_id=${locals.user.organization_id}`,
+		`${BACKEND_URL}/questions/?skip=0&limit=100`,
 		{
 			method: 'GET',
 			headers: {

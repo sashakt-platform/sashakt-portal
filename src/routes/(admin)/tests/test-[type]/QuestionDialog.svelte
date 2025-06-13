@@ -4,8 +4,8 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Questions from '$lib/data/questions.json';
-	import TagsSelection from './TagsSelection.svelte';
-	import StateSelection from './StateSelection.svelte';
+	import TagsSelection from '../../../../lib/components/TagsSelection.svelte';
+	import StateSelection from '../../../../lib/components/StateSelection.svelte';
 	let { open = $bindable(), data, columns, formData } = $props();
 	let tags = $state<String[]>([]);
 	let states = $state<String[]>([]);

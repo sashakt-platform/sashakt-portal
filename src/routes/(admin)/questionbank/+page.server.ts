@@ -2,7 +2,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async () => {
 	const token = getSessionTokenCookie();
 
 	const res = await fetch(`${BACKEND_URL}/questions`, {

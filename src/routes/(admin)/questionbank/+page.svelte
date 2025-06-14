@@ -12,7 +12,8 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
-
+	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
+	$effect(() => useSidebar().setOpen(true));
 	const { data } = $props();
 </script>
 

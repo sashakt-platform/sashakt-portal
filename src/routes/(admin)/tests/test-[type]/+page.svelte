@@ -1,6 +1,5 @@
 <script lang="ts">
 	import EmptyBox from '$lib/components/first-data-box.svelte';
-	import * as Form from '$lib/components/ui/form/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import CircleChevronLeft from '@lucide/svelte/icons/circle-chevron-left';

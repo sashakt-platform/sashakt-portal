@@ -91,9 +91,15 @@
 			...restArray
 		} = testData;
 		$formData = { ...restArray };
-		mode == 'update' && ($formData.test_id = id);
-		mode == 'clone' && ($formData.name = 'Copy of ' + $formData.name);
-		mode == 'convert' && ($formData.is_template = false);
+
+		if (mode === 'update') {
+			$formData.test_id = id;
+		} else if (mode === 'clone') {
+			$formData.name = `Copy of ${$formData.name}`;
+			$formData.link = null;
+		} else if (mode === 'convert') {
+			$formData.is_template = false;
+		}
 		$formData.tag_ids = testData.tags?.map((tag: { id: String }) => String(tag.id)) || [];
 		$formData.state_ids = testData.states?.map((state: { id: String }) => String(state.id)) || [];
 		$formData.question_revision_ids =

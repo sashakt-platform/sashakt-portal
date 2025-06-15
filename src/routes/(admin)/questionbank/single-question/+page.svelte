@@ -21,8 +21,7 @@
 	const {
 		form: formData,
 		enhance,
-		submit,
-		reset
+		submit
 	} = superForm(data.form, {
 		validators: zodClient(questionSchema),
 		dataType: 'json',
@@ -103,17 +102,21 @@
 					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
 						{@render snippetHeading('Answers')}
 
-						{#each totalOptions as { id, key, value }, index}
+						{#each totalOptions as option, index (option.id)}
 							<div class="flex flex-row gap-4">
 								<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
 									<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
-										{key}
+										{option.key}
 									</p>
 								</div>
 								<div class="flex w-full flex-col gap-2">
 									<div class="flex flex-row rounded-sm border-1 border-black">
 										<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
-										<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
+										<Input
+											class=" border-0"
+											name={option.key}
+											bind:value={totalOptions[index].value}
+										/>
 									</div>
 									<div class="flex flex-row gap-2">
 										<Checkbox
@@ -151,10 +154,10 @@
 					<div class="flex h-1/2 flex-col gap-2">
 						{@render snippetHeading('States')}
 						<StateSelection bind:states={$formData.state_ids} />
-						<div class="mt-12 flex items-center space-x-2">
-							<Switch id="airplane-mode" class="bg-green-400" />
-							<Label for="airplane-mode">Active</Label><Info
-								class="my-auto w-4 align-middle text-xs text-gray-600"
+						<div class="mt-12 flex items-center space-x-2 text-gray-300">
+							<Switch id="active-mode" class="bg-green-400" disabled />
+							<Label for="active-mode">Active</Label><Info
+								class="my-auto w-4 align-middle text-xs text-gray-300"
 							/>
 						</div>
 					</div>

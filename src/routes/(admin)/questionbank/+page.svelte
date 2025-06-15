@@ -178,8 +178,8 @@
 								hidden={currentRow !== index}
 								><Table.Cell class="w-12/12 ">
 									<div class="flex h-fit flex-col border-t pt-4">
-										{#each question.options as option, optionIndex}
-											{#each Object.entries(option) as [key, value]}
+										{#each question.options as option, optionIndex (optionIndex)}
+											{#each Object.entries(option) as [key, value](key)}
 												<div class="my-auto flex">
 													<span class="bg-primary-foreground m-2 rounded-sm p-3">{key}</span>
 													<p class="my-auto">{value}</p>

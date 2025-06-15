@@ -12,9 +12,11 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
+	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	$effect(() => useSidebar().setOpen(true));
 	const { data } = $props();
+	let currentRow: number | null = $state(null);
 </script>
 
 <div>
@@ -119,7 +121,13 @@
 					<Table.Body>
 						{#each data.questions as question, index (question.id)}
 							<Table.Row
-								class="my-2 flex items-center  rounded-lg border border-gray-200  bg-white  font-medium "
+								onclick={() => {
+									currentRow = currentRow === index ? null : index;
+								}}
+								class={[
+									'mt-2 flex cursor-pointer  items-center rounded-lg border  border-gray-200  bg-white font-medium',
+									currentRow === index ? 'rounded-b-none border-b-0' : ''
+								]}
 							>
 								<Table.Cell class="w-1/12  items-center">{index + 1}</Table.Cell>
 								<Table.Cell class="w-5/12  items-center">{question.question_text}</Table.Cell>
@@ -145,7 +153,6 @@
 									{/if}
 								</Table.Cell>
 								<Table.Cell class="w-1/12  items-center">
-									<!--  <Button variant="secondary" class="cursor-pointer"><Ellipsis /></Button> -->
 									<DropdownMenu.Root>
 										<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}
 											><Ellipsis /></DropdownMenu.Trigger
@@ -163,6 +170,26 @@
 											</DropdownMenu.Group>
 										</DropdownMenu.Content>
 									</DropdownMenu.Root>
+								</Table.Cell>
+							</Table.Row>
+
+							<Table.Row
+								class="h fade-in mb-2  flex items-center rounded-lg  rounded-t-none border border-t-0  border-gray-200 bg-white font-medium "
+								hidden={currentRow !== index}
+								><Table.Cell class="w-12/12 ">
+									<div class="flex h-fit flex-col border-t pt-4">
+										{#each question.options as option, optionIndex}
+											{#each Object.entries(option) as [key, value]}
+												<div class="my-auto flex">
+													<span class="bg-primary-foreground m-2 rounded-sm p-3">{key}</span>
+													<p class="my-auto">{value}</p>
+													{#if question.correct_answer.includes(optionIndex)}
+														<CircleCheck class="text-primary my-auto ml-4 w-4" />
+													{/if}
+												</div>
+											{/each}
+										{/each}
+									</div>
 								</Table.Cell>
 							</Table.Row>
 						{/each}

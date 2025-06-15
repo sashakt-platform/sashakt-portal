@@ -20,8 +20,8 @@
 		type IndividualTestSchema
 	} from './schema';
 	import Plus from '@lucide/svelte/icons/plus';
-	import TagsSelection from '../../../../lib/components/TagsSelection.svelte';
-	import StateSelection from '../../../../lib/components/StateSelection.svelte';
+	import TagsSelection from '$lib/components/TagsSelection.svelte';
+	import StateSelection from '$lib/components/StateSelection.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';

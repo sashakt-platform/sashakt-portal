@@ -4,8 +4,8 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import WhiteEmptyBox from '$lib/components/white-empty-box.svelte';
 	import Info from '@lucide/svelte/icons/info';
-	import TagsSelection from '../../../../lib/components/TagsSelection.svelte';
-	import StateSelection from '../../../../lib/components/StateSelection.svelte';
+	import TagsSelection from '$lib/components/TagsSelection.svelte';
+	import StateSelection from '$lib/components/StateSelection.svelte';
 
 	let { formData } = $props();
 </script>

@@ -1,4 +1,3 @@
-import { get } from 'svelte/store';
 import type { PageServerLoad, Actions } from './$types.js';
 import { questionSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
@@ -24,9 +23,10 @@ export const actions: Actions = {
         const token = getSessionTokenCookie();
         const form = await superValidate(request, zod(questionSchema));
         if (!form.valid) {
-        console.log('Form validation failed:', form.errors);
             return fail(400, { form });
         }
+
+        try {
             const response = await fetch(`${BACKEND_URL}/questions`, {
                 method: `POST`,
                 headers: {
@@ -36,12 +36,16 @@ export const actions: Actions = {
                 body: JSON.stringify(form.data)
             });
 
-        if (!response.ok) {
-                console.log('Failed to save question:', response.status, response.statusText);
+            if (!response.ok) {
                 return fail(500, { form });
-        }
-        console.log('Question saved successfully');
+            }
             await response.json();
-            return redirect(303, `/questionbank`);
+    
+        } catch (error) {
+            return fail(500, { form });
+        }
+        return redirect(303, `/questionbank`);
+        
     }
-};
+
+}

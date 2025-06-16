@@ -35,7 +35,7 @@
 			<Label class="my-auto align-middle text-sm font-extralight">Manage questions</Label>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4', data.questions.length == 0 ? 'hidden' : 'flex']}>
-			<a href="/questionbank/single-question"
+			<a href="/questionbank/single-question/new"
 				><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
 			>
 			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
@@ -75,7 +75,7 @@
 				Click on the button to create questions to be uploaded in the test template and tests
 			</p>
 			<div class="mt-4">
-				<a href="/questionbank/single-question"
+				<a href="/questionbank/single-question/new"
 					><Button
 						variant="outline"
 						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
@@ -159,10 +159,12 @@
 										>
 										<DropdownMenu.Content class="w-56">
 											<DropdownMenu.Group>
-												<DropdownMenu.Item>
-													<Pencil />
-													<span>Edit</span>
-												</DropdownMenu.Item>
+												<a href="/questionbank/single-question/{question.id}">
+													<DropdownMenu.Item>
+														<Pencil />
+														<span>Edit</span>
+													</DropdownMenu.Item>
+												</a>
 												<DropdownMenu.Item>
 													<Trash_2 />
 													Delete

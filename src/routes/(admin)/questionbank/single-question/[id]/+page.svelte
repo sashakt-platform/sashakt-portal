@@ -17,12 +17,17 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	const { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
+
+	const questionData: Partial<Infer<FormSchema>> | null = data?.questionData || null;
+
+	console.log('Edit Question Data:', questionData);
+
 	console.log('Data:', data);
 	const {
 		form: formData,
 		enhance,
 		submit
-	} = superForm(data.form, {
+	} = superForm(questionData || data.form, {
 		validators: zodClient(questionSchema),
 		dataType: 'json',
 		onSubmit: () => {
@@ -41,18 +46,37 @@
 		}
 	});
 
-	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>([
-		{ id: 1, key: 'A', value: '', correct_answer: false },
-		{ id: 2, key: 'B', value: '', correct_answer: false },
-		{ id: 3, key: 'C', value: '', correct_answer: false },
-		{ id: 4, key: 'D', value: '', correct_answer: false }
-	]);
+	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
+		questionData
+			? questionData?.options.map((v, k) => {
+					console.log('Option:', v, 'Index:', k);
+					const key = Object.keys(v)[0];
+					const value = v[key];
+					console.log('key:', key, 'value:', value);
+					return {
+						id: k + 1,
+						key: key, // Convert index to A, B, C, D...
+						value: value || '',
+						correct_answer: questionData?.correct_answer.includes(k) ? true : false
+					};
+				})
+			: [
+					{ id: 1, key: 'A', value: '', correct_answer: false },
+					{ id: 2, key: 'B', value: '', correct_answer: false },
+					{ id: 3, key: 'C', value: '', correct_answer: false },
+					{ id: 4, key: 'D', value: '', correct_answer: false }
+				]
+	);
 
 	$effect(() => useSidebar().setOpen(false));
 
-	$effect(() => {
-		console.log('totalOptions:', $inspect(totalOptions));
-	});
+	// $effect(() => {
+	// 	console.log('totalOptions:', $inspect(totalOptions));
+	// });
+
+	// $effect(() => {
+	// 	console.log('Form Data:', $inspect($formData));
+	// });
 </script>
 
 <div class="w-screen">
@@ -102,24 +126,21 @@
 					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
 						{@render snippetHeading('Answers')}
 
-						{#each totalOptions as option, index (option.id)}
+						{#each totalOptions as { id, key, value }, index}
 							<div class="flex flex-row gap-4">
 								<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
 									<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
-										{option.key}
+										{key}
 									</p>
 								</div>
 								<div class="flex w-full flex-col gap-2">
 									<div class="flex flex-row rounded-sm border-1 border-black">
 										<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
-										<Input
-											class=" border-0"
-											name={option.key}
-											bind:value={totalOptions[index].value}
-										/>
+										<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
 									</div>
 									<div class="flex flex-row gap-2">
 										<Checkbox
+											checked={totalOptions[index].correct_answer}
 											onCheckedChange={(checked: boolean) =>
 												(totalOptions[index].correct_answer = checked)}
 										/><Label class="text-sm ">Set as correct answer</Label>
@@ -154,10 +175,10 @@
 					<div class="flex h-1/2 flex-col gap-2">
 						{@render snippetHeading('States')}
 						<StateSelection bind:states={$formData.state_ids} />
-						<div class="mt-12 flex items-center space-x-2 text-gray-300">
-							<Switch id="active-mode" class="bg-green-400" disabled />
-							<Label for="active-mode">Active</Label><Info
-								class="my-auto w-4 align-middle text-xs text-gray-300"
+						<div class="mt-12 flex items-center space-x-2">
+							<Switch id="airplane-mode" class="bg-green-400" />
+							<Label for="airplane-mode">Active</Label><Info
+								class="my-auto w-4 align-middle text-xs text-gray-600"
 							/>
 						</div>
 					</div>
@@ -166,7 +187,9 @@
 		</div>
 		<div class="sticky bottom-0 my-4 flex w-full border-t-4 bg-white p-4">
 			<div class="flex w-full justify-between">
-				<Button variant="outline" class="text-primary border-primary border-1">Cancel</Button>
+				<a href="/questionbank"
+					><Button variant="outline" class="text-primary border-primary border-1">Cancel</Button></a
+				>
 				<div class="flex gap-2">
 					<Button class="bg-primary-foreground text-primary font-bold">Preview Question</Button>
 					<Button

@@ -2,11 +2,13 @@ import { z } from 'zod';
 
 
 export const questionSchema = z.object({
+    question_id: z.number().int().optional(),
     question_text: z.string().nonempty({ message: "Question text is required" }),
     instructions: z.string().nullable().optional(),
-    question_type: z.enum(["single-choice", "multi-choice"]),
-    options: z.array(z.record(z.string())).min(2),
-    correct_answer: z.array(z.number().int()).min(1),
+    question_type: z.enum(["single-choice", "multi-choice"]).default("single-choice"),
+    options: z.array(z.record(z.string())).min(2).default([]),
+    correct_answer: z.array(z.number().int()).min(1).default([]),
+    subjective_answer_limit: z.number().int().positive().nullable().optional(),
     is_mandatory: z.boolean().default(true),
     solution: z.string().nullable().optional(),
     organization_id: z.number().int().positive(),

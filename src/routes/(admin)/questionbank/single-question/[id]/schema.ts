@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 
 export const questionSchema = z.object({
-    question_id: z.number().int().optional(),
     question_text: z.string().nonempty({ message: "Question text is required" }),
     instructions: z.string().nullable().optional(),
     question_type: z.enum(["single-choice", "multi-choice"]).default("single-choice"),

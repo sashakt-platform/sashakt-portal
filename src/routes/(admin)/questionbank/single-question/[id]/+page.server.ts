@@ -44,16 +44,16 @@ export const load: PageServerLoad = async ({ params }: any) => {
 
 
 export const actions: Actions = {
-    save: async ({ request }) => {
-        console.log('Saving question...');
+    save: async ({ request,params }) => {
+        console.log('Saving question...',params);
         const token = getSessionTokenCookie();
         const form = await superValidate(request, zod(questionSchema));
         if (!form.valid) {
         console.log('Form validation failed:', form.errors);
             return fail(400, { form });
         }
-            const response = await fetch(`${BACKEND_URL}/questions`, {
-                method: `POST`,
+            const response = await fetch(`${BACKEND_URL}/questions${params.id!=='new' ? `/${params.id}/revisions` : ''}`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`

@@ -108,14 +108,14 @@
 							<h2
 								class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
 							>
-								Create a question
+								{questionData ? 'Edit Question' : 'Create a Question'}
 							</h2>
 							<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 						</div>
 					</div>
-					<Label class="my-auto align-middle text-sm font-extralight"
-						>Add questions with tags and details</Label
-					>
+					<Label class="my-auto align-middle text-sm font-extralight">
+						{questionData ? 'Edit Existing Question' : 'Add questions with tags and details'}
+					</Label>
 				</div>
 				<div
 					class={['text-primary my-auto ml-auto flex cursor-pointer flex-row gap-2 p-4 font-bold']}

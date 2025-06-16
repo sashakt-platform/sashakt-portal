@@ -51,6 +51,13 @@
 			console.log('State ID:', state.state_id);
 			return String(state.state_id);
 		}));
+
+	questionData &&
+		($formData.tag_ids = questionData.tags?.map((tag: any) => {
+			console.log('State ID:', tag.id);
+			return String(tag.id);
+		}));
+
 	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
 		questionData
 			? questionData?.options.map((v, k) => {

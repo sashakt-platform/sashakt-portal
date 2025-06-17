@@ -1,6 +1,5 @@
 <script lang="ts">
 	import EmptyBox from '$lib/components/first-data-box.svelte';
-	import * as Form from '$lib/components/ui/form/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import CircleChevronLeft from '@lucide/svelte/icons/circle-chevron-left';
@@ -21,8 +20,8 @@
 		type IndividualTestSchema
 	} from './schema';
 	import Plus from '@lucide/svelte/icons/plus';
-	import TagsSelection from './TagsSelection.svelte';
-	import StateSelection from './StateSelection.svelte';
+	import TagsSelection from '$lib/components/TagsSelection.svelte';
+	import StateSelection from '$lib/components/StateSelection.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';

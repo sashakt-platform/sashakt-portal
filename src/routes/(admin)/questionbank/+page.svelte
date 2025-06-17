@@ -180,16 +180,14 @@
 								hidden={currentRow !== index}
 								><Table.Cell class="w-12/12 ">
 									<div class="flex h-fit flex-col border-t pt-4">
-										{#each question.options as option, optionIndex (optionIndex)}
-											{#each Object.entries(option) as [key, value](key)}
-												<div class="my-auto flex">
-													<span class="bg-primary-foreground m-2 rounded-sm p-3">{key}</span>
-													<p class="my-auto">{value}</p>
-													{#if question.correct_answer.includes(optionIndex)}
-														<CircleCheck class="text-primary my-auto ml-4 w-4" />
-													{/if}
-												</div>
-											{/each}
+										{#each question.options as option (option.id)}
+											<div class="my-auto flex">
+												<span class="bg-primary-foreground m-2 rounded-sm p-3">{option.key}</span>
+												<p class="my-auto">{option.value}</p>
+												{#if question.correct_answer.includes(option.id)}
+													<CircleCheck class="text-primary my-auto ml-4 w-4" />
+												{/if}
+											</div>
 										{/each}
 									</div>
 								</Table.Cell>

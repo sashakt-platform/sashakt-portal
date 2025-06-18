@@ -20,9 +20,6 @@
 
 	const questionData: Partial<Infer<FormSchema>> | null = data?.questionData || null;
 
-	console.log('Edit Question Data:', questionData);
-
-	console.log('Data:', data);
 	const {
 		form: formData,
 		enhance,
@@ -39,32 +36,24 @@
 				.map((option) => option.id - 1);
 			$formData.created_by_id = data.user.id;
 			$formData.organization_id = data.user.organization_id;
-			console.log('Form submitted with data:', $formData);
-		},
-		onError: (error) => {
-			console.error('Form submission error:', error);
 		}
 	});
 
 	questionData &&
 		($formData.state_ids = questionData.locations?.map((state: any) => {
-			console.log('State ID:', state.state_id);
 			return String(state.state_id);
 		}));
 
 	questionData &&
 		($formData.tag_ids = questionData.tags?.map((tag: any) => {
-			console.log('State ID:', tag.id);
 			return String(tag.id);
 		}));
 
 	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
 		questionData
 			? questionData?.options.map((v, k) => {
-					console.log('Option:', v, 'Index:', k);
 					const key = Object.keys(v)[0];
 					const value = v[key];
-					console.log('key:', key, 'value:', value);
 					return {
 						id: k + 1,
 						key: key, // Convert index to A, B, C, D...
@@ -81,14 +70,6 @@
 	);
 
 	$effect(() => useSidebar().setOpen(false));
-
-	// $effect(() => {
-	// 	console.log('totalOptions:', $inspect(totalOptions));
-	// });
-
-	// $effect(() => {
-	// 	console.log('Form Data:', $inspect($formData));
-	// });
 </script>
 
 <div class="w-screen">

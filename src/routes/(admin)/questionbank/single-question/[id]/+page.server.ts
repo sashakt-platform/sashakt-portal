@@ -8,7 +8,6 @@ import { BACKEND_URL } from '$env/static/private';
 
 
 export const load: PageServerLoad = async ({ params }: any) => {
-    console.log('Loading question form...', params);
     const token = getSessionTokenCookie();
     let questionData = null;
 
@@ -45,11 +44,9 @@ export const load: PageServerLoad = async ({ params }: any) => {
 
 export const actions: Actions = {
     save: async ({ request,params }) => {
-        console.log('Saving question...',params);
         const token = getSessionTokenCookie();
         const form = await superValidate(request, zod(questionSchema));
         if (!form.valid) {
-        console.log('Form validation failed:', form.errors);
             return fail(400, { form });
         }
             const response = await fetch(`${BACKEND_URL}/questions${params.id!=='new' ? `/${params.id}/revisions` : ''}`, {
@@ -62,10 +59,8 @@ export const actions: Actions = {
             });
 
         if (!response.ok) {
-                console.log('Failed to save question:', response.status, response.statusText);
                 return fail(500, { form });
         }
-        console.log('Question saved successfully');
             await response.json();
             return redirect(303, `/questionbank`);
     }

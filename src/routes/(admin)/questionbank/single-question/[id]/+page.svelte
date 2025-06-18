@@ -29,11 +29,11 @@
 		dataType: 'json',
 		onSubmit: () => {
 			$formData.options = totalOptions.map((option) => {
-				return { [option.key]: option.value };
+				return { id: option.id, key: option.key, value: option.value };
 			});
 			$formData.correct_answer = totalOptions
 				.filter((option) => option.correct_answer)
-				.map((option) => option.id - 1);
+				.map((option) => option.id);
 			$formData.created_by_id = data.user.id;
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -50,15 +50,16 @@
 		}));
 
 	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
-		questionData
-			? questionData?.options.map((v, k) => {
-					const key = Object.keys(v)[0];
-					const value = v[key];
+
+		questionData && questionData.options
+			? questionData.options.map((v, k) => {
+					const { id, key, value } = v;
+
 					return {
-						id: k + 1,
-						key: key, // Convert index to A, B, C, D...
+						id,
+						key,
 						value: value || '',
-						correct_answer: questionData?.correct_answer.includes(k) ? true : false
+						correct_answer: questionData?.correct_answer?.includes(id) ? true : false
 					};
 				})
 			: [
@@ -119,7 +120,7 @@
 					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
 						{@render snippetHeading('Answers')}
 
-						{#each totalOptions as { id, key, value }, index}
+						{#each totalOptions as { id, key, value }, index (id)}
 							<div class="flex flex-row gap-4">
 								<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
 									<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
@@ -187,7 +188,7 @@
 					<Button class="bg-primary-foreground text-primary font-bold">Preview Question</Button>
 					<Button
 						class="bg-primary"
-						disabled={$formData.question_text.trim() === '' ||
+						disabled={$formData?.question_text.trim() === '' ||
 							totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
 							!totalOptions.some((option) => option.correct_answer)}
 						onclick={() => {

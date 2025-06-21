@@ -165,10 +165,17 @@
 														<span>Edit</span>
 													</DropdownMenu.Item>
 												</a>
-												<DropdownMenu.Item>
-													<Trash_2 />
-													Delete
-												</DropdownMenu.Item>
+												<form
+													action="/questionbank/single-question/{question.id}?/delete"
+													method="POST"
+												>
+													<button type="submit" class="w-full text-left"
+														><DropdownMenu.Item>
+															<Trash_2 />
+															Delete
+														</DropdownMenu.Item>
+													</button>
+												</form>
 											</DropdownMenu.Group>
 										</DropdownMenu.Content>
 									</DropdownMenu.Root>

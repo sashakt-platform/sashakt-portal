@@ -107,5 +107,20 @@ export const actions: Actions = {
             return fail(500, { tagForm });
         }
         await response.json();
+    },
+    delete: async ({ params }) => {
+        const token = getSessionTokenCookie();
+        const response = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            return fail(500, { error: 'Failed to delete question' });
+        }
+        return redirect(303, `/questionbank`);
     }
 };

@@ -13,10 +13,20 @@
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { questionSchema, type FormSchema } from './schema';
+	import { questionSchema, type FormSchema, type TagFormSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import Tag from './Tag.svelte';
 
-	const { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
+	const {
+		data
+	}: {
+		data: {
+			form: SuperValidated<Infer<FormSchema>>;
+			tagForm: SuperValidated<Infer<TagFormSchema>>;
+			tagTypes: [];
+		};
+	} = $props();
 
 	const questionData: Partial<Infer<FormSchema>> | null = data?.questionData || null;
 
@@ -50,7 +60,6 @@
 		}));
 
 	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
-
 		questionData && questionData.options
 			? questionData.options.map((v, k) => {
 					const { id, key, value } = v;
@@ -69,6 +78,7 @@
 					{ id: 4, key: 'D', value: '', correct_answer: false }
 				]
 	);
+	let openTagDialog: boolean = $state(false);
 
 	$effect(() => useSidebar().setOpen(false));
 </script>
@@ -134,6 +144,7 @@
 									</div>
 									<div class="flex flex-row gap-2">
 										<Checkbox
+											disabled={!totalOptions[index].value.trim()}
 											checked={totalOptions[index].correct_answer}
 											onCheckedChange={(checked: boolean) =>
 												(totalOptions[index].correct_answer = checked)}
@@ -165,12 +176,25 @@
 					<div class="flex h-1/2 flex-col gap-2">
 						{@render snippetHeading('Tags')}
 						<TagsSelection bind:tags={$formData.tag_ids} />
+						<Dialog.Root bind:open={openTagDialog}>
+							<Label
+								onclick={() => (openTagDialog = true)}
+								class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
+								><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
+							>
+							<Dialog.Content class="p-4 px-0 sm:h-[70%] sm:max-w-[45%]">
+								<Dialog.Header class="m-0 h-fit  border-b-2 py-4">
+									<Dialog.Title class="px-8 ">Create new tag</Dialog.Title>
+								</Dialog.Header>
+								<Tag tagTypes={data.tagTypes} form={data.tagForm} bind:open={openTagDialog} />
+							</Dialog.Content>
+						</Dialog.Root>
 					</div>
 					<div class="flex h-1/2 flex-col gap-2">
 						{@render snippetHeading('States')}
 						<StateSelection bind:states={$formData.state_ids} />
 						<div class="mt-12 flex items-center space-x-2">
-							<Switch id="airplane-mode" class="bg-green-400" />
+							<Switch id="airplane-mode" disabled />
 							<Label for="airplane-mode">Active</Label><Info
 								class="my-auto w-4 align-middle text-xs text-gray-600"
 							/>
@@ -191,9 +215,7 @@
 						disabled={$formData?.question_text.trim() === '' ||
 							totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
 							!totalOptions.some((option) => option.correct_answer)}
-						onclick={() => {
-							submit();
-						}}>Save Question</Button
+						onclick={submit}>Save Question</Button
 					>
 				</div>
 			</div>

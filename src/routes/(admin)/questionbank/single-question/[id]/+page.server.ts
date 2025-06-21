@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { questionSchema } from './schema.js';
+import { questionSchema,tagSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
@@ -31,13 +31,37 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	} catch (error) {
 		console.error('Error fetching question data:', error);
 		questionData = null;
-	}
+    }
+    
+    let tagTypes = [];
+    try {
+        const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!tagTypesResponse.ok) {
+            console.error(`Failed to fetch tag types: ${tagTypesResponse.statusText}`);
+            throw new Error('Failed to fetch tag types');
+        }
+
+        tagTypes = await tagTypesResponse.json();
+    }
+    catch (error) {
+        console.error('Error fetching tag types:', error);
+    }
 
     const form = await superValidate(zod(questionSchema));
+    const tagForm = await superValidate(zod(tagSchema));
 
     return {
         form,
+        tagForm,
         questionData,
+        tagTypes
     }
 }
 
@@ -63,5 +87,25 @@ export const actions: Actions = {
         }
             await response.json();
             return redirect(303, `/questionbank`);
+    },
+    tagSave: async ({ request }) => {
+        const token = getSessionTokenCookie();
+        const tagForm = await superValidate(request, zod(tagSchema));
+        if (!tagForm.valid) {
+            return fail(400, { tagForm });
+        }
+        const response = await fetch(`${BACKEND_URL}/tag`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(tagForm.data)
+        });
+
+        if (!response.ok) {
+            return fail(500, { tagForm });
+        }
+        await response.json();
     }
 };

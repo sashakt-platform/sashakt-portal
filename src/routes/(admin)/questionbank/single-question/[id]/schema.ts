@@ -25,3 +25,14 @@ export const questionSchema = z.object({
 });
 
 export type FormSchema = typeof questionSchema;
+
+
+
+export const tagSchema = z.object({
+    description: z.string().nullable().optional(),
+    name: z.string().nonempty({ message: "Tag name is required" }),
+    tag_type_id: z.string(),
+    created_by_id: z.number().int().positive(),
+});
+
+export type TagFormSchema = typeof tagSchema;

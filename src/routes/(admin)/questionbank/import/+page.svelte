@@ -7,9 +7,10 @@
 	import { schema } from './schema.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
 
 	let { data } = $props();
-	const { form, enhance, errors, submit } = superForm(data.form, {
+	const { form, enhance, submit, message } = superForm(data.form, {
 		validators: zodClient(schema),
 		dataType: 'json',
 		onSubmit: () => {
@@ -20,6 +21,16 @@
 	const file = fileProxy(form, 'file');
 </script>
 
+<Dialog.Root open={$message}>
+	<Dialog.Content class="sm:max-w-[425px]">
+		<Dialog.Header>
+			<Dialog.Title>Question Uploading Completed</Dialog.Title>
+			<Dialog.Description>
+				<div class="text-lg">{$message}</div>
+			</Dialog.Description>
+		</Dialog.Header>
+	</Dialog.Content>
+</Dialog.Root>
 <div class="mx-10 flex flex-col gap-20 sm:w-[80%]">
 	<div class="mt-10 flex flex-row">
 		<div class="align-left flex flex-col">
@@ -42,8 +53,8 @@
 		</div>
 	</div>
 
-	<div class="flex w-10/12 flex-row justify-between">
-		<div class="mr-4 w-1/4 rounded-xl bg-white p-6 shadow-lg">
+	<div class="flex flex-row justify-between">
+		<div class="mr-4 h-fit w-1/4 rounded-xl bg-white p-6 shadow-lg">
 			<p class="mb-4 text-2xl font-semibold" style="color:#0369A1">Instructions</p>
 			<ol class="list-inside list-decimal text-sm" style="color: #525252;">
 				<li class="mb-4">
@@ -57,7 +68,7 @@
 				</li>
 			</ol>
 		</div>
-		<div class="w-3/4 bg-white">
+		<div class="w-3/4 bg-white shadow-lg">
 			<form method="POST" enctype="multipart/form-data" use:enhance>
 				<input type="file" hidden name="file" bind:files={$file} accept=".csv" />
 

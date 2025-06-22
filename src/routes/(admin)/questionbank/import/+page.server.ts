@@ -1,11 +1,11 @@
 import { superValidate, fail, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-
+import type { PageServerLoad } from './$types.js';
 import { schema } from './schema.js';
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
 
-export const load = async () => {
+export const load :PageServerLoad= async () => {
 	// Create a form with the default values
 	const form = await superValidate(zod(schema));
 
@@ -47,15 +47,11 @@ export const actions = {
 
 		return response.json().then((data) => {
 			if (response.ok) {
-				return message(form, 'File uploaded successfully');
+				return message(form, data.message || 'File uploaded successfully');
 			} else {
 				return fail(500, { form });
 			}
 		});
-
-		// You can add your file processing logic here
-
-		// return message(form, 'File uploaded successfully');
 	}
-};
+}
 

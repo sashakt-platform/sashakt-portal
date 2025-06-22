@@ -152,16 +152,23 @@
 										/><Label class="text-sm ">Set as correct answer</Label>
 									</div>
 								</div>
-								<div class="mt-2 gap-0 opacity-0 transition-opacity group-hover:opacity-100">
+								<div
+									class={[
+										'mt-2 gap-0 opacity-0 transition-opacity',
+										totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
+									]}
+								>
 									<Trash_2
-										class="m-0 my-auto cursor-pointer p-0"
+										class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
 										onclick={() => {
-											totalOptions = totalOptions
-												.filter((_, i) => i !== index)
-												.map((option, i) => ({
-													...option,
-													key: String.fromCharCode(65 + i)
-												}));
+											if (totalOptions.length > 1) {
+												totalOptions = totalOptions
+													.filter((_, i) => i !== index)
+													.map((option, i) => ({
+														...option,
+														key: String.fromCharCode(65 + i)
+													}));
+											}
 										}}
 									/>
 								</div>

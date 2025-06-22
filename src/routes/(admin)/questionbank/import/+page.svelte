@@ -1,11 +1,12 @@
 <script lang="ts">
 	import Label from '$lib/components/ui/label/label.svelte';
+	import X from '@lucide/svelte/icons/x';
 	import Info from '@lucide/svelte/icons/info';
-	import { Input } from '$lib/components/ui/input/index.js';
 	import { superForm, fileProxy } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
 
 	let { data } = $props();
 	const { form, enhance, errors, submit } = superForm(data.form, {
@@ -19,9 +20,9 @@
 	const file = fileProxy(form, 'file');
 </script>
 
-<div class="ml-10">
-	<div>
-		<div class="mt-10 flex w-full items-center align-middle">
+<div class="mx-10 flex flex-col gap-20 sm:w-[80%]">
+	<div class="mt-10 flex flex-row">
+		<div class="align-left flex flex-col">
 			<span class="flex flex-row">
 				<h2
 					class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
@@ -30,13 +31,18 @@
 				</h2>
 				<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 			</span>
+			<Label class="my-auto align-middle text-sm font-extralight"
+				>Upload a .csv file to import questions to your question bank</Label
+			>
 		</div>
-		<Label class="my-auto align-middle text-sm font-extralight"
-			>Upload a .csv file to import questions to your question bank</Label
-		>
+		<div class="ml-auto">
+			<Button variant="outline" class="text-primary border-primary cursor-pointer bg-transparent"
+				><a href={BulkTemplate} download="template.csv">Download Template</a></Button
+			>
+		</div>
 	</div>
 
-	<div class="mt-10 flex w-10/12 flex-row justify-between">
+	<div class="flex w-10/12 flex-row justify-between">
 		<div class="mr-4 w-1/4 rounded-xl bg-white p-6 shadow-lg">
 			<p class="mb-4 text-2xl font-semibold" style="color:#0369A1">Instructions</p>
 			<ol class="list-inside list-decimal text-sm" style="color: #525252;">
@@ -54,7 +60,6 @@
 		<div class="w-3/4 bg-white">
 			<form method="POST" enctype="multipart/form-data" use:enhance>
 				<input type="file" hidden name="file" bind:files={$file} accept=".csv" />
-				{#if $errors.file}<span>{$errors.file}</span>{/if}
 
 				<div class="flex flex-col px-6">
 					<div
@@ -118,13 +123,19 @@
 									{/if}
 								</p>
 							</div>
+							<X
+								class="my-auto ml-auto cursor-pointer rounded-full bg-gray-100 p-1"
+								onclick={() => {
+									$form.file = null;
+								}}
+							/>
 						</div>
 					{/if}
 					<div class="m-4 ml-auto space-x-3">
 						<Button
 							variant="outline"
 							onclick={() => {
-								// $file = null;
+								$file = undefined;
 							}}>Discard</Button
 						>
 						<Button

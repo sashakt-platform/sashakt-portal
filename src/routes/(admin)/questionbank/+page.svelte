@@ -32,7 +32,9 @@
 					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 				</div>
 			</div>
-			<Label class="my-auto align-middle text-sm font-extralight">Manage questions</Label>
+			<Label class="my-auto align-middle text-sm font-extralight"
+				>Create, edit and update all the questions</Label
+			>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4', data.questions.length == 0 ? 'hidden' : 'flex']}>
 			<a href="/questionbank/single-question/new"

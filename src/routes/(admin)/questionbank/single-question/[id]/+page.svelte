@@ -5,6 +5,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
+	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { Input } from '$lib/components/ui/input';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -71,12 +72,12 @@
 						correct_answer: questionData?.correct_answer?.includes(id) ? true : false
 					};
 				})
-			: [
-					{ id: 1, key: 'A', value: '', correct_answer: false },
-					{ id: 2, key: 'B', value: '', correct_answer: false },
-					{ id: 3, key: 'C', value: '', correct_answer: false },
-					{ id: 4, key: 'D', value: '', correct_answer: false }
-				]
+			: Array.from({ length: 4 }, (_, i) => ({
+					id: i + 1,
+					key: String.fromCharCode(65 + i),
+					value: '',
+					correct_answer: false
+				}))
 	);
 	let openTagDialog: boolean = $state(false);
 
@@ -131,7 +132,7 @@
 						{@render snippetHeading('Answers')}
 
 						{#each totalOptions as { id, key, value }, index (id)}
-							<div class="flex flex-row gap-4">
+							<div class="group flex flex-row gap-4">
 								<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
 									<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
 										{key}
@@ -151,6 +152,19 @@
 										/><Label class="text-sm ">Set as correct answer</Label>
 									</div>
 								</div>
+								<div class="mt-2 gap-0 opacity-0 transition-opacity group-hover:opacity-100">
+									<Trash_2
+										class="m-0 my-auto cursor-pointer p-0"
+										onclick={() => {
+											totalOptions = totalOptions
+												.filter((_, i) => i !== index)
+												.map((option, i) => ({
+													...option,
+													key: String.fromCharCode(65 + i)
+												}));
+										}}
+									/>
+								</div>
 							</div>
 						{/each}
 
@@ -160,7 +174,7 @@
 								class="text-primary border-primary"
 								onclick={() => {
 									totalOptions.push({
-										id: totalOptions.length + 1,
+										id: totalOptions[totalOptions.length - 1].id + 1,
 										key: String.fromCharCode(64 + totalOptions.length + 1),
 										value: '',
 										correct_answer: false
@@ -209,7 +223,9 @@
 					><Button variant="outline" class="text-primary border-primary border-1">Cancel</Button></a
 				>
 				<div class="flex gap-2">
-					<Button class="bg-primary-foreground text-primary font-bold">Preview Question</Button>
+					<Button class="bg-primary-foreground text-primary font-bold" disabled
+						>Preview Question</Button
+					>
 					<Button
 						class="bg-primary"
 						disabled={$formData?.question_text.trim() === '' ||

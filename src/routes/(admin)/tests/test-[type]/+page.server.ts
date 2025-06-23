@@ -3,13 +3,14 @@ import { testSchema, individualTestSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
-import { BACKEND_URL,TEST_TAKER_URL } from '$env/static/private';
+import { BACKEND_URL, TEST_TAKER_URL } from '$env/static/private';
 
 import { getSessionTokenCookie } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const is_template = params.type === 'template';
 
+	let tests = [];
 	const token = getSessionTokenCookie();
 	const res = await fetch(`${BACKEND_URL}/test/?is_template=${is_template}`, {
 		method: 'GET',
@@ -20,10 +21,9 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	if (!res.ok) {
 		console.error('Failed to fetch tests:', res.status, res.statusText);
-		return { tests: null };
+	} else {
+		tests = await res.json();
 	}
-
-	const tests = await res.json();
 
 	// Create a form with the default values
 	const form = await superValidate(zod(testSchema));
@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		form,
 		deleteForm,
 		tests,
-		test_taker_url: TEST_TAKER_URL,
+		test_taker_url: TEST_TAKER_URL
 	};
 };
 
@@ -46,27 +46,24 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod(testSchema));
 		if (!form.valid) {
 			return fail(400, { form });
-        }
+		}
 
-        const is_create = !form.data.test_id;
+		const is_create = !form.data.test_id;
 
-			const response = await fetch(`${BACKEND_URL}/test${is_create ? '' : `/${form.data.test_id}`}`, {
-                method: `${is_create ? 'POST' : 'PUT'}`,
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
-				},
-				body: JSON.stringify(form.data)
-			});
+		const response = await fetch(`${BACKEND_URL}/test${is_create ? '' : `/${form.data.test_id}`}`, {
+			method: `${is_create ? 'POST' : 'PUT'}`,
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify(form.data)
+		});
 
-			if (!response.ok) {
-				return fail(500, { form });
-			}
-			await response.json();
-			return redirect(303, `/tests/test-${form.data.is_template?'template':'session'}`);
-
-
-        
+		if (!response.ok) {
+			return fail(500, { form });
+		}
+		await response.json();
+		return redirect(303, `/tests/test-${form.data.is_template ? 'template' : 'session'}`);
 	},
 
 	delete: async ({ request, params }) => {

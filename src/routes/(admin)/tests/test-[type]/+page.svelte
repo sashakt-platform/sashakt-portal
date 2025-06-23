@@ -197,7 +197,7 @@
 					>
 				</div>
 				<div class="my-auto ml-auto p-4">
-					{#if data.tests.length > 0}
+					{#if data.tests && data.tests.length > 0}
 						<Button
 							class="font-bold"
 							onclick={() => ((currentScreen = typeOfScreen.primary), helpReset())}
@@ -209,7 +209,7 @@
 				</div>
 			</div>
 
-			{#if data.tests.length < 1}
+			{#if data.tests && data.tests.length < 1}
 				<EmptyBox
 					title={$formData.is_template
 						? 'Create your first test template'

@@ -123,9 +123,8 @@
 						{@render snippetHeading('Your Question')}
 						<Textarea name="questionText" bind:value={$formData.question_text} />
 						<div class="flex flex-row gap-2">
-							<Checkbox
-								onCheckedChange={(checked: boolean) => ($formData.is_mandatory = checked)}
-							/><Label class="text-sm ">Set as mandatory</Label>
+							<Checkbox bind:checked={$formData.is_mandatory} />
+							<Label class="text-sm ">Set as mandatory</Label>
 						</div>
 					</div>
 					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">

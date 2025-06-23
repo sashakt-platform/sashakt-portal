@@ -14,7 +14,7 @@ export const questionSchema = z.object({
         options: z.array(optionSchema).min(2).default([]),
         correct_answer: z.array(z.number().int()).min(1).default([]),
         subjective_answer_limit: z.number().int().positive().nullable().optional(),
-        is_mandatory: z.boolean().default(true),
+        is_mandatory: z.boolean().default(false),
         solution: z.string().nullable().optional(),
         organization_id: z.number().int().positive(),
         created_by_id: z.number().int().positive(),

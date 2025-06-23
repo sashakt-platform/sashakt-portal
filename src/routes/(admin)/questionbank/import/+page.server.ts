@@ -45,13 +45,9 @@ export const actions = {
 			return fail(500, { form });
 		}
 
-		return response.json().then((data) => {
-			if (response.ok) {
-				return message(form, data.message || 'File uploaded successfully');
-			} else {
-				return fail(500, { form });
-			}
-		});
+		const data = await response.json();
+		return message(form, data.message || 'File uploaded successfully');
+		
 	}
 }
 

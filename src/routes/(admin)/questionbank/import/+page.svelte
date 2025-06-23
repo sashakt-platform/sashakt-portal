@@ -75,8 +75,8 @@
 				<div class="flex flex-col px-6">
 					<div
 						class="my-6 cursor-pointer items-center rounded-xl border-2 border-dotted border-blue-400 py-6 text-center"
-						on:click={() => document.querySelector('input[type=file]').click()}
-						on:keydown={(e) =>
+						onclick={() => document.querySelector('input[type=file]').click()}
+						onkeydown={(e) =>
 							e.key === 'Enter' && document.querySelector('input[type=file]').click()}
 						role="button"
 						tabindex="0"

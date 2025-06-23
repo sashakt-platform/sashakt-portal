@@ -234,7 +234,7 @@
 					>
 					<Button
 						class="bg-primary"
-						disabled={$formData?.question_text.trim() === '' ||
+						disabled={$formData?.question_text?.trim() === '' ||
 							totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
 							!totalOptions.some((option) => option.correct_answer)}
 						onclick={submit}>Save Question</Button

@@ -38,9 +38,9 @@
 		validators: zodClient(tagSchema),
 		dataType: 'json',
 		onSubmit: () => {
-			$formTagData.created_by_id = tagTypes.filter(
+			$formTagData.created_by_id = tagTypes?.filter(
 				(tagType) => tagType.id === $formTagData.tag_type_id
-			)[0].created_by_id;
+			)[0]?.created_by_id;
 			$formTagData.tag_type_id = String($formTagData.tag_type_id);
 		}
 	});

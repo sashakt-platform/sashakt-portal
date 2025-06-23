@@ -137,7 +137,7 @@
 							<X
 								class="my-auto ml-auto cursor-pointer rounded-full bg-gray-100 p-1"
 								onclick={() => {
-									$form.file = null;
+									$file = undefined;
 								}}
 							/>
 						</div>

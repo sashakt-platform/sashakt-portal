@@ -1,15 +1,11 @@
 <script lang="ts">
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Info from '@lucide/svelte/icons/info';
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
-	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
 	import Timer from '@lucide/svelte/icons/timer';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import ConfigureBox from './ConfigureBox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import * as Select from '$lib/components/ui/select/index.js';
 
 	let { formData } = $props();
 </script>

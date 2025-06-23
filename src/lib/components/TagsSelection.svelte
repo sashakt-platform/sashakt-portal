@@ -6,9 +6,13 @@
 	const tagList = page.data.tags;
 	let { tags = $bindable(), ...rest } = $props();
 
+	console.log('tags', tagList);
+
 	const selectedTags = $derived(
 		tags?.length
-			? tagList.filter((tag) => tags.includes(String(tag.id))).map((tag) => tag.name)
+			? tagList
+					.filter((tag) => tags.includes(String(tag.id)))
+					.map((tag) => tag.name + '-(' + tag.tag_type.name + ')')
 			: 'Select relevant tags'
 	);
 </script>
@@ -35,7 +39,7 @@
 		<Select.Group>
 			<Select.GroupHeading>Select Relavant Tags</Select.GroupHeading>
 			{#each tagList as tag}
-				<Select.Item value={String(tag.id)} label={tag.name} />
+				<Select.Item value={String(tag.id)} label={tag.name + '-(' + tag.tag_type.name + ')'} />
 			{/each}
 		</Select.Group>
 	</Select.Content>

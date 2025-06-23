@@ -36,14 +36,19 @@
 				>Create, edit and update all the questions</Label
 			>
 		</div>
-		<div class={['my-auto ml-auto gap-3 p-4', data.questions.length == 0 ? 'hidden' : 'flex']}>
+		<div
+			class={[
+				'my-auto ml-auto gap-3 p-4',
+				data.questions && data.questions.length == 0 ? 'hidden' : 'flex'
+			]}
+		>
 			<a href="/questionbank/single-question/new"
 				><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
 			>
 			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
 		</div>
 	</div>
-	{#if data.questions.length == 0}
+	{#if data.questions && data.questions.length == 0}
 		<WhiteEmptyBox>
 			<svg
 				width="100"

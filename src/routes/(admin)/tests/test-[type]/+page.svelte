@@ -369,7 +369,7 @@
 	{:else if currentScreen === typeOfScreen.primary}
 		<Primary {formData} />
 	{:else if currentScreen === typeOfScreen.questions}
-		<Question {formData} />
+		<Question {formData} questions={data.questions} />
 	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}

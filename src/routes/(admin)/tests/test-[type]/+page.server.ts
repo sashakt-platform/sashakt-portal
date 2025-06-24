@@ -32,10 +32,23 @@ export const load: PageServerLoad = async ({ params }) => {
 	// Update is_template property based on params.type
 	form.data.is_template = is_template;
 
+	const responseQuestions = await fetch(
+		`${BACKEND_URL}/questions/?skip=0&limit=100`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		}
+	);
+
+	const questions = await responseQuestions.json();
+
 	return {
 		form,
 		deleteForm,
 		tests,
+		questions,
 		test_taker_url: TEST_TAKER_URL
 	};
 };

@@ -6,12 +6,12 @@
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Eye from '@lucide/svelte/icons/eye';
-	import Questions from '$lib/data/questions.json';
 	import { page } from '$app/state';
 
-	const questionList = page.data.questions || [];
+	let { formData, questions } = $props();
+	const questionList = questions || [];
 	let dialogOpen = $state(false);
-	let { formData } = $props();
+
 	const data = questionList.map((question) => {
 		return {
 			id: question.latest_question_revision_id,

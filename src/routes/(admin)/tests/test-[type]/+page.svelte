@@ -36,6 +36,20 @@
 
 	let currentScreen: number = $state(typeOfScreen.main);
 
+	let filteredTags: String[] = $state([]);
+	let filteredStates: String[] = $state([]);
+
+	let filteredTests = $derived.by(() => {
+		return filteredTags.length === 0 && filteredStates.length === 0
+			? data && data?.tests
+			: data &&
+					data?.tests.filter(
+						(test: any) =>
+							test.tags?.some((tag: any) => filteredTags.includes(String(tag.id))) ||
+							test.states?.some((state: any) => filteredStates.includes(String(state.id)))
+					);
+	});
+
 	$effect(() =>
 		currentScreen == typeOfScreen.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
 	);
@@ -239,10 +253,10 @@
 				<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
 					<div class="flex flex-row gap-2">
 						<div class="w-1/5">
-							<TagsSelection disabled />
+							<TagsSelection bind:tags={filteredTags} />
 						</div>
 						<div class="w-1/5">
-							<StateSelection disabled />
+							<StateSelection bind:states={filteredStates} />
 						</div>
 						<div class="ml-auto w-1/5">
 							<Input
@@ -270,7 +284,7 @@
 								</Table.Row>
 							</Table.Header>
 							<Table.Body>
-								{#each data.tests as test, index (test.id)}
+								{#each filteredTests as test, index (test.id)}
 									<Table.Row
 										class=" my-2 flex items-center  rounded-lg border border-gray-200  bg-white  font-medium "
 									>

@@ -228,9 +228,6 @@
 					><Button variant="outline" class="text-primary border-primary border-1">Cancel</Button></a
 				>
 				<div class="flex gap-2">
-					<Button class="bg-primary-foreground text-primary font-bold" disabled
-						>Preview Question</Button
-					>
 					<Button
 						class="bg-primary"
 						disabled={$formData?.question_text?.trim() === '' ||

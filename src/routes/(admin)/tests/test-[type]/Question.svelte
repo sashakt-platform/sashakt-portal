@@ -6,24 +6,12 @@
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Eye from '@lucide/svelte/icons/eye';
-	import { page } from '$app/state';
 
 	let { formData, questions } = $props();
-	const questionList = questions || [];
 	let dialogOpen = $state(false);
-
-	const data = questionList.map((question) => {
-		return {
-			id: question.latest_question_revision_id,
-			question: question.question_text,
-			tags: question.tags.map((tag) => tag.name),
-			options: question.options.map((option) => option.text),
-			answer: question.correct_answer
-		};
-	});
 </script>
 
-<QuestionDialog bind:open={dialogOpen} {data} {columns} {formData} />
+<QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />
 
 <div class="mx-auto flex h-dvh">
 	<div class=" mx-auto w-3/4 p-20">
@@ -97,7 +85,7 @@
 				</div>
 			{:else}
 				<div class="flex h-full w-full flex-col overflow-auto">
-					{#each data.filter((row) => $formData.question_revision_ids.includes(row.id)) as d (d.id)}
+					{#each questions.filter( (row) => $formData.question_revision_ids.includes(row.latest_question_revision_id) ) as d (d.latest_question_revision_id)}
 						<div class="m-4 flex cursor-pointer flex-row">
 							<div class="my-auto">
 								<GripVertical />
@@ -106,10 +94,12 @@
 								class="hover:bg-primary-foreground my-auto flex w-full flex-row items-center rounded-lg border-1 p-4 text-sm"
 							>
 								<p class="w-4/6">
-									{d.question}
+									{d.question_text}
 								</p>
 								<span class="mx-4 w-fit rounded-full border p-1"><Eye class="mx-auto" /></span>
-								<span class="w-2/6"><p>Leadership, Visioning & Planning Exercise</p></span>
+								<span class="w-2/6">
+									<p>{d.tags.map((tag) => tag?.name).join(', ')}</p>
+								</span>
 							</div>
 							<div class="my-auto ml-2 hidden group-hover:block">
 								<Trash2 />

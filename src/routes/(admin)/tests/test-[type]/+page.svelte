@@ -36,19 +36,8 @@
 
 	let currentScreen: number = $state(typeOfScreen.main);
 
-	let filteredTags: String[] = $state([]);
-	let filteredStates: String[] = $state([]);
-
-	let filteredTests = $derived.by(() => {
-		return filteredTags.length === 0 && filteredStates.length === 0
-			? data && data?.tests
-			: data &&
-					data?.tests.filter(
-						(test: any) =>
-							test.tags?.some((tag: any) => filteredTags.includes(String(tag.id))) ||
-							test.states?.some((state: any) => filteredStates.includes(String(state.id)))
-					);
-	});
+	let filteredTags: string[] = $state([]);
+	let filteredStates: string[] = $state([]);
 
 	$effect(() =>
 		currentScreen == typeOfScreen.main ? useSidebar().setOpen(true) : useSidebar().setOpen(false)
@@ -72,10 +61,7 @@
 		reset
 	} = superForm(data.form, {
 		validators: zodClient(testSchema),
-		dataType: 'json',
-		onSubmit: () => {
-			$formData.created_by_id = data.user.id;
-		}
+		dataType: 'json'
 	});
 
 	const {
@@ -119,6 +105,17 @@
 		$formData.question_revision_ids =
 			testData.question_revisions?.map((q: { id: number }) => q.id) || [];
 	}
+
+	let filteredTests = $derived.by(() => {
+		return filteredTags.length === 0 && filteredStates.length === 0
+			? data && data?.tests
+			: data &&
+					data?.tests.filter(
+						(test: any) =>
+							test.tags?.some((tag: any) => filteredTags.includes(String(tag.id))) ||
+							test.states?.some((state: any) => filteredStates.includes(String(state.id)))
+					);
+	});
 
 	function helpReset() {
 		const is_template = $formData.is_template;

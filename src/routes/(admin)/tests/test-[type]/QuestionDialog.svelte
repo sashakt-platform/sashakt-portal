@@ -3,12 +3,29 @@
 	import DataTable from './question_table/data-table.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import Questions from '$lib/data/questions.json';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
-	let { open = $bindable(), data, columns, formData } = $props();
+	let { open = $bindable(), questions, columns, formData } = $props();
 	let tags = $state<String[]>([]);
 	let states = $state<String[]>([]);
+	const data = $derived.by(() =>
+		questions
+			.filter((question) => {
+				return tags.length === 0 && states.length === 0
+					? question
+					: question.tags.some((tag) => tags.includes(String(tag.id))) ||
+							question.locations.some((location) => states.includes(String(location.state_id)));
+			})
+			.map((question) => {
+				return {
+					id: question.latest_question_revision_id,
+					question: question.question_text,
+					tags: question.tags.map((tag) => tag.name),
+					options: question.options.map((option) => option.text),
+					answer: question.correct_answer
+				};
+			})
+	);
 </script>
 
 <Dialog.Root bind:open>
@@ -26,10 +43,10 @@
 			<div class="m-4 h-full">
 				<div class="flex h-1/6 flex-row">
 					<div class="mx-2 w-1/5">
-						<TagsSelection bind:tags disabled />
+						<TagsSelection bind:tags />
 					</div>
 					<div class="mx-2 w-1/5">
-						<StateSelection bind:states disabled />
+						<StateSelection bind:states />
 					</div>
 					<div class="ml-auto flex w-1/5 items-start">
 						<Input type="search" placeholder="Search questions..." disabled></Input>

@@ -20,7 +20,6 @@ export const testSchema = z.object({
 	question_pagination: z.number().optional().default(1),
 	is_template: z.boolean().optional().default(false),
 	template_id: z.number().nullable().optional(),
-	created_by_id: z.number().int(),
 	tag_ids: z.array(z.string()).default([]),
 	question_revision_ids: z.array(z.number()).default([]),
 	state_ids: z.array(z.string()).default([])

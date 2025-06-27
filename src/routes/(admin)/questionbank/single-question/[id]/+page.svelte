@@ -45,7 +45,6 @@
 			$formData.correct_answer = totalOptions
 				.filter((option) => option.correct_answer)
 				.map((option) => option.id);
-			$formData.created_by_id = data.user.id;
 			$formData.organization_id = data.user.organization_id;
 		}
 	});

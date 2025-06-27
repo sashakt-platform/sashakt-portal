@@ -238,7 +238,7 @@
 					rightButton={!$formData.is_template
 						? {
 								title: `Create from test Template`,
-								link: '/tests/test-templates',
+								link: '/tests/test-template',
 								click: () => {
 									$formData.is_template = true;
 									currentScreen = typeOfScreen.main;

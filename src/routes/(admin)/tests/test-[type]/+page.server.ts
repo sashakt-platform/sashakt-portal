@@ -7,12 +7,13 @@ import { BACKEND_URL, TEST_TAKER_URL } from '$env/static/private';
 
 import { getSessionTokenCookie } from '$lib/server/auth';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params,url }) => {
 	const is_template = params.type === 'template';
 
+	let testName = url.searchParams.get('name') || '';
 	let tests = [];
 	const token = getSessionTokenCookie();
-	const res = await fetch(`${BACKEND_URL}/test/?is_template=${is_template}`, {
+	const res = await fetch(`${BACKEND_URL}/test/?is_template=${is_template}&name=${testName}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

@@ -10,6 +10,7 @@
 	import Primary from './Primary.svelte';
 	import Question from './Question.svelte';
 	import Configuration from './Configuration.svelte';
+	import { page } from '$app/state';
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -31,6 +32,7 @@
 	import CopyPlus from '@lucide/svelte/icons/copy-plus';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import { goto } from '$app/navigation';
 
 	const typeOfScreen = { main: 0, primary: 1, questions: 2, configuration: 3 };
 
@@ -53,6 +55,10 @@
 			test_taker_url: string;
 		};
 	} = $props();
+
+	let noTestCreatedYet = $derived.by(() => {
+		return data?.tests?.length === 0 && page.url.searchParams.get('name') === null;
+	});
 
 	const {
 		form: formData,
@@ -208,7 +214,7 @@
 					>
 				</div>
 				<div class="my-auto ml-auto p-4">
-					{#if data.tests && data.tests.length > 0}
+					{#if !noTestCreatedYet}
 						<Button
 							class="font-bold"
 							onclick={() => ((currentScreen = typeOfScreen.primary), helpReset())}
@@ -220,7 +226,7 @@
 				</div>
 			</div>
 
-			{#if data.tests && data.tests.length < 1}
+			{#if noTestCreatedYet}
 				<EmptyBox
 					title={$formData.is_template
 						? 'Create your first test template'
@@ -257,11 +263,20 @@
 						</div>
 						<div class="ml-auto w-1/5">
 							<Input
-								disabled
+								data-sveltekit-keepfocus
+								data-sveltekit-preloaddata
 								type="search"
 								placeholder={$formData.is_template
 									? 'Search test templates...'
 									: 'Search test sessions...'}
+								oninput={(event) => {
+									const url = new URL(page.url);
+									const timeoutId = setTimeout(() => {
+										url.searchParams.set('name', event?.target?.value);
+										goto(url, { keepFocus: true, invalidateAll: true });
+									}, 500);
+									return () => clearTimeout(timeoutId);
+								}}
 							/>
 						</div>
 					</div>

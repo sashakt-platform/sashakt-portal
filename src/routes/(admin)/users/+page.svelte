@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DataTable from './data-table.svelte';
+	import DataTable from '$lib/components/DataTable.svelte';
 	import { columns } from './columns.js';
 	import Info from '@lucide/svelte/icons/info';
 	import { Label } from '$lib/components/ui/label';

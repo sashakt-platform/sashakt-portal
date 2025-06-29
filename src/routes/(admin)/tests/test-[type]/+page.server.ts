@@ -1,13 +1,9 @@
-import type { PageServerLoad, Actions } from './$types.js';
-import { testSchema, individualTestSchema } from './schema.js';
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types.js';
 import { BACKEND_URL, TEST_TAKER_URL } from '$env/static/private';
-
 import { getSessionTokenCookie } from '$lib/server/auth';
 
-export const load: PageServerLoad = async ({ params,url }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
+
 	const is_template = params.type === 'template';
 
 	let testName = url.searchParams.get('name') || '';
@@ -26,12 +22,6 @@ export const load: PageServerLoad = async ({ params,url }) => {
 		tests = await res.json();
 	}
 
-	// Create a form with the default values
-	const form = await superValidate(zod(testSchema));
-	const deleteForm = await superValidate(zod(individualTestSchema));
-
-	// Update is_template property based on params.type
-	form.data.is_template = is_template;
 
 	const responseQuestions = await fetch(
 		`${BACKEND_URL}/questions/?skip=0&limit=100`,
@@ -46,66 +36,9 @@ export const load: PageServerLoad = async ({ params,url }) => {
 	const questions = await responseQuestions.json();
 
 	return {
-		form,
-		deleteForm,
 		tests,
 		questions,
+		is_template: is_template,
 		test_taker_url: TEST_TAKER_URL
 	};
-};
-
-export const actions: Actions = {
-	save: async ({ request }) => {
-		const token = getSessionTokenCookie();
-		const form = await superValidate(request, zod(testSchema));
-		if (!form.valid) {
-			return fail(400, { form });
-		}
-
-		const is_create = !form.data.test_id;
-
-		const response = await fetch(`${BACKEND_URL}/test${is_create ? '' : `/${form.data.test_id}`}`, {
-			method: `${is_create ? 'POST' : 'PUT'}`,
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
-			},
-			body: JSON.stringify(form.data)
-		});
-
-		if (!response.ok) {
-			return fail(500, { form });
-		}
-		await response.json();
-		return redirect(303, `/tests/test-${form.data.is_template ? 'template' : 'session'}`);
-	},
-
-	delete: async ({ request, params }) => {
-		const token = getSessionTokenCookie();
-
-		const form = await superValidate(request, zod(individualTestSchema));
-		if (!form.valid) {
-			return fail(400, { form });
-		}
-
-		const response = await fetch(`${BACKEND_URL}/test/${form.data.test_id}`, {
-			method: 'DELETE',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
-			}
-		});
-
-		if (!response.ok) {
-			return fail(500, { form });
-		}
-
-		return response.json().then((data) => {
-			if (response.ok) {
-				return redirect(303, `/tests/test-${params.type}`);
-			} else {
-				return fail(500, { form });
-			}
-		});
-	}
 };

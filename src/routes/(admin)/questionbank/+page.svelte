@@ -21,8 +21,9 @@
 	let currentRow: number | null = $state(null);
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
+	let filteredSearch: string = $state('');
 	let filteredQuestions = $derived.by(() => {
-		return filteredTags.length === 0 && filteredStates.length === 0
+		return filteredTags.length === 0 && filteredStates.length === 0 && filteredSearch.length === 0
 			? data && data?.questions
 			: data &&
 					data?.questions.filter(
@@ -30,7 +31,9 @@
 							question.tags?.some((tag: any) => filteredTags.includes(String(tag.id))) ||
 							question.locations.some((location) =>
 								filteredStates.includes(String(location.state_id))
-							)
+							) ||
+							(filteredSearch.length > 0 &&
+								question.question_text.toLowerCase().includes(filteredSearch.toLowerCase()))
 					);
 	});
 </script>
@@ -125,7 +128,11 @@
 					<StateSelection bind:states={filteredStates} />
 				</div>
 				<div class="ml-auto w-1/5">
-					<Input type="search" disabled placeholder="Search by question name, tags, or ID" />
+					<Input
+						type="search"
+						placeholder="Search by question name, tags, or ID"
+						bind:value={filteredSearch}
+					/>
 				</div>
 			</div>
 			<div>

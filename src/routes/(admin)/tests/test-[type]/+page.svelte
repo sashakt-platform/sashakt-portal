@@ -61,6 +61,7 @@
 			return true;
 		});
 	});
+	let searchTimeout: ReturnType<typeof setTimeout>;
 </script>
 
 <div id="mainpage" class="flex flex-col">
@@ -133,11 +134,11 @@
 						placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
 						oninput={(event) => {
 							const url = new URL(page.url);
-							const timeoutId = setTimeout(() => {
+							clearTimeout(searchTimeout);
+							searchTimeout = setTimeout(() => {
 								url.searchParams.set('name', event?.target?.value || '');
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}, 500);
-							return () => clearTimeout(timeoutId);
 						}}
 					/>
 				</div>

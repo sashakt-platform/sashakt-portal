@@ -19,21 +19,21 @@ export const load: PageServerLoad = async () => {
 
 	const questionsActive = await responseActive.json();
 
-	const responseDeactivate = await fetch(`${BACKEND_URL}/questions?is_active=false`, {
+	const responseInactive = await fetch(`${BACKEND_URL}/questions?is_active=false`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
 		}
 	});
 
-	if (!responseActive.ok) {
-		console.error('Failed to fetch questions:', responseActive.status, responseActive.statusText);
+	if (!responseInactive.ok) {
+		console.error('Failed to fetch questions:', responseInactive.status, responseInactive.statusText);
 		return { questions: null };
 	}
 
-	const questionsDeactive = await responseDeactivate.json();
+	const questionsInactive = await responseInactive.json();
 
 	return {
-		questions: questionsActive.concat(questionsDeactive)
+		questions: questionsActive.concat(questionsInactive)
 	};
 };

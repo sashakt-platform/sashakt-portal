@@ -128,7 +128,11 @@
 			disabled={currentScreen == typeOfScreen.primary &&
 				($formData.name.trim() == '' || $formData.description.trim() == '')}
 			onclick={() => {
-				currentScreen == typeOfScreen.configuration ? submit() : currentScreen++;
+				if (currentScreen === typeOfScreen.configuration) {
+					submit();
+				} else {
+					currentScreen++;
+				}
 			}}
 			>{currentScreen != typeOfScreen.configuration ? 'Continue' : 'Save'}
 		</Button>

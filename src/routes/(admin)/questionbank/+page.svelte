@@ -22,19 +22,37 @@
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
 	let filteredSearch: string = $state('');
+
 	let filteredQuestions = $derived.by(() => {
-		return filteredTags.length === 0 && filteredStates.length === 0 && filteredSearch.length === 0
-			? data && data?.questions
-			: data &&
-					data?.questions.filter(
-						(question: any) =>
-							question.tags?.some((tag: any) => filteredTags.includes(String(tag.id))) ||
-							question.locations.some((location) =>
-								filteredStates.includes(String(location.state_id))
-							) ||
-							(filteredSearch.length > 0 &&
-								question.question_text.toLowerCase().includes(filteredSearch.toLowerCase()))
-					);
+		if (!data?.questions) return [];
+
+		return data.questions.filter((question: any) => {
+			// Tag filter (if any tags are selected)
+			if (filteredTags.length > 0) {
+				const hasMatchingTag = question.tags?.some((tag: any) =>
+					filteredTags.includes(String(tag.id))
+				);
+				if (!hasMatchingTag) return false;
+			}
+
+			// State filter (if any states are selected)
+			if (filteredStates.length > 0) {
+				const hasMatchingState = question.locations?.some((location: any) =>
+					filteredStates.includes(String(location.state_id))
+				);
+				if (!hasMatchingState) return false;
+			}
+
+			// Search filter (if search text is provided)
+			if (filteredSearch.length > 0) {
+				const matchesSearch = question.question_text
+					?.toLowerCase()
+					.includes(filteredSearch.toLowerCase());
+				if (!matchesSearch) return false;
+			}
+
+			return true;
+		});
 	});
 </script>
 

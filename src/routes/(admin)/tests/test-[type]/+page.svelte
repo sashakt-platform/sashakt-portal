@@ -42,14 +42,25 @@
 	});
 
 	let filteredTests = $derived.by(() => {
-		return filteredTags.length === 0 && filteredStates.length === 0
-			? data && data?.tests
-			: data &&
-					data?.tests.filter(
-						(test: any) =>
-							test.tags?.some((tag: any) => filteredTags.includes(String(tag.id))) ||
-							test.states?.some((state: any) => filteredStates.includes(String(state.id)))
-					);
+		if (!data?.tests) return [];
+
+		return data?.tests.filter((test: any) => {
+			// Tag filter (if any tags are selected)
+			if (filteredTags.length > 0) {
+				const hasMatchingTag = test.tags?.some((tag: any) => filteredTags.includes(String(tag.id)));
+				if (!hasMatchingTag) return false;
+			}
+
+			// State filter (if any states are selected)
+			if (filteredStates.length > 0) {
+				const hasMatchingState = test.states?.some((state: any) =>
+					filteredStates.includes(String(state.id))
+				);
+				if (!hasMatchingState) return false;
+			}
+
+			return true;
+		});
 	});
 </script>
 

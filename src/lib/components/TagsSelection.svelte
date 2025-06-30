@@ -6,8 +6,6 @@
 	const tagList = page.data.tags;
 	let { tags = $bindable(), ...rest } = $props();
 
-	console.log('tags', tagList);
-
 	const selectedTags = $derived(
 		tags?.length
 			? tagList

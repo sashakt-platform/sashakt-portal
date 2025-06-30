@@ -8,13 +8,11 @@ import { BACKEND_URL } from '$env/static/private';
 
 
 export const load: PageServerLoad = async ({ params,url }) => {
-    console.log('current params-->', params);
 
     const token = getSessionTokenCookie();
     let testData = null;
     let templateID= url.searchParams.get('template_id') || null;
-    const is_template = params.type === 'template' ;
-    console.log('is_template-->', is_template);
+    const is_template = params?.type === 'template' ;
     try {
         if (params?.id !== 'new') {
             let id= templateID || params.id;
@@ -46,7 +44,6 @@ export const load: PageServerLoad = async ({ params,url }) => {
   
     const form = await superValidate(zod(testSchema));
     form.data.is_template = is_template;
-    console.log("test data before conversion-->",testData);
 
     const responseQuestions = await fetch(
 		`${BACKEND_URL}/questions/?skip=0&limit=100`,
@@ -75,13 +72,11 @@ export const load: PageServerLoad = async ({ params,url }) => {
 
 export const actions: Actions = {
     save: async ({ request, params }) => {
-        console.log("Saving tests with params:", params);
         const token = getSessionTokenCookie();
         const form = await superValidate(request, zod(testSchema));
         if (!form.valid) {
             return fail(400, { form });
         }
-        console.log("Form data before saving new:", form.data);
             const response = await fetch(`${BACKEND_URL}/test${(params.id!=='new' && params.id!=='convert') ? `/${params.id}` : ''}`, {
                 method: `${(params.id!=='new' && params.id!=='convert')? 'PUT' : 'POST'}`,
                 headers: {
@@ -95,12 +90,10 @@ export const actions: Actions = {
             console.error("Failed to save test:", response.status, response.statusText);
                 return fail(500, { form });
         }
-        console.log("Response from save action:", response);
             await response.json();
             return redirect(303, `/tests/test-${form.data.is_template ? 'template' : 'session'}`);
     },
     delete: async ({ params }) => {
-        console.log("Deleting test with params:", params);
         const token = getSessionTokenCookie();
         const response = await fetch(`${BACKEND_URL}/test/${params.id}`, {
             method: 'DELETE',

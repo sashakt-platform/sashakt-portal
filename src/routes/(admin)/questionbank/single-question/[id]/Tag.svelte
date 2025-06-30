@@ -15,7 +15,6 @@
 		tagTypes: [
 			name: string,
 			id: number,
-			created_by_id: number,
 			organization_id: number,
 			description: string,
 			created_date: string,
@@ -38,9 +37,6 @@
 		validators: zodClient(tagSchema),
 		dataType: 'json',
 		onSubmit: () => {
-			$formTagData.created_by_id = tagTypes?.filter(
-				(tagType) => tagType.id === $formTagData.tag_type_id
-			)[0]?.created_by_id;
 			$formTagData.tag_type_id = String($formTagData.tag_type_id);
 		}
 	});

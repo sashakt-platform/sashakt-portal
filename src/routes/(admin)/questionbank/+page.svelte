@@ -14,9 +14,46 @@
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
+	import TagsSelection from '$lib/components/TagsSelection.svelte';
+	import StateSelection from '$lib/components/StateSelection.svelte';
 	$effect(() => useSidebar().setOpen(true));
 	const { data } = $props();
 	let currentRow: number | null = $state(null);
+	let filteredTags: string[] = $state([]);
+	let filteredStates: string[] = $state([]);
+	let filteredSearch: string = $state('');
+
+	let filteredQuestions = $derived.by(() => {
+		if (!data?.questions) return [];
+
+		return data.questions.filter((question: any) => {
+			// Tag filter (if any tags are selected)
+			if (filteredTags.length > 0) {
+				const hasMatchingTag = question.tags?.some((tag: any) =>
+					filteredTags.includes(String(tag.id))
+				);
+				if (!hasMatchingTag) return false;
+			}
+
+			// State filter (if any states are selected)
+			if (filteredStates.length > 0) {
+				const hasMatchingState = question.locations?.some((location: any) =>
+					filteredStates.includes(String(location.state_id))
+				);
+				if (!hasMatchingState) return false;
+			}
+
+			// Search filter (if search text is provided)
+			if (filteredSearch.length > 0) {
+				const matchesSearch = question.question_text
+					?.toLowerCase()
+					.includes(filteredSearch.toLowerCase());
+				if (!matchesSearch) return false;
+			}
+
+			return true;
+		});
+	});
 </script>
 
 <div>
@@ -103,13 +140,17 @@
 		<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
 			<div class="flex flex-row gap-2">
 				<div class="w-1/5">
-					<!-- <TagsSelection /> -->
+					<TagsSelection bind:tags={filteredTags} />
 				</div>
 				<div class="w-1/5">
-					<!-- <StateSelection /> -->
+					<StateSelection bind:states={filteredStates} />
 				</div>
 				<div class="ml-auto w-1/5">
-					<Input type="search" disabled placeholder="Search by question name, tags, or ID" />
+					<Input
+						type="search"
+						placeholder="Search by question name, tags, or ID"
+						bind:value={filteredSearch}
+					/>
 				</div>
 			</div>
 			<div>
@@ -126,7 +167,7 @@
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{#each data.questions as question, index (question.id)}
+						{#each filteredQuestions as question, index (question.id)}
 							<Table.Row
 								onclick={() => {
 									currentRow = currentRow === index ? null : index;

@@ -99,10 +99,8 @@
 							</svg>
 						</div>
 
-						<p class="text-lg">
-							Drag and drop or <span class="font-bold text-blue-400" style="color:#0369A1"
-								>click to upload</span
-							>
+						<p class="text-lg font-bold text-blue-400" style="color:#0369A1">
+							Click to upload Questions
 						</p>
 						<p class="text-sm text-gray-400">CSV | File Size Limit:20MB</p>
 					</div>

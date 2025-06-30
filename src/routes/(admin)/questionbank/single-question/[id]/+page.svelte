@@ -45,7 +45,6 @@
 			$formData.correct_answer = totalOptions
 				.filter((option) => option.correct_answer)
 				.map((option) => option.id);
-			$formData.created_by_id = data.user.id;
 			$formData.organization_id = data.user.organization_id;
 		}
 	});
@@ -214,7 +213,7 @@
 						{@render snippetHeading('States')}
 						<StateSelection bind:states={$formData.state_ids} />
 						<div class="mt-12 flex items-center space-x-2">
-							<Switch id="airplane-mode" disabled />
+							<Switch id="airplane-mode" bind:checked={$formData.is_active} />
 							<Label for="airplane-mode">Active</Label><Info
 								class="my-auto w-4 align-middle text-xs text-gray-600"
 							/>
@@ -229,9 +228,6 @@
 					><Button variant="outline" class="text-primary border-primary border-1">Cancel</Button></a
 				>
 				<div class="flex gap-2">
-					<Button class="bg-primary-foreground text-primary font-bold" disabled
-						>Preview Question</Button
-					>
 					<Button
 						class="bg-primary"
 						disabled={$formData?.question_text?.trim() === '' ||

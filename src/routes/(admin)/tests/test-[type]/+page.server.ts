@@ -39,6 +39,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		questions = await responseQuestions.json();
 	}
 
+
 	return {
 		tests,
 		questions,

@@ -6,9 +6,9 @@
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Eye from '@lucide/svelte/icons/eye';
-
 	let { formData, questions } = $props();
 	let dialogOpen = $state(false);
+
 </script>
 
 <QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />

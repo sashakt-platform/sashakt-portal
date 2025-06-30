@@ -6,8 +6,8 @@
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	let { open = $bindable(), questions, columns, formData } = $props();
-	let tags = $state<String[]>([]);
-	let states = $state<String[]>([]);
+	let tags = $state<string[]>([]);
+	let states = $state<string[]>([]);
 	let filteredSearch: string = $state('');
 	const data = $derived.by(() =>
 		questions
@@ -40,8 +40,8 @@
 				return {
 					id: question.latest_question_revision_id,
 					question: question.question_text,
-					tags: question.tags.map((tag) => tag.name),
-					options: question.options.map((option) => option.text),
+					tags: question.tags?.map((tag) => tag.name),
+					options: question.options?.map((option) => option.text),
 					answer: question.correct_answer
 				};
 			})

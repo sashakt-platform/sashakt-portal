@@ -30,7 +30,6 @@
 		data
 	}: {
 		data: {
-			user: any;
 			test_taker_url: string;
 			is_template: boolean;
 			tests: any[];
@@ -135,7 +134,7 @@
 						oninput={(event) => {
 							const url = new URL(page.url);
 							const timeoutId = setTimeout(() => {
-								url.searchParams.set('name', event?.target?.value);
+								url.searchParams.set('name', event?.target?.value || '');
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}, 500);
 							return () => clearTimeout(timeoutId);

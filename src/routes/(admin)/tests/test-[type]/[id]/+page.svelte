@@ -46,14 +46,12 @@
 		}
 	});
 
-	testData &&
-		($formData.tag_ids = testData?.tags?.map((tag: { id: String }) => String(tag.id)) || []);
-	testData &&
-		($formData.state_ids =
-			testData?.states?.map((state: { id: String }) => String(state.id)) || []);
-	testData &&
-		($formData.question_revision_ids =
-			testData?.question_revisions?.map((q: { id: number }) => q.id) || []);
+	if (testData) {
+		$formData.tag_ids = testData?.tags?.map((tag: { id: String }) => String(tag.id)) || [];
+		$formData.state_ids = testData?.states?.map((state: { id: String }) => String(state.id)) || [];
+		$formData.question_revision_ids =
+			testData?.question_revisions?.map((q: { id: number }) => q.id) || [];
+	}
 </script>
 
 <form method="POST" action="?/save" use:enhance>

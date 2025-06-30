@@ -58,7 +58,12 @@ export const load: PageServerLoad = async ({ params,url }) => {
 		}
 	);
 
-	const questions = await responseQuestions.json();
+    let questions = [];
+	if (!responseQuestions.ok) {
+		console.error('Failed to fetch questions:', responseQuestions.status, responseQuestions.statusText);
+	} else {
+		questions = await responseQuestions.json();
+	}
 
     return {
         form,

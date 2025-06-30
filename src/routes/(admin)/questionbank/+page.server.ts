@@ -5,21 +5,35 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async () => {
 	const token = getSessionTokenCookie();
 
-	const res = await fetch(`${BACKEND_URL}/questions`, {
+	const responseActive = await fetch(`${BACKEND_URL}/questions`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
 		}
 	});
 
-	if (!res.ok) {
-		console.error('Failed to fetch questions:', res.status, res.statusText);
+	if (!responseActive.ok) {
+		console.error('Failed to fetch questions:', responseActive.status, responseActive.statusText);
 		return { questions: null };
 	}
 
-	const questions = await res.json();
+	const questionsActive = await responseActive.json();
+
+	const responseDeactivate = await fetch(`${BACKEND_URL}/questions?is_active=false`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!responseActive.ok) {
+		console.error('Failed to fetch questions:', responseActive.status, responseActive.statusText);
+		return { questions: null };
+	}
+
+	const questionsDeactive = await responseDeactivate.json();
 
 	return {
-		questions: questions
+		questions: questionsActive.concat(questionsDeactive)
 	};
 };

@@ -213,7 +213,7 @@
 						{@render snippetHeading('States')}
 						<StateSelection bind:states={$formData.state_ids} />
 						<div class="mt-12 flex items-center space-x-2">
-							<Switch id="airplane-mode" disabled />
+							<Switch id="airplane-mode" bind:checked={$formData.is_active} />
 							<Label for="airplane-mode">Active</Label><Info
 								class="my-auto w-4 align-middle text-xs text-gray-600"
 							/>

@@ -8,13 +8,33 @@
 	let { open = $bindable(), questions, columns, formData } = $props();
 	let tags = $state<String[]>([]);
 	let states = $state<String[]>([]);
+	let filteredSearch: string = $state('');
 	const data = $derived.by(() =>
 		questions
 			.filter((question) => {
-				return tags.length === 0 && states.length === 0
-					? question
-					: question.tags.some((tag) => tags.includes(String(tag.id))) ||
-							question.locations.some((location) => states.includes(String(location.state_id)));
+				// Tag filter (if any tags are selected)
+				if (tags.length > 0) {
+					const hasMatchingTag = question.tags?.some((tag: any) => tags.includes(String(tag.id)));
+					if (!hasMatchingTag) return false;
+				}
+
+				// State filter (if any states are selected)
+				if (states.length > 0) {
+					const hasMatchingState = question.locations?.some((location: any) =>
+						states.includes(String(location.state_id))
+					);
+					if (!hasMatchingState) return false;
+				}
+
+				// Search filter (if search text is provided)
+				if (filteredSearch.length > 0) {
+					const matchesSearch = question.question_text
+						?.toLowerCase()
+						.includes(filteredSearch.toLowerCase());
+					if (!matchesSearch) return false;
+				}
+
+				return true;
 			})
 			.map((question) => {
 				return {
@@ -49,7 +69,8 @@
 						<StateSelection bind:states />
 					</div>
 					<div class="ml-auto flex w-1/5 items-start">
-						<Input type="search" placeholder="Search questions..." disabled></Input>
+						<Input type="search" placeholder="Search questions..." bind:value={filteredSearch}
+						></Input>
 					</div>
 				</div>
 				<div class="flex h-5/6 flex-col">

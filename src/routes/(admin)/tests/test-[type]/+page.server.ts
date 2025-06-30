@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		tests = await res.json();
 	}
 
-
+	let questions = [];
 	const responseQuestions = await fetch(
 		`${BACKEND_URL}/questions/?skip=0&limit=100`,
 		{
@@ -33,7 +33,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		}
 	);
 
-	const questions = await responseQuestions.json();
+		if (!responseQuestions.ok) {
+		console.error('Failed to fetch Questions:', responseQuestions.status, responseQuestions.statusText);
+	} else {
+		questions = await responseQuestions.json();
+	}
 
 	return {
 		tests,

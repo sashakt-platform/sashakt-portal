@@ -24,7 +24,7 @@
 
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
-	useSidebar().setOpen(true);
+	$effect(() => useSidebar().setOpen(true));
 
 	let {
 		data

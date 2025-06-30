@@ -7,7 +7,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 
 
-export const load: PageServerLoad = async ({ params,url }: any) => {
+export const load: PageServerLoad = async ({ params,url }) => {
     console.log('current params-->', params);
 
     const token = getSessionTokenCookie();

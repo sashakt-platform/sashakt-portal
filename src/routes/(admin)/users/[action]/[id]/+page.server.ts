@@ -147,7 +147,7 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const err = await res.json();
-			form.errors = { full_name: [err.detail] };
+			form.errors = { password: [err.detail[0].msg] };
 			return fail(401, { form });
 		}
 

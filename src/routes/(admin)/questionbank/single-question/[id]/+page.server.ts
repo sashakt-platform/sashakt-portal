@@ -85,6 +85,46 @@ export const actions: Actions = {
         if (!response.ok) {
                 return fail(500, { form });
         }
+        if (params.id !== 'new') {
+
+
+            const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ tag_ids: form.data.tag_ids })
+            });
+
+            if (!tagResponse.ok) {
+                console.error(`Failed to update tags: ${tagResponse.statusText}`);
+                return fail(500, { form });
+            }
+
+            // Transform state_ids array into the required format
+            const stateDataArray = form.data.state_ids.map(stateId => ({
+                state_id: stateId,
+             
+            }));
+
+            // Send the transformed array to the API
+            const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ locations: stateDataArray })
+            });
+
+            if (!stateResponse.ok) {
+                console.error(`Failed to update states: ${stateResponse.statusText}`);
+                return fail(500, { form });
+            }
+
+            
+        }
             await response.json();
             return redirect(303, `/questionbank`);
     },

@@ -14,7 +14,6 @@ export const load: PageServerLoad = async ({cookies}) => {
 	});
 
 	if (!response.ok) {
-		console.error('Failed to fetch questions:', response.status, response.statusText);
 		setFlash({ type: 'error', message: "Failed to fetch questions. Please try again later." },cookies);
 		return { questions: null };
 	}

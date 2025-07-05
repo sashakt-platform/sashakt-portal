@@ -3,8 +3,9 @@ import { testSchema } from './schema';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail,  } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
+import { redirect,setFlash } from 'sveltekit-flash-message/server';
 
 
 export const load: PageServerLoad = async ({ params,url }) => {
@@ -71,10 +72,11 @@ export const load: PageServerLoad = async ({ params,url }) => {
 
 
 export const actions: Actions = {
-    save: async ({ request, params }) => {
+    save: async ({ request, params,cookies }) => {
         const token = getSessionTokenCookie();
         const form = await superValidate(request, zod(testSchema));
         if (!form.valid) {
+            setFlash({ type: 'error', message: "Test not Created. Please check all the details." }, cookies);
             return fail(400, { form });
         }
             const response = await fetch(`${BACKEND_URL}/test${(params.id!=='new' && params.id!=='convert') ? `/${params.id}` : ''}`, {
@@ -87,14 +89,16 @@ export const actions: Actions = {
             });
 
         if (!response.ok) {
-            console.error("Failed to save test:", response.status, response.statusText);
-                return fail(500, { form });
+            setFlash({ type: 'error', message: `Test not Created. Details: ${response.statusText}` }, cookies);
+            return fail(500, { form });
         }
-            await response.json();
-            return redirect(303, `/tests/test-${form.data.is_template ? 'template' : 'session'}`);
+        redirect(`/tests/test-${form.data.is_template ? 'template' : 'session'}`,
+            { type: 'success', message: `Test ${form.data.is_template ? 'template' : 'session'} saved successfully` }
+            , cookies);
     },
-    delete: async ({ params }) => {
+    delete: async ({ params ,cookies}) => {
         const token = getSessionTokenCookie();
+        const test_type = params.type === 'template' ? 'template' : 'session';
         const response = await fetch(`${BACKEND_URL}/test/${params.id}`, {
             method: 'DELETE',
             headers: {
@@ -104,8 +108,8 @@ export const actions: Actions = {
         });
 
         if (!response.ok) {
-            return fail(500, { error: 'Failed to delete test' });
+            redirect(500,`/tests/test-${test_type}`, { type: 'error', message: `Failed to delete test ${test_type}. Details: ${response.statusText}` }, cookies);
         }
-        return redirect(303, `/tests/test-${params.type === 'template' ? 'template' : 'session'}`);
+        redirect(`/tests/test-${test_type}`, { type: 'success', message: `Test ${test_type} deleted successfully` }, cookies);
     }
 };

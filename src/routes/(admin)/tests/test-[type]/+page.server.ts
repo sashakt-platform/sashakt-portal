@@ -1,8 +1,10 @@
 import type { PageServerLoad } from './$types.js';
 import { BACKEND_URL, TEST_TAKER_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
+import {setFlash } from 'sveltekit-flash-message/server';
 
-export const load: PageServerLoad = async ({ params, url }) => {
+
+export const load: PageServerLoad = async ({ params, url,cookies }) => {
 
 	const is_template = params.type === 'template';
 
@@ -17,7 +19,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	});
 
 	if (!res.ok) {
-		console.error('Failed to fetch tests:', res.status, res.statusText);
+		setFlash({ type: 'error', message: `Failed to fetch Test ${is_template?'template':'sessions'}. Details: ${res.statusText}` },cookies);
 	} else {
 		tests = await res.json();
 	}
@@ -34,7 +36,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	);
 
 		if (!responseQuestions.ok) {
-		console.error('Failed to fetch Questions:', responseQuestions.status, responseQuestions.statusText);
+			setFlash({ type: 'error', message: `Failed to fetch Questions. Details: ${responseQuestions.statusText}` },cookies);
+
 	} else {
 		questions = await responseQuestions.json();
 	}

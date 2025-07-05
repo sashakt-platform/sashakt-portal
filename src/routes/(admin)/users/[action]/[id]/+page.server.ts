@@ -99,7 +99,7 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, params }) => {
+	save: async ({ request, params }) => {
 		const token = getSessionTokenCookie();
 		const form = await superValidate(request, zod(userSchema));
 		if (!form.valid) {
@@ -152,6 +152,23 @@ export const actions: Actions = {
 		}
 
 		await res.json();
+	
+		throw redirect(303, '/users');
+	},
+	delete: async ({ params }) => {
+		const token = getSessionTokenCookie();
+		const res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			}
+		});
+
+		if (!res.ok) {
+			console.error(`Failed to delete user: ${res.statusText}`);
+			return fail(500, { error: 'Failed to delete user' });
+		}
 
 		throw redirect(303, '/users');
 	}

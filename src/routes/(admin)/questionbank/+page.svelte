@@ -16,8 +16,11 @@
 	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
+	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	
 	$effect(() => useSidebar().setOpen(true));
 	const { data } = $props();
+	let deleteAction: string | null = $state(null);
 	let currentRow: number | null = $state(null);
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
@@ -55,6 +58,8 @@
 		});
 	});
 </script>
+
+<DeleteDialog bind:action={deleteAction} elementName="Question" />
 
 <div>
 	<div class="mx-10 flex flex-row py-4 sm:w-[80%]">
@@ -213,17 +218,14 @@
 														<span>Edit</span>
 													</DropdownMenu.Item>
 												</a>
-												<form
-													action="/questionbank/single-question/{question.id}?/delete"
-													method="POST"
+
+												<DropdownMenu.Item
+													onclick={() =>
+														(deleteAction = `/questionbank/single-question/${question.id}?/delete`)}
 												>
-													<button type="submit" class="w-full text-left"
-														><DropdownMenu.Item>
-															<Trash_2 />
-															Delete
-														</DropdownMenu.Item>
-													</button>
-												</form>
+													<Trash_2 />
+													Delete
+												</DropdownMenu.Item>
 											</DropdownMenu.Group>
 										</DropdownMenu.Content>
 									</DropdownMenu.Root>

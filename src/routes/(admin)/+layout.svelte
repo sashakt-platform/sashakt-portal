@@ -2,10 +2,21 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
+
+	import { getFlash } from 'sveltekit-flash-message';
+	import { page } from '$app/state';
+	import { toast } from 'svelte-sonner';
 
 	let isSidebarOpen = $state(true);
 
 	let { children, data } = $props();
+
+	const flash = getFlash(page);
+	$effect(() => {
+		if (!$flash) return;
+		$flash.type === 'error' ? toast.error($flash.message) : toast.success($flash.message);
+	});
 </script>
 
 <Sidebar.Provider bind:open={isSidebarOpen}>
@@ -21,6 +32,7 @@
 			<hr class="w-screen" />
 		</div>
 		<div>
+			<Toaster richColors />
 			{@render children?.()}
 		</div>
 	</main>

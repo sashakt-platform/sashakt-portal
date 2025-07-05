@@ -18,7 +18,7 @@
 	const { form: formData, enhance } = form;
 </script>
 
-<form method="POST" use:enhance>
+<form method="POST" use:enhance action="?/save">
 	<Form.Field {form} name="full_name">
 		<Form.Control>
 			{#snippet children({ props })}

@@ -1,39 +1,29 @@
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from './$types';
+import {setFlash } from 'sveltekit-flash-message/server';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({cookies}) => {
 	const token = getSessionTokenCookie();
 
-	const responseActive = await fetch(`${BACKEND_URL}/questions`, {
+	const response = await fetch(`${BACKEND_URL}/questions`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
 		}
 	});
 
-	if (!responseActive.ok) {
-		console.error('Failed to fetch questions:', responseActive.status, responseActive.statusText);
+	if (!response.ok) {
+		setFlash({ type: 'error', message: "Failed to fetch questions. Please try again later." },cookies);
 		return { questions: null };
 	}
 
-	const questionsActive = await responseActive.json();
+	const questions = await response.json();
 
-	const responseInactive = await fetch(`${BACKEND_URL}/questions?is_active=false`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
-		}
-	});
 
-	if (!responseInactive.ok) {
-		console.error('Failed to fetch questions:', responseInactive.status, responseInactive.statusText);
-		return { questions: null };
-	}
 
-	const questionsInactive = await responseInactive.json();
 
 	return {
-		questions: questionsActive.concat(questionsInactive)
+		questions
 	};
 };

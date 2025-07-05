@@ -18,9 +18,6 @@
 		}
 	}}
 >
-	<AlertDialog.Trigger class={buttonVariants({ variant: 'outline' })}>
-		Show Dialog
-	</AlertDialog.Trigger>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
 			<AlertDialog.Title>Delete {elementName}?</AlertDialog.Title>

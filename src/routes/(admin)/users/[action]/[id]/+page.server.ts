@@ -1,10 +1,11 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail} from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { userSchema } from './schema';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
+import { redirect } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const token = getSessionTokenCookie();
@@ -99,7 +100,7 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-	save: async ({ request, params }) => {
+	save: async ({ request, params,cookies }) => {
 		const token = getSessionTokenCookie();
 		const form = await superValidate(request, zod(userSchema));
 		if (!form.valid) {
@@ -152,10 +153,10 @@ export const actions: Actions = {
 		}
 
 		await res.json();
-	
-		throw redirect(303, '/users');
+		throw redirect(303, `/users`, { type: 'success', message: `User Saved Successfully` }, cookies);
+		
 	},
-	delete: async ({ params }) => {
+	delete: async ({ params,cookies }) => {
 		const token = getSessionTokenCookie();
 		const res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
 			method: 'DELETE',
@@ -169,7 +170,6 @@ export const actions: Actions = {
 			console.error(`Failed to delete user: ${res.statusText}`);
 			return fail(500, { error: 'Failed to delete user' });
 		}
-
-		throw redirect(303, '/users');
+		throw redirect(303, `/users`, { type: 'success', message: `User Deleted Successfully` }, cookies);
 	}
 };

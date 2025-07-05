@@ -21,6 +21,7 @@
 	import FilePlus from '@lucide/svelte/icons/file-plus';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import { goto } from '$app/navigation';
+	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
@@ -62,7 +63,13 @@
 		});
 	});
 	let searchTimeout: ReturnType<typeof setTimeout>;
+	let deleteAction: string | null = $state(null);
 </script>
+
+<DeleteDialog
+	bind:action={deleteAction}
+	elementName={data?.is_template ? 'Test template' : 'Test session'}
+/>
 
 <div id="mainpage" class="flex flex-col">
 	<div class="mx-10 flex flex-row py-4 sm:w-[80%]">
@@ -199,14 +206,14 @@
 														<span>Edit</span>
 													</DropdownMenu.Item>
 												</a>
-												<form action="{page.url.pathname}/{test.id}/?/delete" method="POST">
-													<button type="submit" class="w-full text-left">
-														<DropdownMenu.Item>
-															<Trash_2 />
-															Delete
-														</DropdownMenu.Item>
-													</button>
-												</form>
+												<DropdownMenu.Item
+													onclick={() =>
+														(deleteAction = `${page.url.pathname}/${test.id}/?/delete`)}
+												>
+													<Trash_2 />
+													Delete
+												</DropdownMenu.Item>
+
 												<!-- <form action="{page.url.pathname}/{test.id}/?/save" method="POST">
 													<input type="hidden" name="name" value={'Copy of ' + test.name} />
 													<button type="submit" class="w-full text-left">

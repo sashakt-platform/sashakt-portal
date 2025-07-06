@@ -1,6 +1,5 @@
 <script>
 	import Button from '$lib/components/ui/button/button.svelte';
-	import PenLine from '@lucide/svelte/icons/pen-line';
 	import QuestionDialog from './QuestionDialog.svelte';
 	import { columns } from './question_table/columns.js';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
@@ -50,7 +49,6 @@
 				<div class="flex w-fit flex-col">
 					<div class="flex">
 						<p class="font-bold">{$formData.name}</p>
-						<PenLine class="p-1" />
 					</div>
 					<div class="flex flex-row items-center text-sm">
 						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold"
@@ -90,14 +88,18 @@
 								<GripVertical />
 							</div>
 							<div
-								class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-3 text-sm"
+								class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
 							>
-								<p class="w-4/6">
+								<p class="w-4/6 ">
 									{d.question_text}
 								</p>
-								<span class="mx-4 w-fit rounded-full border p-1"><Eye class="mx-auto" /></span>
 								<span class="w-2/6">
-									<p>{d.tags.map((tag) => tag?.name).join(', ')}</p>
+									{#if d.tags.length > 0}
+										<p>
+											<span class="font-bold">Tags:</span>
+											{d.tags.map((tag) => tag?.name).join(', ')}
+										</p>
+									{/if}
 								</span>
 							</div>
 							<div class="my-auto ml-2 hidden w-fit group-hover:block">

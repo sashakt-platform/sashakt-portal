@@ -55,12 +55,19 @@ export const columns: ColumnDef<Question>[] = [
 
       
  },
-//  {
-//   accessorKey: "options",
-//   header: "Options",
-//   },
+ {
+  accessorKey: "options",
+   header: "Options",
+   cell: ({ row }) => {
+        return row.original.options
+      },
+      size: 1,
+   maxSize: 1,
+      enableHiding:true
+  
+  },
   {
-    accessorKey: "optionHide",
+    accessorKey: "answers",
     header: "Answers",
     cell: ({ row }) => {
       // You can pass whatever you need from `row.original` to the component
@@ -70,10 +77,6 @@ export const columns: ColumnDef<Question>[] = [
     maxSize: 1,
 
   },
-//   {
-//   accessorKey: "answer",
-//   header: "Answer",
-//  },
  {
   accessorKey: "tags",
    header: "Tags",

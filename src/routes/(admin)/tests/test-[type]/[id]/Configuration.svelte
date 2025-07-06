@@ -2,10 +2,12 @@
 	import Info from '@lucide/svelte/icons/info';
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
 	import Timer from '@lucide/svelte/icons/timer';
+	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import ConfigureBox from './ConfigureBox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 
 	let { formData } = $props();
 </script>
@@ -114,15 +116,17 @@
 				</div>
 			</div>
 		</ConfigureBox>
-		<!-- 
-		TODO: Implement Marks Level
+
 		<ConfigureBox title="Test settings" Icon={ClipboardPenLine}>
-			<div class="flex flex-row">
-				<div class="my-auto w-2/5 align-middle">
-					{@render headingSubheading('Marks Level', 'Set the level of marks for the test')}
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4"><Checkbox bind:checked={$formData.show_result} /></div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Show Result',
+						'Configure if results should be shown post test completion'
+					)}
 				</div>
-				<div class=" flex w-3/5 flex-row gap-4"></div>
 			</div>
-		</ConfigureBox> -->
+		</ConfigureBox>
 	</div>
 </div>

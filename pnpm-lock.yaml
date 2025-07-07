@@ -1847,8 +1847,8 @@ packages:
     peerDependencies:
       svelte: ^5.7.0
 
-  runed@0.29.1:
-    resolution: {integrity: sha512-RGQEB8ZiWv4OvzBJhbMj2hMgRM8QrEptzTrDr7TDfkHaRePKjiUka4vJ9QHGY+8s87KymNvFoZAxFdQ4jtZNcA==}
+  runed@0.29.2:
+    resolution: {integrity: sha512-0cq6cA6sYGZwl/FvVqjx9YN+1xEBu9sDDyuWdDW1yWX7JF2wmvmVKfH+hVCZs+csW+P3ARH92MjI3H9QTagOQA==}
     peerDependencies:
       svelte: ^5.7.0
 
@@ -3091,7 +3091,7 @@ snapshots:
       '@floating-ui/dom': 1.7.1
       '@internationalized/date': 3.8.2
       esm-env: 1.2.2
-      runed: 0.29.1(svelte@5.33.18)
+      runed: 0.29.2(svelte@5.33.18)
       svelte: 5.33.18
       svelte-toolbelt: 0.9.3(svelte@5.33.18)
       tabbable: 6.2.0
@@ -3885,7 +3885,7 @@ snapshots:
       esm-env: 1.2.2
       svelte: 5.33.18
 
-  runed@0.29.1(svelte@5.33.18):
+  runed@0.29.2(svelte@5.33.18):
     dependencies:
       esm-env: 1.2.2
       svelte: 5.33.18
@@ -4016,7 +4016,7 @@ snapshots:
   svelte-toolbelt@0.9.3(svelte@5.33.18):
     dependencies:
       clsx: 2.1.1
-      runed: 0.29.1(svelte@5.33.18)
+      runed: 0.29.2(svelte@5.33.18)
       style-to-object: 1.0.9
       svelte: 5.33.18
 

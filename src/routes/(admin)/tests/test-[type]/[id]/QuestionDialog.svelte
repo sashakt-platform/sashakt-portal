@@ -41,7 +41,9 @@
 					id: question.latest_question_revision_id,
 					question: question.question_text,
 					tags: question.tags?.map((tag) => tag.name),
-					options: question.options?.map((option) => option.text),
+					options: question.options?.map((option) => {
+						return option;
+					}),
 					answer: question.correct_answer
 				};
 			})
@@ -49,7 +51,7 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class=" overflow-auto  p-0 sm:h-[90%] sm:max-w-[95%]" preventScroll={false}>
+	<Dialog.Content class="overflow-clip  p-0 sm:h-[90%] sm:max-w-[95%]" preventScroll={false}>
 		<div class="flex h-full flex-col">
 			<Dialog.Header class="  border-b-2 ">
 				<Dialog.Title class="h-fit"
@@ -61,7 +63,7 @@
 			</Dialog.Header>
 
 			<div class="m-4 h-full">
-				<div class="flex h-1/6 flex-row">
+				<div class="flex h-1/12 flex-row">
 					<div class="mx-2 w-1/5">
 						<TagsSelection bind:tags />
 					</div>
@@ -73,7 +75,7 @@
 						></Input>
 					</div>
 				</div>
-				<div class="flex h-5/6 flex-col">
+				<div class="flex h-11/12 flex-col">
 					<DataTable {data} {columns} bind:open {formData} />
 				</div>
 			</div>

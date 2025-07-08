@@ -1,6 +1,5 @@
 <script>
 	import Button from '$lib/components/ui/button/button.svelte';
-	import PenLine from '@lucide/svelte/icons/pen-line';
 	import QuestionDialog from './QuestionDialog.svelte';
 	import { columns } from './question_table/columns.js';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
@@ -8,7 +7,6 @@
 	import Eye from '@lucide/svelte/icons/eye';
 	let { formData, questions } = $props();
 	let dialogOpen = $state(false);
-
 </script>
 
 <QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />
@@ -51,7 +49,6 @@
 				<div class="flex w-fit flex-col">
 					<div class="flex">
 						<p class="font-bold">{$formData.name}</p>
-						<PenLine class="p-1" />
 					</div>
 					<div class="flex flex-row items-center text-sm">
 						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold"
@@ -59,8 +56,8 @@
 						>
 						<span class="text-gray-500"
 							>{$formData.question_revision_ids.length}
-							{$formData.question_revision_ids.length == 1 ? 'question' : 'questions'} (0pts)</span
-						>
+							{$formData.question_revision_ids.length == 1 ? 'question' : 'questions'}
+						</span>
 					</div>
 				</div>
 				{#if $formData.question_revision_ids.length != 0}
@@ -86,23 +83,36 @@
 			{:else}
 				<div class="flex h-full w-full flex-col overflow-auto">
 					{#each questions.filter( (row) => $formData.question_revision_ids.includes(row.latest_question_revision_id) ) as d (d.latest_question_revision_id)}
-						<div class="m-4 flex cursor-pointer flex-row">
-							<div class="my-auto">
+						<div class="group mx-2 mt-2 flex flex-row">
+							<div class="my-auto w-fit">
 								<GripVertical />
 							</div>
 							<div
-								class="hover:bg-primary-foreground my-auto flex w-full flex-row items-center rounded-lg border-1 p-4 text-sm"
+								class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
 							>
-								<p class="w-4/6">
+								<p class="w-4/6 ">
 									{d.question_text}
 								</p>
-								<span class="mx-4 w-fit rounded-full border p-1"><Eye class="mx-auto" /></span>
 								<span class="w-2/6">
-									<p>{d.tags.map((tag) => tag?.name).join(', ')}</p>
+									{#if d.tags.length > 0}
+										<p>
+											<span class="font-bold">Tags:</span>
+											{d.tags.map((tag) => tag?.name).join(', ')}
+										</p>
+									{/if}
 								</span>
 							</div>
-							<div class="my-auto ml-2 hidden group-hover:block">
-								<Trash2 />
+							<div class="my-auto ml-2 hidden w-fit group-hover:block">
+								<button
+									onclick={(e) => {
+										$formData.question_revision_ids = $formData.question_revision_ids.filter(
+											(id) => id !== d.latest_question_revision_id
+										);
+									}}
+									class="cursor-pointer"
+								>
+									<Trash2 />
+								</button>
 							</div>
 						</div>
 					{/each}

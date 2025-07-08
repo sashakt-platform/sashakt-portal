@@ -22,7 +22,9 @@
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<DropdownMenu.Item><Pencil /><a href="/users/edit/{id}">Edit</a></DropdownMenu.Item>
+		<a href="/users/edit/{id}"
+			><DropdownMenu.Item class="cursor-pointer"><Pencil />Edit</DropdownMenu.Item></a
+		>
 		<DropdownMenu.Item onclick={() => (deleteAction = `/users/delete/${id}?/delete`)}>
 			<Trash_2 />
 			Delete

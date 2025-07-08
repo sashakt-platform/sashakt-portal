@@ -5,7 +5,7 @@ import { schema } from './schema.js';
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
 
-export const load :PageServerLoad= async () => {
+export const load: PageServerLoad = async () => {
 	// Create a form with the default values
 	const form = await superValidate(zod(schema));
 
@@ -47,7 +47,5 @@ export const actions = {
 
 		const data = await response.json();
 		return message(form, data.message || 'File uploaded successfully');
-		
 	}
-}
-
+};

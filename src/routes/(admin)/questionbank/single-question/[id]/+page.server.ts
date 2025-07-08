@@ -5,7 +5,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
-import { redirect,setFlash } from 'sveltekit-flash-message/server';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async ({ params }: any) => {
 	const token = getSessionTokenCookie();
@@ -64,11 +64,14 @@ export const load: PageServerLoad = async ({ params }: any) => {
 };
 
 export const actions: Actions = {
-	save: async ({ request, params,cookies }) => {
+	save: async ({ request, params, cookies }) => {
 		const token = getSessionTokenCookie();
 		const form = await superValidate(request, zod(questionSchema));
 		if (!form.valid) {
-			setFlash({ type: 'error', message: "Question not Created. Please check all the details." }, cookies);
+			setFlash(
+				{ type: 'error', message: 'Question not Created. Please check all the details.' },
+				cookies
+			);
 			return fail(400, { form });
 		}
 
@@ -83,7 +86,10 @@ export const actions: Actions = {
 			});
 
 			if (!response.ok) {
-				setFlash({ type: 'error', message: "Question not Created. Please check all the details." }, cookies);
+				setFlash(
+					{ type: 'error', message: 'Question not Created. Please check all the details.' },
+					cookies
+				);
 				return fail(500, { form });
 			}
 		}
@@ -99,7 +105,10 @@ export const actions: Actions = {
 			});
 
 			if (!response.ok) {
-				setFlash({ type: 'error', message: `Failed to update question: ${response.statusText}` }, cookies);
+				setFlash(
+					{ type: 'error', message: `Failed to update question: ${response.statusText}` },
+					cookies
+				);
 				return fail(500, { form });
 			}
 
@@ -113,7 +122,10 @@ export const actions: Actions = {
 			});
 
 			if (!tagResponse.ok) {
-				setFlash({ type: 'error', message: `Failed to update tags: ${tagResponse.statusText}` }, cookies);
+				setFlash(
+					{ type: 'error', message: `Failed to update tags: ${tagResponse.statusText}` },
+					cookies
+				);
 				return fail(500, { form });
 			}
 
@@ -133,14 +145,17 @@ export const actions: Actions = {
 			});
 
 			if (!stateResponse.ok) {
-				setFlash({ type: 'error', message: `Failed to update states: ${stateResponse.statusText}` }, cookies);
+				setFlash(
+					{ type: 'error', message: `Failed to update states: ${stateResponse.statusText}` },
+					cookies
+				);
 				return fail(500, { form });
 			}
 		}
-		redirect('/questionbank', { type: 'success', message: 'Question saved successfully' },cookies);
+		redirect('/questionbank', { type: 'success', message: 'Question saved successfully' }, cookies);
 	},
 
-	tagSave: async ({ request,cookies }) => {
+	tagSave: async ({ request, cookies }) => {
 		const token = getSessionTokenCookie();
 		const tagForm = await superValidate(request, zod(tagSchema));
 		if (!tagForm.valid) {
@@ -162,7 +177,7 @@ export const actions: Actions = {
 		}
 		setFlash({ type: 'success', message: 'Tag saved successfully' }, cookies);
 	},
-	delete: async ({ params,cookies }) => {
+	delete: async ({ params, cookies }) => {
 		const token = getSessionTokenCookie();
 		const response = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
 			method: 'DELETE',
@@ -173,8 +188,18 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			redirect(500,'/questionbank', { type: 'error', message: `Failed to delete question: ${response.statusText}` }, cookies);
+			redirect(
+				500,
+				'/questionbank',
+				{ type: 'error', message: `Failed to delete question: ${response.statusText}` },
+				cookies
+			);
 		}
-		redirect('/questionbank', { type: 'success', message: 'Question deleted successfully' }, cookies);
+		redirect(
+			'/questionbank',
+			{ type: 'success', message: 'Question deleted successfully' },
+			cookies
+		);
 	}
 };
+

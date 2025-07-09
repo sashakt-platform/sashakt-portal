@@ -40,9 +40,6 @@
 			if ($formData.is_template) {
 				$formData.link = null;
 			}
-		},
-		onError: (error) => {
-			console.error('Error in form submission:', error);
 		}
 	});
 
@@ -125,8 +122,12 @@
 
 		<Button
 			class="bg-primary"
-			disabled={currentScreen == typeOfScreen.primary &&
-				($formData.name.trim() == '' || $formData.description.trim() == '')}
+			disabled={(currentScreen === typeOfScreen.primary &&
+				($formData.name.trim() === '' || $formData.description.trim() === '')) ||
+				(currentScreen === typeOfScreen.configuration &&
+					$formData.random_questions &&
+					$formData.no_of_random_questions <= 0) ||
+				$formData.no_of_random_questions > $formData.question_revision_ids.length}
 			onclick={() => {
 				if (currentScreen === typeOfScreen.configuration) {
 					submit();

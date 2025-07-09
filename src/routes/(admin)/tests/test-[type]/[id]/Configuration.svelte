@@ -127,6 +127,63 @@
 					)}
 				</div>
 			</div>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox
+						bind:checked={$formData.shuffle}
+						onCheckedChange={(checked: boolean) => {
+							if (checked) {
+								$formData.random_questions = false;
+								$formData.no_of_random_questions = 0;
+							}
+						}}
+					/>
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Shuffle Questions',
+						'Configure if selected questions should be shuffled during the test'
+					)}
+				</div>
+			</div>
+
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox
+						bind:checked={$formData.random_questions}
+						onCheckedChange={(checked: boolean) => {
+							if (checked) {
+								$formData.shuffle = false;
+							} else {
+								$formData.no_of_random_questions = 0;
+							}
+						}}
+					/>
+				</div>
+				<div class="w-1/2">
+					{@render headingSubheading(
+						'Randomize Questions',
+						'Set the number of random questions to assign from the earlier selected questions.'
+					)}
+				</div>
+				<div class="gap- my-auto flex w-1/2 flex-col">
+					<Input
+						type="number"
+						id="random_count"
+						name="no_of_random_questions"
+						placeholder="Enter total random questions required"
+						hidden={!$formData.random_questions}
+						bind:value={$formData.no_of_random_questions}
+					/>
+					{#if $formData.random_questions && $formData.no_of_random_questions <= 0}
+						<small class="mt-1 text-red-400">Enter a positive integer</small>
+					{:else if $formData.random_questions && $formData.no_of_random_questions > 0 && $formData.question_revision_ids.length < $formData.no_of_random_questions}
+						<small class="mt-1 text-red-400">
+							Number of random questions cannot exceed the total number of questions selected
+						</small>
+					{/if}
+				</div>
+			</div>
 		</ConfigureBox>
 	</div>
 </div>

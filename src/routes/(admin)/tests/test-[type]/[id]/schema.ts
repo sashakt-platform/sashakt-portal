@@ -15,7 +15,10 @@ export const testSchema = z.object({
     no_of_attempts: z.number().optional().default(1),
     shuffle: z.boolean().optional().default(false),
     random_questions: z.boolean().optional().default(false),
-    no_of_random_questions: z.number().nullable().optional(),
+    no_of_random_questions: z.number().nullable().optional()
+        .refine(val => val === null || val === undefined || val > 0, {
+            message: 'Number of random questions must be a positive integer',
+        }),
     question_pagination: z.number().optional().default(1),
     is_template: z.boolean().optional().default(false),
     template_id: z.string().nullable().optional(),

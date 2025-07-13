@@ -21,7 +21,7 @@
 
 <Sidebar.Provider bind:open={isSidebarOpen}>
 	<AppSidebar {data} />
-	<main>
+	<main class="flex h-screen w-full flex-col overflow-hidden">
 		<div class="shadow-lg">
 			<div class={['my-4', isSidebarOpen ? 'flex' : 'hidden']}>
 				<Sidebar.Trigger class="mx-4 w-14 rounded-none border-r-2" />

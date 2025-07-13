@@ -62,7 +62,7 @@
 	</Dialog.Content>
 </Dialog.Root>
 
-<div class="mt-10 ml-10 flex w-full items-center align-middle">
+<div class="mt-10 ml-10 flex items-center align-middle">
 	<span class="flex flex-row">
 		<h2
 			class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"

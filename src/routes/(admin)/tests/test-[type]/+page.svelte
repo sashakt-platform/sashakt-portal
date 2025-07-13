@@ -41,27 +41,6 @@
 		return data?.tests?.length === 0 && page.url.searchParams.get('name') === null;
 	});
 
-	let filteredTests = $derived.by(() => {
-		if (!data?.tests) return [];
-
-		return data?.tests.filter((test: any) => {
-			// Tag filter (if any tags are selected)
-			if (filteredTags.length > 0) {
-				const hasMatchingTag = test.tags?.some((tag: any) => filteredTags.includes(String(tag.id)));
-				if (!hasMatchingTag) return false;
-			}
-
-			// State filter (if any states are selected)
-			if (filteredStates.length > 0) {
-				const hasMatchingState = test.states?.some((state: any) =>
-					filteredStates.includes(String(state.id))
-				);
-				if (!hasMatchingState) return false;
-			}
-
-			return true;
-		});
-	});
 	let searchTimeout: ReturnType<typeof setTimeout>;
 	let deleteAction: string | null = $state(null);
 </script>
@@ -128,10 +107,37 @@
 		<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
 			<div class="flex flex-row gap-2">
 				<div class="w-1/5">
-					<TagsSelection bind:tags={filteredTags} />
+					<TagsSelection
+						bind:tags={filteredTags}
+						onOpenChange={(e: Event) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.search = '';
+								filteredTags.map((tag_id: string) => {
+									console.log('Selected tag:', tag_id);
+									url.searchParams.append('tag_ids', tag_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
 				</div>
+
 				<div class="w-1/5">
-					<StateSelection bind:states={filteredStates} />
+					<StateSelection
+						bind:states={filteredStates}
+						onOpenChange={(e: Event) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.search = '';
+								filteredStates.map((state_id: string) => {
+									console.log('Selected state:', state_id);
+									url.searchParams.append('state_ids', state_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
 				</div>
 				<div class="ml-auto w-1/5">
 					<Input
@@ -166,7 +172,7 @@
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{#each filteredTests as test, index (test.id)}
+						{#each data?.tests as test, index (test.id)}
 							<Table.Row
 								class=" my-2 flex items-center  rounded-lg border border-gray-200  bg-white  font-medium "
 							>

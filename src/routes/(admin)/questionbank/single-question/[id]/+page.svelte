@@ -92,7 +92,7 @@
 				/>
 			</div>
 		{/snippet}
-		<div class="ml-10 flex flex-row">
+		<div class="mx-10 flex flex-row">
 			<div class="my-auto flex flex-col">
 				<div class=" flex w-full items-center align-middle">
 					<div class="flex flex-row">

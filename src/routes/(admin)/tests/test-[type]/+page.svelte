@@ -112,7 +112,7 @@
 						onOpenChange={(e: Event) => {
 							if (!e) {
 								const url = new URL(page.url);
-								url.search = '';
+								url.searchParams.delete('tag_ids');
 								filteredTags.map((tag_id: string) => {
 									console.log('Selected tag:', tag_id);
 									url.searchParams.append('tag_ids', tag_id);
@@ -129,7 +129,7 @@
 						onOpenChange={(e: Event) => {
 							if (!e) {
 								const url = new URL(page.url);
-								url.search = '';
+								url.searchParams.delete('state_ids');
 								filteredStates.map((state_id: string) => {
 									console.log('Selected state:', state_id);
 									url.searchParams.append('state_ids', state_id);

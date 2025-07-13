@@ -12,7 +12,7 @@
 	let tableData = data?.users?.data || [];
 </script>
 
-<div class="mx-10 flex flex-row py-4 sm:w-[80%]">
+<div class="mx-10 flex flex-row py-4">
 	<div class="my-auto flex flex-col">
 		<div class=" flex w-full items-center align-middle">
 			<div class="flex flex-row">
@@ -31,6 +31,6 @@
 	</div>
 </div>
 
-<div class="m-10 w-3/4 rounded-2xl align-top shadow-2xl">
+<div class="m-10 rounded-2xl align-top shadow-2xl">
 	<DataTable data={tableData} {columns} />
 </div>

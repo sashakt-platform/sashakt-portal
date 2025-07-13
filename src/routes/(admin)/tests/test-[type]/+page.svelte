@@ -38,7 +38,7 @@
 	} = $props();
 
 	let noTestCreatedYet = $derived.by(() => {
-		return data?.tests?.length === 0 && page.url.searchParams.get('name') === null;
+		return data?.tests?.length === 0 && [...page.url.searchParams.keys()].length === 0;
 	});
 
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -114,7 +114,6 @@
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
 								filteredTags.map((tag_id: string) => {
-									console.log('Selected tag:', tag_id);
 									url.searchParams.append('tag_ids', tag_id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
@@ -131,7 +130,6 @@
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
 								filteredStates.map((state_id: string) => {
-									console.log('Selected state:', state_id);
 									url.searchParams.append('state_ids', state_id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });

@@ -6,7 +6,6 @@
 	import FileUp from '@lucide/svelte/icons/file-up';
 	import Info from '@lucide/svelte/icons/info';
 	import Pencil from '@lucide/svelte/icons/pencil';
-	import Trash from '@lucide/svelte/icons/trash';
 	import WhiteEmptyBox from '$lib/components/white-empty-box.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -17,7 +16,9 @@
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
-	
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+
 	$effect(() => useSidebar().setOpen(true));
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -26,37 +27,11 @@
 	let filteredStates: string[] = $state([]);
 	let filteredSearch: string = $state('');
 
-	let filteredQuestions = $derived.by(() => {
-		if (!data?.questions) return [];
-
-		return data.questions.filter((question: any) => {
-			// Tag filter (if any tags are selected)
-			if (filteredTags.length > 0) {
-				const hasMatchingTag = question.tags?.some((tag: any) =>
-					filteredTags.includes(String(tag.id))
-				);
-				if (!hasMatchingTag) return false;
-			}
-
-			// State filter (if any states are selected)
-			if (filteredStates.length > 0) {
-				const hasMatchingState = question.locations?.some((location: any) =>
-					filteredStates.includes(String(location.state_id))
-				);
-				if (!hasMatchingState) return false;
-			}
-
-			// Search filter (if search text is provided)
-			if (filteredSearch.length > 0) {
-				const matchesSearch = question.question_text
-					?.toLowerCase()
-					.includes(filteredSearch.toLowerCase());
-				if (!matchesSearch) return false;
-			}
-
-			return true;
-		});
+	let noQuestionCreatedYet = $derived.by(() => {
+		return data?.questions?.length === 0 && [...page.url.searchParams.keys()].length === 0;
 	});
+
+	let searchTimeout: ReturnType<typeof setTimeout>;
 </script>
 
 <DeleteDialog bind:action={deleteAction} elementName="Question" />
@@ -78,19 +53,16 @@
 				>Create, edit and update all the questions</Label
 			>
 		</div>
-		<div
-			class={[
-				'my-auto ml-auto gap-3 p-4',
-				data.questions && data.questions.length == 0 ? 'hidden' : 'flex'
-			]}
-		>
-			<a href="/questionbank/single-question/new"
-				><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
-			>
-			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
+		<div class={['my-auto ml-auto gap-3 p-4']}>
+			{#if !noQuestionCreatedYet}
+				<a href="/questionbank/single-question/new"
+					><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
+				>
+				<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
+			{/if}
 		</div>
 	</div>
-	{#if data.questions && data.questions.length == 0}
+	{#if noQuestionCreatedYet}
 		<WhiteEmptyBox>
 			<svg
 				width="100"
@@ -145,16 +117,49 @@
 		<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
 			<div class="flex flex-row gap-2">
 				<div class="w-1/5">
-					<TagsSelection bind:tags={filteredTags} />
+					<TagsSelection
+						bind:tags={filteredTags}
+						onOpenChange={(e: Event) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('tag_ids');
+								filteredTags.map((tag_id: string) => {
+									url.searchParams.append('tag_ids', tag_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
 				</div>
 				<div class="w-1/5">
-					<StateSelection bind:states={filteredStates} />
+					<StateSelection
+						bind:states={filteredStates}
+						onOpenChange={(e: Event) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('state_ids');
+								filteredStates.map((state_id: string) => {
+									url.searchParams.append('state_ids', state_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
 				</div>
 				<div class="ml-auto w-1/5">
 					<Input
+						data-sveltekit-keepfocus
+						data-sveltekit-preloaddata
 						type="search"
 						placeholder="Search by question name, tags, or ID"
-						bind:value={filteredSearch}
+						oninput={(event) => {
+							const url = new URL(page.url);
+							clearTimeout(searchTimeout);
+							searchTimeout = setTimeout(() => {
+								url.searchParams.set('name', event?.target?.value || '');
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}, 500);
+						}}
 					/>
 				</div>
 			</div>
@@ -172,7 +177,7 @@
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{#each filteredQuestions as question, index (question.id)}
+						{#each data?.questions as question, index (question.id)}
 							<Table.Row
 								onclick={() => {
 									currentRow = currentRow === index ? null : index;

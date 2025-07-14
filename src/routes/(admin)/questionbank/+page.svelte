@@ -117,7 +117,7 @@
 				<div class="w-1/5">
 					<TagsSelection
 						bind:tags={filteredTags}
-						onOpenChange={(e: Event) => {
+						onOpenChange={(e: boolean) => {
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
@@ -132,7 +132,7 @@
 				<div class="w-1/5">
 					<StateSelection
 						bind:states={filteredStates}
-						onOpenChange={(e: Event) => {
+						onOpenChange={(e: boolean) => {
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');

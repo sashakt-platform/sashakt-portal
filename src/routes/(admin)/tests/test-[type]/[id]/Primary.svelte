@@ -10,7 +10,7 @@
 	let { formData } = $props();
 </script>
 
-<div class="mx-auto flex items-center justify-center">
+<div class=" mx-auto flex w-full items-center justify-center">
 	<WhiteEmptyBox>
 		<div class="h-full w-full text-left">
 			<div>

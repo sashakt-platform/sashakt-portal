@@ -112,7 +112,7 @@
 				<p>Revision History</p>
 			</div>
 		</div>
-		<div class="flex h-screen w-full flex-row divide-x-1 bg-white p-8">
+		<div class="mx-10 flex h-screen flex-row bg-white p-9">
 			<div class="flex w-3/5 flex-col gap-2 pr-8">
 				<div class="flex flex-col gap-2">
 					{@render snippetHeading('Your Question')}

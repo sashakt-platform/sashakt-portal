@@ -43,12 +43,25 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const form = await superValidate(zod(testSchema));
 	form.data.is_template = is_template;
 
-	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?skip=0&limit=100`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
+	let questionName = url.searchParams.get('name') || '';
+
+	const tagIdsList = url.searchParams.getAll('tag_ids') || [];
+	const tagParams =
+		tagIdsList.length > 0 ? tagIdsList.map((tagId) => `tag_ids=${tagId}`).join('&') : '';
+
+	const statesList = url.searchParams.getAll('state_ids') || [];
+	const stateParams =
+		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
+
+	const responseQuestions = await fetch(
+		`${BACKEND_URL}/questions?question_text=${questionName}&${tagParams}&${stateParams}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
 		}
-	});
+	);
 
 	let questions = [];
 	if (!responseQuestions.ok) {
@@ -136,4 +149,3 @@ export const actions: Actions = {
 		);
 	}
 };
-

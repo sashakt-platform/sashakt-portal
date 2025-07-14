@@ -19,7 +19,7 @@
 
 <Sidebar.Provider>
 	<AppSidebar {data} />
-	<main class="flex h-screen w-full flex-col overflow-hidden">
+	<main class="flex h-screen w-full flex-col overflow-x-hidden">
 		<div class="shadow-lg">
 			<div class={['my-4']}>
 				<Sidebar.Trigger class="mx-4 w-14 rounded-none border-r-2" />

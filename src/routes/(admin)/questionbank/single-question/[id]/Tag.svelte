@@ -6,7 +6,6 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { tagSchema, type TagFormSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import * as Alert from '$lib/components/ui/alert/index.js';
 	let {
 		tagTypes,
 		form,
@@ -37,7 +36,7 @@
 		validators: zodClient(tagSchema),
 		dataType: 'json',
 		onSubmit: () => {
-			$formTagData.tag_type_id = String($formTagData.tag_type_id);
+			$formTagData.tag_type_id = $formTagData.tag_type_id;
 		}
 	});
 </script>
@@ -53,6 +52,14 @@
 				placeholder="Enter a tag name"
 				name="name"
 				bind:value={$formTagData.name}
+			/>
+		</div>
+		<div class="flex flex-col gap-2">
+			<h2 class="font-semibold">Tag Description</h2>
+			<Textarea
+				placeholder="Enter the description here..."
+				name="description"
+				bind:value={$formTagData.description}
 			/>
 		</div>
 		<div class="flex w-full flex-col gap-2">
@@ -72,19 +79,12 @@
 				</Select.Content>
 			</Select.Root>
 		</div>
-		<div class="flex flex-col gap-2">
-			<h2 class="font-semibold">Tag Description</h2>
-			<Textarea
-				placeholder="Enter the description here..."
-				name="description"
-				bind:value={$formTagData.description}
-			/>
-		</div>
+
 		<div class="my-4 flex flex-row justify-end gap-4">
 			<Button type="button" variant="outline" class="text-primary" onclick={() => (open = false)}
 				>Cancel</Button
 			>
-			<Button type="submit" disabled={!$formTagData.name || !$formTagData.tag_type_id}>Save</Button>
+			<Button type="submit" disabled={!$formTagData.name}>Save</Button>
 		</div>
 	</div>
 </form>

@@ -13,7 +13,7 @@
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
-	<div class="mx-auto mt-10 flex w-1/2 flex-col">
+	<div class="mx-10 mt-10 flex w-full flex-col">
 		{#snippet headingSubheading(heading: string, subheading: string)}
 			<p class="font-bold">{heading}</p>
 			<p class="text-sm font-extralight">

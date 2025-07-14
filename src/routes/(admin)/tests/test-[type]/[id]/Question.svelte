@@ -12,7 +12,7 @@
 <QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />
 
 <div class="mx-auto flex h-dvh">
-	<div class=" mx-auto w-3/4 p-20">
+	<div class=" mx-auto w-full p-20">
 		<div
 			class=" mb-2 flex h-1/6 items-center rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg"
 		>
@@ -90,7 +90,7 @@
 							<div
 								class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
 							>
-								<p class="w-4/6 ">
+								<p class="w-4/6">
 									{d.question_text}
 								</p>
 								<span class="w-2/6">

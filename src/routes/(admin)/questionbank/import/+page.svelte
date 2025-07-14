@@ -31,7 +31,7 @@
 		</Dialog.Header>
 	</Dialog.Content>
 </Dialog.Root>
-<div class="mx-10 flex flex-col gap-20 sm:w-[80%]">
+<div class="mx-10 flex flex-col gap-20">
 	<div class="mt-10 flex flex-row">
 		<div class="align-left flex flex-col">
 			<span class="flex flex-row">

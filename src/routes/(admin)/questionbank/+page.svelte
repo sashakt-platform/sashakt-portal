@@ -35,7 +35,7 @@
 <DeleteDialog bind:action={deleteAction} elementName="Question" />
 
 <div>
-	<div class="mx-10 flex flex-row py-4 sm:w-[80%]">
+	<div class="mx-10 flex flex-row py-4">
 		<div class="my-auto flex flex-col">
 			<div class=" flex w-full items-center align-middle">
 				<div class="flex flex-row">
@@ -112,7 +112,7 @@
 			</div>
 		</WhiteEmptyBox>
 	{:else}
-		<div class="mx-8 mt-10 flex flex-col gap-8 sm:w-[80%]">
+		<div class="mx-8 mt-10 flex flex-col gap-8">
 			<div class="flex flex-row gap-2">
 				<div class="w-1/5">
 					<TagsSelection

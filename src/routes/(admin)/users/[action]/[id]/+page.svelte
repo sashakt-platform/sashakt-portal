@@ -10,12 +10,13 @@
 	}
 </script>
 
-<div class="mx-10 flex flex-col py-4 sm:w-[80%]">
+<div class="mx-10 flex flex-col py-4">
 	<h2
-		class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+		class="my-10 mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
 	>
 		{title}
 	</h2>
-
-	<UserForm {data} />
+	<div class="bg-white p-10">
+		<UserForm {data} />
+	</div>
 </div>

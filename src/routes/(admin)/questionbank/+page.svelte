@@ -13,12 +13,10 @@
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
-	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
-	
-	$effect(() => useSidebar().setOpen(true));
+
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
 	let currentRow: number | null = $state(null);

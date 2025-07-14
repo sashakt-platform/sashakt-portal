@@ -3,7 +3,6 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 
-	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 
@@ -25,7 +24,6 @@
 
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
-	$effect(() => useSidebar().setOpen(true));
 
 	let {
 		data

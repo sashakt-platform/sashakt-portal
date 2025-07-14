@@ -8,8 +8,6 @@
 	import { page } from '$app/state';
 	import { toast } from 'svelte-sonner';
 
-	let isSidebarOpen = $state(true);
-
 	let { children, data } = $props();
 
 	const flash = getFlash(page);
@@ -19,15 +17,15 @@
 	});
 </script>
 
-<Sidebar.Provider bind:open={isSidebarOpen}>
+<Sidebar.Provider>
 	<AppSidebar {data} />
 	<main class="flex h-screen w-full flex-col overflow-hidden">
 		<div class="shadow-lg">
-			<div class={['my-4', isSidebarOpen ? 'flex' : 'hidden']}>
+			<div class={['my-4']}>
 				<Sidebar.Trigger class="mx-4 w-14 rounded-none border-r-2" />
-				<span class="my-auto align-middle text-sm"
-					>... <ChevronRight class="inline w-4 text-sm" /></span
-				>
+				<!-- <span class="my-auto align-middle text-sm" -->
+				<!-- 	>... <ChevronRight class="inline w-4 text-sm" /></span -->
+				<!-- > -->
 			</div>
 			<hr class="w-screen" />
 		</div>

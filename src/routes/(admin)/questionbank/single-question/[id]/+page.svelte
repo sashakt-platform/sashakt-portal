@@ -11,7 +11,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
-	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { questionSchema, type FormSchema, type TagFormSchema } from './schema';
@@ -79,8 +78,6 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
-
-	$effect(() => useSidebar().setOpen(false));
 </script>
 
 <form method="POST" action="?/save" use:enhance>

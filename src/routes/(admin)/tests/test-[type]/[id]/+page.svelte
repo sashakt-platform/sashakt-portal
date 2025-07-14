@@ -1,7 +1,6 @@
 <script lang="ts">
 	import CircleChevronLeft from '@lucide/svelte/icons/circle-chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { useSidebar } from '$lib/components/ui/sidebar/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Primary from './Primary.svelte';
 	import Question from './Question.svelte';
@@ -14,8 +13,6 @@
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
 	let currentScreen: number = $state(typeOfScreen.primary);
-
-	$effect(() => useSidebar().setOpen(false));
 
 	let {
 		data
@@ -53,13 +50,13 @@
 
 <form method="POST" action="?/save" use:enhance>
 	<div class="flex border-b-2 py-2">
-		<div class="flex justify-start">
-			<Button variant="link" class=" text-gray-500" href="./"
-				><CircleChevronLeft />Back to test {$formData.is_template
-					? 'templates'
-					: 'sessions'}</Button
-			>
-		</div>
+		<!-- <div class="flex justify-start"> -->
+		<!-- 	<Button variant="link" class=" text-gray-500" href="./" -->
+		<!-- 		><CircleChevronLeft />Back to test {$formData.is_template -->
+		<!-- 			? 'templates' -->
+		<!-- 			: 'sessions'}</Button -->
+		<!-- 	> -->
+		<!-- </div> -->
 		<div class="mx-auto flex">
 			{#snippet headerNumbers(
 				number: number,

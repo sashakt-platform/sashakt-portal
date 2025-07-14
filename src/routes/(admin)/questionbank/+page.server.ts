@@ -3,15 +3,28 @@ import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from './$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 
-export const load: PageServerLoad = async ({ cookies }) => {
+export const load: PageServerLoad = async ({ cookies, url }) => {
 	const token = getSessionTokenCookie();
 
-	const response = await fetch(`${BACKEND_URL}/questions`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
+	let questionName = url.searchParams.get('name') || '';
+
+	const tagIdsList = url.searchParams.getAll('tag_ids') || [];
+	const tagParams =
+		tagIdsList.length > 0 ? tagIdsList.map((tagId) => `tag_ids=${tagId}`).join('&') : '';
+
+	const statesList = url.searchParams.getAll('state_ids') || [];
+	const stateParams =
+		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
+
+	const response = await fetch(
+		`${BACKEND_URL}/questions?question_text=${questionName}&${tagParams}&${stateParams}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
 		}
-	});
+	);
 
 	if (!response.ok) {
 		setFlash(

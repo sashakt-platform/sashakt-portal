@@ -1,15 +1,17 @@
 <script lang="ts">
+	import * as Breadcrumb from '$lib/components/ui/breadcrumb';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
+
+	import { breadcrumbs } from '$lib/breadcrumb';
 	import { toast } from 'svelte-sonner';
 
 	let { children, data } = $props();
-
+	const breadcrumb = $derived(breadcrumbs(page.url.pathname));
 	const flash = getFlash(page);
 	$effect(() => {
 		if (!$flash) return;
@@ -21,11 +23,21 @@
 	<AppSidebar {data} />
 	<main class="flex h-screen w-full flex-col overflow-x-hidden">
 		<div class="shadow-lg">
-			<div class={['my-4']}>
+			<div class={['my-4 inline-flex items-center']}>
 				<Sidebar.Trigger class="mx-4 w-14 rounded-none border-r-2" />
-				<!-- <span class="my-auto align-middle text-sm" -->
-				<!-- 	>... <ChevronRight class="inline w-4 text-sm" /></span -->
-				<!-- > -->
+
+				<Breadcrumb.Root>
+					<Breadcrumb.List>
+						{#each breadcrumb as crumb, id (id)}
+							<Breadcrumb.Item class={breadcrumb.length - 1 === id ? 'text-primary' : ''}>
+								<Breadcrumb.Link class="text-base font-medium" href={crumb.href}
+									>{crumb.label}</Breadcrumb.Link
+								>
+							</Breadcrumb.Item>
+							<Breadcrumb.Separator class={breadcrumb.length - 1 === id ? 'hidden' : ''} />
+						{/each}
+					</Breadcrumb.List>
+				</Breadcrumb.Root>
 			</div>
 			<hr class="w-screen" />
 		</div>

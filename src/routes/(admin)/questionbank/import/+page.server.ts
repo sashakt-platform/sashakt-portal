@@ -1,6 +1,6 @@
 import { superValidate, fail, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import type { PageServerLoad } from './$types.js';
+import type { PageServerLoad, Actions } from './$types.js';
 import { schema } from './schema.js';
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
@@ -14,7 +14,7 @@ export const load: PageServerLoad = async () => {
 	};
 };
 
-export const actions = {
+export const actions: Actions = {
 	default: async ({ request }) => {
 		const token = getSessionTokenCookie();
 		const form = await superValidate(request, zod(schema));

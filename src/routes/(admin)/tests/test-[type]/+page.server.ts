@@ -40,7 +40,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	}
 
 	let questions = [];
-	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?skip=0&limit=100`, {
+			const responseQuestions = await fetch(`${BACKEND_URL}/questions/?skip=0&limit=100`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

@@ -156,6 +156,9 @@ export const actions: Actions = {
 					is_active: form.data.is_active ? 'true' : 'false'
 				})
 			});
+		} else {
+			// This should not happen, but we need to handle it for TypeScript
+			throw new Error(`Invalid action: ${params.action}`);
 		}
 
 		if (!res.ok) {

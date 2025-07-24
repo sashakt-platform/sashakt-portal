@@ -1,4 +1,4 @@
-import { redirect, type Cookies } from '@sveltejs/kit';
+import { redirect, type Cookies, type RequestEvent } from '@sveltejs/kit';
 import { getRequestEvent } from '$app/server';
 import { BACKEND_URL } from '$env/static/private';
 

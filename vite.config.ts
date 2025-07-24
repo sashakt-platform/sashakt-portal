@@ -3,8 +3,10 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [tailwindcss(), sveltekit()],
+	envDir: '.',
+	envPrefix: ['VITE_', 'BACKEND_URL', 'TEST_TAKER_URL'],
 	test: {
 		workspace: [
 			{
@@ -30,4 +32,4 @@ export default defineConfig({
 			}
 		]
 	}
-});
+}));

@@ -53,10 +53,10 @@
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
 			{#if !noQuestionCreatedYet}
-				<a href="/questionbank/single-question/new"
+				<a href="/questionbank/single-question/new" data-testid="create-question-btn"
 					><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
 				>
-				<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
+				<a href="/questionbank/import" data-testid="bulk-upload-btn"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
 			{/if}
 		</div>
 	</div>
@@ -94,14 +94,14 @@
 				Click on the button to create questions to be uploaded in the test template and tests
 			</p>
 			<div class="mt-4">
-				<a href="/questionbank/single-question/new"
+				<a href="/questionbank/single-question/new" data-testid="empty-create-question-btn"
 					><Button
 						variant="outline"
 						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
 						><Plus /> Create a Question</Button
 					></a
 				>
-				<a href="/questionbank/import"
+				<a href="/questionbank/import" data-testid="empty-bulk-upload-btn"
 					><Button
 						variant="outline"
 						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
@@ -116,6 +116,7 @@
 			<div class="flex flex-row gap-2">
 				<div class="w-1/5">
 					<TagsSelection
+						data-testid="tag-filter"
 						bind:tags={filteredTags}
 						onOpenChange={(e: boolean) => {
 							if (!e) {
@@ -131,6 +132,7 @@
 				</div>
 				<div class="w-1/5">
 					<StateSelection
+						data-testid="state-filter"
 						bind:states={filteredStates}
 						onOpenChange={(e: boolean) => {
 							if (!e) {
@@ -146,6 +148,7 @@
 				</div>
 				<div class="ml-auto w-1/5">
 					<Input
+						data-testid="search-input"
 						data-sveltekit-keepfocus
 						data-sveltekit-preloaddata
 						type="search"
@@ -210,19 +213,20 @@
 								</Table.Cell>
 								<Table.Cell class="w-1/12  items-center">
 									<DropdownMenu.Root>
-										<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}
+										<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })} data-testid="question-actions"
 											><Ellipsis /></DropdownMenu.Trigger
 										>
 										<DropdownMenu.Content class="w-56">
 											<DropdownMenu.Group>
 												<a href="/questionbank/single-question/{question.id}">
-													<DropdownMenu.Item>
+													<DropdownMenu.Item data-testid="edit-question">
 														<Pencil />
 														<span>Edit</span>
 													</DropdownMenu.Item>
 												</a>
 
 												<DropdownMenu.Item
+													data-testid="delete-question"
 													onclick={() =>
 														(deleteAction = `/questionbank/single-question/${question.id}?/delete`)}
 												>

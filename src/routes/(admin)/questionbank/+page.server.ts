@@ -27,8 +27,12 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	);
 
 	if (!response.ok) {
+		const errorMessage = await response.json();
 		setFlash(
-			{ type: 'error', message: 'Failed to fetch questions. Please try again later.' },
+			{
+				type: 'error',
+				message: `Failed to fetch questions: ${errorMessage.detail || response.statusText}`
+			},
 			cookies
 		);
 		return { questions: null };

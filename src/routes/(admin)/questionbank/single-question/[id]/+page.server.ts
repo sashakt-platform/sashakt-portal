@@ -86,8 +86,12 @@ export const actions: Actions = {
 			});
 
 			if (!response.ok) {
+				const errorMessage = await response.json();
 				setFlash(
-					{ type: 'error', message: 'Question not Created. Please check all the details.' },
+					{
+						type: 'error',
+						message: errorMessage.detail || 'Question not Created. Please check all the details.'
+					},
 					cookies
 				);
 				return fail(500, { form });
@@ -105,8 +109,12 @@ export const actions: Actions = {
 			});
 
 			if (!response.ok) {
+				const errorMessage = await response.json();
 				setFlash(
-					{ type: 'error', message: `Failed to update question: ${response.statusText}` },
+					{
+						type: 'error',
+						message: `Failed to update question: ${errorMessage.detail || response.statusText}`
+					},
 					cookies
 				);
 				return fail(500, { form });
@@ -122,8 +130,12 @@ export const actions: Actions = {
 			});
 
 			if (!tagResponse.ok) {
+				const errorMessage = await tagResponse.json();
 				setFlash(
-					{ type: 'error', message: `Failed to update tags: ${tagResponse.statusText}` },
+					{
+						type: 'error',
+						message: `Failed to update tags: ${errorMessage.detail || tagResponse.statusText}`
+					},
 					cookies
 				);
 				return fail(500, { form });
@@ -145,8 +157,12 @@ export const actions: Actions = {
 			});
 
 			if (!stateResponse.ok) {
+				const errorMessage = await stateResponse.json();
 				setFlash(
-					{ type: 'error', message: `Failed to update states: ${stateResponse.statusText}` },
+					{
+						type: 'error',
+						message: `Failed to update states: ${errorMessage.detail || stateResponse.statusText}`
+					},
 					cookies
 				);
 				return fail(500, { form });
@@ -172,7 +188,8 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			setFlash({ type: 'error', message: `Tag not Saved: ${response.statusText}` }, cookies);
+			const errorMessage = await response.json();
+			setFlash({ type: 'error', message: `Tag not Saved: ${errorMessage.detail || response.statusText}` }, cookies);
 			return fail(500, { tagForm });
 		}
 		setFlash({ type: 'success', message: 'Tag saved successfully' }, cookies);

@@ -92,8 +92,12 @@ export const actions: Actions = {
 		);
 
 		if (!response.ok) {
+			const errorMessage = await response.json();
 			setFlash(
-				{ type: 'error', message: `Test not Created. Details: ${response.statusText}` },
+				{
+					type: 'error',
+					message: `Test not Created. Details: ${errorMessage.detail || response.statusText}`
+				},
 				cookies
 			);
 			return fail(500, { form });
@@ -119,12 +123,13 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
+			const errorMessage = await response.json();
 			redirect(
 				500,
 				`/tests/test-${test_type}`,
 				{
 					type: 'error',
-					message: `Failed to delete test ${test_type}. Details: ${response.statusText}`
+					message: `Failed to delete test ${test_type}. Details: ${errorMessage.detail || response.statusText}`
 				},
 				cookies
 			);

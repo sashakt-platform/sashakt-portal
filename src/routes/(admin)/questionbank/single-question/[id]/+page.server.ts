@@ -189,7 +189,10 @@ export const actions: Actions = {
 
 		if (!response.ok) {
 			const errorMessage = await response.json();
-			setFlash({ type: 'error', message: `Tag not Saved: ${errorMessage.detail || response.statusText}` }, cookies);
+			setFlash(
+				{ type: 'error', message: `Tag not Saved: ${errorMessage.detail || response.statusText}` },
+				cookies
+			);
 			return fail(500, { tagForm });
 		}
 		setFlash({ type: 'success', message: 'Tag saved successfully' }, cookies);

@@ -18,12 +18,12 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import * as Pagination from '$lib/components/ui/pagination/index.js';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants.js';
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
 	let currentRow: number | null = $state(null);
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
-	let filteredSearch: string = $state('');
 
 	let noQuestionCreatedYet = $derived.by(() => {
 		return data?.questions?.length === 0 && [...page.url.searchParams.keys()].length === 0;
@@ -151,7 +151,7 @@
 						data-sveltekit-keepfocus
 						data-sveltekit-preloaddata
 						type="search"
-						placeholder="Search by question name, tags, or ID"
+						placeholder="Search by question name"
 						oninput={(event) => {
 							const url = new URL(page.url);
 							url.searchParams.set('page', '1');
@@ -189,7 +189,9 @@
 								]}
 							>
 								<Table.Cell class="w-1/12 items-center">
-									{index + 1 + ((data?.questions.page || 1) - 1) * (data?.questions.size || 25)}
+									{index +
+										1 +
+										((data?.questions.page || 1) - 1) * (data?.questions.size || DEFAULT_PAGE_SIZE)}
 								</Table.Cell>
 								<Table.Cell class="w-5/12  items-center">{question.question_text}</Table.Cell>
 								<Table.Cell class="w-3/12  items-center">

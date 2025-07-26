@@ -121,6 +121,7 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
+								url.searchParams.set('page', '1');
 								filteredTags.map((tag_id: string) => {
 									url.searchParams.append('tag_ids', tag_id);
 								});
@@ -136,6 +137,7 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
+								url.searchParams.set('page', '1');
 								filteredStates.map((state_id: string) => {
 									url.searchParams.append('state_ids', state_id);
 								});
@@ -152,6 +154,7 @@
 						placeholder="Search by question name, tags, or ID"
 						oninput={(event) => {
 							const url = new URL(page.url);
+							url.searchParams.set('page', '1');
 							clearTimeout(searchTimeout);
 							searchTimeout = setTimeout(() => {
 								url.searchParams.set('name', event?.target?.value || '');
@@ -185,7 +188,9 @@
 									currentRow === index ? 'rounded-b-none border-b-0' : ''
 								]}
 							>
-								<Table.Cell class="w-1/12  items-center">{index + 1}</Table.Cell>
+								<Table.Cell class="w-1/12 items-center">
+									{index + 1 + ((data?.questions.page || 1) - 1) * (data?.questions.size || 25)}
+								</Table.Cell>
 								<Table.Cell class="w-5/12  items-center">{question.question_text}</Table.Cell>
 								<Table.Cell class="w-3/12  items-center">
 									{#if question.tags && question.tags.length > 0}
@@ -255,8 +260,40 @@
 						{/each}
 					</Table.Body>
 				</Table.Root>
-				<div>
-					<p>This is pagination</p>
+				<div class="my-4">
+					<Pagination.Root
+						count={data?.questions?.total}
+						perPage={data?.questions?.size}
+						onPageChange={(currentPage) => {
+							const url = new URL(page.url);
+							url.searchParams.set('page', currentPage.toString());
+							goto(url, { keepFocus: true, invalidateAll: true });
+						}}
+					>
+						{#snippet children({ pages, currentPage })}
+							<Pagination.Content>
+								<Pagination.Item>
+									<Pagination.PrevButton />
+								</Pagination.Item>
+								{#each pages as page (page.key)}
+									{#if page.type === 'ellipsis'}
+										<Pagination.Item>
+											<Pagination.Ellipsis />
+										</Pagination.Item>
+									{:else}
+										<Pagination.Item>
+											<Pagination.Link {page} isActive={currentPage === page.value}>
+												{page.value}
+											</Pagination.Link>
+										</Pagination.Item>
+									{/if}
+								{/each}
+								<Pagination.Item>
+									<Pagination.NextButton />
+								</Pagination.Item>
+							</Pagination.Content>
+						{/snippet}
+					</Pagination.Root>
 				</div>
 			</div>
 		</div>

@@ -17,7 +17,7 @@
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-
+	import * as Pagination from '$lib/components/ui/pagination/index.js';
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
 	let currentRow: number | null = $state(null);
@@ -175,7 +175,7 @@
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
-						{#each data?.questions as question, index (question.id)}
+						{#each data?.questions?.items as question, index (question.id)}
 							<Table.Row
 								onclick={() => {
 									currentRow = currentRow === index ? null : index;
@@ -255,6 +255,9 @@
 						{/each}
 					</Table.Body>
 				</Table.Root>
+				<div>
+					<p>This is pagination</p>
+				</div>
 			</div>
 		</div>
 	{/if}

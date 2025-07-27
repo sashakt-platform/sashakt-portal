@@ -7,14 +7,14 @@
 		class: className,
 		children,
 		...restProps
-	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
+	}: WithElementRef<HTMLAttributes<HTMLUListElement>> = $props();
 </script>
 
-<div
+<ul
 	bind:this={ref}
-	data-slot="alert-dialog-header"
-	class={cn('flex flex-col gap-2 text-center sm:text-left', className)}
+	data-slot="pagination-content"
+	class={cn('flex flex-row items-center gap-1', className)}
 	{...restProps}
 >
 	{@render children?.()}
-</div>
+</ul>

@@ -7,6 +7,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const token = getSessionTokenCookie();
 
 	let questionName = url.searchParams.get('name') || '';
+	let currentPage = url.searchParams.get('page') || 1;
 
 	const tagIdsList = url.searchParams.getAll('tag_ids') || [];
 	const tagParams =
@@ -17,7 +18,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
 
 	const response = await fetch(
-		`${BACKEND_URL}/questions?question_text=${questionName}&${tagParams}&${stateParams}`,
+		`${BACKEND_URL}/questions?question_text=${questionName}&${tagParams}&${stateParams}&page=${currentPage}`,
 		{
 			method: 'GET',
 			headers: {
@@ -27,8 +28,12 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	);
 
 	if (!response.ok) {
+		const errorMessage = await response.json();
 		setFlash(
-			{ type: 'error', message: 'Failed to fetch questions. Please try again later.' },
+			{
+				type: 'error',
+				message: `Failed to fetch questions: ${errorMessage.detail || response.statusText}`
+			},
 			cookies
 		);
 		return { questions: null };

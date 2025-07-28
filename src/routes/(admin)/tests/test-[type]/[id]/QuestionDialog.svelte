@@ -10,7 +10,7 @@
 	let states = $state<string[]>([]);
 	let filteredSearch: string = $state('');
 	const data = $derived.by(() =>
-		questions
+		questions.items
 			.filter((question) => {
 				// Tag filter (if any tags are selected)
 				if (tags.length > 0) {

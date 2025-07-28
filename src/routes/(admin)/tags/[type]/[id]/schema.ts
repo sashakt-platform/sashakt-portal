@@ -10,6 +10,8 @@ export type TagFormSchema = typeof tagSchema;
 
 export const tagTypeSchema = z.object({
 	name: z.string().nonempty({ message: 'Tag type name is required' }),
-	description: z.string().nullable().optional()
+	description: z.string().nullable().optional(),
+	organization_id: z.number()
 });
+
 export type TagTypeFormSchema = typeof tagTypeSchema;

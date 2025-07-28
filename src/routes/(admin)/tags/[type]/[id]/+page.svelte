@@ -4,9 +4,10 @@
 	import { Input } from '$lib/components/ui/input';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { tagSchema, type TagFormSchema } from './schema';
+	import { tagSchema, type TagFormSchema, tagTypeSchema, type TagTypeFormSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
 	const {
 		data
@@ -16,28 +17,35 @@
 			tagTypeForm: SuperValidated<Infer<TagFormSchema>>;
 			tagTypes: [];
 			type: string;
+			tagData: Partial<Infer<TagFormSchema>> | Partial<Infer<TagTypeFormSchema>> | null;
 		};
 	} = $props();
 
-	const tagData: Partial<Infer<TagFormSchema>> | null = data?.tagData || null;
-
-	console.log('Tag Data:', $inspect(tagData));
+	const tagData: Partial<Infer<TagFormSchema>> | Partial<Infer<TagTypeFormSchema>> | null =
+		data?.tagData || null;
 
 	const {
 		form: formData,
 		enhance,
 		submit
-	} = superForm(tagData || data.tagForm, {
-		validators: zodClient(tagSchema),
-		dataType: 'json'
+	} = superForm(tagData || (data.type == 'tag' ? data.tagForm : data.tagTypeForm), {
+		validators: zodClient(data.type == 'tag' ? tagSchema : tagTypeSchema),
+		dataType: 'json',
+		onSubmit: () => {
+			if (data.type == 'tagtype') {
+				$formData.organization_id = data.user.organization_id;
+			}
+		}
 	});
 
 	const triggerContent = $derived(
-		data.tagTypes.find((f) => f.id === $formData.tag_type_id)?.name ?? 'Select Tag Type'
+		data.type == 'tag' &&
+			(data.tagTypes.find((f) => f.id === $formData.tag_type_id)?.name ?? 'Select Tag Type')
 	);
 
 	console.log('Tag Form Data:', $inspect($formData));
-	tagData && ($formData.tag_type_id = tagData?.tag_type?.id);
+	tagData && data.type == 'tag' && ($formData.tag_type_id = tagData?.tag_type?.id);
+	const title = $derived(data.type == 'tag' ? 'Tag' : 'Tag Type');
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -56,52 +64,53 @@
 						<h2
 							class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
 						>
-							{tagData ? `Edit ${data.type}` : `Create a ${data.type}`}
+							{tagData ? `Edit ${title}` : `Create a ${title}`}
 						</h2>
 						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 					</div>
 				</div>
 				<Label class="my-auto align-middle text-sm font-extralight">
-					{tagData ? `Edit Existing ${data.type}` : `Add ${data.type}`}
+					{tagData ? `Edit Existing ${title}` : `Add ${title}`}
 				</Label>
 			</div>
 		</div>
 		<div class="mx-10 flex flex-col gap-10 bg-white p-9">
 			<div class="flex w-full flex-col gap-2 pr-8">
-				{@render snippetHeading('Name of the Tag')}
+				{@render snippetHeading(`Name of the ${title}`)}
 				<Input
 					type="text"
 					name="name"
 					bind:value={$formData.name}
-					placeholder="Enter Name of the Tag..."
+					placeholder={`Enter Name of the ${title}...`}
 				/>
 			</div>
 			<div class="flex w-full flex-col gap-2 pr-8">
-				{@render snippetHeading('Description of the Tag')}
-				<Input
-					type="text"
+				{@render snippetHeading(`Description of the ${title}`)}
+				<Textarea
 					name="description"
 					bind:value={$formData.description}
-					placeholder="Enter Description of the Tag..."
+					placeholder={`Enter Description of the ${title}...`}
 				/>
 			</div>
-			<div class="flex w-full flex-col gap-2 pr-8">
-				<h2 class="font-semibold">Select Tag Type</h2>
-				<Select.Root type="single" name="tag_type_id" bind:value={$formData.tag_type_id}>
-					<Select.Trigger>
-						{triggerContent}
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Group>
-							{#each data.tagTypes as tagType (tagType.id)}
-								<Select.Item value={tagType.id} label={tagType.name}>
-									{tagType.name}
-								</Select.Item>
-							{/each}
-						</Select.Group>
-					</Select.Content>
-				</Select.Root>
-			</div>
+			{#if data.type == 'tag'}
+				<div class="flex w-full flex-col gap-2 pr-8">
+					<h2 class="font-semibold">Select Tag Type</h2>
+					<Select.Root type="single" name="tag_type_id" bind:value={$formData.tag_type_id}>
+						<Select.Trigger>
+							{triggerContent}
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								{#each data.tagTypes as tagType (tagType.id)}
+									<Select.Item value={tagType.id} label={tagType.name}>
+										{tagType.name}
+									</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				</div>
+			{/if}
 		</div>
 	</div>
 	<div class="sticky right-0 bottom-0 left-0 mt-4 flex w-full border-t-4 bg-white p-4 shadow-md">
@@ -111,7 +120,7 @@
 			>
 			<div class="flex gap-2">
 				<Button class="bg-primary" onclick={submit} disabled={$formData.name?.trim() === ''}
-					>Save {data.type}</Button
+					>Save {title}</Button
 				>
 			</div>
 		</div>

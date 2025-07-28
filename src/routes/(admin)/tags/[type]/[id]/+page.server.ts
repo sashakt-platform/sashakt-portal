@@ -74,7 +74,10 @@ export const actions: Actions = {
 		}
 		console.log('Saving tags with params:', params);
 		const token = getSessionTokenCookie();
-		const form = await superValidate(request, zod(tagSchema));
+		const form = await superValidate(
+			request,
+			zod(params.type == 'tag' ? tagSchema : tagTypeSchema)
+		);
 		if (!form.valid) {
 			setFlash(
 				{ type: 'error', message: 'Tag not Created. Please check all the details.' },
@@ -128,7 +131,14 @@ export const actions: Actions = {
 				return fail(500, { form });
 			}
 		}
-		redirect('/tags', { type: 'success', message: 'Tag saved successfully' }, cookies);
+		redirect(
+			'/tags',
+			{
+				type: 'success',
+				message: `${params.type === 'tag' ? 'Tag' : 'Tag-Type'} saved successfully`
+			},
+			cookies
+		);
 	},
 	delete: async ({ params, cookies }) => {
 		console.log('Deleting tags with params:', params);
@@ -152,6 +162,13 @@ export const actions: Actions = {
 				cookies
 			);
 		}
-		redirect('/tags', { type: 'success', message: 'Tag deleted successfully' }, cookies);
+		redirect(
+			'/tags',
+			{
+				type: 'success',
+				message: `${params.type === 'tag' ? 'Tag' : 'Tag-Type'} deleted successfully`
+			},
+			cookies
+		);
 	}
 };

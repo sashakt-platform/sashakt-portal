@@ -15,7 +15,10 @@
 </script>
 
 <div>
-	<DeleteDialog bind:action={deleteAction} elementName="Tag" />
+	<DeleteDialog
+		bind:action={deleteAction}
+		elementName={deleteAction?.includes('tagtype') ? 'Tag-Type' : 'Tag'}
+	/>
 	<div class="mx-10 flex flex-row py-4">
 		<div class="my-auto flex flex-col">
 			<div class=" flex w-full items-center align-middle">
@@ -126,8 +129,11 @@
 										})}
 									</Table.Cell>
 									<Table.Cell class="flex w-1/12 flex-row items-center gap-4">
-										<Pencil class="w-4" />
-										<Trash_2 class="w-4" />
+										<a href={`/tags/tagtype/${tagType.id}`}><Pencil class="w-4" /></a>
+										<Trash_2
+											class="w-4"
+											onclick={() => (deleteAction = `/tags/tagtype/${tagType.id}?/delete`)}
+										/>
 									</Table.Cell>
 								</Table.Row>
 							{/each}

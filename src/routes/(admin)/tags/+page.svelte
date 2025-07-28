@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
@@ -7,12 +7,15 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 
 	const { data } = $props();
 	console.log('data', data);
+	let deleteAction: string | null = $state(null);
 </script>
 
 <div>
+	<DeleteDialog bind:action={deleteAction} elementName="Tag" />
 	<div class="mx-10 flex flex-row py-4">
 		<div class="my-auto flex flex-col">
 			<div class=" flex w-full items-center align-middle">
@@ -30,21 +33,20 @@
 			>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
-			<a href="/questionbank/single-question/new"
+			<a href="/tags/tag/new"
 				><Button class="font-bold" variant="outline"><Plus />Create a Tag</Button></a
 			>
-			<a href="/questionbank/import"><Button class=" font-bold "><Plus />Create Tag-Type</Button></a
-			>
+			<a href="/tags/tagtype/new"><Button class=" font-bold "><Plus />Create Tag-Type</Button></a>
 		</div>
 	</div>
 
 	<div class="mx-8 mt-10 flex flex-col gap-8">
-		<Tabs.Root value="tags">
+		<Tabs.Root value="tag" class="w-full">
 			<Tabs.List>
-				<Tabs.Trigger value="tags">Tags</Tabs.Trigger>
-				<Tabs.Trigger value="tag-types">Tag-Types</Tabs.Trigger>
+				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>
+				<Tabs.Trigger value="tagtype">Tag-Types</Tabs.Trigger>
 			</Tabs.List>
-			<Tabs.Content value="tags"
+			<Tabs.Content value="tag"
 				><div>
 					<Table.Root>
 						<Table.Header>
@@ -68,7 +70,7 @@
 										{tag.name}
 									</Table.Cell>
 									<Table.Cell class="flex w-3/12 items-center">
-										{tag?.tag_type?.name||'None'}
+										{tag?.tag_type?.name || 'None'}
 									</Table.Cell>
 									<Table.Cell class="flex w-2/12 items-center">
 										{new Date(tag.modified_date).toLocaleDateString('en-US', {
@@ -80,8 +82,11 @@
 										})}
 									</Table.Cell>
 									<Table.Cell class="flex w-1/12 flex-row items-center gap-4">
-										<Pencil class="w-4 cursor-pointer " />
-										<Trash_2 class="w-4 cursor-pointer" />
+										<a href={`/tags/tag/${tag.id}`}><Pencil class="w-4 cursor-pointer " /></a>
+										<Trash_2
+											class="w-4 cursor-pointer"
+											onclick={() => (deleteAction = `/tags/tag/${tag.id}?/delete`)}
+										/>
 									</Table.Cell>
 								</Table.Row>
 							{/each}
@@ -89,7 +94,7 @@
 					</Table.Root>
 				</div></Tabs.Content
 			>
-			<Tabs.Content value="tag-types"
+			<Tabs.Content value="tagtype"
 				><div>
 					<Table.Root>
 						<Table.Header>

@@ -144,7 +144,11 @@
 							</Sidebar.MenuButton>
 						{/snippet}
 					</DropdownMenu.Trigger>
-					<DropdownMenu.Content side="top" class="w-[--bits-dropdown-menu-anchor-width]">
+					<DropdownMenu.Content
+						side="top"
+						align="end"
+						class="w-[--bits-dropdown-menu-anchor-width]"
+					>
 						<DropdownMenu.Item>
 							<span>My Account</span>
 						</DropdownMenu.Item>

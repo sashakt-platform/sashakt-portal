@@ -72,7 +72,6 @@ export const actions: Actions = {
 		if (params.type != 'tag' && params.type != 'tagtype') {
 			throw new Error('Invalid type parameter');
 		}
-		console.log('Saving tags with params:', params);
 		const token = getSessionTokenCookie();
 		const form = await superValidate(
 			request,
@@ -141,7 +140,6 @@ export const actions: Actions = {
 		);
 	},
 	delete: async ({ params, cookies }) => {
-		console.log('Deleting tags with params:', params);
 		if (params.type != 'tag' && params.type != 'tagtype') {
 			throw new Error('Invalid type parameter');
 		}

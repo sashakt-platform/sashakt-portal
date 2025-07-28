@@ -10,7 +10,6 @@
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 
 	const { data } = $props();
-	console.log('data', data);
 	let deleteAction: string | null = $state(null);
 </script>
 

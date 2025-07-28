@@ -43,8 +43,8 @@
 			(data.tagTypes.find((f) => f.id === $formData.tag_type_id)?.name ?? 'Select Tag Type')
 	);
 
-	console.log('Tag Form Data:', $inspect($formData));
 	tagData && data.type == 'tag' && ($formData.tag_type_id = tagData?.tag_type?.id);
+
 	const title = $derived(data.type == 'tag' ? 'Tag' : 'Tag Type');
 </script>
 

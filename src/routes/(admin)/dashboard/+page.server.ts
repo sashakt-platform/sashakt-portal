@@ -4,43 +4,31 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
 	const token = getSessionTokenCookie();
+	interface DashboardStats {
+		total_questions: number;
+		total_users: number;
+		total_tests: number;
+	}
 
-	let users = [];
-	let questions = [];
-	let tests = [];
+	const stats: DashboardStats = {
+		total_questions: 0,
+		total_users: 0,
+		total_tests: 0
+	};
 
-	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?skip=0&limit=100`, {
+	const responseStats = await fetch(`${BACKEND_URL}/organization/aggregated_data`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
 		}
 	});
 
-	if (responseQuestions.ok) {
-		questions = await responseQuestions.json();
+	if (responseStats.ok) {
+		const statsData = await responseStats.json();
+		stats.total_questions = statsData.total_questions;
+		stats.total_users = statsData.total_users;
+		stats.total_tests = statsData.total_tests;
 	}
 
-	const responseTest = await fetch(`${BACKEND_URL}/test/?is_template=0`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
-		}
-	});
-
-	if (responseTest.ok) {
-		tests = await responseTest.json();
-	}
-
-	const responseUsers = await fetch(`${BACKEND_URL}/users/`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
-		}
-	});
-
-	if (responseUsers.ok) {
-		users = await responseUsers.json();
-	}
-
-	return { users, questions, tests };
+	return { stats };
 };

@@ -31,6 +31,6 @@
 	</div>
 </div>
 
-<div class="m-10 rounded-2xl align-top shadow-2xl">
+<div class="mx-8 mt-10 flex flex-col gap-8">
 	<DataTable data={tableData} {columns} />
 </div>

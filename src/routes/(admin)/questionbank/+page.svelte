@@ -56,7 +56,9 @@
 				<a href="/questionbank/single-question/new" data-testid="create-question-btn"
 					><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
 				>
-				<a href="/questionbank/import" data-testid="bulk-upload-btn"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
+				<a href="/questionbank/import" data-testid="bulk-upload-btn"
+					><Button class=" font-bold "><Plus />Bulk Upload</Button></a
+				>
 			{/if}
 		</div>
 	</div>
@@ -220,8 +222,9 @@
 								</Table.Cell>
 								<Table.Cell class="w-1/12  items-center">
 									<DropdownMenu.Root>
-										<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })} data-testid="question-actions"
-											><Ellipsis /></DropdownMenu.Trigger
+										<DropdownMenu.Trigger
+											class={buttonVariants({ variant: 'ghost' })}
+											data-testid="question-actions"><Ellipsis /></DropdownMenu.Trigger
 										>
 										<DropdownMenu.Content class="w-56">
 											<DropdownMenu.Group>

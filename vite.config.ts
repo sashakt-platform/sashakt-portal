@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
 	envDir: '.',
 	envPrefix: ['VITE_', 'BACKEND_URL', 'TEST_TAKER_URL'],
 	test: {
-		workspace: [
+		projects: [
 			{
 				extends: './vite.config.ts',
 				plugins: [svelteTesting()],

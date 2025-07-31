@@ -16,7 +16,7 @@
 <div>
 	<DeleteDialog
 		bind:action={deleteAction}
-		elementName={deleteAction?.includes('tagtype') ? 'Tag-Type' : 'Tag'}
+		elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
 	/>
 	<div class="mx-10 flex flex-row py-4">
 		<div class="my-auto flex flex-col">
@@ -31,14 +31,14 @@
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight"
-				>Create, edit and update all the Tags and Tag-Types</Label
+				>Create, edit and update all the Tags and Tag Types</Label
 			>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
 			<a href="/tags/tag/new"
 				><Button class="font-bold" variant="outline"><Plus />Create a Tag</Button></a
 			>
-			<a href="/tags/tagtype/new"><Button class=" font-bold "><Plus />Create Tag-Type</Button></a>
+			<a href="/tags/tagtype/new"><Button class=" font-bold "><Plus />Create Tag Type</Button></a>
 		</div>
 	</div>
 
@@ -46,7 +46,7 @@
 		<Tabs.Root value="tag" class="w-full">
 			<Tabs.List>
 				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>
-				<Tabs.Trigger value="tagtype">Tag-Types</Tabs.Trigger>
+				<Tabs.Trigger value="tagtype">Tag Types</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="tag"
 				><div>
@@ -55,11 +55,10 @@
 							<Table.Row
 								class=" bg-primary-foreground my-2 flex items-center rounded-lg font-bold  text-black"
 							>
-								<Table.Head class="flex w-1/12 items-center">No.</Table.Head>
-								<Table.Head class="flex w-5/12 items-center">Tag Name</Table.Head>
-								<Table.Head class="flex w-3/12 items-center">Tag-Type</Table.Head>
+								<Table.Head class="flex w-5/12 items-center">Name</Table.Head>
+								<Table.Head class="flex w-3/12 items-center">Type</Table.Head>
 								<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
-								<Table.Head class="flex w-1/12 items-center">Options</Table.Head>
+								<Table.Head class="flex w-1/12 items-center"></Table.Head>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
@@ -67,7 +66,6 @@
 								<Table.Row
 									class=" mt-2 flex  items-center rounded-lg border  border-gray-200  bg-white font-medium "
 								>
-									<Table.Cell class="flex w-1/12 items-center">{index + 1}</Table.Cell>
 									<Table.Cell class="flex w-5/12 items-center">
 										{tag.name}
 									</Table.Cell>
@@ -103,10 +101,9 @@
 							<Table.Row
 								class=" bg-primary-foreground my-2 flex items-center rounded-lg font-bold  text-black"
 							>
-								<Table.Head class="flex w-1/12 items-center">No.</Table.Head>
-								<Table.Head class="flex w-5/12 items-center">Tag-Type Name</Table.Head>
+								<Table.Head class="flex w-5/12 items-center">Name</Table.Head>
 								<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
-								<Table.Head class="flex w-1/12 items-center">Options</Table.Head>
+								<Table.Head class="flex w-1/12 items-center"></Table.Head>
 							</Table.Row>
 						</Table.Header>
 						<Table.Body>
@@ -114,7 +111,6 @@
 								<Table.Row
 									class=" mt-2 flex cursor-pointer  items-center rounded-lg border  border-gray-200  bg-white font-medium"
 								>
-									<Table.Cell class="flex w-1/12 items-center">{index + 1}</Table.Cell>
 									<Table.Cell class="flex w-5/12 items-center">
 										{tagType.name}
 									</Table.Cell>

@@ -134,7 +134,7 @@ export const actions: Actions = {
 			'/tags',
 			{
 				type: 'success',
-				message: `${params.type === 'tag' ? 'Tag' : 'Tag-Type'} saved successfully`
+				message: `${params.type === 'tag' ? 'Tag' : 'Tag Type'} saved successfully`
 			},
 			cookies
 		);

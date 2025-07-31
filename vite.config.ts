@@ -3,10 +3,12 @@ import { svelteTesting } from '@testing-library/svelte/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(() => ({
 	plugins: [tailwindcss(), sveltekit()],
+	envDir: '.',
+	envPrefix: ['VITE_', 'BACKEND_URL', 'TEST_TAKER_URL'],
 	test: {
-		workspace: [
+		projects: [
 			{
 				extends: './vite.config.ts',
 				plugins: [svelteTesting()],
@@ -30,4 +32,4 @@ export default defineConfig({
 			}
 		]
 	}
-});
+}));

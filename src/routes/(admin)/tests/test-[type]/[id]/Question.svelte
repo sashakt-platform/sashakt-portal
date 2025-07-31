@@ -82,7 +82,7 @@
 				</div>
 			{:else}
 				<div class="flex h-full w-full flex-col overflow-auto">
-					{#each questions.filter( (row) => $formData.question_revision_ids.includes(row.latest_question_revision_id) ) as d (d.latest_question_revision_id)}
+					{#each questions.items.filter( (row) => $formData.question_revision_ids.includes(row.latest_question_revision_id) ) as d (d.latest_question_revision_id)}
 						<div class="group mx-2 mt-2 flex flex-row">
 							<div class="my-auto w-fit">
 								<GripVertical />

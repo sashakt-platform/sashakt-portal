@@ -28,10 +28,11 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	);
 
 	if (!res.ok) {
+		const errorMessage = await res.json();
 		setFlash(
 			{
 				type: 'error',
-				message: `Failed to fetch Test ${is_template ? 'template' : 'sessions'}. Details: ${res.statusText}`
+				message: `Failed to fetch Test ${is_template ? 'template' : 'sessions'}. Details: ${errorMessage.detail || res.statusText}`
 			},
 			cookies
 		);
@@ -48,10 +49,11 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	});
 
 	if (!responseQuestions.ok) {
+		const errorMessage = await responseQuestions.json();
 		setFlash(
 			{
 				type: 'error',
-				message: `Failed to fetch Questions. Details: ${responseQuestions.statusText}`
+				message: `Failed to fetch Questions. Details: ${errorMessage.detail || responseQuestions.statusText}`
 			},
 			cookies
 		);

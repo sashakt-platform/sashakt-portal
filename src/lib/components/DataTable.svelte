@@ -40,13 +40,15 @@
 	});
 </script>
 
-<div class="rounded-md border">
+<div>
 	<Table.Root>
 		<Table.Header>
 			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-				<Table.Row>
+				<Table.Row
+					class=" bg-primary-foreground my-2 flex items-center rounded-lg font-bold  text-black"
+				>
 					{#each headerGroup.headers as header (header.id)}
-						<Table.Head colspan={header.colSpan}>
+						<Table.Head colspan={header.colSpan} class="flex flex-1 items-center">
 							{#if !header.isPlaceholder}
 								<FlexRender
 									content={header.column.columnDef.header}
@@ -60,16 +62,23 @@
 		</Table.Header>
 		<Table.Body>
 			{#each table.getRowModel().rows as row (row.id)}
-				<Table.Row data-state={row.getIsSelected() && 'selected'}>
+				<Table.Row
+					data-state={row.getIsSelected() && 'selected'}
+					class="mt-2 flex cursor-pointer  items-center rounded-lg border  border-gray-200  bg-white font-medium"
+				>
 					{#each row.getVisibleCells() as cell (cell.id)}
-						<Table.Cell>
+						<Table.Cell class="flex-1 items-center">
 							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 						</Table.Cell>
 					{/each}
 				</Table.Row>
 			{:else}
-				<Table.Row>
-					<Table.Cell colspan={columns.length} class="h-24 text-center">No results.</Table.Cell>
+				<Table.Row
+					class="mt-2 flex items-center rounded-lg border border-gray-200 bg-white font-medium"
+				>
+					<Table.Cell colspan={columns.length} class="h-24 text-center items-center w-full"
+						>No results.</Table.Cell
+					>
 				</Table.Row>
 			{/each}
 		</Table.Body>

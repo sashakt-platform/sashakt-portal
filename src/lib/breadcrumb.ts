@@ -8,7 +8,7 @@
  */
 
 export const breadcrumbs = (pathname: string) => {
-	const segments = pathname.split('/').filter(Boolean);
+	const segments = pathname.split('/').slice(0, 3).filter(Boolean);
 
 	let pathAccumulator = '';
 	return segments.map((segment) => {

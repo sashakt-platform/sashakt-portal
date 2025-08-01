@@ -36,11 +36,19 @@
 	const stats_box = [
 		{
 			title: 'Total Questions',
-			description: 'Stats and Generated Insights',
-			count: data?.questions?.length
+			description: 'Total Questions created for the organization',
+			count: data?.stats?.total_questions
 		},
-		{ title: 'Tests', description: 'Stats and Generated Insights', count: data?.tests?.length },
-		{ title: 'Users', description: 'Stats and Generated Insights', count: data?.users?.count }
+		{
+			title: 'Tests',
+			description: 'Total Tests created for the organization',
+			count: data?.stats?.total_tests
+		},
+		{
+			title: 'Users',
+			description: 'Total Users created for the organization',
+			count: data?.stats?.total_users
+		}
 	];
 </script>
 

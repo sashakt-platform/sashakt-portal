@@ -3,7 +3,7 @@ import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { userSchema } from './schema';
+import { createUserSchema, editUserSchema } from './schema';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
 import { redirect } from 'sveltekit-flash-message/server';
 
@@ -89,8 +89,11 @@ export const load: PageServerLoad = async ({ params }) => {
 		console.error('Error fetching organization data:', error);
 	}
 
+	// Use appropriate schema based on action
+	const schema = params.action === 'edit' ? editUserSchema : createUserSchema;
+
 	return {
-		form: await superValidate(zod(userSchema)),
+		form: await superValidate(zod(schema)),
 		action: params.action,
 		id: params.id,
 		user: userData,
@@ -102,7 +105,9 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
 		const token = getSessionTokenCookie();
-		const form = await superValidate(request, zod(userSchema));
+		// Use appropriate schema based on action
+		const schema = params.action === 'edit' ? editUserSchema : createUserSchema;
+		const form = await superValidate(request, zod(schema));
 		if (!form.valid) {
 			return fail(400, {
 				form
@@ -111,21 +116,28 @@ export const actions: Actions = {
 
 		let res: Response;
 		if (params.action === 'edit' && params.id) {
+			// For edit mode, only include password if it's provided
+			const updateData: any = {
+				full_name: form.data.full_name,
+				email: form.data.email,
+				phone: form.data.phone || '',
+				organization_id: form.data.organization_id.toString(),
+				role_id: form.data.role_id.toString(),
+				is_active: form.data.is_active ? 'true' : 'false'
+			};
+
+			// Only include password if it's provided and not empty
+			if (form.data.password && form.data.password.length > 0) {
+				updateData.password = form.data.password;
+			}
+
 			res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify({
-					full_name: form.data.full_name,
-					email: form.data.email,
-					password: form.data.password,
-					phone: form.data.phone || '',
-					organization_id: form.data.organization_id.toString(),
-					role_id: form.data.role_id.toString(),
-					is_active: form.data.is_active ? 'true' : 'false'
-				})
+				body: JSON.stringify(updateData)
 			});
 		} else if (params.action === 'add') {
 			res = await fetch(`${BACKEND_URL}/users`, {

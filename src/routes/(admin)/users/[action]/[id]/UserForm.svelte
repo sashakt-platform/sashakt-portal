@@ -3,16 +3,18 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
-	import { userSchema, type FormSchema } from './schema';
-	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
+	import { createUserSchema, editUserSchema, type FormSchema } from './schema';
+	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
-	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
+	let { data }: { data: any } = $props();
 
 	let userData: Partial<Infer<FormSchema>> | null = data?.user || null;
+	const isEditMode = data.action === 'edit';
+	const schema = isEditMode ? editUserSchema : createUserSchema;
 
 	const form = superForm(userData || data.form, {
-		validators: zodClient(userSchema)
+		validators: zodClient(schema)
 	});
 
 	const { form: formData, enhance } = form;
@@ -40,8 +42,15 @@
 	<Form.Field {form} name="password">
 		<Form.Control>
 			{#snippet children({ props })}
-				<Form.Label>Password</Form.Label>
-				<Input {...props} type="password" bind:value={$formData.password} />
+				<Form.Label
+					>Password {isEditMode ? '(Optional - leave blank to keep current)' : ''}</Form.Label
+				>
+				<Input
+					{...props}
+					type="password"
+					bind:value={$formData.password}
+					placeholder={isEditMode ? 'Leave blank to keep current password' : 'Enter password'}
+				/>
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
@@ -49,8 +58,15 @@
 	<Form.Field {form} name="confirm_password">
 		<Form.Control>
 			{#snippet children({ props })}
-				<Form.Label>Confirm Password</Form.Label>
-				<Input {...props} type="password" bind:value={$formData.confirm_password} />
+				<Form.Label
+					>Confirm Password {isEditMode ? '(Required if password is entered)' : ''}</Form.Label
+				>
+				<Input
+					{...props}
+					type="password"
+					bind:value={$formData.confirm_password}
+					placeholder={isEditMode ? 'Confirm new password if changing' : 'Confirm password'}
+				/>
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

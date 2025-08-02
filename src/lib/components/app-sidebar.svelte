@@ -7,6 +7,7 @@
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import User from '@lucide/svelte/icons/user';
+	import Tags from '@lucide/svelte/icons/tags';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
 	// Menu items.
@@ -35,6 +36,11 @@
 					url: '/tests/test-session'
 				}
 			}
+		},
+		tags: {
+			title: 'Tag Management',
+			url: '/tags',
+			icon: Tags
 		},
 		user: {
 			title: 'User Management',
@@ -124,6 +130,7 @@
 					</Collapsible.Root>
 					<!---- Collapsible menu for Tests ---->
 
+					{@render sidebaritems(menu_items.tags)}
 					{@render sidebaritems(menu_items.user)}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>

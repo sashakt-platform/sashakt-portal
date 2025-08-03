@@ -18,7 +18,7 @@ export const load = async ({ url }) => {
 		size: size.toString(),
 		...(search && { search }),
 		...(sortBy && { sort_by: sortBy }),
-		...(sortOrder && { sort_order: sortOrder })
+		...(sortBy && { sort_order: sortOrder })
 	});
 
 	const res = await fetch(`${BACKEND_URL}/users?${queryParams}`, {

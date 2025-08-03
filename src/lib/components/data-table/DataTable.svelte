@@ -30,6 +30,13 @@
 	let searchInput = $state(search);
 	let searchTimeout: number;
 
+	// cleanup timeout on component destroy
+	$effect(() => {
+		return () => {
+			clearTimeout(searchTimeout);
+		};
+	});
+
 	// let's add debouncing for search
 	function handleSearch() {
 		clearTimeout(searchTimeout);

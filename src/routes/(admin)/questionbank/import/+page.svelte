@@ -72,16 +72,16 @@
 		</Table.Root>
 
 		{#if $message.failed_questions}
-			<div class="flex w-full items-center justify-between">
+			<div class="mt-5 flex w-full items-center">
 				<a
 					href={$message.failed_question_details.split(': ')[1]}
-					class="text-primary inline-flex items-center gap-2 font-medium"
+					class="text-primary w-full font-medium"
 					download="error_report.csv"
 				>
-					<Download size={16} />
-					Download error report
+					<Button class="w-full cursor-pointer py-2 text-base font-semibold"
+						><Download />Download error report</Button
+					>
 				</a>
-				<Button type="submit" class="px-10 py-2 text-base font-semibold">Retry Upload</Button>
 			</div>
 		{:else}
 			<div class="mt-5 w-full font-semibold">

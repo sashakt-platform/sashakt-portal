@@ -76,6 +76,7 @@
 				<a
 					href={$message.failed_question_details.split(': ')[1]}
 					class="text-primary inline-flex items-center gap-2 font-medium"
+					download="error_report.csv"
 				>
 					<Download size={16} />
 					Download error report

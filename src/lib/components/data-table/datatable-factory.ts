@@ -16,32 +16,32 @@ export interface DataTableConfig<T extends { id: string | number }> {
 /**
  * Function to create column configuration for a datatable
  */
-export const createDataTableColumns = <T extends { id: string | number }>(
-	config: DataTableConfig<T>
-) => (
-	currentSortBy: string,
-	currentSortOrder: string,
-	handleSort: (columnId: string) => void
-): ColumnDef<T>[] => {
-	const columns: ColumnDef<T>[] = config.columns.map((col) => {
-		if (col.sortable !== false) {
-			return createSortableColumn(
-				col.key,
-				col.title,
-				currentSortBy,
-				currentSortOrder,
-				handleSort
-			);
-		} else {
-			return {
-				accessorKey: col.key as string,
-				header: col.title
-			};
-		}
-	});
+export const createDataTableColumns =
+	<T extends { id: string | number }>(config: DataTableConfig<T>) =>
+	(
+		currentSortBy: string,
+		currentSortOrder: string,
+		handleSort: (columnId: string) => void
+	): ColumnDef<T>[] => {
+		const columns: ColumnDef<T>[] = config.columns.map((col) => {
+			if (col.sortable !== false) {
+				return createSortableColumn(
+					col.key,
+					col.title,
+					currentSortBy,
+					currentSortOrder,
+					handleSort
+				);
+			} else {
+				return {
+					accessorKey: col.key as string,
+					header: col.title
+				};
+			}
+		});
 
-	// add actions column
-	columns.push(createActionsColumn<T>(config.entityName, config.baseUrl));
+		// add actions column
+		columns.push(createActionsColumn<T>(config.entityName, config.baseUrl));
 
-	return columns;
-};
+		return columns;
+	};

@@ -14,9 +14,9 @@
 		...restProps
 	} = $props();
 
-	const isActiveSorted = currentSortBy === columnId;
-	const isAsc = isActiveSorted && currentSortOrder === 'asc';
-	const isDesc = isActiveSorted && currentSortOrder === 'desc';
+	const isActiveSorted = $derived(currentSortBy === columnId);
+	const isAsc = $derived(isActiveSorted && currentSortOrder === 'asc');
+	const isDesc = $derived(isActiveSorted && currentSortOrder === 'desc');
 </script>
 
 <Button {variant} onclick={() => handleSort(columnId)} {...restProps}>

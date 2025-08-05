@@ -1,16 +1,69 @@
 <script lang="ts">
+	import { DataTable } from '$lib/components/data-table';
+	import { createTagsColumns } from './tags-columns';
+	import { createTagTypesColumns } from './tag-types-columns';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import * as Table from '$lib/components/ui/table/index.js';
 	import Info from '@lucide/svelte/icons/info';
 	import Plus from '@lucide/svelte/icons/plus';
-	import Pencil from '@lucide/svelte/icons/pencil';
-	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
+
+	// Tags related fields
+	const tagsData = $derived(data?.tags?.items || []);
+	const tagsTotalItems = $derived(data?.tags?.total || 0);
+	const tagsTotalPages = $derived(data?.tagsTotalPages || 0);
+	const tagsCurrentPage = $derived(data?.tagsParams?.page || 1);
+	const tagsPageSize = $derived(data?.tagsParams?.size || 10);
+	const tagsSearch = $derived(data?.tagsParams?.search || '');
+	const tagsSortBy = $derived(data?.tagsParams?.sortBy || '');
+	const tagsSortOrder = $derived(data?.tagsParams?.sortOrder || 'asc');
+
+	// Tag Types related fields
+	const tagTypesData = $derived(data?.tagTypes?.items || []);
+	const tagTypesTotalItems = $derived(data?.tagTypes?.total || 0);
+	const tagTypesTotalPages = $derived(data?.tagTypesTotalPages || 0);
+	const tagTypesCurrentPage = $derived(data?.tagTypesParams?.page || 1);
+	const tagTypesPageSize = $derived(data?.tagTypesParams?.size || 10);
+	const tagTypesSearch = $derived(data?.tagTypesParams?.search || '');
+	const tagTypesSortBy = $derived(data?.tagTypesParams?.sortBy || '');
+	const tagTypesSortOrder = $derived(data?.tagTypesParams?.sortOrder || 'asc');
+
+	function handleTagsSort(columnId: string) {
+		const url = new URL(page.url);
+		const newSortOrder = tagsSortBy === columnId && tagsSortOrder === 'asc' ? 'desc' : 'asc';
+
+		url.searchParams.set('tagsSortBy', columnId);
+		url.searchParams.set('tagsSortOrder', newSortOrder);
+		url.searchParams.set('tagsPage', '1');
+
+		goto(url.toString(), { replaceState: false });
+	}
+
+	function handleTagTypesSort(columnId: string) {
+		const url = new URL(page.url);
+		const newSortOrder =
+			tagTypesSortBy === columnId && tagTypesSortOrder === 'asc' ? 'desc' : 'asc';
+
+		url.searchParams.set('tagTypesSortBy', columnId);
+		url.searchParams.set('tagTypesSortOrder', newSortOrder);
+		url.searchParams.set('tagTypesPage', '1');
+
+		goto(url.toString(), { replaceState: false });
+	}
+
+	// get active tab from URL parameter
+	const activeTab = $derived(page.url.searchParams.get('tab') === 'tagtype' ? 'tagtype' : 'tag');
+
+	const tagsColumns = $derived(createTagsColumns(tagsSortBy, tagsSortOrder, handleTagsSort));
+	const tagTypesColumns = $derived(
+		createTagTypesColumns(tagTypesSortBy, tagTypesSortOrder, handleTagTypesSort)
+	);
 </script>
 
 <div>
@@ -35,107 +88,45 @@
 			>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
-			<a href="/tags/tag/new"
+			<a href="/tags/tag/add/new"
 				><Button class="font-bold" variant="outline"><Plus />Create a Tag</Button></a
 			>
-			<a href="/tags/tagtype/new"><Button class=" font-bold "><Plus />Create Tag Type</Button></a>
+			<a href="/tags/tagtype/add/new"
+				><Button class=" font-bold "><Plus />Create Tag Type</Button></a
+			>
 		</div>
 	</div>
 
 	<div class="mx-8 mt-10 flex flex-col gap-8">
-		<Tabs.Root value="tag" class="w-full">
+		<Tabs.Root value={activeTab} class="w-full">
 			<Tabs.List>
 				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>
 				<Tabs.Trigger value="tagtype">Tag Types</Tabs.Trigger>
 			</Tabs.List>
-			<Tabs.Content value="tag"
-				><div>
-					<Table.Root>
-						<Table.Header>
-							<Table.Row
-								class=" bg-primary-foreground my-2 flex items-center rounded-lg font-bold  text-black"
-							>
-								<Table.Head class="flex w-5/12 items-center">Name</Table.Head>
-								<Table.Head class="flex w-3/12 items-center">Type</Table.Head>
-								<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
-								<Table.Head class="flex w-1/12 items-center"></Table.Head>
-							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{#each data?.tags as tag, index (tag.id)}
-								<Table.Row
-									class=" mt-2 flex  items-center rounded-lg border  border-gray-200  bg-white font-medium "
-								>
-									<Table.Cell class="flex w-5/12 items-center">
-										{tag.name}
-									</Table.Cell>
-									<Table.Cell class="flex w-3/12 items-center">
-										{tag?.tag_type?.name || 'None'}
-									</Table.Cell>
-									<Table.Cell class="flex w-2/12 items-center">
-										{new Date(tag.modified_date).toLocaleDateString('en-US', {
-											year: '2-digit',
-											month: 'short',
-											day: 'numeric',
-											hour: 'numeric',
-											minute: 'numeric'
-										})}
-									</Table.Cell>
-									<Table.Cell class="flex w-1/12 flex-row items-center gap-4">
-										<a href={`/tags/tag/${tag.id}`}><Pencil class="w-4 cursor-pointer " /></a>
-										<Trash_2
-											class="w-4 cursor-pointer"
-											onclick={() => (deleteAction = `/tags/tag/${tag.id}?/delete`)}
-										/>
-									</Table.Cell>
-								</Table.Row>
-							{/each}
-						</Table.Body>
-					</Table.Root>
-				</div></Tabs.Content
-			>
-			<Tabs.Content value="tagtype"
-				><div>
-					<Table.Root>
-						<Table.Header>
-							<Table.Row
-								class=" bg-primary-foreground my-2 flex items-center rounded-lg font-bold  text-black"
-							>
-								<Table.Head class="flex w-5/12 items-center">Name</Table.Head>
-								<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
-								<Table.Head class="flex w-1/12 items-center"></Table.Head>
-							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{#each data?.tagTypes as tagType, index (tagType.id)}
-								<Table.Row
-									class=" mt-2 flex cursor-pointer  items-center rounded-lg border  border-gray-200  bg-white font-medium"
-								>
-									<Table.Cell class="flex w-5/12 items-center">
-										{tagType.name}
-									</Table.Cell>
-									<Table.Cell class="flex w-2/12 items-center">
-										{new Date(tagType.modified_date).toLocaleDateString('en-US', {
-											year: '2-digit',
-											month: 'short',
-											day: 'numeric',
-											hour: 'numeric',
-											minute: 'numeric'
-										})}
-									</Table.Cell>
-									<Table.Cell class="flex w-1/12 flex-row items-center gap-4">
-										<a href={`/tags/tagtype/${tagType.id}`}><Pencil class="w-4" /></a>
-										<Trash_2
-											class="w-4"
-											onclick={() => (deleteAction = `/tags/tagtype/${tagType.id}?/delete`)}
-										/>
-									</Table.Cell>
-								</Table.Row>
-							{/each}
-						</Table.Body>
-					</Table.Root>
-				</div></Tabs.Content
-			>
+			<Tabs.Content value="tag">
+				<DataTable
+					data={tagsData}
+					columns={tagsColumns}
+					totalItems={tagsTotalItems}
+					totalPages={tagsTotalPages}
+					currentPage={tagsCurrentPage}
+					pageSize={tagsPageSize}
+					search={tagsSearch}
+					paramPrefix="tags"
+				/>
+			</Tabs.Content>
+			<Tabs.Content value="tagtype">
+				<DataTable
+					data={tagTypesData}
+					columns={tagTypesColumns}
+					totalItems={tagTypesTotalItems}
+					totalPages={tagTypesTotalPages}
+					currentPage={tagTypesCurrentPage}
+					pageSize={tagTypesPageSize}
+					search={tagTypesSearch}
+					paramPrefix="tagTypes"
+				/>
+			</Tabs.Content>
 		</Tabs.Root>
 	</div>
 </div>

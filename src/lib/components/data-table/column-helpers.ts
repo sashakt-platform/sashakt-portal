@@ -10,10 +10,11 @@ export const createSortableColumn = <T>(
 	title: string,
 	currentSortBy: string,
 	currentSortOrder: string,
-	handleSort: (columnId: string) => void
+	handleSort: (columnId: string) => void,
+	options?: Partial<ColumnDef<T>>
 ): ColumnDef<T> => ({
 	accessorKey: accessorKey as string,
-	header: () => {
+	header: ({ column }) => {
 		return renderComponent(DataTableSortButton, {
 			title,
 			columnId: accessorKey as string,
@@ -21,7 +22,8 @@ export const createSortableColumn = <T>(
 			currentSortOrder,
 			handleSort
 		});
-	}
+	},
+	...options
 });
 
 /**

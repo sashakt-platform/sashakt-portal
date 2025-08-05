@@ -15,6 +15,7 @@
 		currentPage: number;
 		pageSize: number;
 		search: string;
+		paramPrefix?: string; // optional parameter prefix for URL params
 	};
 
 	let {
@@ -24,7 +25,8 @@
 		totalPages,
 		currentPage,
 		pageSize,
-		search
+		search,
+		paramPrefix = ''
 	}: DataTableProps<TData, TValue> = $props();
 
 	let searchInput = $state(search);
@@ -50,10 +52,13 @@
 		const url = new URL(page.url);
 
 		Object.entries(params).forEach(([key, value]) => {
+			const paramName = paramPrefix
+				? paramPrefix + key.charAt(0).toUpperCase() + key.slice(1)
+				: key;
 			if (value) {
-				url.searchParams.set(key, value.toString());
+				url.searchParams.set(paramName, value.toString());
 			} else {
-				url.searchParams.delete(key);
+				url.searchParams.delete(paramName);
 			}
 		});
 
@@ -70,7 +75,9 @@
 		get data() {
 			return data;
 		},
-		columns,
+		get columns() {
+			return columns;
+		},
 		getCoreRowModel: getCoreRowModel(),
 		manualPagination: true,
 		manualSorting: true,

@@ -18,6 +18,7 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
+	import Copy from '@lucide/svelte/icons/copy';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import { goto } from '$app/navigation';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
@@ -216,15 +217,23 @@
 													Delete
 												</DropdownMenu.Item>
 
-												<!-- <form action="{page.url.pathname}/{test.id}/?/save" method="POST">
-													<input type="hidden" name="name" value={'Copy of ' + test.name} />
-													<button type="submit" class="w-full text-left">
+												<form
+													action={`/tests/test-session/${test.id}/?/clone`}
+													method="POST"
+													hidden={test.is_template}
+												>
+													<Button
+														type="submit"
+														variant="ghost"
+														size="icon"
+														class="w-full justify-start"
+													>
 														<DropdownMenu.Item>
-															<CopyPlus />
-															<span>Clone</span>
+															<Copy />
+															Clone
 														</DropdownMenu.Item>
-													</button>
-												</form> -->
+													</Button>
+												</form>
 												<a
 													href="/tests/test-session/convert/?template_id={test.id}"
 													hidden={!test.is_template}

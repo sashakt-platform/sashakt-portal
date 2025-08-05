@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { createDataTableColumns } from '$lib/components/data-table/datatable-factory.js';
+import type { ColumnDef } from '@tanstack/table-core';
+import { createSortableColumn, createActionsColumn } from '$lib/components/data-table/column-helpers';
 
 export const userSchema = z.object({
 	id: z.number(),
@@ -8,14 +9,15 @@ export const userSchema = z.object({
 	phone: z.string()
 });
 
-type User = z.infer<typeof userSchema>;
+export type User = z.infer<typeof userSchema>;
 
-export const createColumns = createDataTableColumns<User>({
-	columns: [
-		{ key: 'full_name', title: 'Name' },
-		{ key: 'email', title: 'Email' },
-		{ key: 'phone', title: 'Phone' }
-	],
-	entityName: 'User',
-	baseUrl: '/users'
-});
+export const createColumns = (
+	currentSortBy: string,
+	currentSortOrder: string,
+	handleSort: (columnId: string) => void
+): ColumnDef<User>[] => [
+	createSortableColumn('full_name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('email', 'Email', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('phone', 'Phone', currentSortBy, currentSortOrder, handleSort),
+	createActionsColumn<User>('User', '/users')
+];

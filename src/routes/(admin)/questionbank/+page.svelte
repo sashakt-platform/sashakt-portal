@@ -53,7 +53,7 @@
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
 			{#if !noQuestionCreatedYet}
-				<a href="/questionbank/single-question/new"
+				<a href="/questionbank/single-question/add/new"
 					><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
 				>
 				<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
@@ -94,7 +94,7 @@
 				Click on the button to create questions to be uploaded in the test template and tests
 			</p>
 			<div class="mt-4">
-				<a href="/questionbank/single-question/new"
+				<a href="/questionbank/single-question/add/new"
 					><Button
 						variant="outline"
 						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"

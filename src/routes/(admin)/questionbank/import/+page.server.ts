@@ -46,6 +46,6 @@ export const actions = {
 		}
 
 		const data = await response.json();
-		return message(form, data.message || 'File uploaded successfully');
+		return message(form, data);
 	}
 };

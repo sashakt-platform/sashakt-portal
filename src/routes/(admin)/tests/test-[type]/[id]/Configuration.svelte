@@ -98,11 +98,11 @@
 		</ConfigureBox>
 		<ConfigureBox title="Question settings" Icon={CircleHelp}>
 			<div class="flex flex-col gap-6">
-				<div class="flex flex-row pt-6">
+				<div class="flex flex-row gap-4 pt-10">
 					<div class="w-1/2">
 						{@render headingSubheading(
-							'Question Pagination',
-							'Set the maximum number of questions per screen'
+							'Questions Per Page',
+							"Enter the number of questions to display per page. Enter '0' to display all questions on a single page"
 						)}
 					</div>
 					<div class=" flex w-1/2 flex-row gap-4">

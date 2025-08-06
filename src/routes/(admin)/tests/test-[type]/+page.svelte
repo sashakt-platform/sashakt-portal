@@ -218,21 +218,21 @@
 												</DropdownMenu.Item>
 
 												<form
-													action={`/tests/test-session/${test.id}/?/clone`}
+													action={`${page.url.pathname}/${test.id}/?/clone`}
 													method="POST"
 													hidden={test.is_template}
 												>
-													<Button
-														type="submit"
-														variant="ghost"
-														size="icon"
-														class="w-full justify-start"
-													>
-														<DropdownMenu.Item>
+													<DropdownMenu.Item>
+														<Button
+															type="submit"
+															variant="ghost"
+															size="icon"
+															class="w-full justify-start"
+														>
 															<Copy />
 															Clone
-														</DropdownMenu.Item>
-													</Button>
+														</Button>
+													</DropdownMenu.Item>
 												</form>
 												<a
 													href="/tests/test-session/convert/?template_id={test.id}"

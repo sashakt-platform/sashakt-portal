@@ -64,13 +64,16 @@ export const load: PageServerLoad = async ({ params }) => {
 	// get organization from the backend
 	let formattedOrganizations = [];
 	try {
-		const organizationResponse = await fetch(`${BACKEND_URL}/organization`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
+		const organizationResponse = await fetch(
+			`${BACKEND_URL}/organization/?page=1&size=100&order_by=name`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
 			}
-		});
+		);
 
 		if (!organizationResponse.ok) {
 			console.error(`Failed to fetch organization data: ${organizationResponse.statusText}`);
@@ -81,10 +84,12 @@ export const load: PageServerLoad = async ({ params }) => {
 
 		const organizationData = await organizationResponse.json();
 
-		formattedOrganizations = organizationData.map((organization: { id: string; name: string }) => ({
-			id: organization.id,
-			name: organization.name
-		}));
+		formattedOrganizations = organizationData.items.map(
+			(organization: { id: string; name: string }) => ({
+				id: organization.id,
+				name: organization.name
+			})
+		);
 	} catch (error) {
 		console.error('Error fetching organization data:', error);
 	}

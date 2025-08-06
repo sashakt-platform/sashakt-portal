@@ -6,11 +6,20 @@
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 
-	let { id }: { id: string } = $props();
+	let {
+		entityName = 'Item',
+		editUrl,
+		deleteUrl
+	}: {
+		entityName?: string;
+		editUrl: string;
+		deleteUrl: string;
+	} = $props();
+
 	let deleteAction: string | null = $state(null);
 </script>
 
-<DeleteDialog bind:action={deleteAction} elementName="User" />
+<DeleteDialog bind:action={deleteAction} elementName={entityName} />
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger>
@@ -22,10 +31,13 @@
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<a href="/users/edit/{id}"
-			><DropdownMenu.Item class="cursor-pointer"><Pencil />Edit</DropdownMenu.Item></a
-		>
-		<DropdownMenu.Item onclick={() => (deleteAction = `/users/delete/${id}?/delete`)}>
+		<a href={editUrl}>
+			<DropdownMenu.Item class="cursor-pointer">
+				<Pencil />
+				Edit
+			</DropdownMenu.Item>
+		</a>
+		<DropdownMenu.Item onclick={() => (deleteAction = deleteUrl)}>
 			<Trash_2 />
 			Delete
 		</DropdownMenu.Item>

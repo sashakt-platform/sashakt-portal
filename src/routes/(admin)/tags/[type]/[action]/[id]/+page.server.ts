@@ -50,7 +50,8 @@ export const load: PageServerLoad = async ({ params, cookies }: any) => {
 			throw new Error('Failed to fetch tag types');
 		}
 
-		tagTypes = await tagTypesResponse.json();
+		const tagTypesData = await tagTypesResponse.json();
+		tagTypes = tagTypesData.items;
 	} catch (error) {
 		console.error('Error fetching tag types:', error);
 	}
@@ -130,8 +131,9 @@ export const actions: Actions = {
 				return fail(500, { form });
 			}
 		}
+		const redirectUrl = params.type === 'tag' ? '/tags?tab=tag' : '/tags?tab=tagtype';
 		redirect(
-			'/tags',
+			redirectUrl,
 			{
 				type: 'success',
 				message: `${params.type === 'tag' ? 'Tag' : 'Tag Type'} saved successfully`
@@ -153,15 +155,17 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
+			const redirectUrl = params.type === 'tag' ? '/tags?tab=tag' : '/tags?tab=tagtype';
 			redirect(
 				500,
-				'/tags',
+				redirectUrl,
 				{ type: 'error', message: `Failed to delete tag: ${response.statusText}` },
 				cookies
 			);
 		}
+		const redirectUrl = params.type === 'tag' ? '/tags?tab=tag' : '/tags?tab=tagtype';
 		redirect(
-			'/tags',
+			redirectUrl,
 			{
 				type: 'success',
 				message: `${params.type === 'tag' ? 'Tag' : 'Tag-Type'} deleted successfully`

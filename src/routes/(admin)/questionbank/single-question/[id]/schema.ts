@@ -6,14 +6,26 @@ export const optionSchema = z.object({
 	value: z.string()
 });
 
+export enum QuestionTypeEnum {
+	SingleChoice = 'single-choice',
+	MultiChoice = 'multi-choice'
+}
+
+export const marksSchema = z.object({
+	correct: z.number().int().default(1),
+	wrong: z.number().int().default(0),
+	skipped: z.number().int().default(0)
+});
+
 export const questionSchema = z.object({
 	question_text: z.string().nonempty({ message: 'Question text is required' }),
 	instructions: z.string().nullable().optional(),
-	question_type: z.enum(['single-choice', 'multi-choice']).default('single-choice'),
+	question_type: z.nativeEnum(QuestionTypeEnum),
 	options: z.array(optionSchema).min(2).default([]),
 	correct_answer: z.array(z.number().int()).min(1).default([]),
 	subjective_answer_limit: z.number().int().positive().nullable().optional(),
 	is_mandatory: z.boolean().default(false),
+	marking_scheme: marksSchema,
 	solution: z.string().nullable().optional(),
 	organization_id: z.number().int().positive(),
 	state_ids: z.array(z.string()).default([]),

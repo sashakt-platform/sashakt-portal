@@ -13,7 +13,7 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { questionSchema, type FormSchema, type TagFormSchema } from './schema';
+	import { questionSchema, type FormSchema, type TagFormSchema, QuestionTypeEnum } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
@@ -45,6 +45,10 @@
 				.filter((option) => option.correct_answer)
 				.map((option) => option.id);
 			$formData.organization_id = data.user.organization_id;
+			$formData.question_type =
+				$formData.correct_answer.length > 1
+					? QuestionTypeEnum.MultiChoice
+					: QuestionTypeEnum.SingleChoice;
 		}
 	});
 
@@ -112,107 +116,141 @@
 				<p>Revision History</p>
 			</div>
 		</div>
-		<div class="mx-10 flex flex-row bg-white p-9">
-			<div class="flex w-3/5 flex-col gap-2 pr-8">
-				<div class="flex flex-col gap-2">
-					{@render snippetHeading('Your Question')}
-					<Textarea name="questionText" bind:value={$formData.question_text} />
-					<div class="flex flex-row gap-2">
-						<Checkbox bind:checked={$formData.is_mandatory} />
-						<Label class="text-sm ">Set as mandatory</Label>
+		<div class="mx-10 flex flex-col gap-8 bg-white p-9">
+			<div class="flex flex-row">
+				<div class="flex w-3/5 flex-col gap-4 pr-8">
+					<div class="flex flex-col gap-2">
+						{@render snippetHeading('Your Question')}
+						<Textarea
+							name="questionText"
+							bind:value={$formData.question_text}
+							placeholder="Your Question..."
+						/>
+						<div class="flex flex-row gap-2">
+							<Checkbox bind:checked={$formData.is_mandatory} />
+							<Label class="text-sm ">Set as mandatory</Label>
+						</div>
+					</div>
+					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
+						{@render snippetHeading('Answers')}
+
+						{#each totalOptions as { id, key, value }, index (id)}
+							<div class="group flex flex-row gap-4">
+								<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
+									<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
+										{key}
+									</p>
+								</div>
+								<div class="flex w-full flex-col gap-2">
+									<div class="flex flex-row rounded-sm border-1 border-black">
+										<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
+										<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
+									</div>
+									<div class="flex flex-row gap-2">
+										<Checkbox
+											disabled={!totalOptions[index].value.trim()}
+											checked={totalOptions[index].correct_answer}
+											onCheckedChange={(checked: boolean) =>
+												(totalOptions[index].correct_answer = checked)}
+										/><Label class="text-sm ">Set as correct answer</Label>
+									</div>
+								</div>
+								<div
+									class={[
+										'mt-2 gap-0 opacity-0 transition-opacity',
+										totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
+									]}
+								>
+									<Trash_2
+										class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
+										onclick={() => {
+											if (totalOptions.length > 1) {
+												totalOptions = totalOptions
+													.filter((_, i) => i !== index)
+													.map((option, i) => ({
+														...option,
+														key: String.fromCharCode(65 + i)
+													}));
+											}
+										}}
+									/>
+								</div>
+							</div>
+						{/each}
+
+						<div class="flex justify-end">
+							<Button
+								variant="outline"
+								class="text-primary border-primary"
+								onclick={() => {
+									totalOptions.push({
+										id: totalOptions[totalOptions.length - 1].id + 1,
+										key: String.fromCharCode(64 + totalOptions.length + 1),
+										value: '',
+										correct_answer: false
+									});
+								}}
+							>
+								<Plus />Add Answer</Button
+							>
+						</div>
 					</div>
 				</div>
-				<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
-					{@render snippetHeading('Answers')}
-
-					{#each totalOptions as { id, key, value }, index (id)}
-						<div class="group flex flex-row gap-4">
-							<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
-								<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
-									{key}
-								</p>
-							</div>
-							<div class="flex w-full flex-col gap-2">
-								<div class="flex flex-row rounded-sm border-1 border-black">
-									<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
-									<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
-								</div>
-								<div class="flex flex-row gap-2">
-									<Checkbox
-										disabled={!totalOptions[index].value.trim()}
-										checked={totalOptions[index].correct_answer}
-										onCheckedChange={(checked: boolean) =>
-											(totalOptions[index].correct_answer = checked)}
-									/><Label class="text-sm ">Set as correct answer</Label>
-								</div>
-							</div>
-							<div
-								class={[
-									'mt-2 gap-0 opacity-0 transition-opacity',
-									totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
-								]}
+				<div class="flex w-2/5 flex-col pl-8">
+					<div class="flex h-1/2 flex-col gap-2">
+						{@render snippetHeading('Tags')}
+						<TagsSelection bind:tags={$formData.tag_ids} />
+						<Dialog.Root bind:open={openTagDialog}>
+							<Label
+								onclick={() => (openTagDialog = true)}
+								class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
+								><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
 							>
-								<Trash_2
-									class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
-									onclick={() => {
-										if (totalOptions.length > 1) {
-											totalOptions = totalOptions
-												.filter((_, i) => i !== index)
-												.map((option, i) => ({
-													...option,
-													key: String.fromCharCode(65 + i)
-												}));
-										}
-									}}
-								/>
-							</div>
+							<Dialog.Content class="p-4 px-0 sm:h-[70%] sm:max-w-[45%]">
+								<Dialog.Header class="m-0 h-fit  border-b-2 py-4">
+									<Dialog.Title class="px-8 ">Create new tag</Dialog.Title>
+								</Dialog.Header>
+								<Tag tagTypes={data.tagTypes} form={data.tagForm} bind:open={openTagDialog} />
+							</Dialog.Content>
+						</Dialog.Root>
+					</div>
+					<div class="flex h-1/2 flex-col gap-2">
+						{@render snippetHeading('States')}
+						<StateSelection bind:states={$formData.state_ids} />
+						<div class="mt-12 flex items-center space-x-2">
+							<Switch id="airplane-mode" bind:checked={$formData.is_active} />
+							<Label for="airplane-mode">Active</Label><Info
+								class="my-auto w-4 align-middle text-xs text-gray-600"
+							/>
 						</div>
-					{/each}
-
-					<div class="flex justify-end">
-						<Button
-							variant="outline"
-							class="text-primary border-primary"
-							onclick={() => {
-								totalOptions.push({
-									id: totalOptions[totalOptions.length - 1].id + 1,
-									key: String.fromCharCode(64 + totalOptions.length + 1),
-									value: '',
-									correct_answer: false
-								});
-							}}
-						>
-							<Plus />Add Answer</Button
-						>
 					</div>
 				</div>
 			</div>
-			<div class="flex w-2/5 flex-col pl-8">
-				<div class="flex h-1/2 flex-col gap-2">
-					{@render snippetHeading('Tags')}
-					<TagsSelection bind:tags={$formData.tag_ids} />
-					<Dialog.Root bind:open={openTagDialog}>
-						<Label
-							onclick={() => (openTagDialog = true)}
-							class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
-							><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
-						>
-						<Dialog.Content class="p-4 px-0 sm:h-[70%] sm:max-w-[45%]">
-							<Dialog.Header class="m-0 h-fit  border-b-2 py-4">
-								<Dialog.Title class="px-8 ">Create new tag</Dialog.Title>
-							</Dialog.Header>
-							<Tag tagTypes={data.tagTypes} form={data.tagForm} bind:open={openTagDialog} />
-						</Dialog.Content>
-					</Dialog.Root>
-				</div>
-				<div class="flex h-1/2 flex-col gap-2">
-					{@render snippetHeading('States')}
-					<StateSelection bind:states={$formData.state_ids} />
-					<div class="mt-12 flex items-center space-x-2">
-						<Switch id="airplane-mode" bind:checked={$formData.is_active} />
-						<Label for="airplane-mode">Active</Label><Info
-							class="my-auto w-4 align-middle text-xs text-gray-600"
+			<div class="flex flex-row gap-8">
+				<div class="flex w-1/2 flex-row gap-4">
+					<div class="flex w-full flex-col gap-2">
+						{@render snippetHeading('Additional Instructions')}
+						<Textarea
+							name="instructions"
+							bind:value={$formData.instructions}
+							placeholder="Additional Instructions for the question..."
 						/>
+					</div>
+				</div>
+				<div class="flex w-1/2 flex-row gap-4">
+					<div class="flex w-full flex-col gap-2">
+						{@render snippetHeading('Marking Scheme')}
+						<div class="flex h-full flex-row gap-2 rounded-lg border border-gray-100 p-4">
+							<p class="my-auto w-1/2">Set Marks for Correct Answer</p>
+							<input
+								type="number"
+								name="marking_scheme.correct"
+								bind:value={$formData.marking_scheme.correct}
+								min="1"
+								class=" rounded-sm border-1 border-gray-300 p-2"
+								placeholder="Marks for correct answer"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>

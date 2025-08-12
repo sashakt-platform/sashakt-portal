@@ -1,7 +1,7 @@
 <script lang="ts" generics="TData, TValue">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { type ColumnDef, getCoreRowModel } from '@tanstack/table-core';
+	import { type ColumnDef, getCoreRowModel, getExpandedRowModel } from '@tanstack/table-core';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -16,6 +16,10 @@
 		pageSize: number;
 		search: string;
 		paramPrefix?: string; // optional parameter prefix for URL params
+		expandable?: boolean; // enable row expansion
+		renderExpandedRow?: (row: TData) => any; // snippet function to render expanded content
+		emptyStateMessage?: string; // custom empty state message
+		emptyStateContent?: () => any; // custom empty state content
 	};
 
 	let {
@@ -26,7 +30,11 @@
 		currentPage,
 		pageSize,
 		search,
-		paramPrefix = ''
+		paramPrefix = '',
+		expandable = false,
+		renderExpandedRow,
+		emptyStateMessage = 'No results.',
+		emptyStateContent
 	}: DataTableProps<TData, TValue> = $props();
 
 	let searchInput = $state(search);
@@ -70,19 +78,34 @@
 		updateUrl({ page: newPage });
 	}
 
+	// State for expanded rows
+	let expanded = $state({});
+
 	// create table
-	const table = createSvelteTable({
-		get data() {
-			return data;
-		},
-		get columns() {
-			return columns;
-		},
-		getCoreRowModel: getCoreRowModel(),
-		manualPagination: true,
-		manualSorting: true,
-		manualFiltering: true
-	});
+
+	const table = $derived(
+		createSvelteTable({
+			data,
+			columns,
+			state: expandable ? { expanded } : {},
+			onExpandedChange: expandable
+				? (updater) => {
+						if (typeof updater === 'function') {
+							expanded = updater(expanded);
+						} else {
+							expanded = updater;
+						}
+					}
+				: undefined,
+			getCoreRowModel: getCoreRowModel(),
+			getExpandedRowModel: expandable ? getExpandedRowModel() : undefined,
+			enableExpanding: expandable,
+			getRowCanExpand: expandable ? () => true : undefined,
+			manualPagination: true,
+			manualSorting: true,
+			manualFiltering: true
+		})
+	);
 </script>
 
 <div>
@@ -113,16 +136,38 @@
 		</Table.Header>
 		<Table.Body>
 			{#each table.getRowModel().rows as row (row.id)}
-				<Table.Row data-state={row.getIsSelected() && 'selected'}>
-					{#each row.getVisibleCells() as cell (cell.id)}
-						<Table.Cell>
+				<Table.Row
+					data-state={row.getIsSelected() && 'selected'}
+					class={expandable && row.getCanExpand() ? 'cursor-pointer' : ''}
+					onclick={expandable && row.getCanExpand() ? () => row.toggleExpanded() : undefined}
+				>
+					{#each row.getVisibleCells() as cell, index (cell.id)}
+						<Table.Cell
+							title={expandable && index === 0 && row.getCanExpand() ? 'View options' : undefined}
+						>
 							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 						</Table.Cell>
 					{/each}
 				</Table.Row>
+
+				{#if expandable && row.getIsExpanded() && renderExpandedRow}
+					<Table.Row class="border-t-0">
+						<Table.Cell colspan={columns.length} class="p-0">
+							<div class="border-t p-4">
+								{@html renderExpandedRow(row.original)}
+							</div>
+						</Table.Cell>
+					</Table.Row>
+				{/if}
 			{:else}
 				<Table.Row>
-					<Table.Cell colspan={columns.length} class="h-24 text-center">No results.</Table.Cell>
+					<Table.Cell colspan={columns.length} class="h-24 text-center">
+						{#if emptyStateContent}
+							{@html emptyStateContent()}
+						{:else}
+							{emptyStateMessage}
+						{/if}
+					</Table.Cell>
 				</Table.Row>
 			{/each}
 		</Table.Body>

@@ -2,9 +2,9 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { page } from '$app/state';
-	let { states = $bindable(), ...rest } = $props();
 
-	const stateList = page.data.states;
+	const stateList = page.data.states.items || [];
+	let { states = $bindable(), ...rest } = $props();
 
 	const selectedStates = $derived(
 		states?.length

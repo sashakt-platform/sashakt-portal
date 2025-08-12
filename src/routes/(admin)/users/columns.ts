@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import type { ColumnDef } from '@tanstack/table-core';
-import { createSortableColumn, createActionsColumn } from '$lib/components/data-table/column-helpers';
+import {
+	createSortableColumn,
+	createActionsColumn
+} from '$lib/components/data-table/column-helpers';
 
 export const userSchema = z.object({
 	id: z.number(),

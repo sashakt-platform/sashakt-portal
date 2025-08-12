@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
-import { DataTableActions, DataTableSortButton } from './index.js';
+import { DataTableActions, DataTableSortButton, DataTableExpandButton } from './index.js';
 
 /**
  *  Function to create a sortable column with the given configuration
@@ -42,6 +42,28 @@ export const createActionsColumn = <T extends { id: string | number }>(
 			entityName,
 			editUrl: `${baseUrl}/edit/${row.original.id}`,
 			deleteUrl: `${baseUrl}/delete/${row.original.id}?/delete`
+		});
+	}
+});
+
+/**
+ * Function to create an expand/collapse column for expandable rows
+ */
+export const createExpandColumn = <T>(): ColumnDef<T> => ({
+	id: 'expand',
+	header: '',
+	size: 40,
+	enableSorting: false,
+	enableHiding: false,
+	cell: ({ row }) => {
+		if (!row.getCanExpand()) return '';
+
+		return renderComponent(DataTableExpandButton, {
+			isExpanded: row.getIsExpanded(),
+			canExpand: row.getCanExpand(),
+			onToggle: () => {
+				row.toggleExpanded();
+			}
 		});
 	}
 });

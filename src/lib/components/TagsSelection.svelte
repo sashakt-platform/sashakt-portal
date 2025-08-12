@@ -3,7 +3,7 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { page } from '$app/state';
 
-	const tagList = page.data.tags;
+	const tagList = page.data.tags?.items || [];
 	let { tags = $bindable(), ...rest } = $props();
 
 	const selectedTags = $derived(

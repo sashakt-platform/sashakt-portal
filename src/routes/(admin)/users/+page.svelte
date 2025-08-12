@@ -7,6 +7,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 	let { data } = $props();
 
@@ -14,7 +15,7 @@
 	const totalItems = $derived(data?.users?.total || 0);
 	const totalPages = $derived(data?.totalPages || 0);
 	const currentPage = $derived(data?.params?.page || 1);
-	const pageSize = $derived(data?.params?.size || 10);
+	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');

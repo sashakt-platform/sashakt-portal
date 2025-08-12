@@ -11,6 +11,7 @@
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 	let {
 		data
@@ -27,10 +28,10 @@
 	const tableData = $derived(data?.tests?.items || data?.tests || []);
 	const totalItems = $derived(data?.tests?.total || data?.tests?.length || 0);
 	const totalPages = $derived(
-		data?.tests?.pages || Math.ceil(totalItems / (data?.params?.size || 10))
+		data?.tests?.pages || Math.ceil(totalItems / (data?.params?.size || DEFAULT_PAGE_SIZE))
 	);
 	const currentPage = $derived(data?.params?.page || 1);
-	const pageSize = $derived(data?.params?.size || 10);
+	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');

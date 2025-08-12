@@ -13,6 +13,7 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -25,7 +26,7 @@
 
 	const totalPages = $derived(data?.questions?.pages || 0);
 	const currentPage = $derived(data?.params?.page || 1);
-	const pageSize = $derived(data?.params?.size || 10);
+	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');

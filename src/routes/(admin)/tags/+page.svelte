@@ -10,6 +10,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -19,7 +20,7 @@
 	const tagsTotalItems = $derived(data?.tags?.total || 0);
 	const tagsTotalPages = $derived(data?.tagsTotalPages || 0);
 	const tagsCurrentPage = $derived(data?.tagsParams?.page || 1);
-	const tagsPageSize = $derived(data?.tagsParams?.size || 10);
+	const tagsPageSize = $derived(data?.tagsParams?.size || DEFAULT_PAGE_SIZE);
 	const tagsSearch = $derived(data?.tagsParams?.search || '');
 	const tagsSortBy = $derived(data?.tagsParams?.sortBy || '');
 	const tagsSortOrder = $derived(data?.tagsParams?.sortOrder || 'asc');
@@ -29,7 +30,7 @@
 	const tagTypesTotalItems = $derived(data?.tagTypes?.total || 0);
 	const tagTypesTotalPages = $derived(data?.tagTypesTotalPages || 0);
 	const tagTypesCurrentPage = $derived(data?.tagTypesParams?.page || 1);
-	const tagTypesPageSize = $derived(data?.tagTypesParams?.size || 10);
+	const tagTypesPageSize = $derived(data?.tagTypesParams?.size || DEFAULT_PAGE_SIZE);
 	const tagTypesSearch = $derived(data?.tagTypesParams?.search || '');
 	const tagTypesSortBy = $derived(data?.tagTypesParams?.sortBy || '');
 	const tagTypesSortOrder = $derived(data?.tagTypesParams?.sortOrder || 'asc');

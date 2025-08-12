@@ -33,7 +33,7 @@
 	let noQuestionCreatedYet = $state(true);
 
 	$effect(() => {
-		// Check if there are any meaningful search/filter parameters (exclude pagination params)
+		// check if there are any meaningful search/filter parameters (exclude pagination params)
 		const meaningfulParams = ['search', 'name', 'tag_ids', 'state_ids', 'sortBy', 'sortOrder'];
 		const hasFilters = meaningfulParams.some((param) => {
 			const value = page.url.searchParams.get(param);
@@ -41,17 +41,17 @@
 			return value && value.trim() !== '';
 		});
 
-		// Also check if there are multiple tag_ids or state_ids
+		// also check if there are multiple tag_ids or state_ids
 		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
 		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
 
 		const result = totalItems === 0 && !hasFilters && !hasTagFilters && !hasStateFilters;
 
-		// Update the state
+		// update the state
 		noQuestionCreatedYet = result;
 	});
 
-	// Handle sorting
+	// handle sorting
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
 		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';

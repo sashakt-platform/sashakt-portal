@@ -40,7 +40,7 @@ export const createQuestionColumns = (
 			if (tags && tags.length > 0) {
 				return tags.map((tag) => tag.name).join(', ');
 			}
-			return 'None';
+			return '';
 		}
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {

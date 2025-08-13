@@ -23,7 +23,7 @@ export const createTagsColumns = (
 	{
 		accessorKey: 'tag_type',
 		header: 'Type',
-		cell: ({ row }) => row.original.tag_type?.name || 'None'
+		cell: ({ row }) => row.original.tag_type?.name || ''
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)

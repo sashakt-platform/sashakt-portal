@@ -13,7 +13,6 @@
 		totalPages: number;
 		currentPage: number;
 		pageSize: number;
-		search: string;
 		paramPrefix?: string; // optional parameter prefix for URL params
 		expandable?: boolean; // enable row expansion
 		renderExpandedRow?: (row: TData) => any; // snippet function to render expanded content
@@ -29,7 +28,6 @@
 		totalPages,
 		currentPage,
 		pageSize,
-		search,
 		paramPrefix = '',
 		expandable = false,
 		renderExpandedRow,
@@ -38,27 +36,14 @@
 		expandColumnId
 	}: DataTableProps<TData, TValue> = $props();
 
-	// update URL parameters and navigate to the new URL
-	function updateUrl(params: Record<string, string | number>) {
-		const url = new URL(page.url);
-
-		Object.entries(params).forEach(([key, value]) => {
-			const paramName = paramPrefix
-				? paramPrefix + key.charAt(0).toUpperCase() + key.slice(1)
-				: key;
-			if (value) {
-				url.searchParams.set(paramName, value.toString());
-			} else {
-				url.searchParams.delete(paramName);
-			}
-		});
-
-		goto(url.toString(), { replaceState: false });
-	}
-
 	// pagination
 	function goToPage(newPage: number) {
-		updateUrl({ page: newPage });
+		const url = new URL(page.url);
+		const paramName = paramPrefix
+			? paramPrefix + 'Page'
+			: 'page';
+		url.searchParams.set(paramName, newPage.toString());
+		goto(url.toString(), { replaceState: false });
 	}
 
 	// State for expanded rows
@@ -114,7 +99,7 @@
 				<Table.Row
 					data-state={row.getIsSelected() && 'selected'}
 				>
-					{#each row.getVisibleCells() as cell, index (cell.id)}
+					{#each row.getVisibleCells() as cell (cell.id)}
 						<Table.Cell
 							class={expandable && expandColumnId && cell.column.id === expandColumnId ? 'cursor-pointer' : ''}
 							onclick={expandable && expandColumnId && cell.column.id === expandColumnId && row.getCanExpand() ? () => row.toggleExpanded() : undefined}

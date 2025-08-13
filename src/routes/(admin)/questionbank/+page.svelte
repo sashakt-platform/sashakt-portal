@@ -237,7 +237,6 @@
 				{totalPages}
 				{currentPage}
 				{pageSize}
-				{search}
 				expandable={true}
 				expandColumnId="answers"
 				renderExpandedRow={expandedRowContent}

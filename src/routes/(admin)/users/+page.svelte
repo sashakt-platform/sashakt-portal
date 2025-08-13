@@ -85,6 +85,5 @@
 		{totalPages}
 		{currentPage}
 		{pageSize}
-		{search}
 	/>
 </div>

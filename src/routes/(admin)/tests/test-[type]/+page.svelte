@@ -214,7 +214,6 @@
 				{totalPages}
 				{currentPage}
 				{pageSize}
-				{search}
 				emptyStateMessage={data?.is_template
 					? 'No test templates found matching your criteria.'
 					: 'No test sessions found matching your criteria.'}

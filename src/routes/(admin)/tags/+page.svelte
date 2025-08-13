@@ -135,7 +135,6 @@
 					totalPages={tagsTotalPages}
 					currentPage={tagsCurrentPage}
 					pageSize={tagsPageSize}
-					search={tagsSearch}
 					paramPrefix="tags"
 				/>
 			</Tabs.Content>
@@ -167,7 +166,6 @@
 					totalPages={tagTypesTotalPages}
 					currentPage={tagTypesCurrentPage}
 					pageSize={tagTypesPageSize}
-					search={tagTypesSearch}
 					paramPrefix="tagTypes"
 				/>
 			</Tabs.Content>

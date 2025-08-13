@@ -13,7 +13,6 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 	const { data } = $props();
@@ -81,7 +80,6 @@
 		);
 	});
 
-
 	// Render expanded row content
 	function expandedRowContent(question: any) {
 		return `
@@ -94,7 +92,7 @@
 						<p class="my-auto">${option.value}</p>
 						${
 							question.correct_answer.includes(option.id)
-								? '<svg class="text-primary my-auto ml-4 w-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>'
+								? '<svg class="text-primary my-auto ml-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
 								: ''
 						}
 					</div>
@@ -187,7 +185,7 @@
 		</WhiteEmptyBox>
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
-			<div class="flex flex-row gap-4 items-center">
+			<div class="flex flex-row items-center gap-4">
 				<div class="w-1/3">
 					<Input
 						placeholder="Search questions..."

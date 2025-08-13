@@ -46,24 +46,3 @@ export const createActionsColumn = <T extends { id: string | number }>(
 	}
 });
 
-/**
- * Function to create an expand/collapse column for expandable rows
- */
-export const createExpandColumn = <T>(): ColumnDef<T> => ({
-	id: 'expand',
-	header: '',
-	size: 40,
-	enableSorting: false,
-	enableHiding: false,
-	cell: ({ row }) => {
-		if (!row.getCanExpand()) return '';
-
-		return renderComponent(DataTableExpandButton, {
-			isExpanded: row.getIsExpanded(),
-			canExpand: row.getCanExpand(),
-			onToggle: () => {
-				row.toggleExpanded();
-			}
-		});
-	}
-});

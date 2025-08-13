@@ -1,8 +1,7 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import {
 	createSortableColumn,
-	createActionsColumn,
-	createExpandColumn
+	createActionsColumn
 } from '$lib/components/data-table/column-helpers';
 import { formatDate } from '$lib/utils';
 

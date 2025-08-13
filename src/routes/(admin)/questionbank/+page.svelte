@@ -67,7 +67,7 @@
 
 	// Create columns (reactive)
 	const columns = $derived(
-		createQuestionColumns(sortBy, sortOrder, handleSort, currentPage, pageSize)
+		createQuestionColumns(sortBy, sortOrder, handleSort)
 	);
 
 	// Check if filters are applied

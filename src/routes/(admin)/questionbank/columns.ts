@@ -19,9 +19,7 @@ export interface Question {
 export const createQuestionColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
-	handleSort: (columnId: string) => void,
-	currentPage: number,
-	pageSize: number
+	handleSort: (columnId: string) => void
 ): ColumnDef<Question>[] => [
 	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
 	{

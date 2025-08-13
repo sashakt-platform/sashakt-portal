@@ -61,7 +61,7 @@ export const createTestColumns = (
 				// Add session-specific actions
 				customActions.push({
 					label: 'Clone',
-					href: `${baseUrl}/${test.id}/?/clone`,
+					href: `${baseUrl}/${test.id}?/clone`,
 					icon: 'copy',
 					method: 'POST'
 				});

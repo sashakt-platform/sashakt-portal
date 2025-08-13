@@ -51,7 +51,8 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		);
 		return {
 			questions: { items: [], total: 0, pages: 0 },
-			params: { page, size, search: search, sortBy, sortOrder }
+			totalPages: 0,
+			params: { page, size, search, sortBy, sortOrder }
 		};
 	}
 
@@ -60,6 +61,6 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	return {
 		questions,
 		totalPages: questions.pages || 0,
-		params: { page, size, search: search, sortBy, sortOrder }
+		params: { page, size, search, sortBy, sortOrder }
 	};
 };

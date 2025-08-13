@@ -73,6 +73,13 @@ export const createTestColumns = (
 				});
 			} else {
 				// Add session-specific actions
+				customActions.push({
+					label: 'Clone',
+					href: `${baseUrl}/${test.id}/?/clone`,
+					icon: 'copy',
+					method: 'POST'
+				});
+
 				if (test.link) {
 					customActions.push({
 						label: 'Conduct Test',

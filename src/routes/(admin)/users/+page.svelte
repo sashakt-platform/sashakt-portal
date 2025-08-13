@@ -8,8 +8,10 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import Input from '$lib/components/ui/input/input.svelte';
 
 	let { data } = $props();
+	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	const tableData = $derived(data?.users?.items || []);
 	const totalItems = $derived(data?.users?.total || 0);
@@ -56,6 +58,26 @@
 </div>
 
 <div class="mx-8 mt-10 flex flex-col gap-8">
+	<div class="flex items-center py-4">
+		<Input
+			placeholder="Search users..."
+			value={search}
+			oninput={(event) => {
+				const url = new URL(page.url);
+				clearTimeout(searchTimeout);
+				searchTimeout = setTimeout(() => {
+					if (event.target?.value) {
+						url.searchParams.set('search', event.target.value);
+					} else {
+						url.searchParams.delete('search');
+					}
+					url.searchParams.set('page', '1');
+					goto(url, { keepFocus: true, invalidateAll: true });
+				}, 300);
+			}}
+			class="max-w-sm"
+		/>
+	</div>
 	<DataTable
 		data={tableData}
 		{columns}

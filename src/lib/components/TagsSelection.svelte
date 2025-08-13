@@ -11,7 +11,7 @@
 			? tagList
 					.filter((tag) => tags.includes(String(tag.id)))
 					.map((tag) => tag.name + (tag.tag_type ? '-(' + tag.tag_type.name + ')' : ''))
-			: 'Select relevant tags'
+			: 'Select tags'
 	);
 </script>
 
@@ -35,7 +35,7 @@
 	</Select.Trigger>
 	<Select.Content>
 		<Select.Group>
-			<Select.GroupHeading>Select Relavant Tags</Select.GroupHeading>
+			<Select.GroupHeading>Select Tags</Select.GroupHeading>
 			{#each tagList as tag}
 				<Select.Item
 					value={String(tag.id)}

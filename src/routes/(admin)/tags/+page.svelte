@@ -11,9 +11,12 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import Input from '$lib/components/ui/input/input.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
+	let tagsSearchTimeout: ReturnType<typeof setTimeout>;
+	let tagTypesSearchTimeout: ReturnType<typeof setTimeout>;
 
 	// Tags related fields
 	const tagsData = $derived(data?.tags?.items || []);
@@ -105,6 +108,26 @@
 				<Tabs.Trigger value="tagtype">Tag Types</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="tag">
+				<div class="flex items-center py-4">
+					<Input
+						placeholder="Search tags..."
+						value={tagsSearch}
+						oninput={(event) => {
+							const url = new URL(page.url);
+							clearTimeout(tagsSearchTimeout);
+							tagsSearchTimeout = setTimeout(() => {
+								if (event.target?.value) {
+									url.searchParams.set('tagsSearch', event.target.value);
+								} else {
+									url.searchParams.delete('tagsSearch');
+								}
+								url.searchParams.set('tagsPage', '1');
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}, 300);
+						}}
+						class="max-w-sm"
+					/>
+				</div>
 				<DataTable
 					data={tagsData}
 					columns={tagsColumns}
@@ -117,6 +140,26 @@
 				/>
 			</Tabs.Content>
 			<Tabs.Content value="tagtype">
+				<div class="flex items-center py-4">
+					<Input
+						placeholder="Search tag types..."
+						value={tagTypesSearch}
+						oninput={(event) => {
+							const url = new URL(page.url);
+							clearTimeout(tagTypesSearchTimeout);
+							tagTypesSearchTimeout = setTimeout(() => {
+								if (event.target?.value) {
+									url.searchParams.set('tagTypesSearch', event.target.value);
+								} else {
+									url.searchParams.delete('tagTypesSearch');
+								}
+								url.searchParams.set('tagTypesPage', '1');
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}, 300);
+						}}
+						class="max-w-sm"
+					/>
+				</div>
 				<DataTable
 					data={tagTypesData}
 					columns={tagTypesColumns}

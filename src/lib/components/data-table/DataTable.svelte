@@ -5,7 +5,6 @@
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
@@ -36,24 +35,6 @@
 		emptyStateMessage = 'No results.',
 		emptyStateContent
 	}: DataTableProps<TData, TValue> = $props();
-
-	let searchInput = $state(search);
-	let searchTimeout: number;
-
-	// cleanup timeout on component destroy
-	$effect(() => {
-		return () => {
-			clearTimeout(searchTimeout);
-		};
-	});
-
-	// let's add debouncing for search
-	function handleSearch() {
-		clearTimeout(searchTimeout);
-		searchTimeout = setTimeout(() => {
-			updateUrl({ search: searchInput, page: 1 });
-		}, 500);
-	}
 
 	// update URL parameters and navigate to the new URL
 	function updateUrl(params: Record<string, string | number>) {
@@ -109,14 +90,6 @@
 </script>
 
 <div>
-	<div class="flex items-center py-4">
-		<Input
-			placeholder="Search all columns..."
-			bind:value={searchInput}
-			oninput={handleSearch}
-			class="max-w-sm"
-		/>
-	</div>
 	<Table.Root>
 		<Table.Header>
 			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}

@@ -12,6 +12,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import Input from '$lib/components/ui/input/input.svelte';
 
 	let {
 		data
@@ -90,6 +91,7 @@
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
 	let deleteAction: string | null = $state(null);
+	let searchTimeout: ReturnType<typeof setTimeout>;
 </script>
 
 <DeleteDialog
@@ -152,8 +154,27 @@
 		/>
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
-			<div class="flex flex-row gap-2">
-				<div class="w-1/5">
+			<div class="flex flex-row gap-4 items-center">
+				<div class="w-1/3">
+					<Input
+						placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
+						value={search}
+						oninput={(event) => {
+							const url = new URL(page.url);
+							clearTimeout(searchTimeout);
+							searchTimeout = setTimeout(() => {
+								if (event.target?.value) {
+									url.searchParams.set('search', event.target.value);
+								} else {
+									url.searchParams.delete('search');
+								}
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}, 300);
+						}}
+					/>
+				</div>
+
+				<div class="w-1/3">
 					<TagsSelection
 						bind:tags={filteredTags}
 						onOpenChange={(e: boolean) => {
@@ -169,7 +190,7 @@
 					/>
 				</div>
 
-				<div class="w-1/5">
+				<div class="w-1/3">
 					<StateSelection
 						bind:states={filteredStates}
 						onOpenChange={(e: boolean) => {

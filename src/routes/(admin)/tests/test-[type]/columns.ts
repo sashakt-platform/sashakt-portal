@@ -23,14 +23,6 @@ export const createTestColumns = (
 	testTakerUrl: string,
 	onDelete: (testId: string) => void
 ): ColumnDef<Test>[] => [
-	{
-		id: 'serial',
-		header: 'No.',
-		cell: ({ row }) => {
-			const index = row.index;
-			return index + 1 + (currentPage - 1) * pageSize;
-		}
-	},
 	createSortableColumn(
 		'name',
 		`Test ${isTemplate ? 'Template' : 'Name'}`,

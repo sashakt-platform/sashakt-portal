@@ -11,7 +11,7 @@
 			? stateList
 					.filter((state: { id: any }) => states.includes(String(state.id)))
 					.map((state: { name: any }) => state.name)
-			: 'Select relevant states'
+			: 'Select states'
 	);
 </script>
 
@@ -35,7 +35,7 @@
 	</Select.Trigger>
 	<Select.Content>
 		<Select.Group>
-			<Select.GroupHeading>Select Relavant States</Select.GroupHeading>
+			<Select.GroupHeading>Select States</Select.GroupHeading>
 			{#each stateList as state}
 				<Select.Item value={String(state.id)} label={state.name} />
 			{/each}

@@ -10,6 +10,7 @@
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
@@ -19,6 +20,7 @@
 	let deleteAction: string | null = $state(null);
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
+	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	// Extract data and pagination info
 	const tableData = $derived(data?.questions?.items || []);
@@ -79,39 +81,6 @@
 		);
 	});
 
-	// Custom empty state message
-	const emptyStateMessage = $derived(() => {
-		if (hasActiveFilters) {
-			return 'No questions match your search criteria. Try adjusting your filters or search terms.';
-		}
-		return 'No questions found.';
-	});
-
-	// Custom empty state content for filtered results
-	function customEmptyStateContent() {
-		if (hasActiveFilters) {
-			return `
-				<div class="text-center py-8">
-					<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0012 15c-2.34 0-4.513-.751-6.262-2.03L5 13.5v-2.25L3.5 12l1.5-.75v-2.25l.738.53A7.962 7.962 0 0112 9c2.34 0 4.513.751 6.262 2.03L19 10.5v2.25l1.5-.75-1.5.75v2.25l-.738-.53z" />
-					</svg>
-					<h3 class="mt-2 text-sm font-medium text-gray-900">No questions found</h3>
-					<p class="mt-1 text-sm text-gray-500">
-						No questions match your current search or filter criteria.
-					</p>
-					<div class="mt-4">
-						<button 
-							onclick="window.location.href='/questionbank'"
-							class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-						>
-							Clear all filters
-						</button>
-					</div>
-				</div>
-			`;
-		}
-		return null;
-	}
 
 	// Render expanded row content
 	function expandedRowContent(question: any) {
@@ -218,8 +187,28 @@
 		</WhiteEmptyBox>
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
-			<div class="flex flex-row gap-2">
-				<div class="w-1/5">
+			<div class="flex flex-row gap-4 items-center">
+				<div class="w-1/3">
+					<Input
+						placeholder="Search questions..."
+						value={search}
+						oninput={(event) => {
+							const url = new URL(page.url);
+							clearTimeout(searchTimeout);
+							searchTimeout = setTimeout(() => {
+								if (event.target?.value) {
+									url.searchParams.set('search', event.target.value);
+								} else {
+									url.searchParams.delete('search');
+								}
+								url.searchParams.set('page', '1');
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}, 300);
+						}}
+					/>
+				</div>
+
+				<div class="w-1/3">
 					<TagsSelection
 						bind:tags={filteredTags}
 						onOpenChange={(e: boolean) => {
@@ -235,7 +224,8 @@
 						}}
 					/>
 				</div>
-				<div class="w-1/5">
+
+				<div class="w-1/3">
 					<StateSelection
 						bind:states={filteredStates}
 						onOpenChange={(e: boolean) => {
@@ -262,8 +252,7 @@
 				{search}
 				expandable={true}
 				renderExpandedRow={expandedRowContent}
-				{emptyStateMessage}
-				emptyStateContent={customEmptyStateContent}
+				emptyStateMessage="No questions found matching your criteria."
 			/>
 		</div>
 	{/if}

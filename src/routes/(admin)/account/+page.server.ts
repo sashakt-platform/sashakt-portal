@@ -48,7 +48,6 @@ export const actions: Actions = {
 				form
 			});
 		}
-		console.log(JSON.stringify(form.data));
 
 		let res: Response;
 		const updateData: any = {

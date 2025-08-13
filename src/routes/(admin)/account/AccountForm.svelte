@@ -4,15 +4,20 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import type { PageData } from './$types';
 	import { editUserSchema, type EditUserSchema } from './schema';
 
-	let { data, isEditMode = $bindable() }: { data: any; isEditMode: boolean } = $props();
+	let { data, isEditMode = $bindable() }: { data: PageData; isEditMode: boolean } = $props();
 
 	let userData: Partial<Infer<EditUserSchema>> | null = data?.currentUser || null;
-	$inspect(data.form);
 
 	const form = superForm(userData || data.form, {
-		validators: zodClient(editUserSchema)
+		validators: zodClient(editUserSchema),
+		onResult: ({ result }) => {
+			if (result.type === 'redirect') {
+				isEditMode = false;
+			}
+		}
 	});
 
 	const { form: formData, enhance } = form;
@@ -50,7 +55,7 @@
 	{#if isEditMode}
 		<div class="float-end mt-2 flex gap-x-3">
 			<Button variant="outline" onclick={() => (isEditMode = false)}>Cancel</Button>
-			<Form.Button onclick={() => (isEditMode = false)}>Save</Form.Button>
+			<Form.Button>Save</Form.Button>
 		</div>
 	{/if}
 </form>

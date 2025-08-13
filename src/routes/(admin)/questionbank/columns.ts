@@ -32,7 +32,7 @@ export const createQuestionColumns = (
 		},
 		size: 40
 	},
-	createSortableColumn('question_text', 'Question', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',

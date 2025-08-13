@@ -23,13 +23,7 @@ export const createTestColumns = (
 	testTakerUrl: string,
 	onDelete: (testId: string) => void
 ): ColumnDef<Test>[] => [
-	createSortableColumn(
-		'name',
-		`Test ${isTemplate ? 'Template' : 'Name'}`,
-		currentSortBy,
-		currentSortOrder,
-		handleSort
-	),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',

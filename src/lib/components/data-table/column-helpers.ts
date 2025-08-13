@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
-import { DataTableActions, DataTableSortButton, DataTableExpandButton } from './index.js';
+import { DataTableActions, DataTableSortButton } from './index.js';
 
 /**
  *  Function to create a sortable column with the given configuration

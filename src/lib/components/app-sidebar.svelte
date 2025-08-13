@@ -157,7 +157,7 @@
 						class="w-[--bits-dropdown-menu-anchor-width]"
 					>
 						<DropdownMenu.Item>
-							<span>My Account</span>
+							<a href="/account"><span>My Account</span></a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
 							<a href="/logout">

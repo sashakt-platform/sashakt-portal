@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 			questions: [],
 			is_template: is_template,
 			test_taker_url: TEST_TAKER_URL,
-			params: { page, size, search: search || sortBy, sortOrder }
+			params: { page, size, search, sortBy, sortOrder }
 		};
 	}
 
@@ -80,6 +80,6 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 		questions,
 		is_template: is_template,
 		test_taker_url: TEST_TAKER_URL,
-		params: { page, size, search: search, sortBy, sortOrder }
+		params: { page, size, search, sortBy, sortOrder }
 	};
 };

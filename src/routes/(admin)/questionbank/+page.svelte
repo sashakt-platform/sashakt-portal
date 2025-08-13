@@ -70,16 +70,6 @@
 		createQuestionColumns(sortBy, sortOrder, handleSort)
 	);
 
-	// Check if filters are applied
-	const hasActiveFilters = $derived(() => {
-		const meaningfulParams = ['search', 'name', 'tag_ids', 'state_ids'];
-		return (
-			meaningfulParams.some((param) => page.url.searchParams.has(param)) ||
-			filteredTags.length > 0 ||
-			filteredStates.length > 0
-		);
-	});
-
 	// Render expanded row content
 	function expandedRowContent(question: any) {
 		return `

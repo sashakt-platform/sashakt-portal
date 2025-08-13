@@ -74,7 +74,7 @@
 		{#if $message.failed_questions}
 			<div class="mt-5 flex w-full items-center">
 				<a
-					href={$message.failed_question_details.split(': ')[1]}
+					href={$message.error_log}
 					class="text-primary w-full font-medium"
 					download="error_report.csv"
 				>

@@ -249,6 +249,7 @@
 				{pageSize}
 				{search}
 				expandable={true}
+				expandColumnId="answers"
 				renderExpandedRow={expandedRowContent}
 				emptyStateMessage="No questions found matching your criteria."
 			/>

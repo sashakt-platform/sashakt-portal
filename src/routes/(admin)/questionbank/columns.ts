@@ -4,6 +4,8 @@ import {
 	createActionsColumn
 } from '$lib/components/data-table/column-helpers';
 import { formatDate } from '$lib/utils';
+import Eye from '@lucide/svelte/icons/eye';
+import { renderComponent } from '$lib/components/ui/data-table/index.js';
 
 export interface Question {
 	id: string;
@@ -21,18 +23,15 @@ export const createQuestionColumns = (
 	currentPage: number,
 	pageSize: number
 ): ColumnDef<Question>[] => [
-	{
-		id: 'expand',
-		header: '',
-		cell: ({ row }) => {
-			const isExpanded = row.getIsExpanded();
-			const chevron = isExpanded ? '▼' : '▶';
-
-			return chevron;
-		},
-		size: 40
-	},
 	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
+	{
+		id: 'answers',
+		header: 'Answers',
+		cell: ({ row }) => {
+			return renderComponent(Eye, { class: 'text-gray-400' });
+		},
+		size: 80
+	},
 	{
 		accessorKey: 'tags',
 		header: 'Tags',

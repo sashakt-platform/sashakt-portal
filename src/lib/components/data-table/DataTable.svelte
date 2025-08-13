@@ -19,6 +19,7 @@
 		renderExpandedRow?: (row: TData) => any; // snippet function to render expanded content
 		emptyStateMessage?: string; // custom empty state message
 		emptyStateContent?: () => any; // custom empty state content
+		expandColumnId?: string; // column ID that should handle expand functionality
 	};
 
 	let {
@@ -33,7 +34,8 @@
 		expandable = false,
 		renderExpandedRow,
 		emptyStateMessage = 'No results.',
-		emptyStateContent
+		emptyStateContent,
+		expandColumnId
 	}: DataTableProps<TData, TValue> = $props();
 
 	// update URL parameters and navigate to the new URL
@@ -111,12 +113,12 @@
 			{#each table.getRowModel().rows as row (row.id)}
 				<Table.Row
 					data-state={row.getIsSelected() && 'selected'}
-					class={expandable && row.getCanExpand() ? 'cursor-pointer' : ''}
-					onclick={expandable && row.getCanExpand() ? () => row.toggleExpanded() : undefined}
 				>
 					{#each row.getVisibleCells() as cell, index (cell.id)}
 						<Table.Cell
-							title={expandable && index === 0 && row.getCanExpand() ? 'View options' : undefined}
+							class={expandable && expandColumnId && cell.column.id === expandColumnId ? 'cursor-pointer' : ''}
+							onclick={expandable && expandColumnId && cell.column.id === expandColumnId && row.getCanExpand() ? () => row.toggleExpanded() : undefined}
+							title={expandable && expandColumnId && cell.column.id === expandColumnId && row.getCanExpand() ? 'View details' : undefined}
 						>
 							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 						</Table.Cell>

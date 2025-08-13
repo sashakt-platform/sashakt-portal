@@ -34,7 +34,7 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	}
 	let tagTypes = [];
 	try {
-		const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype/`, {
+		const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype/?page=1&size=100`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -47,7 +47,8 @@ export const load: PageServerLoad = async ({ params }: any) => {
 			throw new Error('Failed to fetch tag types');
 		}
 
-		tagTypes = await tagTypesResponse.json();
+		const tagTypesRes = await tagTypesResponse.json();
+		tagTypes = tagTypesRes.items || [];
 	} catch (error) {
 		console.error('Error fetching tag types:', error);
 	}

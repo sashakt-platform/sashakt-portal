@@ -139,5 +139,33 @@ export const actions: Actions = {
 			{ type: 'success', message: `Test ${test_type} deleted successfully` },
 			cookies
 		);
+	},
+	clone: async ({ params, cookies }) => {
+		const token = getSessionTokenCookie();
+		const response = await fetch(`${BACKEND_URL}/test/${params.id}/clone`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			}
+		});
+
+		if (!response.ok) {
+			const errorMessage = await response.json();
+			redirect(
+				500,
+				`/tests/test-session`,
+				{
+					type: 'error',
+					message: `Failed to clone test session. Details: ${errorMessage.detail || response.statusText}`
+				},
+				cookies
+			);
+		}
+		redirect(
+			`/tests/test-session`,
+			{ type: 'success', message: `Test session cloned successfully` },
+			cookies
+		);
 	}
 };

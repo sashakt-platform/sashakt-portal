@@ -71,7 +71,7 @@
 			</Table.Body>
 		</Table.Root>
 
-		{#if $message.failed_questions}
+		{#if $message.error_log?.startsWith('data:text/csv;base64')}
 			<div class="mt-5 flex w-full items-center">
 				<a
 					href={$message.error_log}

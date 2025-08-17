@@ -1,8 +1,12 @@
 <script lang="ts">
 	import Label from '$lib/components/ui/label/label.svelte';
-	import X from '@lucide/svelte/icons/x';
+	import * as Table from '$lib/components/ui/table';
+	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import Download from '@lucide/svelte/icons/download';
 	import Info from '@lucide/svelte/icons/info';
-	import { superForm, fileProxy } from 'sveltekit-superforms';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import X from '@lucide/svelte/icons/x';
+	import { fileProxy, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -22,13 +26,75 @@
 </script>
 
 <Dialog.Root open={$message}>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content class="text-sm sm:max-w-[512px]">
 		<Dialog.Header>
-			<Dialog.Title>Question Uploading Completed</Dialog.Title>
+			<Dialog.Title class="mb-4 inline-flex items-center gap-2 text-xl font-semibold">
+				{#if $message.failed_questions}
+					<TriangleAlert color="#C7584A" size={28} />
+					File upload error
+				{:else}
+					<CircleCheck color="#1E8F36" size={28} />
+					File upload successful
+				{/if}
+			</Dialog.Title>
 			<Dialog.Description>
-				<div class="text-lg">{$message}</div>
+				{$message.message}
 			</Dialog.Description>
 		</Dialog.Header>
+		<p class="text-muted-foreground mt-2 font-semibold">Upload summary</p>
+		<Table.Root class="rounded-lg bg-blue-50">
+			{#if $message.failed_questions}
+				<Table.Caption class="text-left">
+					Download the error report to fix the row-specific issues and re-upload the file after
+					fixing the errors.
+				</Table.Caption>
+			{/if}
+			<Table.Body>
+				<Table.Row>
+					<Table.Cell class="font-medium">Total Rows</Table.Cell>
+					<Table.Cell>
+						{$message.uploaded_questions}
+					</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell class="font-medium">Validated Rows</Table.Cell>
+					<Table.Cell>
+						{$message.success_questions}
+					</Table.Cell>
+				</Table.Row>
+				<Table.Row>
+					<Table.Cell class="font-medium">Errors</Table.Cell>
+					<Table.Cell>
+						{$message.failed_questions}
+					</Table.Cell>
+				</Table.Row>
+			</Table.Body>
+		</Table.Root>
+
+		{#if $message.error_log?.startsWith('data:text/csv;base64')}
+			<div class="mt-5 flex w-full items-center">
+				<a
+					href={$message.error_log}
+					class="text-primary w-full font-medium"
+					download="error_report.csv"
+				>
+					<Button class="w-full cursor-pointer py-2 text-base font-semibold"
+						><Download />Download error report</Button
+					>
+				</a>
+			</div>
+		{:else}
+			<div class="mt-5 w-full font-semibold">
+				<div class="float-end">
+					<Dialog.Close>
+						<Button class="bg-primary-foreground text-primary mr-2">Upload more</Button>
+					</Dialog.Close>
+					<a href="/questionbank" class="bg-primary rounded-md px-5 py-2 text-white"
+						>Go to question bank</a
+					>
+				</div>
+			</div>
+		{/if}
 	</Dialog.Content>
 </Dialog.Root>
 <div class="mx-10 flex flex-col gap-20">

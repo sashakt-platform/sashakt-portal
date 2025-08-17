@@ -44,6 +44,10 @@
 				}
 			});
 			$formData.question_revision_ids = tempArray;
+			if ($formData.template_id) {
+				$formData.template_id = String($formData.template_id);
+			}
+
 			if ($formData.is_template) {
 				$formData.link = null;
 			}

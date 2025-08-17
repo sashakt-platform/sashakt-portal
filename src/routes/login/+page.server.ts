@@ -4,7 +4,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { loginSchema } from './schema';
-import { setSessionTokenCookie } from '$lib/server/auth.js';
+import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -36,10 +36,13 @@ export const actions: Actions = {
 			return fail(401, { form });
 		}
 
-		const { access_token } = await res.json();
+		const { access_token, refresh_token, expires_in } = await res.json();
 
-		// TODO: We should ge token expriry from backend
-		setSessionTokenCookie(cookies, access_token, new Date(Date.now() + 60 * 60 * 24 * 1000));
+		// Use expires_in from backend, fallback to 24 hours if not provided
+		const accessExpiryMs = expires_in ? expires_in * 1000 : 60 * 60 * 24 * 1000;
+
+		setSessionTokenCookie(cookies, access_token, new Date(Date.now() + accessExpiryMs));
+		setRefreshTokenCookie(cookies, refresh_token);
 
 		throw redirect(303, '/dashboard');
 	}

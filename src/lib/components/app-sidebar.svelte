@@ -160,6 +160,9 @@
 							<a href="/account"><span>My Account</span></a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
+							<a href="/account/password"><span>Change Password</span></a>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>
 							<a href="/logout">
 								<span>Sign out</span>
 							</a>

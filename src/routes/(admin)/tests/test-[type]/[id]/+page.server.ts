@@ -43,7 +43,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const form = await superValidate(zod(testSchema));
 	form.data.is_template = is_template;
 
-	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?page=1&size=100`, {
+	const questionPage = url.searchParams.get('question_page') || '1';
+
+	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?page=${questionPage}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

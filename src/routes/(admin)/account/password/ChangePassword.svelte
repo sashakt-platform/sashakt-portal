@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { redirect } from '@sveltejs/kit';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
@@ -47,7 +47,7 @@
 	</Form.Field>
 
 	<div class="float-end mt-2 flex gap-x-3">
-		<Button variant="outline" onclick={() => redirect(301, '/')}>Cancel</Button>
+		<Button variant="outline" onclick={() => goto('/')}>Cancel</Button>
 		<Form.Button>Save</Form.Button>
 	</div>
 </form>

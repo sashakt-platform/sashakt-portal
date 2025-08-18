@@ -24,12 +24,12 @@ export const actions: Actions = {
 			});
 		}
 
-		const passwordUpdateData: any = {
+		const passwordUpdateData: { current_password: string; new_password: string } = {
 			current_password: form.data.current_password,
 			new_password: form.data.new_password
 		};
 
-		let response: Response = await fetch(`${BACKEND_URL}/users/me/password`, {
+		const response = await fetch(`${BACKEND_URL}/users/me/password`, {
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json',
@@ -39,7 +39,13 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			return fail(401, { form });
+			let message = 'Unable to update password';
+
+			const error = await response.json();
+			message = error?.detail?.[0].msg ?? error?.detail ?? message;
+
+			form.errors = { current_password: [message] };
+			return fail(response.status === 401 ? 401 : 400, { form });
 		}
 
 		await response.json();

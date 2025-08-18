@@ -6,13 +6,18 @@ export const marksSchema = z.object({
 	skipped: z.number().int().default(0)
 });
 
+export enum MarksLevel {
+	QUESTION = 'question',
+	TEST = 'test'
+}
+
 export const testSchema = z.object({
 	name: z.string(),
 	description: z.string(),
 	start_time: z.string().nullable().optional(),
 	end_time: z.string().nullable().optional(),
 	time_limit: z.number().nullable().optional(),
-	marks_level: z.enum(['question', 'test']).nullable().optional().default('question'),
+	marks_level: z.nativeEnum(MarksLevel).nullable().optional().default(MarksLevel.QUESTION),
 	marks: z.number().nullable().optional(),
 	marking_scheme: marksSchema,
 	completion_message: z.string().nullable().optional(),

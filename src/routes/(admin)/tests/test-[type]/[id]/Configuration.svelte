@@ -9,6 +9,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
+	import { MarksLevel } from './schema';
 
 	let { formData } = $props();
 </script>
@@ -191,7 +192,7 @@
 			<div class="flex flex-row gap-8 pt-10">
 				<RadioGroup.Root bind:value={$formData.marks_level} class="flex w-full flex-col  gap-8">
 					<div class="b flex w-full items-center space-x-2">
-						<RadioGroup.Item value="question" id="question_level" />
+						<RadioGroup.Item value={MarksLevel.QUESTION} id="question_level" />
 						<Label for="question_level"
 							>{@render headingSubheading(
 								'Question Level Marking Scheme',
@@ -201,7 +202,7 @@
 					</div>
 					<div class="flex w-full flex-row items-center gap-4">
 						<div class="flex w-1/2 flex-row items-center space-x-2">
-							<RadioGroup.Item value="test" id="test_level" />
+							<RadioGroup.Item value={MarksLevel.TEST} id="test_level" />
 							<Label for="test_level"
 								>{@render headingSubheading(
 									'Test Level Marking Scheme',

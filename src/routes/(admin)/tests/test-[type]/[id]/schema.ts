@@ -1,13 +1,20 @@
 import { z } from 'zod';
 
+export const marksSchema = z.object({
+	correct: z.number().int().default(1),
+	wrong: z.number().int().default(0),
+	skipped: z.number().int().default(0)
+});
+
 export const testSchema = z.object({
 	name: z.string(),
 	description: z.string(),
 	start_time: z.string().nullable().optional(),
 	end_time: z.string().nullable().optional(),
 	time_limit: z.number().nullable().optional(),
-	marks_level: z.enum(['question', 'test']).nullable().optional(),
+	marks_level: z.enum(['question', 'test']).nullable().optional().default('question'),
 	marks: z.number().nullable().optional(),
+	marking_scheme: marksSchema,
 	completion_message: z.string().nullable().optional(),
 	start_instructions: z.string().nullable().optional(),
 	link: z.string().nullable().optional(),

@@ -154,7 +154,7 @@
 		/>
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
-			<div class="flex flex-row gap-4 items-center">
+			<div class="flex flex-row items-center gap-4">
 				<div class="w-1/3">
 					<Input
 						placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}

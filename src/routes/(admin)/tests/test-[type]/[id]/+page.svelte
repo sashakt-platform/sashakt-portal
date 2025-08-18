@@ -34,6 +34,9 @@
 		validators: zodClient(testSchema),
 		dataType: 'json',
 		onSubmit() {
+			if ($formData.template_id) {
+				$formData.template_id = String($formData.template_id);
+			}
 			if ($formData.is_template) {
 				$formData.link = null;
 			}

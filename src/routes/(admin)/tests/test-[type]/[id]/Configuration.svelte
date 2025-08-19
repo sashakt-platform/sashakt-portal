@@ -12,6 +12,18 @@
 	import { MarksLevel } from './schema';
 
 	let { formData } = $props();
+
+	if (!$formData.marking_scheme) {
+		$formData.marking_scheme = {
+			correct: 1,
+			wrong: 0,
+			skipped: 0
+		};
+	}
+
+	if (!$formData.marks_level) {
+		$formData.marks_level = MarksLevel.QUESTION;
+	}
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">

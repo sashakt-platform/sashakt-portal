@@ -62,6 +62,14 @@
 			return String(tag.id);
 		}));
 
+	if (questionData && !questionData.marking_scheme) {
+		$formData.marking_scheme = {
+			correct: 1,
+			wrong: 0,
+			skipped: 0
+		};
+	}
+
 	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
 		questionData && questionData.options
 			? questionData.options.map((v, k) => {

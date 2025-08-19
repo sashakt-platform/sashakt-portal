@@ -1,35 +1,97 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table/index.js';
+	import { DataTable } from '$lib/components/data-table';
+	import { createQuestionColumns } from './columns';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import Button, { buttonVariants } from '$lib/components/ui/button/button.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import FileUp from '@lucide/svelte/icons/file-up';
 	import Info from '@lucide/svelte/icons/info';
-	import Pencil from '@lucide/svelte/icons/pencil';
 	import WhiteEmptyBox from '$lib/components/white-empty-box.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import Trash_2 from '@lucide/svelte/icons/trash-2';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import * as Pagination from '$lib/components/ui/pagination/index.js';
-	import { DEFAULT_PAGE_SIZE } from '$lib/constants.js';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
-	let currentRow: number | null = $state(null);
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
+	let searchTimeout: ReturnType<typeof setTimeout>;
 
-	let noQuestionCreatedYet = $derived.by(() => {
-		return data?.questions?.length === 0 && [...page.url.searchParams.keys()].length === 0;
+	// Extract data and pagination info
+	const tableData = $derived(data?.questions?.items || []);
+	const totalItems = $derived(data?.questions?.total || 0);
+
+	const totalPages = $derived(data?.questions?.pages || 0);
+	const currentPage = $derived(data?.params?.page || 1);
+	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
+	const search = $derived(data?.params?.search || '');
+	const sortBy = $derived(data?.params?.sortBy || '');
+	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
+
+	let noQuestionCreatedYet = $state(true);
+
+	$effect(() => {
+		// check if there are any meaningful search/filter parameters (exclude pagination params)
+		const meaningfulParams = ['search', 'name', 'tag_ids', 'state_ids', 'sortBy', 'sortOrder'];
+		const hasFilters = meaningfulParams.some((param) => {
+			const value = page.url.searchParams.get(param);
+			// Only consider it a filter if the parameter has a non-empty value
+			return value && value.trim() !== '';
+		});
+
+		// also check if there are multiple tag_ids or state_ids
+		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
+		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
+
+		const result = totalItems === 0 && !hasFilters && !hasTagFilters && !hasStateFilters;
+
+		// update the state
+		noQuestionCreatedYet = result;
 	});
 
-	let searchTimeout: ReturnType<typeof setTimeout>;
+	// handle sorting
+	function handleSort(columnId: string) {
+		const url = new URL(page.url);
+		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
+
+		url.searchParams.set('sortBy', columnId);
+		url.searchParams.set('sortOrder', newSortOrder);
+		url.searchParams.set('page', '1');
+
+		goto(url.toString(), { replaceState: false });
+	}
+
+	// Create columns (reactive)
+	const columns = $derived(
+		createQuestionColumns(sortBy, sortOrder, handleSort)
+	);
+
+	// Render expanded row content
+	function expandedRowContent(question: any) {
+		return `
+			<div class="flex h-fit flex-col">
+				${question.options
+					.map(
+						(option: any) => `
+					<div class="my-auto flex">
+						<span class="bg-primary-foreground m-2 rounded-sm p-3">${option.key}</span>
+						<p class="my-auto">${option.value}</p>
+						${
+							question.correct_answer.includes(option.id)
+								? '<svg class="text-primary my-auto ml-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
+								: ''
+						}
+					</div>
+				`
+					)
+					.join('')}
+			</div>
+		`;
+	}
 </script>
 
 <DeleteDialog bind:action={deleteAction} elementName="Question" />
@@ -53,7 +115,7 @@
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
 			{#if !noQuestionCreatedYet}
-				<a href="/questionbank/single-question/new"
+				<a href="/questionbank/single-question/add/new"
 					><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
 				>
 				<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
@@ -94,7 +156,7 @@
 				Click on the button to create questions to be uploaded in the test template and tests
 			</p>
 			<div class="mt-4">
-				<a href="/questionbank/single-question/new"
+				<a href="/questionbank/single-question/add/new"
 					><Button
 						variant="outline"
 						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
@@ -113,8 +175,28 @@
 		</WhiteEmptyBox>
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
-			<div class="flex flex-row gap-2">
-				<div class="w-1/5">
+			<div class="flex flex-row items-center gap-4">
+				<div class="w-1/3">
+					<Input
+						placeholder="Search questions..."
+						value={search}
+						oninput={(event) => {
+							const url = new URL(page.url);
+							clearTimeout(searchTimeout);
+							searchTimeout = setTimeout(() => {
+								if (event.target?.value) {
+									url.searchParams.set('search', event.target.value);
+								} else {
+									url.searchParams.delete('search');
+								}
+								url.searchParams.set('page', '1');
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}, 300);
+						}}
+					/>
+				</div>
+
+				<div class="w-1/3">
 					<TagsSelection
 						bind:tags={filteredTags}
 						onOpenChange={(e: boolean) => {
@@ -130,7 +212,8 @@
 						}}
 					/>
 				</div>
-				<div class="w-1/5">
+
+				<div class="w-1/3">
 					<StateSelection
 						bind:states={filteredStates}
 						onOpenChange={(e: boolean) => {
@@ -146,158 +229,19 @@
 						}}
 					/>
 				</div>
-				<div class="ml-auto w-1/5">
-					<Input
-						data-sveltekit-keepfocus
-						data-sveltekit-preloaddata
-						type="search"
-						placeholder="Search by question name"
-						oninput={(event) => {
-							const url = new URL(page.url);
-							url.searchParams.set('page', '1');
-							clearTimeout(searchTimeout);
-							searchTimeout = setTimeout(() => {
-								url.searchParams.set('name', event?.target?.value || '');
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}, 500);
-						}}
-					/>
-				</div>
 			</div>
-			<div>
-				<Table.Root>
-					<Table.Header>
-						<Table.Row
-							class=" bg-primary-foreground my-2 flex items-center rounded-lg font-bold  text-black"
-						>
-							<Table.Head class="flex w-1/12 items-center">No.</Table.Head>
-							<Table.Head class="flex w-5/12 items-center">Question</Table.Head>
-							<Table.Head class="flex w-3/12 items-center">Tags</Table.Head>
-							<Table.Head class="flex w-2/12 items-center">Updated</Table.Head>
-							<Table.Head class="flex w-1/12 items-center"></Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each data?.questions?.items as question, index (question.id)}
-							<Table.Row
-								onclick={() => {
-									currentRow = currentRow === index ? null : index;
-								}}
-								class={[
-									'mt-2 flex cursor-pointer  items-center rounded-lg border  border-gray-200  bg-white font-medium',
-									currentRow === index ? 'rounded-b-none border-b-0' : ''
-								]}
-							>
-								<Table.Cell class="w-1/12 items-center">
-									{index +
-										1 +
-										((data?.questions.page || 1) - 1) * (data?.questions.size || DEFAULT_PAGE_SIZE)}
-								</Table.Cell>
-								<Table.Cell class="w-5/12  items-center">{question.question_text}</Table.Cell>
-								<Table.Cell class="w-3/12  items-center">
-									{#if question.tags && question.tags.length > 0}
-										{question.tags.map((tag: { name: string }) => tag.name).join(', ')}
-									{:else}
-										None
-									{/if}
-								</Table.Cell>
-								<Table.Cell class="w-2/12  items-center">
-									{#if question.modified_date}
-										{new Date(question.modified_date).toLocaleDateString('en-US', {
-											day: 'numeric',
-											month: 'short',
-											year: 'numeric'
-										})}
-										{new Date(question.modified_date).toLocaleTimeString('en-US', {
-											hour: 'numeric',
-											minute: '2-digit',
-											hour12: true
-										})}
-									{/if}
-								</Table.Cell>
-								<Table.Cell class="w-1/12  items-center">
-									<DropdownMenu.Root>
-										<DropdownMenu.Trigger class={buttonVariants({ variant: 'ghost' })}
-											><Ellipsis /></DropdownMenu.Trigger
-										>
-										<DropdownMenu.Content class="w-56">
-											<DropdownMenu.Group>
-												<a href="/questionbank/single-question/{question.id}">
-													<DropdownMenu.Item>
-														<Pencil />
-														<span>Edit</span>
-													</DropdownMenu.Item>
-												</a>
-
-												<DropdownMenu.Item
-													onclick={() =>
-														(deleteAction = `/questionbank/single-question/${question.id}?/delete`)}
-												>
-													<Trash_2 />
-													Delete
-												</DropdownMenu.Item>
-											</DropdownMenu.Group>
-										</DropdownMenu.Content>
-									</DropdownMenu.Root>
-								</Table.Cell>
-							</Table.Row>
-
-							<Table.Row
-								class="h fade-in mb-2  flex items-center rounded-lg  rounded-t-none border border-t-0  border-gray-200 bg-white font-medium "
-								hidden={currentRow !== index}
-								><Table.Cell class="w-12/12 ">
-									<div class="flex h-fit flex-col border-t pt-4">
-										{#each question.options as option (option.id)}
-											<div class="my-auto flex">
-												<span class="bg-primary-foreground m-2 rounded-sm p-3">{option.key}</span>
-												<p class="my-auto">{option.value}</p>
-												{#if question.correct_answer.includes(option.id)}
-													<CircleCheck class="text-primary my-auto ml-4 w-4" />
-												{/if}
-											</div>
-										{/each}
-									</div>
-								</Table.Cell>
-							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
-				<div class="my-4">
-					<Pagination.Root
-						count={data?.questions?.total}
-						perPage={data?.questions?.size}
-						onPageChange={(currentPage) => {
-							const url = new URL(page.url);
-							url.searchParams.set('page', currentPage.toString());
-							goto(url, { keepFocus: true, invalidateAll: true });
-						}}
-					>
-						{#snippet children({ pages, currentPage })}
-							<Pagination.Content>
-								<Pagination.Item>
-									<Pagination.PrevButton />
-								</Pagination.Item>
-								{#each pages as page (page.key)}
-									{#if page.type === 'ellipsis'}
-										<Pagination.Item>
-											<Pagination.Ellipsis />
-										</Pagination.Item>
-									{:else}
-										<Pagination.Item>
-											<Pagination.Link {page} isActive={currentPage === page.value}>
-												{page.value}
-											</Pagination.Link>
-										</Pagination.Item>
-									{/if}
-								{/each}
-								<Pagination.Item>
-									<Pagination.NextButton />
-								</Pagination.Item>
-							</Pagination.Content>
-						{/snippet}
-					</Pagination.Root>
-				</div>
-			</div>
+			<DataTable
+				data={tableData}
+				{columns}
+				{totalItems}
+				{totalPages}
+				{currentPage}
+				{pageSize}
+				expandable={true}
+				expandColumnId="answers"
+				renderExpandedRow={expandedRowContent}
+				emptyStateMessage="No questions found matching your criteria."
+			/>
 		</div>
 	{/if}
 </div>

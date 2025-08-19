@@ -28,7 +28,13 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Name</Form.Label>
-				<Input {...props} readonly={!isEditMode} bind:value={$formData.full_name} />
+				{#if isEditMode}
+					<Input {...props} bind:value={$formData.full_name} />
+				{:else}
+					<div class="mb-2 px-3.5 py-2.5 text-sm">
+						{$formData.full_name}
+					</div>
+				{/if}
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
@@ -37,7 +43,13 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Email</Form.Label>
-				<Input {...props} readonly={!isEditMode} bind:value={$formData.email} />
+				{#if isEditMode}
+					<Input {...props} bind:value={$formData.email} />
+				{:else}
+					<div class="mb-2 px-3.5 py-2.5 text-sm">
+						{$formData.email}
+					</div>
+				{/if}
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
@@ -47,7 +59,13 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Phone</Form.Label>
-				<Input {...props} readonly={!isEditMode} bind:value={$formData.phone} />
+				{#if isEditMode}
+					<Input {...props} bind:value={$formData.phone} />
+				{:else}
+					<div class="mb-2 px-3.5 py-2.5 text-sm">
+						{$formData.phone}
+					</div>
+				{/if}
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

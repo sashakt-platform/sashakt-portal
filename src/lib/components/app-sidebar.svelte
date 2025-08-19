@@ -157,10 +157,10 @@
 						class="w-[--bits-dropdown-menu-anchor-width]"
 					>
 						<DropdownMenu.Item>
-							<a href="/account"><span>My Account</span></a>
+							<a href="/profile"><span>My Profile</span></a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
-							<a href="/account/password"><span>Change Password</span></a>
+							<a href="/profile/password"><span>Change Password</span></a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
 							<a href="/logout">

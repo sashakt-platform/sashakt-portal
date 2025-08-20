@@ -1,6 +1,5 @@
 <script lang="ts" generics="TData, TValue">
 	import {
-		type ColumnDef,
 		type PaginationState,
 		type SortingState,
 		type ColumnFiltersState,
@@ -17,27 +16,40 @@
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
+	import { columns } from '../question_table/columns.js';
 
-	type DataTableProps<TData, TValue> = {
-		columns: ColumnDef<TData, TValue>[];
+	type DataTableProps<TData> = {
 		data: TData[];
 		open: boolean;
-		formData: any;
+		rowSelection: RowSelectionState;
+		isTemplate: boolean;
 	};
 
-	let { columns, data, open = $bindable(), formData }: DataTableProps<TData, TValue> = $props();
+	let {
+		data,
+		open = $bindable(),
+		rowSelection = $bindable(),
+		isTemplate
+	}: DataTableProps<TData, TValue> = $props();
 
-	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
+	let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: data.size || 10 });
 	let sorting = $state<SortingState>([]);
 	let columnFilters = $state<ColumnFiltersState>([]);
 	let columnVisibility = $state<VisibilityState>({});
-	let rowSelection = $state<RowSelectionState>({});
+
 	let currentRow: number | null = $state(null);
+
 	const table = createSvelteTable({
 		get data() {
-			return data;
+			return data.items;
 		},
 		columns,
+		manualPagination: true,
+		pageCount: -1,
+		rowCount: data.total,
+		getRowId: (row) => row.latest_question_revision_id.toString(),
 		getCoreRowModel: getCoreRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -48,6 +60,9 @@
 			} else {
 				pagination = updater;
 			}
+			const url = new URL(page.url);
+			url.searchParams.set('question_page', (pagination.pageIndex + 1).toString());
+			goto(url, { keepFocus: true, invalidateAll: true, replaceState: true, noScroll: true });
 		},
 		onSortingChange: (updater) => {
 			if (typeof updater === 'function') {
@@ -95,16 +110,6 @@
 			}
 		}
 	});
-
-	if (open) {
-		$formData.question_revision_ids.forEach((element: any) => {
-			table.getFilteredRowModel().rows.filter((row: any) => {
-				if (row.original?.id == element) {
-					row.toggleSelected(true);
-				}
-			});
-		});
-	}
 </script>
 
 <div class="flex h-full flex-col">
@@ -117,7 +122,7 @@
 							class={[
 								'pl-0 text-white',
 								header.id.includes('select') && 'col-span-1 ',
-								header.id.includes('question') && 'col-span-3',
+								header.id.includes('question_text') && 'col-span-3',
 								header.id.includes('tags') && 'col-span-3',
 								header.id.includes('answers') && 'col-span-1',
 								header.id.includes('options') && 'hidden'
@@ -137,7 +142,7 @@
 			{/each}
 		</Table.Header>
 		<Table.Body class="grid max-h-[calc(100vh-300px)] overflow-y-auto pb-16">
-			{#each table.getRowModel().rows as row, index (row.id)}
+			{#each table.getRowModel().rows as row, index (row.original.latest_question_revision_id)}
 				<Table.Row
 					class={[
 						' my-2 mb-0 grid cursor-pointer grid-cols-8 rounded-lg border-1 ',
@@ -150,13 +155,13 @@
 							class={[
 								'text-left',
 								cell.id.includes('select') && 'col-span-1',
-								cell.id.includes('question') && 'col-span-3',
+								cell.id.includes('question_text') && 'col-span-3',
 								cell.id.includes('options') && 'hidden',
 								cell.id.includes('tags') && 'col-span-3',
 								cell.id.includes('answers') && 'col-span-1'
 							]}
 							onclick={() => {
-								if (!cell.id.includes('answers')) return;
+								if (!cell.id.includes('correct_answer')) return;
 								currentRow = currentRow === index ? null : index;
 							}}
 						>
@@ -172,7 +177,7 @@
 							<div class="my-auto flex">
 								<span class="bg-primary-foreground m-2 rounded-sm p-3">{option.key}</span>
 								<p class="my-auto">{option.value}</p>
-								{#if row.original?.answer?.includes(option.id)}
+								{#if row.original?.correct_answer?.includes(option.id)}
 									<CircleCheck class="text-primary my-auto ml-4 w-4" />
 								{/if}
 							</div>
@@ -192,23 +197,18 @@
 		<Button
 			class="bg-primary hover:bg-primary/90 my-auto rounded px-4 text-white"
 			onclick={() => {
-				let tempArray: number[] = [];
-				table.getFilteredSelectedRowModel().rows.forEach((element: any) => {
-					tempArray.push(element.original?.id);
-				});
-				$formData.question_revision_ids = tempArray;
 				open = false;
 			}}
 		>
-			Add to Test {$formData.is_template ? ' Template' : ''}
+			Add to Test {isTemplate ? ' Template' : ''}
 		</Button>
 		<div class="my-auto ml-10 flex-1 text-sm font-normal">
-			{table.getFilteredSelectedRowModel().rows.length} of{' '}
-			{table.getFilteredRowModel().rows.length} question(s) selected.
+			{Object.entries(rowSelection).length} of{' '}
+			{data.total} question(s) selected.
 		</div>
 		<div class="ml-auto flex items-center">
 			<p class="mx-4">
-				Page {table.getState().pagination.pageIndex + 1} out of {table.getPageCount()}
+				Page {table.getState().pagination.pageIndex + 1} out of {data.pages}
 			</p>
 		</div>
 		<div class="flex items-center justify-end space-x-2 py-4">

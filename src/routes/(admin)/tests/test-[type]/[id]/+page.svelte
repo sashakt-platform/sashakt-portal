@@ -9,7 +9,9 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { testSchema, type FormSchema } from './schema';
+	import { type RowSelectionState } from '@tanstack/table-core';
 
+	let rowSelection = $state<RowSelectionState>({});
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
 	let currentScreen: number = $state(typeOfScreen.primary);
@@ -31,12 +33,21 @@
 		enhance,
 		submit
 	} = superForm(testData || data.form, {
+		applyAction: 'never',
 		validators: zodClient(testSchema),
 		dataType: 'json',
 		onSubmit() {
+			let tempArray: number[] = [];
+			Object.entries(rowSelection).forEach(([key, value]) => {
+				if (value) {
+					tempArray.push(Number(key));
+				}
+			});
+			$formData.question_revision_ids = tempArray;
 			if ($formData.template_id) {
 				$formData.template_id = String($formData.template_id);
 			}
+
 			if ($formData.is_template) {
 				$formData.link = null;
 			}
@@ -53,13 +64,6 @@
 
 <form method="POST" action="?/save" use:enhance>
 	<div class="flex border-b-2 py-2">
-		<!-- <div class="flex justify-start"> -->
-		<!-- 	<Button variant="link" class=" text-gray-500" href="./" -->
-		<!-- 		><CircleChevronLeft />Back to test {$formData.is_template -->
-		<!-- 			? 'templates' -->
-		<!-- 			: 'sessions'}</Button -->
-		<!-- 	> -->
-		<!-- </div> -->
 		<div class="mx-auto flex">
 			{#snippet headerNumbers(
 				number: number,
@@ -112,7 +116,12 @@
 	{#if currentScreen === typeOfScreen.primary}
 		<Primary {formData} />
 	{:else if currentScreen === typeOfScreen.questions}
-		<Question {formData} questions={data.questions} />
+		<Question
+			name={$formData.name}
+			isTemplate={$formData.is_template}
+			questions={data.questions}
+			bind:rowSelection
+		/>
 	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}

@@ -4,6 +4,8 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 
+	import Applyform from './Applyform.svelte';
+
 	let { data } = $props();
 
 	const information = [
@@ -82,21 +84,17 @@
 </div>
 
 <div>
-	<div class="mt-4 ml-10 flex w-3/4 flex-row justify-between">
+	<div class="mt-4 ml-10 flex w-3/4 flex-row">
 		{#each stats_box as stat}
-			<div class="m-4 w-1/3 rounded-xl bg-white p-4">
-				<p class="font-semibold">{stat.title}</p>
+			<div
+				class="animate-fadeIn m-4 w-1/3 rounded-xl bg-white p-4 shadow-lg hover:scale-105 hover:shadow-2xl hover:shadow-2xl"
+			>
+				<p class="mb-2 border-b pb-2 font-semibold">{stat.title}</p>
 				<p class="text-sm">{stat.description}</p>
-				<div class="p-12 text-5xl">{stat.count}</div>
+				<div class="p-12 text-5xl font-semibold">{stat.count}</div>
 			</div>
 		{/each}
 	</div>
-	<!-- <div class="mt-4 ml-10 flex w-3/4 flex-row justify-between"> -->
-	<!-- 	<div class="m-4 mb-10 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
-	<!-- 		<div class="h-screen w-full"></div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="m-4 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
-	<!-- 		<div class="h-screen w-full"></div> -->
-	<!-- 	</div> -->
-	<!-- </div> -->
+
+	<Applyform {data} />
 </div>

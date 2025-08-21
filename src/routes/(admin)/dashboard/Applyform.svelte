@@ -45,57 +45,52 @@
 	});
 </script>
 
-<div class="m-4 mt-10 mr-10 ml-10 flex items-center justify-start gap-90">
-	<div class="flex flex-col">
-		<h2 class=" text-2xl font-bold">Test Attempt Details</h2>
-
-		<p class=" text-sm text-gray-600">details of the attempts made by candidates</p>
-	</div>
-
-	<div class="m-4 mt-6 ml-10 flex flex-col items-center">
-		<h3 class="mb-2 text-sm font-semibold text-gray-700">Select Date Range</h3>
-
-		<div>
-			<form method="POST" use:enhance action="?/applyFilter">
-				<div class="flex gap-4">
-					<Form.Field {form} name="start_date">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Start Date</Form.Label>
-								<Input {...props} type="date" bind:value={$formData.start_date} />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-					<Form.Field {form} name="end_date">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>End Date</Form.Label>
-								<Input {...props} type="date" bind:value={$formData.end_date} />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				</div>
-
-				<div class="flex items-center justify-center">
-					<Form.Button class="px-4">Apply Filter</Form.Button>
-				</div>
-			</form>
-		</div>
-	</div>
-</div>
-<div class="card m-4 mt-10 ml-10 flex w-full cursor-pointer">
-	{#each test_summary_box as stat}
-		<div
-			class="m-4 w-1/4 rounded-xl bg-white p-4 hover:scale-105 hover:shadow-xl"
-			style="flex: 0 0 20%;"
-		>
-			<div class="flex items-center gap-2 font-semibold">
-				<p class="mb-2 border-b">{stat.title}</p>
+<div class="mt-10 flex w-full justify-center">
+	<div class="w-full max-w-7xl rounded-xl bg-white p-6">
+		<div class="m-4 flex items-start justify-between">
+			<div>
+				<h2 class=" text-2xl font-bold">Test Attempt Details</h2>
+				<p class="text-sm text-gray-600">Details of the Attempts made by Candidates</p>
 			</div>
-			<p class="text-sm">{stat.description}</p>
-			<div class="p-12 text-5xl">{stat.count}</div>
+
+			<div class="mt-4 flex flex-col items-start md:mt-0 md:items-center">
+				<h3 class="mb-2 text-sm font-semibold text-gray-700">Select Date Range</h3>
+				<form method="POST" use:enhance action="?/applyFilter" class="flex flex-col gap-4">
+					<div class="flex flex-col md:flex-row">
+						<Form.Field {form} name="start_date">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label class="flex items-center justify-center">From</Form.Label>
+									<Input {...props} type="date" bind:value={$formData.start_date} />
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+						<Form.Field {form} name="end_date">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label class="flex items-center justify-center">To</Form.Label>
+									<Input {...props} type="date" bind:value={$formData.end_date} />
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+					</div>
+
+					<div class="flex justify-center">
+						<Form.Button class="px-4">Apply Filter</Form.Button>
+					</div>
+				</form>
+			</div>
 		</div>
-	{/each}
+
+		<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+			{#each test_summary_box as stat}
+				<div class="flex flex-col justify-between rounded-lg border p-6 text-center">
+					<p class="text-base font-semibold">{stat.title}</p>
+					<p class="text-4xl">{stat.count}</p>
+				</div>
+			{/each}
+		</div>
+	</div>
 </div>

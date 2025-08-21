@@ -165,7 +165,7 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const err = await res.json();
-			form.errors = { password: [err.detail[0].msg] };
+			form.errors = { email: [err.detail] };
 			return fail(401, { form });
 		}
 

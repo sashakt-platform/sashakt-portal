@@ -1,31 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Label from '$lib/components/ui/label/label.svelte';
+
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
 
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
-
-	$effect(() => {
-		const meaningfulParams = ['tag_ids', 'state_ids'];
-		const hasFilters = meaningfulParams.some((param) => {
-			const value = page.url.searchParams.get(param);
-			return value && value.trim() !== '';
-		});
-
-		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
-		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
-
-		const result = !hasFilters && !hasTagFilters && !hasStateFilters;
-	});
 
 	const information = [
 		{

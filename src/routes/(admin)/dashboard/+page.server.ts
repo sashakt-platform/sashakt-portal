@@ -2,8 +2,26 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
 	const token = getSessionTokenCookie();
+	const tagIdsList = url.searchParams.getAll('tag_ids') || [];
+	const tagParams =
+		tagIdsList.length > 0 ? tagIdsList.map((tagId) => `tag_ids=${tagId}`).join('&') : '';
+	const statesList = url.searchParams.getAll('state_ids') || [];
+	const stateParams =
+		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
+
+	const queryString = [tagParams, stateParams].filter(Boolean).join('&');
+
+
+	interface DashboardPerformance {
+		overall_avg_score: number;
+		overall_avg_time_minutes: number;
+	}
+	const performance: DashboardPerformance = {
+		overall_avg_score: 0,
+		overall_avg_time_minutes: 0
+	};
 	interface DashboardStats {
 		total_questions: number;
 		total_users: number;
@@ -29,6 +47,19 @@ export const load: PageServerLoad = async () => {
 		stats.total_users = statsData.total_users;
 		stats.total_tests = statsData.total_tests;
 	}
+	const responsePerformance = await fetch(`${BACKEND_URL}/candidate/overall-analytics?${queryString}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
 
-	return { stats };
+	if (responsePerformance.ok) {
+		const performanceData = await responsePerformance.json();
+
+		performance.overall_avg_score = performanceData.overall_avg_score;
+		performance.overall_avg_time_minutes = performanceData.overall_avg_time_minutes;
+	}
+
+	return { stats, performance };
 };

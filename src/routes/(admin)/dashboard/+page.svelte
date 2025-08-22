@@ -1,10 +1,31 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+
+	import StateSelection from '$lib/components/StateSelection.svelte';
+	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
+
+	let filteredTags: string[] = $state([]);
+	let filteredStates: string[] = $state([]);
+
+	$effect(() => {
+		const meaningfulParams = ['tag_ids', 'state_ids'];
+		const hasFilters = meaningfulParams.some((param) => {
+			const value = page.url.searchParams.get(param);
+			return value && value.trim() !== '';
+		});
+
+		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
+		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
+
+		const result = !hasFilters && !hasTagFilters && !hasStateFilters;
+	});
 
 	const information = [
 		{
@@ -99,4 +120,50 @@
 	<!-- 		<div class="h-screen w-full"></div> -->
 	<!-- 	</div> -->
 	<!-- </div> -->
+</div>
+<div class="m-10 flex w-1/2 flex-row justify-between">
+	<div class=" flex-1 rounded-xl bg-white p-4">
+		<p class="font-semibold">Score & Duration Analysis</p>
+		<p class="text-sm">Overall average performance of all candidates</p>
+		<div class="mt-5 flex flex-col justify-between gap-2 sm:flex-row">
+			<TagsSelection
+				bind:tags={filteredTags}
+				onOpenChange={(e: boolean) => {
+					if (!e) {
+						const url = new URL(page.url);
+						url.searchParams.delete('tag_ids');
+
+						filteredTags.map((tag_id: string) => {
+							url.searchParams.append('tag_ids', tag_id);
+						});
+						goto(url, { keepFocus: true, invalidateAll: true });
+					}
+				}}
+			/>
+			<StateSelection
+				bind:states={filteredStates}
+				onOpenChange={(e: boolean) => {
+					if (!e) {
+						const url = new URL(page.url);
+						url.searchParams.delete('state_ids');
+						filteredStates.map((state_id: string) => {
+							url.searchParams.append('state_ids', state_id);
+						});
+						goto(url, { keepFocus: true, invalidateAll: true });
+					}
+				}}
+			/>
+		</div>
+
+		<div class="flex flex-row justify-between p-5">
+			<div class="item-center ml-5 flex flex-col p-2">
+				<p class="item-center text-lg font-medium">Avg. Score</p>
+				<p class="text-5xl">{data?.performance?.overall_avg_score}%</p>
+			</div>
+			<div class="mr-10 flex flex-col p-2">
+				<p class="text-lg font-medium">Avg. Duration</p>
+				<p class="text-5xl">{data?.performance?.overall_avg_time_minutes}</p>
+			</div>
+		</div>
+	</div>
 </div>

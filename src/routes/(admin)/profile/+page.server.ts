@@ -72,7 +72,7 @@ export const actions: Actions = {
 		await res.json();
 		throw redirect(
 			303,
-			`/account`,
+			`/profile`,
 			{ type: 'success', message: `Details Updated Successfully` },
 			cookies
 		);

@@ -157,7 +157,10 @@
 						class="w-[--bits-dropdown-menu-anchor-width]"
 					>
 						<DropdownMenu.Item>
-							<span>My Account</span>
+							<a href="/profile"><span>My Profile</span></a>
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>
+							<a href="/profile/password"><span>Change Password</span></a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
 							<a href="/logout">

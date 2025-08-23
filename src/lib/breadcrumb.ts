@@ -48,7 +48,7 @@ export const breadcrumbs = (pathname: string) => {
 	const segments = pathname
 		.split('/')
 		.filter(Boolean)
-		.splice(0, 3)
+		.slice(0, 3)
 		.filter((item) => isNaN(item));
 
 	let pathAccumulator = '';

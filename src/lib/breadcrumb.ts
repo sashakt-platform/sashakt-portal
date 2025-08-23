@@ -45,6 +45,7 @@ const prettifyLabel = (segment: string) => {
 };
 
 export const breadcrumbs = (pathname: string) => {
+	if (!pathname || pathname === '/') return [];
 	const segments = pathname
 		.split('/')
 		.filter(Boolean)
@@ -64,6 +65,6 @@ export const breadcrumbs = (pathname: string) => {
 		return { label, href: pathAccumulator };
 	});
 
-	if (crumbs.length === 1) return crumbs;
+	if (crumbs.length <= 1) return crumbs;
 	return [crumbs[0], crumbs[crumbs.length - 1]];
 };

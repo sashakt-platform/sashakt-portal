@@ -8,8 +8,22 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
+	import { MarksLevel } from './schema';
 
 	let { formData } = $props();
+
+	if (!$formData.marking_scheme) {
+		$formData.marking_scheme = {
+			correct: 1,
+			wrong: 0,
+			skipped: 0
+		};
+	}
+
+	if (!$formData.marks_level) {
+		$formData.marks_level = MarksLevel.QUESTION;
+	}
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
@@ -98,11 +112,11 @@
 		</ConfigureBox>
 		<ConfigureBox title="Question settings" Icon={CircleHelp}>
 			<div class="flex flex-col gap-6">
-				<div class="flex flex-row pt-6">
+				<div class="flex flex-row gap-4 pt-10">
 					<div class="w-1/2">
 						{@render headingSubheading(
-							'Question Pagination',
-							'Set the maximum number of questions per screen'
+							'Questions Per Page',
+							"Enter the number of questions to display per page. Enter '0' to display all questions on a single page"
 						)}
 					</div>
 					<div class=" flex w-1/2 flex-row gap-4">
@@ -183,6 +197,43 @@
 						</small>
 					{/if}
 				</div>
+			</div>
+		</ConfigureBox>
+
+		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>
+			<div class="flex flex-row gap-8 pt-10">
+				<RadioGroup.Root bind:value={$formData.marks_level} class="flex w-full flex-col  gap-8">
+					<div class="b flex w-full items-center space-x-2">
+						<RadioGroup.Item value={MarksLevel.QUESTION} id="question_level" />
+						<Label for="question_level"
+							>{@render headingSubheading(
+								'Question Level Marking Scheme',
+								'Set Marks Individually (per question) for each question of the test'
+							)}</Label
+						>
+					</div>
+					<div class="flex w-full flex-row items-center gap-4">
+						<div class="flex w-1/2 flex-row items-center space-x-2">
+							<RadioGroup.Item value={MarksLevel.TEST} id="test_level" />
+							<Label for="test_level"
+								>{@render headingSubheading(
+									'Test Level Marking Scheme',
+									'Set uniform Marks for all the questions in the test'
+								)}</Label
+							>
+						</div>
+						<div class="flex w-1/2 flex-col gap-1" hidden={$formData.marks_level !== 'test'}>
+							<small class="text-gray-500">Marks for Correct Answer at Test Level</small>
+							<Input
+								class="flex w-full"
+								type="number"
+								placeholder="Enter Marks for Correct Answer"
+								name="marking_scheme.correct"
+								bind:value={$formData.marking_scheme.correct}
+							/>
+						</div>
+					</div>
+				</RadioGroup.Root>
 			</div>
 		</ConfigureBox>
 	</div>

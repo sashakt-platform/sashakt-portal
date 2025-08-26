@@ -9,6 +9,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { Input } from '$lib/components/ui/input';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
@@ -110,7 +111,20 @@
 						>
 							{questionData ? 'Edit Question' : 'Create a Question'}
 						</h2>
-						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+						<Tooltip.Provider>
+							<Tooltip.Root>
+								<Tooltip.Trigger>
+									<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+								</Tooltip.Trigger>
+								<Tooltip.Content class="bg-accent w-40 text-xs" side="bottom">
+									<p>
+										Here you can add a new question by providing the question text, possible
+										answers, marking scheme, tags, and states. Make sure to mark the correct
+										answer(s) before saving.
+									</p>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
 					</div>
 				</div>
 				<Label class="my-auto align-middle text-sm font-extralight">

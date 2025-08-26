@@ -7,6 +7,7 @@
 	import { tagSchema, type TagFormSchema, tagTypeSchema, type TagTypeFormSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
 	const {
@@ -66,7 +67,19 @@
 						>
 							{tagData ? `Edit ${title}` : `Create a ${title}`}
 						</h2>
-						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+						<Tooltip.Provider>
+							<Tooltip.Root>
+								<Tooltip.Trigger>
+									<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+								</Tooltip.Trigger>
+								<Tooltip.Content class="bg-accent w-40 text-xs" side="bottom">
+									<p>
+										Use this panel to create or edit tags and tag types. Fill in the details and
+										click 'Save' to apply changes.
+									</p>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						</Tooltip.Provider>
 					</div>
 				</div>
 				<Label class="my-auto align-middle text-sm font-extralight">

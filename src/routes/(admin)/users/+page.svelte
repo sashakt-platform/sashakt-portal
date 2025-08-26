@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -47,7 +48,20 @@
 				>
 					User Management
 				</h2>
-				<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+
+				<Tooltip.Provider>
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+						</Tooltip.Trigger>
+						<Tooltip.Content class="bg-accent w-40 text-xs" side="bottom">
+							<p>
+								This panel displays all users in the system. You can edit or delete a user by
+								clicking the three dots next to their entry.
+							</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
 			</div>
 		</div>
 		<Label class="my-auto align-middle text-sm font-extralight">Manage users</Label>

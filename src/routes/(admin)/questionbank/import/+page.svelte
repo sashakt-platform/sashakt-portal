@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Table from '$lib/components/ui/table';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import Download from '@lucide/svelte/icons/download';
 	import Info from '@lucide/svelte/icons/info';
@@ -106,7 +107,20 @@
 				>
 					Import questions
 				</h2>
-				<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+				<Tooltip.Provider>
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+						</Tooltip.Trigger>
+						<Tooltip.Content class="bg-accent w-40 text-xs" side="bottom">
+							<p>
+								Upload a CSV file containing questions. Make sure to follow the template format.
+								After uploading, you will see a summary and can download an error report if there
+								are issues.
+							</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
 			</span>
 			<Label class="my-auto align-middle text-sm font-extralight"
 				>Upload a .csv file to import questions to your question bank</Label

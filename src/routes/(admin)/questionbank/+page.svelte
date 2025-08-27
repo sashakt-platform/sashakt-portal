@@ -11,6 +11,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
@@ -106,7 +107,33 @@
 					>
 						Question Bank
 					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<button
+									type="button"
+									aria-label="Help: Question Bank"
+									aria-describedby="tt-questionbank-help"
+									class="focus-visible:ring-primary inline-flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
+								>
+									<Info class="h-4 w-4" />
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Content
+								id="tt-questionbank-help"
+								class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+								side="bottom"
+								sideOffset={8}
+								align="start"
+							>
+								<p>
+									The Question Bank lets you create, edit, and organize all your questions. Use
+									filters and search to find specific questions, and bulk upload for faster
+									management. Questions here can be used in test templates and assigned to tests.
+								</p>
+							</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight"

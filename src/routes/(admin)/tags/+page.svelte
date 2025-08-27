@@ -11,6 +11,7 @@
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import Input from '$lib/components/ui/input/input.svelte';
 
 	const { data } = $props();
@@ -84,7 +85,32 @@
 					>
 						Tag Management
 					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<button
+									type="button"
+									aria-label="Help: Tag Management"
+									aria-describedby="tt-tags-help"
+									class="focus-visible:ring-primary inline-flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
+								>
+									<Info class="h-4 w-4" />
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Content
+								id="tt-tags-help"
+								class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+								side="bottom"
+								sideOffset={8}
+								align="start"
+							>
+								<p>
+									Manage all tags and tag types here. You can create, edit, or delete tags and tag
+									types using the available actions.
+								</p>
+							</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight"

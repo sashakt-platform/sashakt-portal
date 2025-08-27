@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -47,7 +48,33 @@
 				>
 					User Management
 				</h2>
-				<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+
+				<Tooltip.Provider>
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								type="button"
+								aria-label="Help: User management"
+								aria-describedby="tt-usermanagement-help"
+								class="focus-visible:ring-primary inline-flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
+							>
+								<Info class="h-4 w-4" />
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content
+							id="tt-usermanagement-help"
+							class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+							side="bottom"
+							sideOffset={8}
+							align="start"
+						>
+							<p>
+								This panel displays all users in the system. You can edit or delete a user by
+								clicking the three dots next to their entry.
+							</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
 			</div>
 		</div>
 		<Label class="my-auto align-middle text-sm font-extralight">Manage users</Label>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import EmptyBox from '$lib/components/first-data-box.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import Info from '@lucide/svelte/icons/info';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
@@ -109,7 +110,33 @@
 					>
 						{data?.is_template ? 'Test templates' : 'Test sessions'}
 					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<button
+									type="button"
+									aria-label={data?.is_template ? 'Help: Test templates' : 'Help: Test sessions'}
+									aria-describedby="tt-tests-help"
+									class="focus-visible:ring-primary inline-flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
+								>
+									<Info class="h-4 w-4" />
+								</button>
+							</Tooltip.Trigger>
+							<Tooltip.Content
+								id="tt-tests-help"
+								class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+								side="bottom"
+								sideOffset={8}
+								align="start"
+							>
+								<p>
+									{data?.is_template
+										? 'This panel lists all your test templates. You can create, edit, or delete a template using the available actions.'
+										: 'This panel lists all your test sessions. You can create, edit, or delete a test using the available actions.'}
+								</p>
+							</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight"

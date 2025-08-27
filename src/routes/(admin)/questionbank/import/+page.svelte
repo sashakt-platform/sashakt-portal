@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Table from '$lib/components/ui/table';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import Download from '@lucide/svelte/icons/download';
 	import Info from '@lucide/svelte/icons/info';
@@ -106,7 +107,33 @@
 				>
 					Import questions
 				</h2>
-				<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+				<Tooltip.Provider>
+					<Tooltip.Root>
+						<Tooltip.Trigger>
+							<button
+								type="button"
+								aria-label="Help: Question Bank"
+								aria-describedby="tt-questionbank-help"
+								class="focus-visible:ring-primary inline-flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
+							>
+								<Info class="h-4 w-4" />
+							</button>
+						</Tooltip.Trigger>
+						<Tooltip.Content
+							id="tt-questionbank-help"
+							class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+							side="bottom"
+							sideOffset={8}
+							align="start"
+						>
+							<p>
+								Upload a CSV file containing questions. Make sure to follow the template format.
+								After uploading, you will see a summary and can download an error report if there
+								are issues.
+							</p>
+						</Tooltip.Content>
+					</Tooltip.Root>
+				</Tooltip.Provider>
 			</span>
 			<Label class="my-auto align-middle text-sm font-extralight"
 				>Upload a .csv file to import questions to your question bank</Label

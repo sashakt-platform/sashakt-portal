@@ -2,6 +2,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
@@ -77,7 +78,34 @@
 		>
 			Dashboard
 		</h2>
-		<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger>
+					<button
+						type="button"
+						aria-label="Help: Dashboard"
+						aria-describedby="tt-dashboard-help"
+						class="focus-visible:ring-primary inline-flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
+					>
+						<Info class="h-4 w-4" />
+					</button>
+				</Tooltip.Trigger>
+				<Tooltip.Content
+					id="tt-dashboard-help"
+					class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+					side="bottom"
+					sideOffset={8}
+					align="start"
+				>
+					<p>
+						Dashboard provides a quick overview of your organization&apos;s activity, including
+						total questions, tests, and users. Use the features to manage question banks, create and
+						assign tests, and monitor analytics for better insights.
+					</p>
+				</Tooltip.Content>
+			</Tooltip.Root>
+		</Tooltip.Provider>
 	</span>
 </div>
 

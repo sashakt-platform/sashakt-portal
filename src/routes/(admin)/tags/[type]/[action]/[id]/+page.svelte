@@ -70,12 +70,25 @@
 						<Tooltip.Provider>
 							<Tooltip.Root>
 								<Tooltip.Trigger>
-									<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+									<button
+										type="button"
+										aria-label={`Help: ${title}`}
+										aria-describedby="tt-tag-form-help"
+										class="focus-visible:ring-primary inline-flex h-5 w-5 items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
+									>
+										<Info class="h-4 w-4" />
+									</button>
 								</Tooltip.Trigger>
-								<Tooltip.Content class="bg-accent w-40 text-xs" side="bottom">
+								<Tooltip.Content
+									id="tt-tag-form-help"
+									class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+									side="bottom"
+									sideOffset={8}
+									align="start"
+								>
 									<p>
-										Use this panel to create or edit tags and tag types. Fill in the details and
-										click 'Save' to apply changes.
+										Use this panel to create or edit {title.toLowerCase()}s. Fill in the details and
+										click Save to apply changes.
 									</p>
 								</Tooltip.Content>
 							</Tooltip.Root>

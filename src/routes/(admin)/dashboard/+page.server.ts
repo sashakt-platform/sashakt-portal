@@ -39,7 +39,9 @@ export const load: PageServerLoad = async () => {
 
 	if (responseStats.ok) {
 		const statsData = await responseStats.json();
-		Object.assign(stats, statsData);
+
+		const { total_questions = 0, total_users = 0, total_tests = 0 } = statsData ?? {};
+		Object.assign(stats, { total_questions, total_users, total_tests });
 	}
 
 	const responseTestStats = await fetch(`${BACKEND_URL}/candidate/summary`, {
@@ -51,7 +53,18 @@ export const load: PageServerLoad = async () => {
 
 	if (responseTestStats.ok) {
 		const testStatsData = await responseTestStats.json();
-		Object.assign(testAttemptStats, testStatsData);
+		const {
+			total_test_submitted = 0,
+			total_test_not_submitted = 0,
+			not_submitted_active = 0,
+			not_submitted_inactive = 0
+		} = testStatsData ?? {};
+		Object.assign(testAttemptStats, {
+			total_test_submitted,
+			total_test_not_submitted,
+			not_submitted_active,
+			not_submitted_inactive
+		});
 	}
 
 	return { stats, testAttemptStats };

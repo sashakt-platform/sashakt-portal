@@ -90,7 +90,7 @@
 
 <div class="m-4 flex flex-col gap-6">
 	<div class="flex flex-row">
-		{#each stats_box as stat}
+		{#each stats_box as stat (stat.title)}
 			{@render dataBox(stat.title, stat.description, stat.count)}
 		{/each}
 	</div>

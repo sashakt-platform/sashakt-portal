@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 
@@ -52,6 +53,14 @@
 	];
 </script>
 
+{#snippet dataBox(title: string, description: string, count: number)}
+	<div class="m-4 w-full rounded-xl border bg-white p-4">
+		<p class="font-semibold">{title}</p>
+		<p class="text-sm">{description}</p>
+		<div class="p-12 text-5xl">{count}</div>
+	</div>
+{/snippet}
+
 <Dialog.Root open={false}>
 	<Dialog.Content>
 		<Dialog.Header>
@@ -81,22 +90,58 @@
 	</span>
 </div>
 
-<div>
-	<div class="mt-4 ml-10 flex w-3/4 flex-row justify-between">
+<div class="m-4 flex flex-col gap-6">
+	<div class="flex flex-row">
 		{#each stats_box as stat}
-			<div class="m-4 w-1/3 rounded-xl bg-white p-4">
-				<p class="font-semibold">{stat.title}</p>
-				<p class="text-sm">{stat.description}</p>
-				<div class="p-12 text-5xl">{stat.count}</div>
-			</div>
+			{@render dataBox(stat.title, stat.description, stat.count)}
 		{/each}
 	</div>
-	<!-- <div class="mt-4 ml-10 flex w-3/4 flex-row justify-between"> -->
-	<!-- 	<div class="m-4 mb-10 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
-	<!-- 		<div class="h-screen w-full"></div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="m-4 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
-	<!-- 		<div class="h-screen w-full"></div> -->
-	<!-- 	</div> -->
-	<!-- </div> -->
+	<div class="m-4 flex flex-col rounded-xl bg-white p-4">
+		<div class="flex flex-row">
+			<div class="my-auto flex w-1/2 flex-col">
+				<p class="font-semibold">Test Attempt Details</p>
+				<p class="text-sm">Details of the Attempts made by the candidate</p>
+			</div>
+			<div class="flex w-1/2 flex-row gap-8 rounded-lg p-4">
+				<p class="my-auto">Select Date of Range</p>
+				<div class="mx-auto flex flex-row gap-8 align-middle">
+					<div class="flex w-1/2 flex-col gap-1">
+						<Label for="dateStart" class="my-auto w-fit font-extralight whitespace-nowrap"
+							>Start Time</Label
+						>
+						<Input type="datetime-local" id="dateStart" name="start_time" />
+					</div>
+					<div class="flex w-1/2 flex-col gap-1">
+						<Label for="dateEnd" class="my-auto w-fit font-extralight whitespace-nowrap"
+							>End Time</Label
+						>
+						<Input type="datetime-local" id="dateEnd" name="end_time" />
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr class="my-4" />
+		<div class="flex flex-row">
+			{@render dataBox(
+				'Submitted Test Attempts',
+				'Total Test Attempts  submitted by the candidates',
+				22
+			)}
+			{@render dataBox(
+				'Non-Submitted Test Attempts',
+				'Total Test Attempts non-submitted by the candidates',
+				22
+			)}
+			{@render dataBox(
+				'Active Test Attempts',
+				'Non-Submitted Test Attempts which are currently active',
+				22
+			)}
+			{@render dataBox(
+				'Inactive Test Attempts',
+				'Non-Submitted Test Attempts which are now inactive',
+				22
+			)}
+		</div>
+	</div>
 </div>

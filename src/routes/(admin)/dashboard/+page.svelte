@@ -107,46 +107,50 @@
 	<!-- 	</div> -->
 	<!-- </div> -->
 </div>
-<div class="m-10 flex w-1/2 flex-row justify-between">
+<div class="m-10 flex flex-row justify-between">
 	<div class=" flex-1 rounded-xl bg-white p-4">
-		<p class="font-semibold">Score & Duration Analysis</p>
-		<p class="text-sm">Overall average performance of all candidates</p>
-		<div class="mt-5 flex flex-col justify-between gap-2 sm:flex-row">
-			<TagsSelection
-				bind:tags={filteredTags}
-				onOpenChange={(e: boolean) => {
-					if (!e) {
-						const url = new URL(page.url);
-						url.searchParams.delete('tag_ids');
+		<div class="flex flex-row gap-8">
+			<div class="flex w-1/2 flex-col">
+				<p class="font-semibold">Score & Duration Analysis</p>
+				<p class="text-sm">Overall average performance of all candidates</p>
+			</div>
+			<div class=" flex w-1/2 flex-col justify-between gap-2 sm:flex-row">
+				<TagsSelection
+					bind:tags={filteredTags}
+					onOpenChange={(e: boolean) => {
+						if (!e) {
+							const url = new URL(page.url);
+							url.searchParams.delete('tag_ids');
 
-						filteredTags.map((tag_id: string) => {
-							url.searchParams.append('tag_ids', tag_id);
-						});
-						goto(url, { keepFocus: true, invalidateAll: true });
-					}
-				}}
-			/>
-			<StateSelection
-				bind:states={filteredStates}
-				onOpenChange={(e: boolean) => {
-					if (!e) {
-						const url = new URL(page.url);
-						url.searchParams.delete('state_ids');
-						filteredStates.map((state_id: string) => {
-							url.searchParams.append('state_ids', state_id);
-						});
-						goto(url, { keepFocus: true, invalidateAll: true });
-					}
-				}}
-			/>
+							filteredTags.map((tag_id: string) => {
+								url.searchParams.append('tag_ids', tag_id);
+							});
+							goto(url, { keepFocus: true, invalidateAll: true });
+						}
+					}}
+				/>
+				<StateSelection
+					bind:states={filteredStates}
+					onOpenChange={(e: boolean) => {
+						if (!e) {
+							const url = new URL(page.url);
+							url.searchParams.delete('state_ids');
+							filteredStates.map((state_id: string) => {
+								url.searchParams.append('state_ids', state_id);
+							});
+							goto(url, { keepFocus: true, invalidateAll: true });
+						}
+					}}
+				/>
+			</div>
 		</div>
 
-		<div class="flex flex-row justify-between p-5">
-			<div class="item-center ml-5 flex flex-col p-2">
+		<div class="b flex flex-row gap-32 p-5">
+			<div class="item-center flex w-1/2 flex-col items-center p-2">
 				<p class="item-center text-lg font-medium">Avg. Score</p>
-				<p class="text-5xl">{data?.performance?.overall_avg_score}%</p>
+				<p class="text-5xl">{data?.performance?.overall_score_percent}%</p>
 			</div>
-			<div class="mr-10 flex flex-col p-2">
+			<div class="mr-10 flex w-1/2 flex-col items-center p-2">
 				<p class="text-lg font-medium">Avg. Duration</p>
 				<p class="text-5xl">{data?.performance?.overall_avg_time_minutes}</p>
 			</div>

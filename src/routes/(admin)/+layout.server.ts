@@ -45,7 +45,7 @@ export const load: PageServerLoad = async () => {
 	});
 
 	if (!responseDistricts.ok) {
-		console.error('Failed to fetch states:', responseDistricts.status, responseDistricts.statusText);
+		console.error('Failed to fetch districts:', responseDistricts.status, responseDistricts.statusText);
 	} else {
 		districts = await responseDistricts.json();
 	}

@@ -13,7 +13,6 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const queryString = [tagParams, stateParams].filter(Boolean).join('&');
 
-
 	interface DashboardPerformance {
 		overall_score_percent: number;
 		overall_avg_time_minutes: number;
@@ -34,6 +33,20 @@ export const load: PageServerLoad = async ({ url }) => {
 		total_tests: 0
 	};
 
+	interface TestAttemptStatsType {
+		total_test_submitted: number;
+		total_test_not_submitted: number;
+		not_submitted_active: number;
+		not_submitted_inactive: number;
+	}
+
+	const testAttemptStats: TestAttemptStatsType = {
+		total_test_submitted: 0,
+		total_test_not_submitted: 0,
+		not_submitted_active: 0,
+		not_submitted_inactive: 0
+	};
+
 	const responseStats = await fetch(`${BACKEND_URL}/organization/aggregated_data`, {
 		method: 'GET',
 		headers: {
@@ -43,16 +56,19 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	if (responseStats.ok) {
 		const statsData = await responseStats.json();
-		stats.total_questions = statsData.total_questions;
-		stats.total_users = statsData.total_users;
-		stats.total_tests = statsData.total_tests;
+
+		const { total_questions = 0, total_users = 0, total_tests = 0 } = statsData ?? {};
+		Object.assign(stats, { total_questions, total_users, total_tests });
 	}
-	const responsePerformance = await fetch(`${BACKEND_URL}/candidate/overall-analytics?${queryString}`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
+	const responsePerformance = await fetch(
+		`${BACKEND_URL}/candidate/overall-analytics?${queryString}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
 		}
-	});
+	);
 
 	if (responsePerformance.ok) {
 		const performanceData = await responsePerformance.json();
@@ -61,5 +77,28 @@ export const load: PageServerLoad = async ({ url }) => {
 		performance.overall_avg_time_minutes = performanceData.overall_avg_time_minutes;
 	}
 
-	return { stats, performance };
+	const responseTestStats = await fetch(`${BACKEND_URL}/candidate/summary`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (responseTestStats.ok) {
+		const testStatsData = await responseTestStats.json();
+		const {
+			total_test_submitted = 0,
+			total_test_not_submitted = 0,
+			not_submitted_active = 0,
+			not_submitted_inactive = 0
+		} = testStatsData ?? {};
+		Object.assign(testAttemptStats, {
+			total_test_submitted,
+			total_test_not_submitted,
+			not_submitted_active,
+			not_submitted_inactive
+		});
+	}
+
+	return { stats, testAttemptStats, performance };
 };

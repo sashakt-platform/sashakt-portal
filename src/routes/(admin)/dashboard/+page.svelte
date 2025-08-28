@@ -54,7 +54,7 @@
 </script>
 
 {#snippet dataBox(title: string, description: string, count: number)}
-	<div class="m-4 w-full rounded-xl border bg-white p-4">
+	<div class="m-4 w-full rounded-xl border border-gray-100 bg-white p-4">
 		<p class="font-semibold">{title}</p>
 		<p class="text-sm">{description}</p>
 		<div class="p-12 text-5xl">{count}</div>
@@ -109,38 +109,38 @@
 						<Label for="dateStart" class="my-auto w-fit font-extralight whitespace-nowrap"
 							>Start Time</Label
 						>
-						<Input type="datetime-local" id="dateStart" name="start_time" />
+						<Input type="date" id="dateStart" name="start_time" />
 					</div>
 					<div class="flex w-1/2 flex-col gap-1">
 						<Label for="dateEnd" class="my-auto w-fit font-extralight whitespace-nowrap"
 							>End Time</Label
 						>
-						<Input type="datetime-local" id="dateEnd" name="end_time" />
+						<Input type="date" id="dateEnd" name="end_time" />
 					</div>
 				</div>
 			</div>
 		</div>
-		<hr class="my-4" />
+		<hr class="my-4 border-gray-100" />
 		<div class="flex flex-row">
 			{@render dataBox(
 				'Submitted Test Attempts',
 				'Total Test Attempts  submitted by the candidates',
-				22
+				data.testAttemptStats?.total_test_submitted
 			)}
 			{@render dataBox(
 				'Non-Submitted Test Attempts',
 				'Total Test Attempts non-submitted by the candidates',
-				22
+				data.testAttemptStats?.total_test_not_submitted
 			)}
 			{@render dataBox(
 				'Active Test Attempts',
 				'Non-Submitted Test Attempts which are currently active',
-				22
+				data.testAttemptStats?.not_submitted_active
 			)}
 			{@render dataBox(
 				'Inactive Test Attempts',
 				'Non-Submitted Test Attempts which are now inactive',
-				22
+				data.testAttemptStats?.not_submitted_inactive
 			)}
 		</div>
 	</div>

@@ -58,11 +58,11 @@
 	];
 </script>
 
-{#snippet dataBox(title: string, description: string, count: number)}
+{#snippet dataBox(title: string, description: string, count: number, percent: boolean = false)}
 	<div class="m-4 w-full rounded-xl border border-gray-100 bg-white p-4">
 		<p class="font-semibold">{title}</p>
 		<p class="text-sm">{description}</p>
-		<div class="p-12 text-5xl">{count}</div>
+		<div class="p-12 text-5xl">{count}{percent ? '%' : ''}</div>
 	</div>
 {/snippet}
 
@@ -95,13 +95,13 @@
 	</span>
 </div>
 
-<div class="m-4 flex flex-col gap-6">
+<div class="mx-8 my-4 flex flex-col gap-6">
 	<div class="flex flex-row">
 		{#each stats_box as stat (stat.title)}
 			{@render dataBox(stat.title, stat.description, stat.count)}
 		{/each}
 	</div>
-	<div class="m-4 flex flex-col rounded-xl bg-white p-4">
+	<div class="flex flex-col rounded-xl bg-white p-4">
 		<div class="flex flex-row">
 			<div class="my-auto flex w-1/2 flex-col">
 				<p class="font-semibold">Test Attempt Summary</p>
@@ -132,53 +132,47 @@
 			)}
 		</div>
 	</div>
-</div>
-<div class="m-10 flex flex-row justify-between">
-	<div class=" flex-1 rounded-xl bg-white p-4">
-		<div class="flex flex-row gap-8">
-			<div class="flex w-1/2 flex-col">
-				<p class="font-semibold">Score & Duration Analysis</p>
-				<p class="text-sm">Overall average performance of all candidates</p>
+	<div class="flex flex-row justify-between">
+		<div class=" flex-1 rounded-xl bg-white p-4">
+			<div class="flex flex-row gap-8">
+				<div class="flex w-3/4 flex-col">
+					<p class="font-semibold">Score & Duration Analysis</p>
+					<p class="text-sm">Overall average performance of all candidates</p>
+				</div>
+				<div class="right-0 flex w-1/4 flex-col items-end justify-end gap-2 sm:flex-row">
+					<StateSelection
+						bind:states={filteredStates}
+						onOpenChange={(e: boolean) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('state_ids');
+								filteredStates.map((state_id: string) => {
+									url.searchParams.append('state_ids', state_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
+				</div>
 			</div>
-			<div class=" flex w-1/2 flex-col justify-between gap-2 sm:flex-row">
-				<TagsSelection
-					bind:tags={filteredTags}
-					onOpenChange={(e: boolean) => {
-						if (!e) {
-							const url = new URL(page.url);
-							url.searchParams.delete('tag_ids');
+			<hr class="my-4 border-gray-300" />
 
-							filteredTags.map((tag_id: string) => {
-								url.searchParams.append('tag_ids', tag_id);
-							});
-							goto(url, { keepFocus: true, invalidateAll: true });
-						}
-					}}
-				/>
-				<StateSelection
-					bind:states={filteredStates}
-					onOpenChange={(e: boolean) => {
-						if (!e) {
-							const url = new URL(page.url);
-							url.searchParams.delete('state_ids');
-							filteredStates.map((state_id: string) => {
-								url.searchParams.append('state_ids', state_id);
-							});
-							goto(url, { keepFocus: true, invalidateAll: true });
-						}
-					}}
-				/>
-			</div>
-		</div>
-
-		<div class="b flex flex-row gap-32 p-5">
-			<div class="item-center flex w-1/2 flex-col items-center p-2">
-				<p class="item-center text-lg font-medium">Avg. Score</p>
-				<p class="text-5xl">{data?.performance?.overall_score_percent}%</p>
-			</div>
-			<div class="mr-10 flex w-1/2 flex-col items-center p-2">
-				<p class="text-lg font-medium">Avg. Duration</p>
-				<p class="text-5xl">{data?.performance?.overall_avg_time_minutes}</p>
+			<div class=" flex flex-row gap-8">
+				<div class="item-center flex w-1/2 flex-col items-center p-2">
+					{@render dataBox(
+						'Overall Score Percentage',
+						'Percentage of overall score achieved by candidates',
+						data.performance?.overall_score_percent,
+						true
+					)}
+				</div>
+				<div class=" flex w-1/2 flex-col items-center p-2">
+					{@render dataBox(
+						'Overall Average Time (Minutes)',
+						'Overall average time taken by candidates',
+						data.performance?.overall_avg_time_minutes
+					)}
+				</div>
 			</div>
 		</div>
 	</div>

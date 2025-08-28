@@ -15,11 +15,11 @@ export const load: PageServerLoad = async ({ url }) => {
 
 
 	interface DashboardPerformance {
-		overall_avg_score: number;
+		overall_score_percent: number;
 		overall_avg_time_minutes: number;
 	}
 	const performance: DashboardPerformance = {
-		overall_avg_score: 0,
+		overall_score_percent: 0,
 		overall_avg_time_minutes: 0
 	};
 	interface DashboardStats {
@@ -57,7 +57,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (responsePerformance.ok) {
 		const performanceData = await responsePerformance.json();
 
-		performance.overall_avg_score = performanceData.overall_avg_score;
+		performance.overall_score_percent = performanceData.overall_score_percent;
 		performance.overall_avg_time_minutes = performanceData.overall_avg_time_minutes;
 	}
 

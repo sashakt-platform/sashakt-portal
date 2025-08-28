@@ -9,6 +9,7 @@ export const load: PageServerLoad = async () => {
 
 	let states = [];
 	let tags = [];
+	let districts = [];
 
 	const responseState = await fetch(`${BACKEND_URL}/location/state/?skip=0&limit=100`, {
 		method: 'GET',
@@ -36,9 +37,24 @@ export const load: PageServerLoad = async () => {
 		tags = await responseTags.json();
 	}
 
+	const responseDistricts = await fetch(`${BACKEND_URL}/location/district/?skip=0&limit=100`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!responseDistricts.ok) {
+		console.error('Failed to fetch states:', responseDistricts.status, responseDistricts.statusText);
+	} else {
+		districts = await responseDistricts.json();
+	}
+
+
 	return {
 		user: locals.user,
 		states: states,
-		tags: tags
+		tags: tags,
+		districts: districts,
 	};
 };

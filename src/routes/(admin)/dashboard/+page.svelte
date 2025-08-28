@@ -100,29 +100,29 @@
 		<div class="flex flex-row">
 			<div class="my-auto flex w-1/2 flex-col">
 				<p class="font-semibold">Test Attempt Details</p>
-				<p class="text-sm">Details of the Attempts made by the candidate</p>
+				<p class="text-sm">Details of the attempts made by the candidate</p>
 			</div>
 		</div>
 		<hr class="my-4 border-gray-300" />
 		<div class="flex flex-row">
 			{@render dataBox(
 				'Submitted Test Attempts',
-				'Total Test Attempts  submitted by the candidates',
+				'Number of test attempts submitted by candidates',
 				data.testAttemptStats?.total_test_submitted
 			)}
 			{@render dataBox(
 				'Non-Submitted Test Attempts',
-				'Total Test Attempts non-submitted by the candidates',
+				'Number of test attempts not submitted by candidates',
 				data.testAttemptStats?.total_test_not_submitted
 			)}
 			{@render dataBox(
 				'Active Test Attempts',
-				'Non-Submitted Test Attempts which are currently active',
+				'Non-submitted test attempts that are currently active',
 				data.testAttemptStats?.not_submitted_active
 			)}
 			{@render dataBox(
 				'Inactive Test Attempts',
-				'Non-Submitted Test Attempts which are now inactive',
+				'Non-submitted test attempts that are now inactive',
 				data.testAttemptStats?.not_submitted_inactive
 			)}
 		</div>

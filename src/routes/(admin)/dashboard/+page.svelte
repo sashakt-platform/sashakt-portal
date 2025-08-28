@@ -102,25 +102,8 @@
 				<p class="font-semibold">Test Attempt Details</p>
 				<p class="text-sm">Details of the Attempts made by the candidate</p>
 			</div>
-			<div class="flex w-1/2 flex-row gap-8 rounded-lg p-4">
-				<p class="my-auto">Select Date of Range</p>
-				<div class="mx-auto flex flex-row gap-8 align-middle">
-					<div class="flex w-1/2 flex-col gap-1">
-						<Label for="dateStart" class="my-auto w-fit font-extralight whitespace-nowrap"
-							>Start Time</Label
-						>
-						<Input type="date" id="dateStart" name="start_time" />
-					</div>
-					<div class="flex w-1/2 flex-col gap-1">
-						<Label for="dateEnd" class="my-auto w-fit font-extralight whitespace-nowrap"
-							>End Time</Label
-						>
-						<Input type="date" id="dateEnd" name="end_time" />
-					</div>
-				</div>
-			</div>
 		</div>
-		<hr class="my-4 border-gray-100" />
+		<hr class="my-4 border-gray-300" />
 		<div class="flex flex-row">
 			{@render dataBox(
 				'Submitted Test Attempts',

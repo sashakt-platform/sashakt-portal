@@ -99,7 +99,7 @@
 	<div class="m-4 flex flex-col rounded-xl bg-white p-4">
 		<div class="flex flex-row">
 			<div class="my-auto flex w-1/2 flex-col">
-				<p class="font-semibold">Test Attempt Details</p>
+				<p class="font-semibold">Test Attempt Summary</p>
 				<p class="text-sm">Details of the attempts made by the candidate</p>
 			</div>
 		</div>

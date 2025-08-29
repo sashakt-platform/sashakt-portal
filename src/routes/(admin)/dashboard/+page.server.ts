@@ -4,14 +4,12 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = getSessionTokenCookie();
-	const tagIdsList = url.searchParams.getAll('tag_ids') || [];
-	const tagParams =
-		tagIdsList.length > 0 ? tagIdsList.map((tagId) => `tag_ids=${tagId}`).join('&') : '';
+
 	const statesList = url.searchParams.getAll('state_ids') || [];
 	const stateParams =
 		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
 
-	const queryString = [tagParams, stateParams].filter(Boolean).join('&');
+	const queryString = [stateParams].filter(Boolean);
 
 	interface OverallAnalytics {
 		overall_score_percent: number;

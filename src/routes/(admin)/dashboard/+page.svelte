@@ -2,14 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import StateSelection from '$lib/components/StateSelection.svelte';
-	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
 
-	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
 
 	const information = [

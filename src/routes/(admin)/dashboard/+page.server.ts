@@ -2,8 +2,23 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
 	const token = getSessionTokenCookie();
+
+	const statesList = url.searchParams.getAll('state_ids') || [];
+	const stateParams =
+		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
+
+	const queryString = [stateParams].filter(Boolean);
+
+	interface OverallAnalytics {
+		overall_score_percent: number;
+		overall_avg_time_minutes: number;
+	}
+	const overallAnalyticsStats: OverallAnalytics = {
+		overall_score_percent: 0,
+		overall_avg_time_minutes: 0
+	};
 	interface DashboardStats {
 		total_questions: number;
 		total_users: number;
@@ -43,6 +58,26 @@ export const load: PageServerLoad = async () => {
 		const { total_questions = 0, total_users = 0, total_tests = 0 } = statsData ?? {};
 		Object.assign(stats, { total_questions, total_users, total_tests });
 	}
+	const responsePerformance = await fetch(
+		`${BACKEND_URL}/candidate/overall-analytics?${queryString}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		}
+	);
+
+	if (responsePerformance.ok) {
+		const overallAnalyticsData = await responsePerformance.json();
+
+		const { overall_score_percent = 0, overall_avg_time_minutes = 0 } = overallAnalyticsData ?? {};
+
+		Object.assign(overallAnalyticsStats, {
+			overall_score_percent,
+			overall_avg_time_minutes
+		});
+	}
 
 	const responseTestStats = await fetch(`${BACKEND_URL}/candidate/summary`, {
 		method: 'GET',
@@ -67,5 +102,5 @@ export const load: PageServerLoad = async () => {
 		});
 	}
 
-	return { stats, testAttemptStats };
+	return { stats, testAttemptStats, overallAnalyticsStats };
 };

@@ -80,6 +80,7 @@ export const createTestColumns = (
 				entityName: isTemplate ? 'Test Template' : 'Test Session',
 				editUrl: `${baseUrl}/${test.id}/`,
 				deleteUrl: `${baseUrl}/${test.id}?/delete`,
+				downloadQR: `${testTakerUrl}/test/${test.link}`,
 				customActions,
 				onDelete: () => onDelete(test.id)
 			});

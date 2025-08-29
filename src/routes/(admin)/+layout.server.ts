@@ -10,6 +10,7 @@ export const load: PageServerLoad = async () => {
 	let states = [];
 	let tags = [];
 	let districts = [];
+	let tagtypes = [];
 
 	const responseState = await fetch(`${BACKEND_URL}/location/state/?skip=0&limit=100`, {
 		method: 'GET',
@@ -50,11 +51,25 @@ export const load: PageServerLoad = async () => {
 		districts = await responseDistricts.json();
 	}
 
+	const responseTagtypes = await fetch(`${BACKEND_URL}/tagtype/?skip=0&limit=100`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!responseTagtypes.ok) {
+		console.error('Failed to fetch tagtypes:', responseTagtypes.status, responseTagtypes.statusText);
+	} else {
+		tagtypes = await responseTagtypes.json();
+	}
+
 
 	return {
 		user: locals.user,
 		states: states,
 		tags: tags,
 		districts: districts,
+		tagtypes: tagtypes,
 	};
 };

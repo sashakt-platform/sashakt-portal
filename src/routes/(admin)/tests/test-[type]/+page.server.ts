@@ -17,6 +17,9 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	const tagIdsList = url.searchParams.getAll('tag_ids') || [];
 	const tagParams =
 		tagIdsList.length > 0 ? tagIdsList.map((tagId) => `tag_ids=${tagId}`).join('&') : '';
+	const tagtypeIdsList = url.searchParams.getAll('tag_type_ids') || [];
+	const tagtypeParams =
+		tagtypeIdsList.length > 0 ? tagtypeIdsList.map((tagtypeId) => `tag_type_ids=${tagtypeId}`).join('&') : '';
 	const statesList = url.searchParams.getAll('state_ids') || [];
 	const stateParams =
 		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
@@ -35,7 +38,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	});
 
 	// add tag and state params if they exist
-	const queryString = [queryParams.toString(), tagParams, stateParams, districtParams].filter(Boolean).join('&');
+	const queryString = [queryParams.toString(), tagParams, stateParams, districtParams, tagtypeParams].filter(Boolean).join('&');
 
 	const token = getSessionTokenCookie();
 	const res = await fetch(`${BACKEND_URL}/test/?${queryString}`, {

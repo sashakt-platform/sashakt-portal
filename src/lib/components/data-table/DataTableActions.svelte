@@ -1,6 +1,7 @@
 <script lang="ts">
 	import EllipsisIcon from '@lucide/svelte/icons/ellipsis';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import Download from '@lucide/svelte/icons/download';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
@@ -8,6 +9,7 @@
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Copy from '@lucide/svelte/icons/copy';
+	import QrCode from '../QR-code.svelte';
 
 	interface CustomAction {
 		label: string;
@@ -21,12 +23,14 @@
 		entityName = 'Item',
 		editUrl,
 		deleteUrl,
+		downloadQR,
 		customActions = [],
 		onDelete
 	}: {
 		entityName?: string;
 		editUrl: string;
 		deleteUrl: string;
+		downloadQR?: string;
 		customActions?: CustomAction[];
 		onDelete?: () => void;
 	} = $props();
@@ -77,6 +81,13 @@
 			<Trash_2 />
 			Delete
 		</DropdownMenu.Item>
+
+		{#if downloadQR}
+			<DropdownMenu.Item class="cursor-pointer">
+				<Download />
+				<QrCode testLink={downloadQR} />
+			</DropdownMenu.Item>
+		{/if}
 
 		{#each customActions as action}
 			{#if action.href && action.method === 'POST'}

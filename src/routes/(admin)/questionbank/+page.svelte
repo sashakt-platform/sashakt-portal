@@ -14,11 +14,13 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
 	let filteredTags: string[] = $state([]);
 	let filteredStates: string[] = $state([]);
+	let filteredTagtypes: string[] = $state([]);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	// Extract data and pagination info
@@ -36,7 +38,15 @@
 
 	$effect(() => {
 		// check if there are any meaningful search/filter parameters (exclude pagination params)
-		const meaningfulParams = ['search', 'name', 'tag_ids', 'state_ids', 'sortBy', 'sortOrder'];
+		const meaningfulParams = [
+			'search',
+			'name',
+			'tag_ids',
+			'state_ids',
+			'tag_type_ds',
+			'sortBy',
+			'sortOrder'
+		];
 		const hasFilters = meaningfulParams.some((param) => {
 			const value = page.url.searchParams.get(param);
 			// Only consider it a filter if the parameter has a non-empty value
@@ -46,8 +56,10 @@
 		// also check if there are multiple tag_ids or state_ids
 		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
 		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
+		const hasTagtypeFilters = page.url.searchParams.getAll('tag_type_ids').length > 0;
 
-		const result = totalItems === 0 && !hasFilters && !hasTagFilters && !hasStateFilters;
+		const result =
+			totalItems === 0 && !hasFilters && !hasTagFilters && !hasStateFilters && !hasTagtypeFilters;
 
 		// update the state
 		noQuestionCreatedYet = result;
@@ -66,9 +78,7 @@
 	}
 
 	// Create columns (reactive)
-	const columns = $derived(
-		createQuestionColumns(sortBy, sortOrder, handleSort)
-	);
+	const columns = $derived(createQuestionColumns(sortBy, sortOrder, handleSort));
 
 	// Render expanded row content
 	function expandedRowContent(question: any) {
@@ -223,6 +233,22 @@
 								url.searchParams.set('page', '1');
 								filteredStates.map((state_id: string) => {
 									url.searchParams.append('state_ids', state_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
+				</div>
+				<div class="w-1/3">
+					<TagTypeSelection
+						bind:tagtypes={filteredTagtypes}
+						onOpenChange={(e: boolean) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('tag_type_ids');
+								url.searchParams.set('page', '1');
+								filteredTagtypes.map((tagtype_id: string) => {
+									url.searchParams.append('tag_type_ids', tagtype_id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

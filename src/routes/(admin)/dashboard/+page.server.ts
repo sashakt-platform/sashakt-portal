@@ -16,6 +16,20 @@ export const load: PageServerLoad = async () => {
 		total_tests: 0
 	};
 
+	interface TestAttemptStatsType {
+		total_test_submitted: number;
+		total_test_not_submitted: number;
+		not_submitted_active: number;
+		not_submitted_inactive: number;
+	}
+
+	const testAttemptStats: TestAttemptStatsType = {
+		total_test_submitted: 0,
+		total_test_not_submitted: 0,
+		not_submitted_active: 0,
+		not_submitted_inactive: 0
+	};
+
 	const responseStats = await fetch(`${BACKEND_URL}/organization/aggregated_data`, {
 		method: 'GET',
 		headers: {
@@ -25,10 +39,33 @@ export const load: PageServerLoad = async () => {
 
 	if (responseStats.ok) {
 		const statsData = await responseStats.json();
-		stats.total_questions = statsData.total_questions;
-		stats.total_users = statsData.total_users;
-		stats.total_tests = statsData.total_tests;
+
+		const { total_questions = 0, total_users = 0, total_tests = 0 } = statsData ?? {};
+		Object.assign(stats, { total_questions, total_users, total_tests });
 	}
 
-	return { stats };
+	const responseTestStats = await fetch(`${BACKEND_URL}/candidate/summary`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (responseTestStats.ok) {
+		const testStatsData = await responseTestStats.json();
+		const {
+			total_test_submitted = 0,
+			total_test_not_submitted = 0,
+			not_submitted_active = 0,
+			not_submitted_inactive = 0
+		} = testStatsData ?? {};
+		Object.assign(testAttemptStats, {
+			total_test_submitted,
+			total_test_not_submitted,
+			not_submitted_active,
+			not_submitted_inactive
+		});
+	}
+
+	return { stats, testAttemptStats };
 };

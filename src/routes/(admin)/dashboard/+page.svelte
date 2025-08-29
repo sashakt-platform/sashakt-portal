@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Label from '$lib/components/ui/label/label.svelte';
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
@@ -52,6 +51,14 @@
 	];
 </script>
 
+{#snippet dataBox(title: string, description: string, count: number)}
+	<div class="m-4 w-full rounded-xl border border-gray-100 bg-white p-4">
+		<p class="font-semibold">{title}</p>
+		<p class="text-sm">{description}</p>
+		<div class="p-12 text-5xl">{count}</div>
+	</div>
+{/snippet}
+
 <Dialog.Root open={false}>
 	<Dialog.Content>
 		<Dialog.Header>
@@ -81,22 +88,41 @@
 	</span>
 </div>
 
-<div>
-	<div class="mt-4 ml-10 flex w-3/4 flex-row justify-between">
-		{#each stats_box as stat}
-			<div class="m-4 w-1/3 rounded-xl bg-white p-4">
-				<p class="font-semibold">{stat.title}</p>
-				<p class="text-sm">{stat.description}</p>
-				<div class="p-12 text-5xl">{stat.count}</div>
-			</div>
+<div class="m-4 flex flex-col gap-6">
+	<div class="flex flex-row">
+		{#each stats_box as stat (stat.title)}
+			{@render dataBox(stat.title, stat.description, stat.count)}
 		{/each}
 	</div>
-	<!-- <div class="mt-4 ml-10 flex w-3/4 flex-row justify-between"> -->
-	<!-- 	<div class="m-4 mb-10 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
-	<!-- 		<div class="h-screen w-full"></div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="m-4 h-1/2 w-1/2 rounded-xl bg-white p-4"> -->
-	<!-- 		<div class="h-screen w-full"></div> -->
-	<!-- 	</div> -->
-	<!-- </div> -->
+	<div class="m-4 flex flex-col rounded-xl bg-white p-4">
+		<div class="flex flex-row">
+			<div class="my-auto flex w-1/2 flex-col">
+				<p class="font-semibold">Test Attempt Summary</p>
+				<p class="text-sm">Details of the attempts made by the candidate</p>
+			</div>
+		</div>
+		<hr class="my-4 border-gray-300" />
+		<div class="flex flex-row">
+			{@render dataBox(
+				'Submitted Test Attempts',
+				'Number of test attempts submitted by candidates',
+				data.testAttemptStats?.total_test_submitted
+			)}
+			{@render dataBox(
+				'Non-Submitted Test Attempts',
+				'Number of test attempts not submitted by candidates',
+				data.testAttemptStats?.total_test_not_submitted
+			)}
+			{@render dataBox(
+				'Active Test Attempts',
+				'Non-submitted test attempts that are currently active',
+				data.testAttemptStats?.not_submitted_active
+			)}
+			{@render dataBox(
+				'Inactive Test Attempts',
+				'Non-submitted test attempts that are now inactive',
+				data.testAttemptStats?.not_submitted_inactive
+			)}
+		</div>
+	</div>
 </div>

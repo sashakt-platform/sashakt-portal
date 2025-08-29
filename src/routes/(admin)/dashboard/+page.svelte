@@ -137,7 +137,7 @@
 			<div class="flex flex-row gap-8">
 				<div class="flex w-3/4 flex-col">
 					<p class="font-semibold">Score & Duration Analysis</p>
-					<p class="text-sm">Overall average performance of all candidates</p>
+					<p class="text-sm">Overall performance of all candidates</p>
 				</div>
 				<div class="right-0 flex w-1/4 flex-col items-end justify-end gap-2 sm:flex-row">
 					<StateSelection
@@ -162,15 +162,15 @@
 					{@render dataBox(
 						'Overall Score Percentage',
 						'Percentage of overall score achieved by candidates',
-						data.performance?.overall_score_percent,
+						data.overallAnalyticsStats?.overall_score_percent,
 						true
 					)}
 				</div>
 				<div class=" flex w-1/2 flex-col items-center p-2">
 					{@render dataBox(
 						'Overall Average Time (Minutes)',
-						'Overall average time taken by candidates',
-						data.performance?.overall_avg_time_minutes
+						'Overall average time taken by candidates to complete test',
+						data.overallAnalyticsStats?.overall_avg_time_minutes
 					)}
 				</div>
 			</div>

@@ -13,11 +13,11 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const queryString = [tagParams, stateParams].filter(Boolean).join('&');
 
-	interface DashboardPerformance {
+	interface OverallAnalytics {
 		overall_score_percent: number;
 		overall_avg_time_minutes: number;
 	}
-	const performance: DashboardPerformance = {
+	const overallAnalyticsStats: OverallAnalytics = {
 		overall_score_percent: 0,
 		overall_avg_time_minutes: 0
 	};
@@ -71,10 +71,14 @@ export const load: PageServerLoad = async ({ url }) => {
 	);
 
 	if (responsePerformance.ok) {
-		const performanceData = await responsePerformance.json();
+		const overallAnalyticsData = await responsePerformance.json();
 
-		performance.overall_score_percent = performanceData.overall_score_percent;
-		performance.overall_avg_time_minutes = performanceData.overall_avg_time_minutes;
+		const { overall_score_percent = 0, overall_avg_time_minutes = 0 } = overallAnalyticsData ?? {};
+
+		Object.assign(overallAnalyticsStats, {
+			overall_score_percent,
+			overall_avg_time_minutes
+		});
 	}
 
 	const responseTestStats = await fetch(`${BACKEND_URL}/candidate/summary`, {
@@ -100,5 +104,5 @@ export const load: PageServerLoad = async ({ url }) => {
 		});
 	}
 
-	return { stats, testAttemptStats, performance };
+	return { stats, testAttemptStats, overallAnalyticsStats };
 };

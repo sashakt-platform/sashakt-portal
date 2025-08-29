@@ -9,7 +9,16 @@ export const load: PageServerLoad = async ({ url }) => {
 	const stateParams =
 		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
 
-	const queryString = [stateParams].filter(Boolean);
+	const tagtypeIdsList = url.searchParams.getAll('tag_type_ids') || [];
+	const tagtypeParams =
+		tagtypeIdsList.length > 0 ? tagtypeIdsList.map((tagtypeId) => `tag_type_ids=${tagtypeId}`).join('&') : '';
+
+	const districtsList = url.searchParams.getAll('district_ids') || [];
+	const districtParams =
+		districtsList.length > 0 ? districtsList.map((district) => `district_ids=${district}`).join('&') : '';
+
+	const queryString = [stateParams, tagtypeParams, districtParams].filter(Boolean).join('&');
+
 
 	interface OverallAnalytics {
 		overall_score_percent: number;

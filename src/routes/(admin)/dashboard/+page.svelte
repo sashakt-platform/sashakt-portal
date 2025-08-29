@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
+	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Info from '@lucide/svelte/icons/info';
@@ -9,6 +11,8 @@
 	let { data } = $props();
 
 	let filteredStates: string[] = $state([]);
+	let filteredTagtypes: string[] = $state([]);
+	let filteredDistricts: string[] = $state([]);
 
 	const information = [
 		{
@@ -137,7 +141,7 @@
 					<p class="font-semibold">Score & Duration Analysis</p>
 					<p class="text-sm">Overall performance of all candidates</p>
 				</div>
-				<div class="right-0 flex w-1/4 flex-col items-end justify-end gap-2 sm:flex-row">
+				<div class="w-1/3">
 					<StateSelection
 						bind:states={filteredStates}
 						onOpenChange={(e: boolean) => {
@@ -146,6 +150,38 @@
 								url.searchParams.delete('state_ids');
 								filteredStates.map((state_id: string) => {
 									url.searchParams.append('state_ids', state_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
+				</div>
+
+				<div class="w-1/3">
+					<TagTypeSelection
+						bind:tagtypes={filteredTagtypes}
+						onOpenChange={(e: boolean) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('tag_type_ids');
+								filteredTagtypes.map((tagtype_id: string) => {
+									url.searchParams.append('tag_type_ids', tagtype_id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
+				</div>
+
+				<div class="w-1/3">
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						onOpenChange={(e: boolean) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('district_ids');
+								filteredDistricts.map((district_id: string) => {
+									url.searchParams.append('district_ids', district_id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

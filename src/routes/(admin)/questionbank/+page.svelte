@@ -43,7 +43,7 @@
 			'name',
 			'tag_ids',
 			'state_ids',
-			'tag_type_ds',
+			'tag_type_ids',
 			'sortBy',
 			'sortOrder'
 		];

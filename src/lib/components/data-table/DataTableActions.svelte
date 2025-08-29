@@ -30,7 +30,7 @@
 		entityName?: string;
 		editUrl: string;
 		deleteUrl: string;
-		downloadQR: string;
+		downloadQR?: string;
 		customActions?: CustomAction[];
 		onDelete?: () => void;
 	} = $props();
@@ -82,10 +82,12 @@
 			Delete
 		</DropdownMenu.Item>
 
-		<DropdownMenu.Item class="cursor-pointer">
-			<Download />
-			<QrCode testLink={downloadQR} />
-		</DropdownMenu.Item>
+		{#if downloadQR}
+			<DropdownMenu.Item class="cursor-pointer">
+				<Download />
+				<QrCode testLink={downloadQR} />
+			</DropdownMenu.Item>
+		{/if}
 
 		{#each customActions as action}
 			{#if action.href && action.method === 'POST'}

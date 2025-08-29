@@ -3,7 +3,10 @@
 	import { onMount } from 'svelte';
 
 	const { testLink }: { testLink: string } = $props();
-	const fileName = testLink.split('/test/')[1];
+	const fileName = (() => {
+		const part = testLink.split('/test/')[1] ?? '';
+		return part.trim() ? part : 'test-qr';
+	})();
 
 	const config = {
 		data: testLink,
@@ -13,9 +16,16 @@
 	};
 
 	let src = $state('');
+	let ready = $state(false);
 
 	onMount(async () => {
-		src = await createQrPngDataUrl(config);
+		try {
+			src = await createQrPngDataUrl(config);
+		} catch (e) {
+			console.error('QR generation failed', e);
+		} finally {
+			ready = true;
+		}
 	});
 </script>
 

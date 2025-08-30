@@ -58,13 +58,19 @@
 	</Popover.Trigger>
 	<Popover.Content class="w-fit p-0">
 		<Command.Root>
-			<Command.Input placeholder="Search States..." />
+			<Command.Input
+				placeholder="Search States..."
+				oninput={(e: Event) => {
+					const query = (e.target as HTMLInputElement).value.toLowerCase();
+					console.log('searching for', query);
+				}}
+			/>
 			<Command.List>
 				<Command.Empty>No state found.</Command.Empty>
 				<Command.Group>
 					{#each stateList as state (state.id)}
 						<Command.Item
-							value={String(state.id)}
+							value={String(state.name)}
 							onSelect={() => {
 								console.log('selected', state.id);
 								const stateId = String(state.id);

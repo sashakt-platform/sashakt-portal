@@ -209,10 +209,13 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
+			const failMessage = await response.json();
 			redirect(
-				500,
 				'/questionbank',
-				{ type: 'error', message: `Failed to delete question: ${response.statusText}` },
+				{
+					type: 'error',
+					message: `${failMessage.detail || response.statusText}`
+				},
 				cookies
 			);
 		}

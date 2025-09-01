@@ -7,12 +7,14 @@
 
 	let { tagtypes = $bindable(), ...rest } = $props();
 
+	const placeholder = 'Select Type of Tags';
+
 	const selectedTagtypes = $derived(
 		tagtypes?.length
 			? tagtypeList
 					.filter((tagtype) => tagtypes.includes(String(tagtype.id)))
 					.map((tagtype) => tagtype.name)
-			: 'Select tagtypes'
+			: placeholder
 	);
 </script>
 
@@ -36,7 +38,7 @@
 	</Select.Trigger>
 	<Select.Content>
 		<Select.Group>
-			<Select.GroupHeading>Select Tagtypes</Select.GroupHeading>
+			<Select.GroupHeading>{placeholder}</Select.GroupHeading>
 			{#each tagtypeList as tagtype (tagtype.id)}
 				<Select.Item value={String(tagtype.id)} label={tagtype.name} />
 			{/each}

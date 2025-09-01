@@ -186,7 +186,7 @@
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
 			<div class="flex flex-row items-center gap-4">
-				<div class="w-1/3">
+				<div class="w-1/3 mr-8">
 					<Input
 						placeholder="Search questions..."
 						value={search}

@@ -16,7 +16,7 @@
 </script>
 
 {#snippet myBadge(children: any)}
-	<Badge variant="default" style={'background-color:#3587B4'} class="m-1 rounded-sm  p-2"
+	<Badge variant="default" style="background-color:#3587B4" class="m-1 rounded-sm  p-2"
 		>{children}</Badge
 	>
 {/snippet}
@@ -36,7 +36,7 @@
 	<Select.Content>
 		<Select.Group>
 			<Select.GroupHeading>Select districts</Select.GroupHeading>
-			{#each districtList as district}
+			{#each districtList as district (district.id)}
 				<Select.Item value={String(district.id)} label={district.name} />
 			{/each}
 		</Select.Group>

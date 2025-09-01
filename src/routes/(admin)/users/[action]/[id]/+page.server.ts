@@ -183,8 +183,15 @@ export const actions: Actions = {
 		});
 
 		if (!res.ok) {
-			console.error(`Failed to delete user: ${res.statusText}`);
-			return fail(500, { error: 'Failed to delete user' });
+			const errorMessage = await res.json();
+			redirect(
+				'/users',
+				{
+					type: 'error',
+					message: `${errorMessage.detail || res.statusText}`
+				},
+				cookies
+			);
 		}
 		throw redirect(
 			303,

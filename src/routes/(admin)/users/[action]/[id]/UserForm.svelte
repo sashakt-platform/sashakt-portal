@@ -6,6 +6,7 @@
 	import { createUserSchema, editUserSchema, type FormSchema } from './schema';
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import StateSelection from '$lib/components/StateSelection.svelte';
 
 	let { data }: { data: any } = $props();
 
@@ -14,10 +15,15 @@
 	const schema = isEditMode ? editUserSchema : createUserSchema;
 
 	const form = superForm(userData || data.form, {
-		validators: zodClient(schema)
+		validators: zodClient(schema),
+		dataType: 'json'
 	});
 
 	const { form: formData, enhance } = form;
+
+	if (userData) {
+		$formData.state_ids = userData?.states?.map((state: { id: String }) => String(state.id)) || [];
+	}
 </script>
 
 <form method="POST" use:enhance action="?/save">
@@ -126,6 +132,20 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
+	{#if data.roles
+		.find((role) => role.id === $formData.role_id)
+		?.label?.toLowerCase()
+		.includes('state')}
+		<Form.Field {form} name="state_ids">
+			<Form.Control>
+				{#snippet children({ props })}
+					<Form.Label>States</Form.Label>
+					<StateSelection {...props} bind:states={$formData.state_ids} />
+				{/snippet}
+			</Form.Control>
+			<Form.FieldErrors />
+		</Form.Field>
+	{/if}
 	<Form.Field {form} name="is_active">
 		<Form.Control>
 			{#snippet children({ props })}

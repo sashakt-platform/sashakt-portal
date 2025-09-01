@@ -135,7 +135,7 @@
 	{#if data.roles
 		.find((role) => role.id === $formData.role_id)
 		?.label?.toLowerCase()
-		.includes('state')}
+		?.includes('state')}
 		<Form.Field {form} name="state_ids">
 			<Form.Control>
 				{#snippet children({ props })}

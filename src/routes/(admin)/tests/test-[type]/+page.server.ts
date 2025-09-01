@@ -23,9 +23,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	const statesList = url.searchParams.getAll('state_ids') || [];
 	const stateParams =
 		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
-	const districtsList = url.searchParams.getAll('district_ids') || [];
-	const districtParams =
-		districtsList.length > 0 ? districtsList.map((district) => `district_ids=${district}`).join('&') : '';
+
 
 	// build query string for DataTable pagination/sorting
 	const queryParams = new URLSearchParams({
@@ -38,7 +36,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	});
 
 	// add tag and state params if they exist
-	const queryString = [queryParams.toString(), tagParams, stateParams, districtParams, tagtypeParams].filter(Boolean).join('&');
+	const queryString = [queryParams.toString(), tagParams, stateParams, tagtypeParams].filter(Boolean).join('&');
 
 	const token = getSessionTokenCookie();
 	const res = await fetch(`${BACKEND_URL}/test/?${queryString}`, {

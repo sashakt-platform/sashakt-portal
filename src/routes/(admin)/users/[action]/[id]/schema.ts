@@ -8,6 +8,7 @@ const baseUserSchema = z.object({
 	phone: z.string().optional(),
 	organization_id: z.number({ message: 'Organization is required' }),
 	role_id: z.number({ message: 'Role is required' }),
+	state_ids: z.array(z.string()).optional(),
 	is_active: z.boolean().optional().default(true)
 });
 

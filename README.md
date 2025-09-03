@@ -26,3 +26,19 @@ You can preview the production build with `npm run preview`.
 ## Deployment
 
 TBD
+
+
+
+##  Vitest UI
+
+Vitest UI lets you view and interact with tests in the browser.
+
+Install:
+```bash
+npm i -D @vitest/ui
+```
+
+Run with UI:
+```bash
+vitest --ui
+```

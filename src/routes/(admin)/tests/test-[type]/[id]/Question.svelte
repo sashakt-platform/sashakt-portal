@@ -1,15 +1,13 @@
-<script>
+<script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import QuestionDialog from './QuestionDialog.svelte';
-	import { columns } from './question_table/columns.js';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import Eye from '@lucide/svelte/icons/eye';
-	let { formData, questions } = $props();
+	let { rowSelection = $bindable(), questions, name, isTemplate } = $props();
 	let dialogOpen = $state(false);
 </script>
 
-<QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />
+<QuestionDialog bind:open={dialogOpen} {questions} bind:rowSelection {isTemplate} />
 
 <div class="mx-auto flex h-dvh">
 	<div class=" mx-auto w-full p-20">
@@ -48,19 +46,19 @@
 			<div class="flex h-full w-full flex-row">
 				<div class="flex w-fit flex-col">
 					<div class="flex">
-						<p class="font-bold">{$formData.name}</p>
+						<p class="font-bold">{name}</p>
 					</div>
 					<div class="flex flex-row items-center text-sm">
 						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold"
-							>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
+							>{isTemplate ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
 						>
 						<span class="text-gray-500"
-							>{$formData.question_revision_ids.length}
-							{$formData.question_revision_ids.length == 1 ? 'question' : 'questions'}
+							>{Object.entries(rowSelection).length}
+							{Object.entries(rowSelection).length == 1 ? 'question' : 'questions'}
 						</span>
 					</div>
 				</div>
-				{#if $formData.question_revision_ids.length != 0}
+				{#if Object.entries(rowSelection).length}
 					<div class="my-auto ml-auto flex">
 						<Button onclick={() => (dialogOpen = true)}>Select More Questions</Button>
 					</div>
@@ -70,11 +68,12 @@
 		<div
 			class="my-auto flex h-full justify-center rounded-t-sm rounded-b-xl border bg-white p-4 shadow-lg"
 		>
-			{#if $formData.question_revision_ids.length == 0}
+			{#if Object.entries(rowSelection).length === 0}
 				<div class="my-auto text-center">
+					{Object.entries(rowSelection)}
 					<p class="text-lg font-bold">Shortlist your Questions</p>
 					<p class="text-sm text-gray-400">
-						Add the relevant questions to your test {$formData.is_template ? 'template' : ''}
+						Add the relevant questions to your test {isTemplate ? 'template' : ''}
 					</p>
 					<Button class="mt-6 bg-[#0369A1]" onclick={() => (dialogOpen = true)}
 						>Select from question bank</Button
@@ -82,7 +81,7 @@
 				</div>
 			{:else}
 				<div class="flex h-full w-full flex-col overflow-auto">
-					{#each questions.items.filter( (row) => $formData.question_revision_ids.includes(row.latest_question_revision_id) ) as d (d.latest_question_revision_id)}
+					{#each Object.entries(rowSelection) as [key, value], index}
 						<div class="group mx-2 mt-2 flex flex-row">
 							<div class="my-auto w-fit">
 								<GripVertical />
@@ -91,23 +90,22 @@
 								class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
 							>
 								<p class="w-4/6">
-									{d.question_text}
+									{value.question_text}
 								</p>
 								<span class="w-2/6">
-									{#if d.tags.length > 0}
-										<p>
-											<span class="font-bold">Tags:</span>
-											{d.tags.map((tag) => tag?.name).join(', ')}
-										</p>
-									{/if}
+									<p>
+										<span class="font-bold">Tags:</span>
+										{value.tags || 'No tags'}
+									</p>
 								</span>
 							</div>
 							<div class="my-auto ml-2 hidden w-fit group-hover:block">
 								<button
+									type="button"
 									onclick={(e) => {
-										$formData.question_revision_ids = $formData.question_revision_ids.filter(
-											(id) => id !== d.latest_question_revision_id
-										);
+										const newSelection = { ...rowSelection };
+										delete newSelection[key];
+										rowSelection = newSelection;
 									}}
 									class="cursor-pointer"
 								>

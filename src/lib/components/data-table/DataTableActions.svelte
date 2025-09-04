@@ -6,6 +6,7 @@
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
+	import QrCode from '@lucide/svelte/icons/qr-code';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Copy from '@lucide/svelte/icons/copy';
 
@@ -49,6 +50,8 @@
 				return ExternalLink;
 			case 'copy':
 				return Copy;
+			case 'qr-code':
+				return QrCode;
 			default:
 				return undefined;
 		}

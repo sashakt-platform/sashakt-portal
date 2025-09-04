@@ -126,6 +126,7 @@ export const actions: Actions = {
 				full_name: form.data.full_name,
 				email: form.data.email,
 				phone: form.data.phone || '',
+				state_ids: form.data.state_ids,
 				organization_id: form.data.organization_id.toString(),
 				role_id: form.data.role_id.toString(),
 				is_active: form.data.is_active ? 'true' : 'false'
@@ -156,6 +157,7 @@ export const actions: Actions = {
 					email: form.data.email,
 					password: form.data.password,
 					phone: form.data.phone || '',
+					state_ids: form.data.state_ids,
 					organization_id: form.data.organization_id.toString(),
 					role_id: form.data.role_id.toString(),
 					is_active: form.data.is_active ? 'true' : 'false'
@@ -165,7 +167,7 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const err = await res.json();
-			form.errors = { password: [err.detail[0].msg] };
+			form.errors = { email: [err.detail] };
 			return fail(401, { form });
 		}
 
@@ -183,8 +185,15 @@ export const actions: Actions = {
 		});
 
 		if (!res.ok) {
-			console.error(`Failed to delete user: ${res.statusText}`);
-			return fail(500, { error: 'Failed to delete user' });
+			const errorMessage = await res.json();
+			redirect(
+				'/users',
+				{
+					type: 'error',
+					message: `${errorMessage.detail || res.statusText}`
+				},
+				cookies
+			);
 		}
 		throw redirect(
 			303,

@@ -40,6 +40,7 @@
 		variant="default"
 		style="background-color:#3587B4"
 		class="m-1 flex items-center gap-1 rounded-sm "
+
 	>
 		{children.name}
 		<button
@@ -142,7 +143,7 @@
 	<Select.Content>
 		<Select.Group>
 			<Select.GroupHeading>Select States</Select.GroupHeading>
-			{#each stateList as state}
+			{#each stateList as state (state.id)}
 				<Select.Item value={String(state.id)} label={state.name} />
 			{/each}
 		</Select.Group>

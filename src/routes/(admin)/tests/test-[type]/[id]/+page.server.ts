@@ -125,11 +125,10 @@ export const actions: Actions = {
 		if (!response.ok) {
 			const errorMessage = await response.json();
 			redirect(
-				500,
 				`/tests/test-${test_type}`,
 				{
 					type: 'error',
-					message: `Failed to delete test ${test_type}. Details: ${errorMessage.detail || response.statusText}`
+					message: `${errorMessage.detail || response.statusText}`
 				},
 				cookies
 			);

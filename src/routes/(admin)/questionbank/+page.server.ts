@@ -20,6 +20,9 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const statesList = url.searchParams.getAll('state_ids') || [];
 	const stateParams =
 		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
+	const tagtypeIdsList = url.searchParams.getAll('tag_type_ids') || [];
+	const tagtypeParams =
+		tagtypeIdsList.length > 0 ? tagtypeIdsList.map((tagtypeId) => `tag_type_ids=${tagtypeId}`).join('&') : '';
 
 	// build query string
 	const queryParams = new URLSearchParams({
@@ -31,7 +34,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	});
 
 	// add tag and state params if they exist
-	const queryString = [queryParams.toString(), tagParams, stateParams].filter(Boolean).join('&');
+	const queryString = [queryParams.toString(), tagParams, stateParams, tagtypeParams].filter(Boolean).join('&');
 
 	const response = await fetch(`${BACKEND_URL}/questions?${queryString}`, {
 		method: 'GET',

@@ -16,7 +16,7 @@
 </script>
 
 {#snippet myBadge(children: any)}
-	<Badge variant="default" style={'background-color:#3587B4'} class="m-1 rounded-sm  p-2"
+	<Badge variant="default" style="background-color:#3587B4" class="m-1 rounded-sm  p-2"
 		>{children}</Badge
 	>
 {/snippet}
@@ -36,7 +36,7 @@
 	<Select.Content>
 		<Select.Group>
 			<Select.GroupHeading>Select Tags</Select.GroupHeading>
-			{#each tagList as tag}
+			{#each tagList as tag (tag.id)}
 				<Select.Item
 					value={String(tag.id)}
 					label={tag.name + (tag.tag_type ? '-(' + tag.tag_type.name + ')' : '')}

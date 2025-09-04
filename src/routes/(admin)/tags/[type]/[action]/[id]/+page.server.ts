@@ -155,11 +155,14 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
+			const errorMessage = await response.json();
 			const redirectUrl = params.type === 'tag' ? '/tags?tab=tag' : '/tags?tab=tagtype';
 			redirect(
-				500,
 				redirectUrl,
-				{ type: 'error', message: `Failed to delete tag: ${response.statusText}` },
+				{
+					type: 'error',
+					message: `${errorMessage.detail || response.statusText}`
+				},
 				cookies
 			);
 		}

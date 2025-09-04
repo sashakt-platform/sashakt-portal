@@ -3,14 +3,16 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
 import type { PageServerLoad } from '../$types';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
 	const { locals } = getRequestEvent();
 	const token = getSessionTokenCookie();
 
 	let states = [];
 	let tags = [];
 
-	const responseState = await fetch(`${BACKEND_URL}/location/state/?skip=0&limit=100`, {
+	const statesearch = url.searchParams.get('state_search') || '';
+
+	const responseState = await fetch(`${BACKEND_URL}/location/state/?name=${statesearch}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

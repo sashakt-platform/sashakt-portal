@@ -17,6 +17,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
+	import type { StateFilter } from '$lib/types/filters';
 
 	const {
 		data
@@ -35,6 +36,7 @@
 		enhance,
 		submit
 	} = superForm(questionData || data.form, {
+		applyAction: 'never',
 		validators: zodClient(questionSchema),
 		dataType: 'json',
 		onSubmit: () => {
@@ -49,13 +51,18 @@
 				$formData.correct_answer.length > 1
 					? QuestionTypeEnum.MultiChoice
 					: QuestionTypeEnum.SingleChoice;
+
+			$formData.state_ids = $formData.state_ids?.map((state: any) => {
+				return String(state.id);
+			});
 		}
 	});
 
 	questionData &&
-		($formData.state_ids = questionData.locations?.map((state: any) => {
-			return String(state.state_id);
-		}));
+		($formData.state_ids = questionData.locations?.map((location: StateFilter) => ({
+			id: location.id,
+			name: location.name
+		})));
 
 	questionData &&
 		($formData.tag_ids = questionData.tags?.map((tag: any) => {

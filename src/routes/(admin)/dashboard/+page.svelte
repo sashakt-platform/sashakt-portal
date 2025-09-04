@@ -4,11 +4,12 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { type StateFilter } from '$lib/types/filters.js';
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
 
-	let filteredStates: string[] = $state([]);
+	let filteredStates: StateFilter[] = $state([]);
 
 	const information = [
 		{
@@ -144,8 +145,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
+								filteredStates.map((state: StateFilter) => {
+									url.searchParams.append('state_ids', state.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

@@ -14,11 +14,12 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import { type StateFilter } from '$lib/types/filters';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
 	let filteredTags: string[] = $state([]);
-	let filteredStates: string[] = $state([]);
+	let filteredStates: StateFilter[] = $state([]);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	// Extract data and pagination info
@@ -66,9 +67,7 @@
 	}
 
 	// Create columns (reactive)
-	const columns = $derived(
-		createQuestionColumns(sortBy, sortOrder, handleSort)
-	);
+	const columns = $derived(createQuestionColumns(sortBy, sortOrder, handleSort));
 
 	// Render expanded row content
 	function expandedRowContent(question: any) {
@@ -221,8 +220,8 @@
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
 								url.searchParams.set('page', '1');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
+								filteredStates.map((state_id: StateFilter) => {
+									url.searchParams.append('state_ids', state_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

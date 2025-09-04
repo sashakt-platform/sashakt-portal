@@ -13,6 +13,7 @@
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import type { StateFilter } from '$lib/types/filters.js';
 
 	let {
 		data
@@ -89,7 +90,7 @@
 	);
 
 	let filteredTags: string[] = $state([]);
-	let filteredStates: string[] = $state([]);
+	let filteredStates: StateFilter[] = $state([]);
 	let deleteAction: string | null = $state(null);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 </script>
@@ -197,8 +198,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
+								filteredStates.map((state_id: StateFilter) => {
+									url.searchParams.append('state_ids', state_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

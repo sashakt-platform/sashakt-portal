@@ -76,7 +76,7 @@
 			<Button
 				{...props}
 				variant="outline"
-				class="my-8  w-full justify-start "
+				class="h-10 w-full justify-start"
 				role="combobox"
 				aria-expanded={open}
 			>

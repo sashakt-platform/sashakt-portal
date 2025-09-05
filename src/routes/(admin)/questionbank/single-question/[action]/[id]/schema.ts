@@ -28,7 +28,7 @@ export const questionSchema = z.object({
 	marking_scheme: marksSchema,
 	solution: z.string().nullable().optional(),
 	organization_id: z.number().int().positive(),
-	state_ids: z.array(z.string()).default([]),
+	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	district_ids: z.array(z.string()).default([]),
 	block_ids: z.array(z.string()).default([]),
 	tag_ids: z.array(z.string()).default([]),

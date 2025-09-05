@@ -40,7 +40,6 @@
 		variant="default"
 		style="background-color:#3587B4"
 		class="m-1 flex items-center gap-1 rounded-sm "
-
 	>
 		{children.name}
 		<button
@@ -111,15 +110,21 @@
 					<Command.Item
 						value={String(state.name)}
 						onSelect={() => {
-							const stateId = state.id;
-							if (states.some((s) => s.id === stateId)) {
-								states = states.filter((s: { id: number }) => s.id !== stateId);
+							const stateId: String = String(state.id);
+							if (states.some((s: StateFilter) => s.id === stateId)) {
+								states = states.filter((s: StateFilter) => String(s.id) !== stateId);
 							} else {
-								states = states ? [...states, state] : [state];
+								states = states
+									? [...states, { id: String(state.id), name: state.name }]
+									: [{ id: String(state.id), name: state.name }];
 							}
 						}}
 					>
-						<CheckIcon class={cn(!states.some((s) => s.id === state.id) && 'text-transparent')} />
+						<CheckIcon
+							class={cn(
+								!states.some((s) => String(s.id) === String(state.id)) && 'text-transparent'
+							)}
+						/>
 						{state.name}
 					</Command.Item>
 				{/each}

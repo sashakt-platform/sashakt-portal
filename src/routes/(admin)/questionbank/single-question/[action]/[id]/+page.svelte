@@ -51,17 +51,13 @@
 				$formData.correct_answer.length > 1
 					? QuestionTypeEnum.MultiChoice
 					: QuestionTypeEnum.SingleChoice;
-
-			$formData.state_ids = $formData.state_ids?.map((state: any) => {
-				return String(state.id);
-			});
 		}
 	});
 
 	questionData &&
 		($formData.state_ids = questionData.locations?.map((location: StateFilter) => ({
-			id: location.id,
-			name: location.name
+			id: String(location.state_id),
+			name: location.state_name
 		})));
 
 	questionData &&

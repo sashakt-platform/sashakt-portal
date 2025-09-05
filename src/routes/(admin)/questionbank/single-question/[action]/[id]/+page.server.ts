@@ -76,6 +76,11 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
+		const transformedFormData = {
+			...form.data,
+			state_ids: form.data.state_ids.map((s) => s.id)
+		};
+
 		if (params.id === 'new') {
 			const response = await fetch(`${BACKEND_URL}/questions`, {
 				method: 'POST',
@@ -83,7 +88,7 @@ export const actions: Actions = {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify(form.data)
+				body: JSON.stringify(transformedFormData)
 			});
 
 			if (!response.ok) {
@@ -144,7 +149,7 @@ export const actions: Actions = {
 
 			// Transform state_ids array into the required format
 			const stateDataArray = form.data.state_ids.map((stateId) => ({
-				state_id: stateId
+				state_id: stateId.id
 			}));
 
 			// Send the transformed array to the API

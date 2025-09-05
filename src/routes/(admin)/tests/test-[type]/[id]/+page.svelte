@@ -42,9 +42,6 @@
 			if ($formData.is_template) {
 				$formData.link = null;
 			}
-			$formData.state_ids = $formData.state_ids?.map((state: any) => {
-				return String(state.id);
-			});
 		}
 	});
 
@@ -52,7 +49,7 @@
 		$formData.tag_ids = testData?.tags?.map((tag: { id: String }) => String(tag.id)) || [];
 		$formData.state_ids =
 			testData?.states?.map((state: StateFilter) => ({
-				id: state.id,
+				id: String(state.id),
 				name: state.name
 			})) || [];
 		$formData.question_revision_ids =

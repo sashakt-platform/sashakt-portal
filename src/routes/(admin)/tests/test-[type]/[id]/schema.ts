@@ -32,7 +32,7 @@ export const testSchema = z.object({
 	template_id: z.string().nullable().optional(),
 	tag_ids: z.array(z.string()).default([]),
 	question_revision_ids: z.array(z.number()).default([]),
-	state_ids: z.array(z.string()).default([]),
+	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().optional().default(true)
 });
 

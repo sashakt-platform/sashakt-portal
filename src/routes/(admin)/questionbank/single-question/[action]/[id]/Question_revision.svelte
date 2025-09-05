@@ -27,7 +27,7 @@
 			</Dialog.Header>
 			<div class=" w-full overflow-y-auto">
 				{#if revisions && revisions.length > 0}
-					{#each revisions as revision, i}
+					{#each revisions as revision, i (revision.id || revision.created_date)}
 						{@const length = revisions.length}
 						<div class="m-10">
 							<div class="  flex items-center gap-4 text-xl">
@@ -37,11 +37,11 @@
 											class="z-10 flex h-4 w-4 items-center justify-center  rounded-full   bg-green-600 text-white "
 										/>
 									{:else}
-										<div class="bg-sky z-10 h-4 w-4 rounded-full border-1 bg-sky-100"></div>
+										<div class="z-10 h-4 w-4 rounded-full border-1 bg-sky-100"></div>
 									{/if}
 
 									{#if i < length - 1}
-										<div class="absolute h-25 w-0.5 bg-sky-100"></div>
+										<div class="absolute h-32 w-0.5 bg-sky-100"></div>
 									{/if}
 								</div>
 

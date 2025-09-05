@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { createSortableColumn } from '$lib/components/data-table/column-helpers';
-import { formatDate } from '$lib/utils';
+import { formatDate, downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 
@@ -71,6 +71,19 @@ export const createTestColumns = (
 						label: 'Conduct Test',
 						action: () => window.open(`${testTakerUrl}/test/${test.link}`, '_blank'),
 						icon: 'external-link'
+					});
+
+					customActions.push({
+						label: 'Download QR Code',
+						action: async () => {
+							const fileName = `qr-${test.name.replace(/\s+/g, '-').toLowerCase()}`;
+							try {
+								await downloadQRCode(`${testTakerUrl}/test/${test.link}`, fileName);
+							} catch (error) {
+								console.error('Failed to download QR code:', error);
+							}
+						},
+						icon: 'qr-code'
 					});
 				}
 			}

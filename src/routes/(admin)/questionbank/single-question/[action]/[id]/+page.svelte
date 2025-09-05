@@ -17,7 +17,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import QuestionRevision from './Question_revision.svelte';
 
 	const {
 		data
@@ -28,7 +28,6 @@
 			tagTypes: [];
 		};
 	} = $props();
-	let revisions = data?.questionRevisions;
 
 	const questionData: Partial<Infer<FormSchema>> | null = data?.questionData || null;
 
@@ -92,7 +91,6 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
-	let openrevisionDialog: boolean = $state(false);
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -123,63 +121,9 @@
 			<div
 				class={['text-primary my-auto ml-auto flex cursor-pointer flex-row gap-2 p-4 font-bold']}
 			>
-				<div class="m-4 flex h-1/2 flex-col gap-4">
-					<Dialog.Root bind:open={openrevisionDialog}>
-						<Label
-							onclick={() => (openrevisionDialog = true)}
-							class="text-primary flex cursor-pointer flex-row items-center text-xl font-semibold"
-							><History /> Revision History</Label
-						>
-						<Dialog.Content class=" max-h-[700px] w-[500px]   sm:h-[70%] sm:max-w-[45%]">
-							<Dialog.Header class="m-0 h-fit  border-b-2 py-4">
-								<Dialog.Title>Revision History</Dialog.Title>
-								<p class=" text-sm text-gray-600">
-									View the logs and changes done to this question
-								</p>
-							</Dialog.Header>
-							<div class=" overflow-y-auto">
-								{#if revisions && revisions.length > 0}
-									{#each revisions as revision, i}
-										{@const length = revisions.length}
-										<div class="  m-8 flex items-center gap-2 text-xl">
-											{#if revision.is_current}
-												<div
-													class="flex h-4 w-4 items-center justify-center rounded-full border-2 border-green-600 bg-green-600 text-white"
-												>
-													<CircleCheck class="h-4 w-4" />
-												</div>
-											{:else}
-												<div class="bg-sky h-4 w-4 rounded-full border-2 border-gray-400"></div>
-											{/if}
-
-											<p
-												class="flex h-8 w-15 items-center justify-center rounded-md bg-sky-50 text-[14px] font-semibold"
-											>
-												#{length - i}
-											</p>
-
-											<p class="text-grey text-grey font-[Fira_Sans] text-[18px] font-medium">
-												{new Date(revision.created_date).toLocaleDateString('en-GB', {
-													day: 'numeric',
-													month: 'short',
-													year: 'numeric'
-												}) +
-													', ' +
-													new Date(revision.created_date).toLocaleTimeString('en-GB', {
-														hour: 'numeric',
-														minute: '2-digit',
-														hour12: true
-													})}
-											</p>
-										</div>
-									{/each}
-								{:else}
-									<p>No revisions found.</p>
-								{/if}
-							</div>
-						</Dialog.Content>
-					</Dialog.Root>
-				</div>
+				{#if questionData}
+					<QuestionRevision {data} />
+				{/if}
 			</div>
 		</div>
 		<div class="mx-10 flex flex-col gap-8 bg-white p-9">

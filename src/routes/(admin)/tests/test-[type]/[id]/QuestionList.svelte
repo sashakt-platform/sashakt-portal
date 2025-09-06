@@ -7,8 +7,12 @@
 	let dialogOpen = $state(false);
 
 	const handleRemoveQuestion = (questionId: number) => {
+		// remove from both IDs and question data
 		$formData.question_revision_ids = $formData.question_revision_ids.filter(
 			(id: number) => id !== questionId
+		);
+		$formData.question_revisions = $formData.question_revisions.filter(
+			(question: any) => question.id !== questionId
 		);
 	};
 </script>
@@ -86,7 +90,7 @@
 				</div>
 			{:else}
 				<SelectedQuestionsList
-					{selectedQuestions}
+					selectedQuestions={$formData.question_revisions || []}
 					bind:selectedQuestionIds={$formData.question_revision_ids}
 					onRemoveQuestion={handleRemoveQuestion}
 				/>

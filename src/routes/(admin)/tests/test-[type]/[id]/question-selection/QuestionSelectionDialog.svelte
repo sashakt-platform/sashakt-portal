@@ -75,9 +75,41 @@
 		handleSort
 	);
 
-	const handleSelectionChange = (selectedRows: QuestionForSelection[]) => {
+	// maintain selected question data across all pages
+	const initializeSelectedQuestions = () => {
+		const allSelectedQuestionsMap = new Map<string, QuestionForSelection>();
+		if ($formData?.question_revisions) {
+			$formData.question_revisions.forEach((question: any) => {
+				allSelectedQuestionsMap.set(String(question.id), question);
+			});
+		}
+		return allSelectedQuestionsMap;
+	};
+
+	let allSelectedQuestions = $state<Map<string, QuestionForSelection>>(
+		initializeSelectedQuestions()
+	);
+
+	const handleSelectionChange = (
+		selectedRows: QuestionForSelection[],
+		selectedRowIds: string[]
+	) => {
 		if ($formData) {
-			$formData.question_revision_ids = selectedRows.map((row) => row.latest_question_revision_id);
+			// update the map with current page's selected rows
+			selectedRows.forEach((row) => {
+				allSelectedQuestions.set(String(row.latest_question_revision_id), row);
+			});
+
+			// remove deselected rows
+			for (const [id] of allSelectedQuestions) {
+				if (!selectedRowIds.includes(id)) {
+					allSelectedQuestions.delete(id);
+				}
+			}
+
+			// update form data with IDs and question data
+			$formData.question_revision_ids = selectedRowIds.map((id) => Number(id));
+			$formData.question_revisions = Array.from(allSelectedQuestions.values());
 		}
 	};
 
@@ -104,7 +136,7 @@
 		`;
 	};
 
-	// Handle selection confirmation
+	// handle selection confirmation
 	const handleSelectionConfirm = () => {
 		open = false;
 	};

@@ -25,7 +25,7 @@
 		emptyStateContent?: () => any; // custom empty state content
 		expandColumnId?: string; // column ID that should handle expand functionality
 		enableSelection?: boolean; // enable row selection
-		onSelectionChange?: (selectedRows: TData[]) => void; // callback when selection changes
+		onSelectionChange?: (selectedRows: TData[], selectedRowIds: string[]) => void; // callback when selection changes
 		getRowId?: (row: TData) => string; // function to get unique row ID
 		preSelectedIds?: (string | number)[]; // pre-selected row IDs
 	};
@@ -97,12 +97,17 @@
 						} else {
 							rowSelection = updater;
 						}
-						// Notify parent of selection changes
 						if (onSelectionChange) {
-							const selectedRows = table
+							// get all selected row IDs from the complete selection state
+							const selectedRowIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+
+							// NOTE: tanstack does not provide a way to get full selected rows across all pages
+							// get full data for current page rows
+							const currentPageSelectedRows = table
 								.getFilteredSelectedRowModel()
 								.rows.map((row) => row.original);
-							onSelectionChange(selectedRows);
+
+							onSelectionChange(currentPageSelectedRows, selectedRowIds);
 						}
 					}
 				: undefined,

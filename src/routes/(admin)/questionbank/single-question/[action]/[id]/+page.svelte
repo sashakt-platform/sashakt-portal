@@ -60,10 +60,16 @@
 		}));
 	}
 
-	questionData &&
-		($formData.tag_ids = questionData.tags?.map((tag: any) => {
-			return String(tag.id);
-		}));
+	if (questionData?.tags?.length) {
+		$formData.tag_ids = questionData.tags.map((tag) => {
+			const tagName = tag.name;
+			const tagTypeName = tag.tag_type?.name;
+			return {
+				id: String((tag as { id: string | number }).id),
+				name: tagTypeName ? `${tagName} (${tagTypeName})` : tagName
+			};
+		});
+	}
 
 	if (questionData && !questionData.marking_scheme) {
 		$formData.marking_scheme = {

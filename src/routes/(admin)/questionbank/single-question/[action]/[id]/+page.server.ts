@@ -78,7 +78,8 @@ export const actions: Actions = {
 
 		const transformedFormData = {
 			...form.data,
-			state_ids: form.data.state_ids.map((s) => s.id)
+			state_ids: form.data.state_ids.map((s) => s.id),
+			tag_ids: form.data.tag_ids.map((t) => t.id)
 		};
 
 		if (params.id === 'new') {
@@ -125,14 +126,16 @@ export const actions: Actions = {
 				);
 				return fail(500, { form });
 			}
-
+			
+			// Transform tag_ids array into the required format
+			const tagsDataArray = form.data.tag_ids.map((tagId) => tagId.id);
 			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify({ tag_ids: form.data.tag_ids })
+				body: JSON.stringify({ tag_ids: tagsDataArray })
 			});
 
 			if (!tagResponse.ok) {

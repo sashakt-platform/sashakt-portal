@@ -41,7 +41,16 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (!responseTags.ok) {
 		console.error('Failed to fetch tags:', responseTags.status, responseTags.statusText);
 	} else {
-		tags = await responseTags.json();
+		const rawTags = await responseTags.json();
+		// Transform tags to include tag type in the name
+		tags = {
+			...rawTags,
+			items:
+				rawTags.items?.map((tag: any) => ({
+					...tag,
+					name: tag.tag_type?.name ? `${tag.name} - (${tag.tag_type.name})` : tag.name
+				})) || []
+		};
 	}
 
 	const responseDistricts = await fetch(`${BACKEND_URL}/location/district/?skip=0&limit=100`, {

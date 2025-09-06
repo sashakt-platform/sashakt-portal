@@ -81,7 +81,8 @@ export const actions: Actions = {
 		}
 		const transformedFormData = {
 			...form.data,
-			state_ids: form.data.state_ids.map((s) => s.id)
+			state_ids: form.data.state_ids.map((s) => s.id),
+			tag_ids: form.data.tag_ids.map((t) => t.id)
 		};
 		const response = await fetch(
 			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : ''}`,

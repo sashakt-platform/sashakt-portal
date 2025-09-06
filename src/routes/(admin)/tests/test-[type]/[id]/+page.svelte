@@ -46,11 +46,16 @@
 	});
 
 	if (testData) {
-		$formData.tag_ids = testData?.tags?.map((tag: { id: String }) => String(tag.id)) || [];
 		$formData.state_ids =
 			testData?.states?.map((state: Filter) => ({
 				id: String(state.id),
 				name: state.name
+			})) || [];
+
+		$formData.tag_ids =
+			testData?.tags?.map((tag: Filter) => ({
+				id: String(tag.id),
+				name: tag.name
 			})) || [];
 		$formData.question_revision_ids =
 			testData?.question_revisions?.map((q: { id: number }) => q.id) || [];

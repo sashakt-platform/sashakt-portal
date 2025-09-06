@@ -100,7 +100,7 @@
 		)
 	);
 
-	let filteredTags: string[] = $state([]);
+	let filteredTags: Filter[] = $state([]);
 	let filteredStates: Filter[] = $state([]);
 	let filteredTagtypes: string[] = $state([]);
 	let deleteAction: string | null = $state(null);
@@ -194,8 +194,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
-								filteredTags.map((tag_id: string) => {
-									url.searchParams.append('tag_ids', tag_id);
+								filteredTags.map((tag_id: Filter) => {
+									url.searchParams.append('tag_ids', tag_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

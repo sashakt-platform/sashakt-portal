@@ -3,7 +3,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Primary from './Primary.svelte';
-	import Question from './Question.svelte';
+	import QuestionList from './QuestionList.svelte';
 	import Configuration from './Configuration.svelte';
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
@@ -112,7 +112,12 @@
 	{#if currentScreen === typeOfScreen.primary}
 		<Primary {formData} />
 	{:else if currentScreen === typeOfScreen.questions}
-		<Question {formData} questions={data.questions} />
+		<QuestionList
+			{formData}
+			questions={data.questions}
+			questionParams={data.questionParams}
+			selectedQuestions={data.selectedQuestions}
+		/>
 	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}

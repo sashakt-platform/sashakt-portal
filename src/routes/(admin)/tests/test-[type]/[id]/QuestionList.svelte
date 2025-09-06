@@ -1,15 +1,19 @@
-<script>
+<script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
-	import QuestionDialog from './QuestionDialog.svelte';
-	import { columns } from './question_table/columns.js';
-	import GripVertical from '@lucide/svelte/icons/grip-vertical';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import Eye from '@lucide/svelte/icons/eye';
-	let { formData, questions } = $props();
+	import QuestionSelectionDialog from './question-selection/QuestionSelectionDialog.svelte';
+	import SelectedQuestionsList from './question-selection/SelectedQuestionsList.svelte';
+
+	let { formData, questions, questionParams, selectedQuestions = [] } = $props();
 	let dialogOpen = $state(false);
+
+	const handleRemoveQuestion = (questionId: number) => {
+		$formData.question_revision_ids = $formData.question_revision_ids.filter(
+			(id: number) => id !== questionId
+		);
+	};
 </script>
 
-<QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />
+<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} />
 
 <div class="mx-auto flex h-dvh">
 	<div class=" mx-auto w-full p-20">
@@ -81,42 +85,11 @@
 					>
 				</div>
 			{:else}
-				<div class="flex h-full w-full flex-col overflow-auto">
-					{#each questions.items.filter( (row) => $formData.question_revision_ids.includes(row.latest_question_revision_id) ) as d (d.latest_question_revision_id)}
-						<div class="group mx-2 mt-2 flex flex-row">
-							<div class="my-auto w-fit">
-								<GripVertical />
-							</div>
-							<div
-								class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
-							>
-								<p class="w-4/6">
-									{d.question_text}
-								</p>
-								<span class="w-2/6">
-									{#if d.tags.length > 0}
-										<p>
-											<span class="font-bold">Tags:</span>
-											{d.tags.map((tag) => tag?.name).join(', ')}
-										</p>
-									{/if}
-								</span>
-							</div>
-							<div class="my-auto ml-2 hidden w-fit group-hover:block">
-								<button
-									onclick={(e) => {
-										$formData.question_revision_ids = $formData.question_revision_ids.filter(
-											(id) => id !== d.latest_question_revision_id
-										);
-									}}
-									class="cursor-pointer"
-								>
-									<Trash2 />
-								</button>
-							</div>
-						</div>
-					{/each}
-				</div>
+				<SelectedQuestionsList
+					{selectedQuestions}
+					bind:selectedQuestionIds={$formData.question_revision_ids}
+					onRemoveQuestion={handleRemoveQuestion}
+				/>
 			{/if}
 		</div>
 	</div>

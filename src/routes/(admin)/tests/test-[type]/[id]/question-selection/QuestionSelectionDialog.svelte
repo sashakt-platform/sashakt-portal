@@ -1,0 +1,203 @@
+<script lang="ts">
+	import Info from '@lucide/svelte/icons/info';
+	import { DataTable } from '$lib/components/data-table';
+	import { createQuestionSelectionColumns } from './columns';
+	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import Input from '$lib/components/ui/input/input.svelte';
+	import TagsSelection from '$lib/components/TagsSelection.svelte';
+	import StateSelection from '$lib/components/StateSelection.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import type { QuestionForSelection } from './columns';
+	import type { ColumnDef } from '@tanstack/table-core';
+	import { Button } from '$lib/components/ui/button';
+	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+
+	let { open = $bindable(), questions, questionParams, formData } = $props();
+	let tags = $state<string[]>([]);
+	let states = $state<string[]>([]);
+	let searchTimeout: ReturnType<typeof setTimeout>;
+
+	// let's format questions data to match QuestionForSelection interface
+	const questionData: QuestionForSelection[] = $derived(
+		questions.items?.map((question: any) => ({
+			id: question.latest_question_revision_id,
+			question_text: question.question_text,
+			tags: question.tags,
+			options: question.options || [],
+			correct_answer: question.correct_answer || [],
+			latest_question_revision_id: question.latest_question_revision_id
+		})) || []
+	);
+
+	// handle filter changes by updating URL params
+	const updateFilters = () => {
+		const url = new URL(page.url);
+
+		if (tags.length > 0) {
+			url.searchParams.set('questionTags', tags.join(','));
+		} else {
+			url.searchParams.delete('questionTags');
+		}
+
+		if (states.length > 0) {
+			url.searchParams.set('questionStates', states.join(','));
+		} else {
+			url.searchParams.delete('questionStates');
+		}
+
+		// reset to first page when filters change
+		url.searchParams.set('questionPage', '1');
+
+		goto(url.toString());
+	};
+
+	// handle sorting in dialog
+	const handleSort = (columnId: string) => {
+		const url = new URL(page.url);
+		if (questionParams?.questionSortBy === columnId) {
+			url.searchParams.set(
+				'questionSortOrder',
+				questionParams?.questionSortOrder === 'asc' ? 'desc' : 'asc'
+			);
+		} else {
+			url.searchParams.set('questionSortBy', columnId);
+			url.searchParams.set('questionSortOrder', 'asc');
+		}
+		goto(url.toString());
+	};
+
+	// now we can create columns
+	const columns: ColumnDef<QuestionForSelection>[] = createQuestionSelectionColumns(
+		questionParams?.questionSortBy || '',
+		questionParams?.questionSortOrder || 'asc',
+		handleSort
+	);
+
+	const handleSelectionChange = (selectedRows: QuestionForSelection[]) => {
+		if ($formData) {
+			$formData.question_revision_ids = selectedRows.map((row) => row.latest_question_revision_id);
+		}
+	};
+
+	// render expanded row content for question options
+	const renderExpandedRow = (row: QuestionForSelection) => {
+		return `
+			<div class="p-4">
+				${row.options
+					?.map(
+						(option) => `
+					<div class="flex items-center my-2">
+						<span class="bg-primary-foreground rounded-sm p-2 mr-3">${option.key}</span>
+						<span class="mr-4">${option.value}</span>
+						${
+							row.correct_answer?.includes(option.id)
+								? '<svg class="text-primary my-auto ml-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
+								: ''
+						}
+					</div>
+				`
+					)
+					.join('')}
+			</div>
+		`;
+	};
+
+	// Handle selection confirmation
+	const handleSelectionConfirm = () => {
+		open = false;
+	};
+</script>
+
+<Dialog.Root bind:open>
+	<Dialog.Content class="overflow-clip  p-0 sm:h-[90%] sm:max-w-[95%]" preventScroll={false}>
+		<div class="flex h-full flex-col">
+			<Dialog.Header class="  border-b-2 ">
+				<Dialog.Title class="h-fit"
+					><div class="ml-6 flex py-4 text-xl">
+						<p>Select questions from question bank</p>
+						<Info class="my-auto ml-2 w-4" />
+					</div></Dialog.Title
+				>
+			</Dialog.Header>
+
+			<div class="m-4 h-full">
+				<div class="flex h-1/12 flex-row">
+					<div class="mx-2 w-1/5">
+						<TagsSelection
+							bind:tags
+							onOpenChange={(e: boolean) => {
+								if (!e) {
+									updateFilters();
+								}
+							}}
+						/>
+					</div>
+					<div class="mx-2 w-1/5">
+						<StateSelection
+							bind:states
+							onOpenChange={(e: boolean) => {
+								if (!e) {
+									updateFilters();
+								}
+							}}
+						/>
+					</div>
+					<div class="ml-auto flex w-1/5 items-start">
+						<Input
+							type="search"
+							placeholder="Search questions..."
+							value={questionParams?.questionSearch || ''}
+							oninput={(event) => {
+								const url = new URL(page.url);
+								clearTimeout(searchTimeout);
+								searchTimeout = setTimeout(() => {
+									const target = event.target as HTMLInputElement;
+									if (target?.value) {
+										url.searchParams.set('questionSearch', target.value);
+									} else {
+										url.searchParams.delete('questionSearch');
+									}
+									url.searchParams.set('questionPage', '1');
+									goto(url, { keepFocus: true, invalidateAll: true });
+								}, 300);
+							}}
+						></Input>
+					</div>
+				</div>
+				<div class="relative flex h-11/12 flex-col">
+					<DataTable
+						data={questionData}
+						{columns}
+						totalItems={questions.total || 0}
+						totalPages={questions.pages || 0}
+						currentPage={questionParams?.questionPage || 1}
+						pageSize={questionParams?.questionSize || DEFAULT_PAGE_SIZE}
+						paramPrefix="question"
+						expandable={true}
+						{renderExpandedRow}
+						expandColumnId="answers"
+						emptyStateMessage="No questions found."
+						enableSelection={true}
+						onSelectionChange={handleSelectionChange}
+						getRowId={(row) => String(row.latest_question_revision_id)}
+					/>
+
+					<!-- Fixed Bottom Bar -->
+					<div class="absolute right-0 bottom-0 left-0 z-10 border-t bg-white p-4 shadow-lg">
+						<div class="flex items-center justify-between">
+							<Button class="bg-primary hover:bg-primary/90" onclick={handleSelectionConfirm}>
+								Add to Test {$formData.is_template ? ' Template' : ''}
+							</Button>
+
+							<div class="text-muted-foreground text-sm">
+								{$formData.question_revision_ids?.length || 0} question(s) selected
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</Dialog.Content>
+</Dialog.Root>

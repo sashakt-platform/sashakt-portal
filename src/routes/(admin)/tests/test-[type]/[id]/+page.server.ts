@@ -6,6 +6,7 @@ import { getSessionTokenCookie } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const token = getSessionTokenCookie();
@@ -43,14 +44,36 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const form = await superValidate(zod(testSchema));
 	form.data.is_template = is_template;
 
-	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?page=1&size=100`, {
+	// extract question dialog pagination and filter parameters
+	const questionPage = Number(url.searchParams.get('questionPage')) || 1;
+	const questionSize = Number(url.searchParams.get('questionSize')) || DEFAULT_PAGE_SIZE;
+	const questionSearch = url.searchParams.get('questionSearch') || '';
+	const questionTags = url.searchParams.get('questionTags') || '';
+	const questionStates = url.searchParams.get('questionStates') || '';
+
+	// build query parameters for questions API (for dialog)
+	const questionParams = new URLSearchParams({
+		page: questionPage.toString(),
+		size: questionSize.toString(),
+		...(questionSearch && { question_text: questionSearch })
+	});
+
+	if (questionTags) {
+		questionParams.set('tag_ids', questionTags);
+	}
+
+	if (questionStates) {
+		questionParams.set('state_ids', questionStates);
+	}
+
+	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?${questionParams.toString()}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
 		}
 	});
 
-	let questions = [];
+	let questions = { items: [], total: 0, pages: 0 };
 	if (!responseQuestions.ok) {
 		console.error(
 			'Failed to fetch questions:',
@@ -61,10 +84,24 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		questions = await responseQuestions.json();
 	}
 
+	// existing question testData.question_revisions for display
+	const selectedQuestions = testData?.question_revisions || [];
+
+	// pass pagination parameters for the question dialog
+	const questionPaginationParams = {
+		questionPage,
+		questionSize,
+		questionSearch,
+		questionTags,
+		questionStates
+	};
+
 	return {
 		form,
 		testData,
-		questions
+		questions,
+		selectedQuestions,
+		questionParams: questionPaginationParams
 	};
 };
 

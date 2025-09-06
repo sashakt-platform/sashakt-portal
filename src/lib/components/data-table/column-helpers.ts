@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions, DataTableSortButton } from './index.js';
+import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 
 /**
  *  Function to create a sortable column with the given configuration
@@ -46,3 +47,27 @@ export const createActionsColumn = <T extends { id: string | number }>(
 	}
 });
 
+/**
+ * Function to create a selection column with checkboxes
+ */
+export const createSelectionColumn = <T>(): ColumnDef<T> => ({
+	id: 'select',
+	header: ({ table }) =>
+		renderComponent(Checkbox, {
+			checked: table.getIsAllPageRowsSelected(),
+			indeterminate: table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
+			onCheckedChange: (value: boolean) => table.toggleAllPageRowsSelected(!!value),
+			'aria-label': 'Select all'
+		}),
+	cell: ({ row }) =>
+		renderComponent(Checkbox, {
+			checked: row.getIsSelected(),
+			onCheckedChange: (value: boolean) => {
+				row.toggleSelected(!!value);
+			},
+			'aria-label': 'Select row'
+		}),
+	enableSorting: false,
+	enableHiding: false,
+	size: 50
+});

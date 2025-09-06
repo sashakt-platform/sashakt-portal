@@ -1,7 +1,12 @@
 <script lang="ts" generics="TData, TValue">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { type ColumnDef, getCoreRowModel, getExpandedRowModel } from '@tanstack/table-core';
+	import {
+		type ColumnDef,
+		type RowSelectionState,
+		getCoreRowModel,
+		getExpandedRowModel
+	} from '@tanstack/table-core';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -19,6 +24,9 @@
 		emptyStateMessage?: string; // custom empty state message
 		emptyStateContent?: () => any; // custom empty state content
 		expandColumnId?: string; // column ID that should handle expand functionality
+		enableSelection?: boolean; // enable row selection
+		onSelectionChange?: (selectedRows: TData[]) => void; // callback when selection changes
+		getRowId?: (row: TData) => string; // function to get unique row ID
 	};
 
 	let {
@@ -33,15 +41,16 @@
 		renderExpandedRow,
 		emptyStateMessage = 'No results.',
 		emptyStateContent,
-		expandColumnId
+		expandColumnId,
+		enableSelection = false,
+		onSelectionChange,
+		getRowId = (row: any) => String(row.id)
 	}: DataTableProps<TData, TValue> = $props();
 
 	// pagination
 	function goToPage(newPage: number) {
 		const url = new URL(page.url);
-		const paramName = paramPrefix
-			? paramPrefix + 'Page'
-			: 'page';
+		const paramName = paramPrefix ? paramPrefix + 'Page' : 'page';
 		url.searchParams.set(paramName, newPage.toString());
 		goto(url.toString(), { replaceState: false });
 	}
@@ -49,13 +58,19 @@
 	// State for expanded rows
 	let expanded = $state({});
 
+	// State for row selection
+	let rowSelection = $state<RowSelectionState>({});
+
 	// create table
 
 	const table = $derived(
 		createSvelteTable({
 			data,
 			columns,
-			state: expandable ? { expanded } : {},
+			state: {
+				...(expandable && { expanded }),
+				...(enableSelection && { rowSelection })
+			},
 			onExpandedChange: expandable
 				? (updater) => {
 						if (typeof updater === 'function') {
@@ -65,10 +80,28 @@
 						}
 					}
 				: undefined,
+			onRowSelectionChange: enableSelection
+				? (updater) => {
+						if (typeof updater === 'function') {
+							rowSelection = updater(rowSelection);
+						} else {
+							rowSelection = updater;
+						}
+						// Notify parent of selection changes
+						if (onSelectionChange) {
+							const selectedRows = table
+								.getFilteredSelectedRowModel()
+								.rows.map((row) => row.original);
+							onSelectionChange(selectedRows);
+						}
+					}
+				: undefined,
 			getCoreRowModel: getCoreRowModel(),
 			getExpandedRowModel: expandable ? getExpandedRowModel() : undefined,
 			enableExpanding: expandable,
 			getRowCanExpand: expandable ? () => true : undefined,
+			enableRowSelection: enableSelection,
+			getRowId: enableSelection ? getRowId : undefined,
 			manualPagination: true,
 			manualSorting: true,
 			manualFiltering: true
@@ -96,14 +129,24 @@
 		</Table.Header>
 		<Table.Body>
 			{#each table.getRowModel().rows as row (row.id)}
-				<Table.Row
-					data-state={row.getIsSelected() && 'selected'}
-				>
+				<Table.Row data-state={row.getIsSelected() && 'selected'}>
 					{#each row.getVisibleCells() as cell (cell.id)}
 						<Table.Cell
-							class={expandable && expandColumnId && cell.column.id === expandColumnId ? 'cursor-pointer' : ''}
-							onclick={expandable && expandColumnId && cell.column.id === expandColumnId && row.getCanExpand() ? () => row.toggleExpanded() : undefined}
-							title={expandable && expandColumnId && cell.column.id === expandColumnId && row.getCanExpand() ? 'View details' : undefined}
+							class={expandable && expandColumnId && cell.column.id === expandColumnId
+								? 'cursor-pointer'
+								: ''}
+							onclick={expandable &&
+							expandColumnId &&
+							cell.column.id === expandColumnId &&
+							row.getCanExpand()
+								? () => row.toggleExpanded()
+								: undefined}
+							title={expandable &&
+							expandColumnId &&
+							cell.column.id === expandColumnId &&
+							row.getCanExpand()
+								? 'View details'
+								: undefined}
 						>
 							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 						</Table.Cell>
@@ -134,6 +177,11 @@
 	</Table.Root>
 	<div class="flex items-center justify-between space-x-2 py-4">
 		<div class="text-muted-foreground flex-1 text-sm">
+			{#if enableSelection}
+				{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows
+					.length} selected
+				<span class="mx-2">•</span>
+			{/if}
 			Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)} of
 			{totalItems} entries
 		</div>

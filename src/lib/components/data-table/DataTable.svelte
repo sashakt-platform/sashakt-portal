@@ -60,16 +60,17 @@
 	// state for expanded rows
 	let expanded = $state({});
 
-	// initialize row selection with preselected IDs
-	const initialRowSelection: RowSelectionState = {};
+	// initialize row selection state with preselected IDs
+	const initialSelection: RowSelectionState = {};
 	if (enableSelection && preSelectedIds.length > 0) {
 		preSelectedIds.forEach((id) => {
-			initialRowSelection[String(id)] = true;
+			const rowId = String(id);
+			initialSelection[rowId] = true;
 		});
 	}
 
 	// state for row selection
-	let rowSelection = $state<RowSelectionState>(initialRowSelection);
+	let rowSelection = $state<RowSelectionState>(initialSelection);
 
 	// create table
 	const table = $derived(

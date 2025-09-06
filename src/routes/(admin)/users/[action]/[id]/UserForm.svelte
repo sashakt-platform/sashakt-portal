@@ -25,7 +25,7 @@
 
 	if (userData) {
 		$formData.state_ids =
-			userData?.states?.map((state: StateFilter) => ({ id: state.id, name: state.name })) || [];
+			userData?.states?.map((state: StateFilter) => ({ id: String(state.id), name: state.name })) || [];
 	}
 </script>
 

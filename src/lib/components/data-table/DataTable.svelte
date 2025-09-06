@@ -27,6 +27,7 @@
 		enableSelection?: boolean; // enable row selection
 		onSelectionChange?: (selectedRows: TData[]) => void; // callback when selection changes
 		getRowId?: (row: TData) => string; // function to get unique row ID
+		preSelectedIds?: (string | number)[]; // pre-selected row IDs
 	};
 
 	let {
@@ -44,7 +45,8 @@
 		expandColumnId,
 		enableSelection = false,
 		onSelectionChange,
-		getRowId = (row: any) => String(row.id)
+		getRowId = (row: any) => String(row.id),
+		preSelectedIds = []
 	}: DataTableProps<TData, TValue> = $props();
 
 	// pagination
@@ -55,14 +57,21 @@
 		goto(url.toString(), { replaceState: false });
 	}
 
-	// State for expanded rows
+	// state for expanded rows
 	let expanded = $state({});
 
-	// State for row selection
-	let rowSelection = $state<RowSelectionState>({});
+	// initialize row selection with preselected IDs
+	const initialRowSelection: RowSelectionState = {};
+	if (enableSelection && preSelectedIds.length > 0) {
+		preSelectedIds.forEach((id) => {
+			initialRowSelection[String(id)] = true;
+		});
+	}
+
+	// state for row selection
+	let rowSelection = $state<RowSelectionState>(initialRowSelection);
 
 	// create table
-
 	const table = $derived(
 		createSvelteTable({
 			data,

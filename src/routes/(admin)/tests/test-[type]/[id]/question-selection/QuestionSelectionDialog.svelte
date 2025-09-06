@@ -182,6 +182,7 @@
 						enableSelection={true}
 						onSelectionChange={handleSelectionChange}
 						getRowId={(row) => String(row.latest_question_revision_id)}
+						preSelectedIds={$formData.question_revision_ids || []}
 					/>
 
 					<!-- Fixed Bottom Bar -->

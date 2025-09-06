@@ -1,4 +1,4 @@
-export interface StateFilter {
+export interface Filter {
 	id: string;
 	name: string;
 }

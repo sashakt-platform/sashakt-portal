@@ -9,7 +9,7 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { testSchema, type FormSchema } from './schema';
-	import type { StateFilter } from '$lib/types/filters';
+	import type { Filter } from '$lib/types/filters';
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
@@ -48,7 +48,7 @@
 	if (testData) {
 		$formData.tag_ids = testData?.tags?.map((tag: { id: String }) => String(tag.id)) || [];
 		$formData.state_ids =
-			testData?.states?.map((state: StateFilter) => ({
+			testData?.states?.map((state: Filter) => ({
 				id: String(state.id),
 				name: state.name
 			})) || [];

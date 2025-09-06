@@ -14,13 +14,13 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
-	import { type StateFilter } from '$lib/types/filters';
+	import { type Filter } from '$lib/types/filters';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
-	let filteredTags: string[] = $state([]);
-	let filteredStates: StateFilter[] = $state([]);
+	let filteredTags: Filter[] = $state([]);
+	let filteredStates: Filter[] = $state([]);
 
 	let filteredTagtypes: string[] = $state([]);
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -35,7 +35,6 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
-
 	let noQuestionCreatedYet = $state(true);
 
 	$effect(() => {
@@ -216,8 +215,8 @@
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
 								url.searchParams.set('page', '1');
-								filteredTags.map((tag_id: string) => {
-									url.searchParams.append('tag_ids', tag_id);
+								filteredTags.map((tag_id: Filter) => {
+									url.searchParams.append('tag_ids', tag_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}
@@ -233,7 +232,7 @@
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
 								url.searchParams.set('page', '1');
-								filteredStates.map((state_id: StateFilter) => {
+								filteredStates.map((state_id: Filter) => {
 									url.searchParams.append('state_ids', state_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });

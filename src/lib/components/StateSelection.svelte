@@ -1,44 +1,18 @@
 <script lang="ts">
-	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { page } from '$app/state';
+	import * as Command from '$lib/components/ui/command/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { cn } from '$lib/utils.js';
+	import CheckIcon from '@lucide/svelte/icons/check';
+	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
+	import { goto } from '$app/navigation';
+	import { type Filter } from '$lib/types/filters';
+	import Filteration from './Filteration.svelte';
 
-	const stateList = page.data.states.items || [];
+	let stateList = $derived.by(() => page?.data?.states?.items ?? []);
 	let { states = $bindable(), ...rest } = $props();
-
-	const selectedStates = $derived(
-		states?.length
-			? stateList
-					.filter((state: { id: any }) => states.includes(String(state.id)))
-					.map((state: { name: any }) => state.name)
-			: 'Select states'
-	);
 </script>
 
-{#snippet myBadge(children: any)}
-	<Badge variant="default" style="background-color:#3587B4" class="m-1 rounded-sm  p-2"
-		>{children}</Badge
-	>
-{/snippet}
-
-<Select.Root type="multiple" bind:value={states} name="states" {...rest}>
-	<Select.Trigger>
-		{#if states?.length === 0}
-			{selectedStates}
-		{:else}
-			<span class="truncate text-start">
-				{#each selectedStates as state}
-					{@render myBadge(state)}
-				{/each}
-			</span>
-		{/if}
-	</Select.Trigger>
-	<Select.Content>
-		<Select.Group>
-			<Select.GroupHeading>Select States</Select.GroupHeading>
-			{#each stateList as state (state.id)}
-				<Select.Item value={String(state.id)} label={state.name} />
-			{/each}
-		</Select.Group>
-	</Select.Content>
-</Select.Root>
+<Filteration bind:items={states} itemName="state" bind:itemList={stateList} {...rest} />

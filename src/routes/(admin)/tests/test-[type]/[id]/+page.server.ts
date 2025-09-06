@@ -79,6 +79,11 @@ export const actions: Actions = {
 			);
 			return fail(400, { form });
 		}
+		const transformedFormData = {
+			...form.data,
+			state_ids: form.data.state_ids.map((s) => s.id),
+			tag_ids: form.data.tag_ids.map((t) => t.id)
+		};
 		const response = await fetch(
 			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : ''}`,
 			{
@@ -87,7 +92,7 @@ export const actions: Actions = {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify(form.data)
+				body: JSON.stringify(transformedFormData)
 			}
 		);
 

@@ -13,6 +13,7 @@
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 
 	let {
@@ -99,8 +100,8 @@
 		)
 	);
 
-	let filteredTags: string[] = $state([]);
-	let filteredStates: string[] = $state([]);
+	let filteredTags: Filter[] = $state([]);
+	let filteredStates: Filter[] = $state([]);
 	let filteredTagtypes: string[] = $state([]);
 	let deleteAction: string | null = $state(null);
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -193,8 +194,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
-								filteredTags.map((tag_id: string) => {
-									url.searchParams.append('tag_ids', tag_id);
+								filteredTags.map((tag_id: Filter) => {
+									url.searchParams.append('tag_ids', tag_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}
@@ -209,8 +210,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
+								filteredStates.map((state_id: Filter) => {
+									url.searchParams.append('state_ids', state_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

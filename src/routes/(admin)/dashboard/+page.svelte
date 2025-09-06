@@ -5,11 +5,12 @@
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { type Filter } from '$lib/types/filters.js';
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
 
-	let filteredStates: string[] = $state([]);
+	let filteredStates: Filter[] = $state([]);
 	let filteredTagtypes: string[] = $state([]);
 
 	const information = [
@@ -146,8 +147,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
+								filteredStates.map((state: Filter) => {
+									url.searchParams.append('state_ids', state.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

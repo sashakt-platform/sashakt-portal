@@ -17,7 +17,6 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
-	import type { StateFilter } from '$lib/types/filters';
 
 	const {
 		data
@@ -54,11 +53,12 @@
 		}
 	});
 
-	questionData &&
-		($formData.state_ids = questionData.locations?.map((location: StateFilter) => ({
-			id: String(location.state_id),
-			name: location.state_name
-		})));
+	if (questionData?.locations?.length) {
+		$formData.state_ids = questionData.locations.map((location) => ({
+			id: String((location as { state_id: string | number }).state_id),
+			name: (location as { state_name: string }).state_name
+		}));
+	}
 
 	questionData &&
 		($formData.tag_ids = questionData.tags?.map((tag: any) => {

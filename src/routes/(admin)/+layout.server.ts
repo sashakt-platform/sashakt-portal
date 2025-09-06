@@ -14,12 +14,15 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const statesearch = url.searchParams.get('state_search') || '';
 
-	const responseState = await fetch(`${BACKEND_URL}/location/state/?name=${statesearch}`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
+	const responseState = await fetch(
+		`${BACKEND_URL}/location/state/?name=${encodeURIComponent(statesearch)}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
 		}
-	});
+	);
 
 	if (!responseState.ok) {
 		console.error('Failed to fetch states:', responseState.status, responseState.statusText);
@@ -48,7 +51,11 @@ export const load: PageServerLoad = async ({ url }) => {
 	});
 
 	if (!responseDistricts.ok) {
-		console.error('Failed to fetch districts:', responseDistricts.status, responseDistricts.statusText);
+		console.error(
+			'Failed to fetch districts:',
+			responseDistricts.status,
+			responseDistricts.statusText
+		);
 	} else {
 		districts = await responseDistricts.json();
 	}
@@ -61,17 +68,20 @@ export const load: PageServerLoad = async ({ url }) => {
 	});
 
 	if (!responseTagtypes.ok) {
-		console.error('Failed to fetch tagtypes:', responseTagtypes.status, responseTagtypes.statusText);
+		console.error(
+			'Failed to fetch tagtypes:',
+			responseTagtypes.status,
+			responseTagtypes.statusText
+		);
 	} else {
 		tagtypes = await responseTagtypes.json();
 	}
-
 
 	return {
 		user: locals.user,
 		states: states,
 		tags: tags,
 		districts: districts,
-		tagtypes: tagtypes,
+		tagtypes: tagtypes
 	};
 };

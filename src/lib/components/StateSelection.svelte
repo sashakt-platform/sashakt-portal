@@ -1,5 +1,4 @@
 <script lang="ts">
-	import * as Select from '$lib/components/ui/select/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { page } from '$app/state';
 	import * as Command from '$lib/components/ui/command/index.js';
@@ -21,13 +20,10 @@
 	// Debounced search
 	let searchTimeout: NodeJS.Timeout | undefined;
 	function handleSearch(e: Event) {
-		const query = (e.target as HTMLInputElement).value.toLowerCase();
-		searchQuery = query;
-
 		clearTimeout(searchTimeout);
 		searchTimeout = setTimeout(() => {
 			const url = new URL(page.url);
-			if (query) url.searchParams.set('state_search', query);
+			if (searchQuery) url.searchParams.set('state_search', searchQuery.toLowerCase());
 			else url.searchParams.delete('state_search');
 
 			goto(url, { keepFocus: true, invalidateAll: true });
@@ -61,6 +57,7 @@
 	{...rest}
 	onOpenChangeComplete={() => {
 		if (!open) {
+			searchQuery = '';
 			try {
 				const url = new URL(page.url);
 				url.searchParams.delete('state_search');
@@ -84,7 +81,7 @@
 					{placeholder}
 				{:else if states?.length < 3}
 					<span class="flex flex-row truncate text-start">
-						{#each states as state}
+						{#each states as state (state.id)}
 							{@render myBadge(state)}
 						{/each}
 					</span>
@@ -103,26 +100,29 @@
 	</Popover.Trigger>
 	<Popover.Content class="w-fit p-0 ">
 		<Command.Root>
-			<Command.Input placeholder="Search States..." oninput={handleSearch} />
+			<Command.Input
+				placeholder="Search States..."
+				oninput={handleSearch}
+				bind:value={searchQuery}
+			/>
 			<Command.List>
 				<Command.Empty>No state found.</Command.Empty>
 				{#each stateList as state (state.id)}
 					<Command.Item
 						value={String(state.name)}
 						onSelect={() => {
-							const stateId: String = String(state.id);
-							if (states.some((s: StateFilter) => s.id === stateId)) {
-								states = states.filter((s: StateFilter) => String(s.id) !== stateId);
+							const stateId: string = String(state.id);
+							const next = (states ?? []) as StateFilter[];
+							if (next.some((s) => String(s.id) === stateId)) {
+								states = next.filter((s) => String(s.id) !== stateId);
 							} else {
-								states = states
-									? [...states, { id: String(state.id), name: state.name }]
-									: [{ id: String(state.id), name: state.name }];
+								states = [...next, { id: String(state.id), name: state.name }];
 							}
 						}}
 					>
 						<CheckIcon
 							class={cn(
-								!states.some((s) => String(s.id) === String(state.id)) && 'text-transparent'
+								!(states ?? []).some((s) => String(s.id) === String(state.id)) && 'text-transparent'
 							)}
 						/>
 						{state.name}
@@ -132,25 +132,3 @@
 		</Command.Root>
 	</Popover.Content>
 </Popover.Root>
-
-<!-- <Select.Root type="multiple" bind:value={states} name="states" {...rest}>
-	<Select.Trigger>
-		{#if states?.length === 0}
-			{selectedStates}
-		{:else}
-			<span class="truncate text-start">
-				{#each selectedStates as state}
-					{@render myBadge(state)}
-				{/each}
-			</span>
-		{/if}
-	</Select.Trigger>
-	<Select.Content>
-		<Select.Group>
-			<Select.GroupHeading>Select States</Select.GroupHeading>
-			{#each stateList as state (state.id)}
-				<Select.Item value={String(state.id)} label={state.name} />
-			{/each}
-		</Select.Group>
-	</Select.Content>
-</Select.Root> -->

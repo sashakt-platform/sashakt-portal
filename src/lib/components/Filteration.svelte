@@ -84,14 +84,14 @@
 							{@render myBadge(item)}
 						{/each}
 					</span>
-				{:else if items.length >= 3}
+				{:else if items?.length >= 3}
 					{#if items[0]}
 						{@render myBadge(items[0])}
 					{/if}
 					{#if items[1]}
 						{@render myBadge(items[1])}
 					{/if}
-					+ {items.length - 2}
+					+ {items?.length - 2}
 				{/if}
 				<ChevronsUpDownIcon class="ml-auto opacity-50" />
 			</Button>

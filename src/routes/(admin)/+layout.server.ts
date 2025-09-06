@@ -12,10 +12,11 @@ export const load: PageServerLoad = async ({ url }) => {
 	let districts = [];
 	let tagtypes = [];
 
-	const statesearch = url.searchParams.get('state_search') || '';
+	const stateSearch = url.searchParams.get('state_search') || '';
+	const tagSearch = url.searchParams.get('tag_search') || '';
 
 	const responseState = await fetch(
-		`${BACKEND_URL}/location/state/?name=${encodeURIComponent(statesearch)}`,
+		`${BACKEND_URL}/location/state/?name=${encodeURIComponent(stateSearch)}`,
 		{
 			method: 'GET',
 			headers: {
@@ -30,7 +31,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		states = await responseState.json();
 	}
 
-	const responseTags = await fetch(`${BACKEND_URL}/tag/?skip=0&limit=100`, {
+	const responseTags = await fetch(`${BACKEND_URL}/tag/?name=${encodeURIComponent(tagSearch)}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

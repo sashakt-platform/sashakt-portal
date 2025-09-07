@@ -11,11 +11,17 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	const tagtypeIdsList = url.searchParams.getAll('tag_type_ids') || [];
 	const tagtypeParams =
-		tagtypeIdsList.length > 0 ? tagtypeIdsList.map((tagtypeId) => `tag_type_ids=${tagtypeId}`).join('&') : '';
+		tagtypeIdsList.length > 0
+			? tagtypeIdsList.map((tagtypeId) => `tag_type_ids=${tagtypeId}`).join('&')
+			: '';
 
+	const districtIdsList = url.searchParams.getAll('district_ids') || [];
+	const districtParams =
+		districtIdsList.length > 0
+			? districtIdsList.map((districtId) => `district_ids=${districtId}`).join('&')
+			: '';
 
-	const queryString = [stateParams, tagtypeParams].filter(Boolean).join('&');
-
+	const queryString = [stateParams, tagtypeParams, districtParams].filter(Boolean).join('&');
 
 	interface OverallAnalytics {
 		overall_score_percent: number;

@@ -14,13 +14,15 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import { type Filter } from '$lib/types/filters';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
-	let filteredTags: string[] = $state([]);
-	let filteredStates: string[] = $state([]);
-	let filteredTagtypes: string[] = $state([]);
+	let filteredTags: Filter[] = $state([]);
+	let filteredStates: Filter[] = $state([]);
+
+	let filteredTagtypes: Filter[] = $state([]);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	// Extract data and pagination info
@@ -33,7 +35,6 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
-
 	let noQuestionCreatedYet = $state(true);
 
 	$effect(() => {
@@ -186,7 +187,7 @@
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
 			<div class="flex flex-row items-center gap-4">
-				<div class="w-1/3 mr-8">
+				<div class="mr-8 w-1/3">
 					<Input
 						placeholder="Search questions..."
 						value={search}
@@ -214,8 +215,8 @@
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
 								url.searchParams.set('page', '1');
-								filteredTags.map((tag_id: string) => {
-									url.searchParams.append('tag_ids', tag_id);
+								filteredTags.map((tag_id: Filter) => {
+									url.searchParams.append('tag_ids', tag_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}
@@ -231,8 +232,8 @@
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
 								url.searchParams.set('page', '1');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
+								filteredStates.map((state_id: Filter) => {
+									url.searchParams.append('state_ids', state_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}
@@ -241,14 +242,14 @@
 				</div>
 				<div class="w-1/3">
 					<TagTypeSelection
-						bind:tagtypes={filteredTagtypes}
+						bind:tagTypes={filteredTagtypes}
 						onOpenChange={(e: boolean) => {
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_type_ids');
 								url.searchParams.set('page', '1');
-								filteredTagtypes.map((tagtype_id: string) => {
-									url.searchParams.append('tag_type_ids', tagtype_id);
+								filteredTagtypes.map((tagtype: Filter) => {
+									url.searchParams.append('tag_type_ids', tagtype.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

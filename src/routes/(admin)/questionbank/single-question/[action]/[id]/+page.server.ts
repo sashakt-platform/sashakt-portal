@@ -76,6 +76,12 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
+		const transformedFormData = {
+			...form.data,
+			state_ids: form.data.state_ids.map((s) => s.id),
+			tag_ids: form.data.tag_ids.map((t) => t.id)
+		};
+
 		if (params.id === 'new') {
 			const response = await fetch(`${BACKEND_URL}/questions`, {
 				method: 'POST',
@@ -83,7 +89,7 @@ export const actions: Actions = {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify(form.data)
+				body: JSON.stringify(transformedFormData)
 			});
 
 			if (!response.ok) {
@@ -120,14 +126,16 @@ export const actions: Actions = {
 				);
 				return fail(500, { form });
 			}
-
+			
+			// Transform tag_ids array into the required format
+			const tagsDataArray = form.data.tag_ids.map((tagId) => tagId.id);
 			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify({ tag_ids: form.data.tag_ids })
+				body: JSON.stringify({ tag_ids: tagsDataArray })
 			});
 
 			if (!tagResponse.ok) {
@@ -144,7 +152,7 @@ export const actions: Actions = {
 
 			// Transform state_ids array into the required format
 			const stateDataArray = form.data.state_ids.map((stateId) => ({
-				state_id: stateId
+				state_id: stateId.id
 			}));
 
 			// Send the transformed array to the API

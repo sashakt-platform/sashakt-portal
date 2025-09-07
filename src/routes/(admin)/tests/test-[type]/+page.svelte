@@ -13,7 +13,9 @@
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 
 	let {
 		data
@@ -59,9 +61,15 @@
 		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
 		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
 		const hasTagtypeFilters = page.url.searchParams.getAll('tag_type_ids').length > 0;
+		const hasDistrictFilters = page.url.searchParams.getAll('district_ids').length > 0;
 
 		noTestCreatedYet =
-			totalItems === 0 && !hasFilters && !hasTagFilters && !hasStateFilters && !hasTagtypeFilters;
+			totalItems === 0 &&
+			!hasFilters &&
+			!hasTagFilters &&
+			!hasStateFilters &&
+			!hasTagtypeFilters &&
+			!hasDistrictFilters;
 	});
 
 	// handle sorting
@@ -99,9 +107,10 @@
 		)
 	);
 
-	let filteredTags: string[] = $state([]);
-	let filteredStates: string[] = $state([]);
-	let filteredTagtypes: string[] = $state([]);
+	let filteredTags: Filter[] = $state([]);
+	let filteredStates: Filter[] = $state([]);
+	let filteredTagtypes: Filter[] = $state([]);
+	let filteredDistricts: Filter[] = $state([]);
 	let deleteAction: string | null = $state(null);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 </script>
@@ -193,8 +202,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_ids');
-								filteredTags.map((tag_id: string) => {
-									url.searchParams.append('tag_ids', tag_id);
+								filteredTags.map((tag_id: Filter) => {
+									url.searchParams.append('tag_ids', tag_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}
@@ -209,8 +218,8 @@
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('state_ids');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
+								filteredStates.map((state_id: Filter) => {
+									url.searchParams.append('state_ids', state_id.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}
@@ -220,13 +229,29 @@
 
 				<div class="w-1/3">
 					<TagTypeSelection
-						bind:tagtypes={filteredTagtypes}
+						bind:tagTypes={filteredTagtypes}
 						onOpenChange={(e: boolean) => {
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_type_ids');
-								filteredTagtypes.map((tagtype_id: string) => {
-									url.searchParams.append('tag_type_ids', tagtype_id);
+								filteredTagtypes.map((tagtype: Filter) => {
+									url.searchParams.append('tag_type_ids', tagtype.id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
+				</div>
+
+				<div class="w-1/3">
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						onOpenChange={(e: boolean) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('district_ids');
+								filteredDistricts.map((district: Filter) => {
+									url.searchParams.append('district_ids', district.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

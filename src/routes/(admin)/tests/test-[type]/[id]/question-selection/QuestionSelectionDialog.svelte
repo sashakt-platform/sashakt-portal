@@ -175,29 +175,9 @@
 				>
 			</Dialog.Header>
 
-			<div class="m-4 h-full">
-				<div class="flex h-1/12 flex-row">
-					<div class="mx-2 w-1/5">
-						<TagsSelection
-							bind:tags
-							onOpenChange={(e: boolean) => {
-								if (!e) {
-									updateFilters();
-								}
-							}}
-						/>
-					</div>
-					<div class="mx-2 w-1/5">
-						<StateSelection
-							bind:states
-							onOpenChange={(e: boolean) => {
-								if (!e) {
-									updateFilters();
-								}
-							}}
-						/>
-					</div>
-					<div class="ml-auto flex w-1/5 items-start">
+			<div class="m-4 flex h-full flex-col gap-8">
+				<div class="flex flex-row items-center gap-4">
+					<div class="mr-8 w-1/3">
 						<Input
 							type="search"
 							placeholder="Search questions..."
@@ -218,8 +198,28 @@
 							}}
 						></Input>
 					</div>
+					<div class="w-1/3">
+						<TagsSelection
+							bind:tags
+							onOpenChange={(e: boolean) => {
+								if (!e) {
+									updateFilters();
+								}
+							}}
+						/>
+					</div>
+					<div class="w-1/3">
+						<StateSelection
+							bind:states
+							onOpenChange={(e: boolean) => {
+								if (!e) {
+									updateFilters();
+								}
+							}}
+						/>
+					</div>
 				</div>
-				<div class="relative flex h-11/12 flex-col">
+				<div class="relative flex flex-1 flex-col">
 					<DataTable
 						data={questionData}
 						{columns}
@@ -238,7 +238,7 @@
 						preSelectedIds={$formData.question_revision_ids || []}
 					/>
 
-					<!-- Fixed Bottom Bar -->
+					<!-- fixed bottom bar -->
 					<div class="absolute right-0 bottom-0 left-0 z-10 border-t bg-white p-4 shadow-lg">
 						<div class="flex items-center justify-between">
 							<Button class="bg-primary hover:bg-primary/90" onclick={handleSelectionConfirm}>

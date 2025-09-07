@@ -11,7 +11,6 @@
 	import type { QuestionForSelection } from './columns';
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { Button } from '$lib/components/ui/button';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 	let { open = $bindable(), questions, questionParams, formData } = $props();
@@ -95,20 +94,25 @@
 		selectedRowIds: string[]
 	) => {
 		if ($formData) {
-			// update the map with current page's selected rows
+			// get current page's question IDs
+			const currentPageIds = questionData.map((q) => String(q.latest_question_revision_id));
+
+			// remove deselected items from current page only
+			currentPageIds.forEach((id) => {
+				if (!selectedRowIds.includes(id)) {
+					allSelectedQuestions.delete(id);
+				}
+			});
+
+			// add newly selected rows from current page
 			selectedRows.forEach((row) => {
 				allSelectedQuestions.set(String(row.latest_question_revision_id), row);
 			});
 
-			// remove deselected rows
-			for (const [id] of allSelectedQuestions) {
-				if (!selectedRowIds.includes(id)) {
-					allSelectedQuestions.delete(id);
-				}
-			}
-
-			// update form data with IDs and question data
-			$formData.question_revision_ids = selectedRowIds.map((id) => Number(id));
+			// update form data with all selected items across all pages
+			$formData.question_revision_ids = Array.from(allSelectedQuestions.keys()).map((id) =>
+				Number(id)
+			);
 			$formData.question_revisions = Array.from(allSelectedQuestions.values());
 		}
 	};
@@ -215,7 +219,7 @@
 							enableSelection={true}
 							onSelectionChange={handleSelectionChange}
 							getRowId={(row) => String(row.latest_question_revision_id)}
-							preSelectedIds={$formData.question_revision_ids || []}
+							preSelectedIds={Array.from(allSelectedQuestions.keys())}
 						/>
 					</div>
 

@@ -136,30 +136,9 @@
 		`;
 	};
 
-	// clean up dialog specific query parameters
-	const cleanupDialogParams = () => {
-		const url = new URL(page.url);
-		const paramsToRemove = [
-			'questionPage',
-			'questionSize',
-			'questionSearch',
-			'questionTags',
-			'questionStates',
-			'questionSortBy',
-			'questionSortOrder'
-		];
-
-		paramsToRemove.forEach((param) => {
-			url.searchParams.delete(param);
-		});
-
-		goto(url.toString(), { replaceState: true });
-	};
-
 	// handle selection confirmation
 	const handleSelectionConfirm = () => {
 		open = false;
-		cleanupDialogParams();
 	};
 </script>
 

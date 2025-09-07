@@ -11,7 +11,7 @@
 	let { data } = $props();
 
 	let filteredStates: Filter[] = $state([]);
-	let filteredTagtypes: string[] = $state([]);
+	let filteredTagtypes: Filter[] = $state([]);
 
 	const information = [
 		{
@@ -158,13 +158,13 @@
 
 				<div class="w-1/3">
 					<TagTypeSelection
-						bind:tagtypes={filteredTagtypes}
+						bind:tagTypes={filteredTagtypes}
 						onOpenChange={(e: boolean) => {
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_type_ids');
-								filteredTagtypes.map((tagtype_id: string) => {
-									url.searchParams.append('tag_type_ids', tagtype_id);
+								filteredTagtypes.map((tagType: Filter) => {
+									url.searchParams.append('tag_type_ids', tagType.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

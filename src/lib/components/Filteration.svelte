@@ -11,10 +11,10 @@
 
 	type Filter = { id: string; name: string };
 
-	let { items = $bindable(), itemList = $bindable(), itemName, ...rest } = $props();
+	let { items = $bindable(), itemList = $bindable(), itemName, label = null, ...rest } = $props();
 	let open = $state(false);
 	let searchQuery = $state('');
-	const placeholder = 'Select ' + itemName + 's';
+	const placeholder = 'Select ' + (label ?? itemName) + 's';
 
 	// Debounced search
 	let searchTimeout: NodeJS.Timeout | undefined;
@@ -100,7 +100,7 @@
 	<Popover.Content class="w-fit p-0 ">
 		<Command.Root>
 			<Command.Input
-				placeholder={'Search ' + itemName + 's...'}
+				placeholder={'Search ' + (label ?? itemName) + 's...'}
 				oninput={handleSearch}
 				bind:value={searchQuery}
 			/>

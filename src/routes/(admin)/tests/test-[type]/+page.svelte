@@ -102,7 +102,7 @@
 
 	let filteredTags: Filter[] = $state([]);
 	let filteredStates: Filter[] = $state([]);
-	let filteredTagtypes: string[] = $state([]);
+	let filteredTagtypes: Filter[] = $state([]);
 	let deleteAction: string | null = $state(null);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 </script>
@@ -221,13 +221,13 @@
 
 				<div class="w-1/3">
 					<TagTypeSelection
-						bind:tagtypes={filteredTagtypes}
+						bind:tagTypes={filteredTagtypes}
 						onOpenChange={(e: boolean) => {
 							if (!e) {
 								const url = new URL(page.url);
 								url.searchParams.delete('tag_type_ids');
-								filteredTagtypes.map((tagtype_id: string) => {
-									url.searchParams.append('tag_type_ids', tagtype_id);
+								filteredTagtypes.map((tagtype: Filter) => {
+									url.searchParams.append('tag_type_ids', tagtype.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

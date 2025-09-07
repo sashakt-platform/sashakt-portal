@@ -220,7 +220,7 @@
 					</div>
 				</div>
 				<div class="relative flex flex-1 flex-col">
-					<div style="height: 400px;" class="overflow-auto">
+					<div class="overflow-auto pb-20" style="max-height: 65vh;">
 						<DataTable
 							data={questionData}
 							{columns}
@@ -241,7 +241,7 @@
 					</div>
 
 					<!-- fixed bottom bar -->
-					<div class="absolute right-0 bottom-0 left-0 z-10 border-t bg-white p-4 shadow-lg">
+					<div class="absolute right-0 bottom-0 left-0 border-t bg-white p-4">
 						<div class="flex items-center justify-between">
 							<Button class="bg-primary hover:bg-primary/90" onclick={handleSelectionConfirm}>
 								Add to Test {$formData.is_template ? ' Template' : ''}

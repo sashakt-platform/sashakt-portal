@@ -208,53 +208,14 @@
 				</div>
 
 				<div class="w-1/3">
-					<TagsSelection
-						bind:tags={filteredTags}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('tag_ids');
-								url.searchParams.set('page', '1');
-								filteredTags.map((tag_id: Filter) => {
-									url.searchParams.append('tag_ids', tag_id.id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<TagsSelection bind:tags={filteredTags} filteration={true} />
 				</div>
 
 				<div class="w-1/3">
-					<StateSelection
-						bind:states={filteredStates}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('state_ids');
-								url.searchParams.set('page', '1');
-								filteredStates.map((state_id: Filter) => {
-									url.searchParams.append('state_ids', state_id.id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
 				<div class="w-1/3">
-					<TagTypeSelection
-						bind:tagTypes={filteredTagtypes}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('tag_type_ids');
-								url.searchParams.set('page', '1');
-								filteredTagtypes.map((tagtype: Filter) => {
-									url.searchParams.append('tag_type_ids', tagtype.id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
 			</div>
 			<DataTable

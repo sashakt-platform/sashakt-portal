@@ -11,7 +11,14 @@
 
 	type Filter = { id: string; name: string };
 
-	let { items = $bindable(), itemList = $bindable(), itemName, label = null, ...rest } = $props();
+	let {
+		items = $bindable(),
+		itemList = $bindable(),
+		itemName,
+		label = null,
+		filteration = false,
+		...rest
+	} = $props();
 	let open = $state(false);
 	let searchQuery = $state('');
 	const placeholder = 'Select ' + (label ?? itemName) + 's';
@@ -54,16 +61,22 @@
 <Popover.Root
 	bind:open
 	{...rest}
-	onOpenChangeComplete={() => {
-		if (!open) {
+	onOpenChange={(e: boolean) => {
+		if (!e) {
 			searchQuery = '';
+			const url = new URL(page.url);
 			try {
-				const url = new URL(page.url);
 				url.searchParams.delete(itemName + '_search');
-				goto(url, { keepFocus: true, invalidateAll: true });
 			} catch (e) {
 				console.error('Failed to update URL on popover close', e);
 			}
+			if (filteration) {
+				url.searchParams.delete(itemName + '_ids');
+				items.map((item: Filter) => {
+					url.searchParams.append(itemName + '_ids', item.id);
+				});
+			}
+			goto(url, { keepFocus: true, invalidateAll: true });
 		}
 	}}
 >

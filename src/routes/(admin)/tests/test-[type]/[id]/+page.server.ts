@@ -50,21 +50,23 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const questionSearch = url.searchParams.get('questionSearch') || '';
 	const questionTags = url.searchParams.get('questionTags') || '';
 	const questionStates = url.searchParams.get('questionStates') || '';
+	const questionSortBy = url.searchParams.get('questionSortBy') || '';
+	const questionSortOrder = url.searchParams.get('questionSortOrder') || 'asc';
 
 	// build query parameters for questions API (for dialog)
 	const questionParams = new URLSearchParams({
 		page: questionPage.toString(),
 		size: questionSize.toString(),
-		...(questionSearch && { question_text: questionSearch })
+		...(questionSearch && { question_text: questionSearch }),
+		...(questionSortBy && { sort_by: questionSortBy }),
+		...(questionSortOrder && { sort_order: questionSortOrder })
 	});
 
-	if (questionTags) {
-		questionParams.set('tag_ids', questionTags);
-	}
+	const tagIds = questionTags ? questionTags.split(',').filter(Boolean) : [];
+	for (const id of tagIds) questionParams.append('tag_ids', id);
 
-	if (questionStates) {
-		questionParams.set('state_ids', questionStates);
-	}
+	const stateIds = questionStates ? questionStates.split(',').filter(Boolean) : [];
+	for (const id of stateIds) questionParams.append('state_ids', id);
 
 	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?${questionParams.toString()}`, {
 		method: 'GET',
@@ -93,7 +95,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		questionSize,
 		questionSearch,
 		questionTags,
-		questionStates
+		questionStates,
+		questionSortBy,
+		questionSortOrder
 	};
 
 	return {

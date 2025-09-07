@@ -3,7 +3,7 @@
 	import QuestionSelectionDialog from './question-selection/QuestionSelectionDialog.svelte';
 	import SelectedQuestionsList from './question-selection/SelectedQuestionsList.svelte';
 
-	let { formData, questions, questionParams, selectedQuestions = [] } = $props();
+	let { formData, questions, questionParams } = $props();
 	let dialogOpen = $state(false);
 
 	const handleRemoveQuestion = (questionId: number) => {
@@ -12,7 +12,7 @@
 			(id: number) => id !== questionId
 		);
 		$formData.question_revisions = $formData.question_revisions.filter(
-			(question: any) => question.id !== questionId
+			(question: { id: number }) => question.id !== questionId
 		);
 	};
 </script>

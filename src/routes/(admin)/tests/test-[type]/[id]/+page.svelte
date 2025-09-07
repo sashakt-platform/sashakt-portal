@@ -112,12 +112,7 @@
 	{#if currentScreen === typeOfScreen.primary}
 		<Primary {formData} />
 	{:else if currentScreen === typeOfScreen.questions}
-		<QuestionList
-			{formData}
-			questions={data.questions}
-			questionParams={data.questionParams}
-			selectedQuestions={data.selectedQuestions}
-		/>
+		<QuestionList {formData} questions={data.questions} questionParams={data.questionParams} />
 	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}

@@ -57,9 +57,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const questionParams = new URLSearchParams({
 		page: questionPage.toString(),
 		size: questionSize.toString(),
+		sort_order: questionSortOrder,
 		...(questionSearch && { question_text: questionSearch }),
-		...(questionSortBy && { sort_by: questionSortBy }),
-		...(questionSortOrder && { sort_order: questionSortOrder })
+		...(questionSortBy && { sort_by: questionSortBy })
 	});
 
 	const tagIds = questionTags ? questionTags.split(',').filter(Boolean) : [];

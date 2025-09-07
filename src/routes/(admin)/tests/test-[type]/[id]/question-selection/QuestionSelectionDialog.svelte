@@ -220,23 +220,25 @@
 					</div>
 				</div>
 				<div class="relative flex flex-1 flex-col">
-					<DataTable
-						data={questionData}
-						{columns}
-						totalItems={questions.total || 0}
-						totalPages={questions.pages || 0}
-						currentPage={questionParams?.questionPage || 1}
-						pageSize={questionParams?.questionSize || DEFAULT_PAGE_SIZE}
-						paramPrefix="question"
-						expandable={true}
-						{renderExpandedRow}
-						expandColumnId="answers"
-						emptyStateMessage="No questions found."
-						enableSelection={true}
-						onSelectionChange={handleSelectionChange}
-						getRowId={(row) => String(row.latest_question_revision_id)}
-						preSelectedIds={$formData.question_revision_ids || []}
-					/>
+					<div style="height: 400px;" class="overflow-auto">
+						<DataTable
+							data={questionData}
+							{columns}
+							totalItems={questions.total || 0}
+							totalPages={questions.pages || 0}
+							currentPage={questionParams?.questionPage || 1}
+							pageSize={questionParams?.questionSize || DEFAULT_PAGE_SIZE}
+							paramPrefix="question"
+							expandable={true}
+							{renderExpandedRow}
+							expandColumnId="answers"
+							emptyStateMessage="No questions found."
+							enableSelection={true}
+							onSelectionChange={handleSelectionChange}
+							getRowId={(row) => String(row.latest_question_revision_id)}
+							preSelectedIds={$formData.question_revision_ids || []}
+						/>
+					</div>
 
 					<!-- fixed bottom bar -->
 					<div class="absolute right-0 bottom-0 left-0 z-10 border-t bg-white p-4 shadow-lg">

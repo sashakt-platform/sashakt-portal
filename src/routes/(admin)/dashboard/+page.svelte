@@ -143,50 +143,14 @@
 					<p class="text-sm">Overall performance of all candidates</p>
 				</div>
 				<div class="w-1/3">
-					<StateSelection
-						bind:states={filteredStates}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('state_ids');
-								filteredStates.map((state: Filter) => {
-									url.searchParams.append('state_ids', state.id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
 
 				<div class="w-1/3">
-					<TagTypeSelection
-						bind:tagTypes={filteredTagtypes}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('tag_type_ids');
-								filteredTagtypes.map((tagType: Filter) => {
-									url.searchParams.append('tag_type_ids', tagType.id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
 				<div class="w-1/3">
-					<DistrictSelection
-						bind:districts={filteredDistricts}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('district_ids');
-								filteredDistricts.map((district: Filter) => {
-									url.searchParams.append('district_ids', district.id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<DistrictSelection bind:districts={filteredDistricts} filteration={true} />
 				</div>
 			</div>
 			<hr class="my-4 border-gray-300" />

@@ -45,7 +45,7 @@
 		expandColumnId,
 		enableSelection = false,
 		onSelectionChange,
-		getRowId = (row: any) => String(row.id),
+		getRowId = (row: unknown) => String((row as { id: string | number }).id),
 		preSelectedIds = []
 	}: DataTableProps<TData, TValue> = $props();
 

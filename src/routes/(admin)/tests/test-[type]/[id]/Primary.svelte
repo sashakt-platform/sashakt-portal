@@ -6,6 +6,7 @@
 	import Info from '@lucide/svelte/icons/info';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 
 	let { formData } = $props();
 </script>
@@ -45,8 +46,8 @@
 				/>
 			</div>
 
-			<div class="flex">
-				<div class="mt-10 mr-6 w-1/2">
+			<div class="flex flex-row gap-8">
+				<div class="mt-10 w-1/3">
 					<div class="flex align-middle">
 						<Label for="template-name" class="text-2xl">Tags</Label><span
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
@@ -55,13 +56,21 @@
 					<TagsSelection bind:tags={$formData.tag_ids} />
 				</div>
 
-				<div class="mt-10 w-1/2">
+				<div class="mt-10 w-1/3">
 					<div class="flex align-middle">
 						<Label for="template-name" class="text-2xl">States</Label><span
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
 					<StateSelection bind:states={$formData.state_ids} />
+				</div>
+				<div class="mt-10 w-1/3">
+					<div class="flex align-middle">
+						<Label for="template-name" class="text-2xl">Districts</Label><span
+							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
+						>
+					</div>
+					<DistrictSelection bind:districts={$formData.district_ids} />
 				</div>
 			</div>
 		</div>

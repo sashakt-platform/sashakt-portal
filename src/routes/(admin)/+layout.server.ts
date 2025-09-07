@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const stateSearch = url.searchParams.get('state_search') || '';
 	const tagSearch = url.searchParams.get('tag_search') || '';
 	const tagTypeSearch = url.searchParams.get('tag_type_search') || '';
+	const districtSearch = url.searchParams.get('district_search') || '';
 
 	const responseState = await fetch(
 		`${BACKEND_URL}/location/state/?name=${encodeURIComponent(stateSearch)}`,
@@ -54,12 +55,15 @@ export const load: PageServerLoad = async ({ url }) => {
 		};
 	}
 
-	const responseDistricts = await fetch(`${BACKEND_URL}/location/district/?skip=0&limit=100`, {
-		method: 'GET',
-		headers: {
-			Authorization: `Bearer ${token}`
+	const responseDistricts = await fetch(
+		`${BACKEND_URL}/location/district/?name=${encodeURIComponent(districtSearch)}`,
+		{
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
 		}
-	});
+	);
 
 	if (!responseDistricts.ok) {
 		console.error(

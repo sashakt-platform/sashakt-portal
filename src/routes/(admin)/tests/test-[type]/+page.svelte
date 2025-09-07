@@ -15,6 +15,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 
 	let {
 		data
@@ -60,9 +61,15 @@
 		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
 		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
 		const hasTagtypeFilters = page.url.searchParams.getAll('tag_type_ids').length > 0;
+		const hasDistrictFilters = page.url.searchParams.getAll('district_ids').length > 0;
 
 		noTestCreatedYet =
-			totalItems === 0 && !hasFilters && !hasTagFilters && !hasStateFilters && !hasTagtypeFilters;
+			totalItems === 0 &&
+			!hasFilters &&
+			!hasTagFilters &&
+			!hasStateFilters &&
+			!hasTagtypeFilters &&
+			!hasDistrictFilters;
 	});
 
 	// handle sorting
@@ -103,6 +110,7 @@
 	let filteredTags: Filter[] = $state([]);
 	let filteredStates: Filter[] = $state([]);
 	let filteredTagtypes: Filter[] = $state([]);
+	let filteredDistricts: Filter[] = $state([]);
 	let deleteAction: string | null = $state(null);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 </script>
@@ -228,6 +236,22 @@
 								url.searchParams.delete('tag_type_ids');
 								filteredTagtypes.map((tagtype: Filter) => {
 									url.searchParams.append('tag_type_ids', tagtype.id);
+								});
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}
+						}}
+					/>
+				</div>
+
+				<div class="w-1/3">
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						onOpenChange={(e: boolean) => {
+							if (!e) {
+								const url = new URL(page.url);
+								url.searchParams.delete('district_ids');
+								filteredDistricts.map((district: Filter) => {
+									url.searchParams.append('district_ids', district.id);
 								});
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}

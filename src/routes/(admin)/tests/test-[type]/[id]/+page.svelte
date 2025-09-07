@@ -52,6 +52,12 @@
 				name: state.name
 			})) || [];
 
+		$formData.district_ids =
+			testData?.districts?.map((district: Filter) => ({
+				id: String(district.id),
+				name: district.name
+			})) || [];
+
 		$formData.tag_ids =
 			testData?.tags?.map((tag: Filter) => ({
 				id: String(tag.id),

@@ -69,11 +69,11 @@
 		$formData.random_tag_count =
 			(
 				testData?.random_tag_counts as
-					| Array<{ tag: { id: string; name: string }; count: number }>
+					| Array<{ tag: { id: string; name: string; tag_type?: { name: string } }; count: number }>
 					| undefined
 			)?.map((t) => ({
 				id: String(t.tag.id),
-				name: t.tag.name,
+				name: t.tag.name + (t.tag.tag_type?.name ? `- (${t.tag.tag_type?.name})` : ''),
 				count: t.count
 			})) || [];
 	}

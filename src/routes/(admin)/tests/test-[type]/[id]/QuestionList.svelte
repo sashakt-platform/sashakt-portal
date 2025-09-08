@@ -2,8 +2,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import QuestionSelectionDialog from './question-selection/QuestionSelectionDialog.svelte';
 	import SelectedQuestionsList from './question-selection/SelectedQuestionsList.svelte';
-	import GripVertical from '@lucide/svelte/icons/grip-vertical';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { Label } from '$lib/components/ui/label';
 	import TestPaper from '$lib/icons/TestPaper.svelte';

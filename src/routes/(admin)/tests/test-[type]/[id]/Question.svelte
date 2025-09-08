@@ -155,7 +155,7 @@
 			{:else if questionSelectionMode == 'tagBased'}
 				{#if $formData.random_tag_count.length == 0}
 					<div class="my-auto text-center">
-						<p class="text-lg font-bold">Tag-Based Randomization</p>
+						<p class="text-lg font-bold">Tag-Based Question Randomization</p>
 						<p class="text-sm text-gray-400">
 							Add the relevant random questions to your test {$formData.is_template
 								? 'template'

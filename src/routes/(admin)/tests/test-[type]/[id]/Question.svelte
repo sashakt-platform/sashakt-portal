@@ -33,7 +33,7 @@
 			<div class="flex h-full w-fit">
 				<TestPaper />
 			</div>
-			<p class="w-1/2 text-lg font-semibold">Question Selection For the Test</p>
+			<p class="text-lg font-semibold">Selection</p>
 			<RadioGroup.Root
 				bind:value={questionSelectionMode}
 				class="mx-auto flex w-full  flex-row justify-center gap-8 "
@@ -45,10 +45,8 @@
 						onclick={() => ($formData.random_tag_count = [])}
 					/>
 					<Label for="manual"
-						><p class="font-bold">Manual Questions Selection</p>
-						<p class="text-sm font-extralight">
-							Select Questions Manually from the Question Bank
-						</p></Label
+						><p class="font-bold">Manual</p>
+						<p class="text-sm font-extralight">Select from the Question Bank</p></Label
 					>
 				</div>
 				<div class="flex w-fit flex-row items-center gap-4">
@@ -59,8 +57,8 @@
 							onclick={() => ($formData.question_revision_ids = [])}
 						/>
 						<Label for="tagBased"
-							><p class="font-bold">Tag-Based Random Questions</p>
-							<p class="text-sm font-extralight">Select Tags for Random Questions with Count</p>
+							><p class="font-bold">Random</p>
+							<p class="text-sm font-extralight">Based on the Tags</p>
 						</Label>
 					</div>
 				</div>
@@ -89,7 +87,6 @@
 				</div>
 				{#if questionSelectionMode == 'tagBased'}
 					<div class="my-auto flex w-1/2 flex-col justify-center align-middle">
-						<p class="text-sm text-gray-400">Select Tags for Randomization</p>
 						<TagsSelection bind:tags={$formData.random_tag_count} />
 					</div>
 				{/if}
@@ -156,20 +153,15 @@
 			{:else if questionSelectionMode == 'tagBased'}
 				{#if $formData.random_tag_count.length == 0}
 					<div class="my-auto text-center">
-						<p class="text-lg font-bold">Tag-Based Question Randomization</p>
 						<p class="text-sm text-gray-400">
-							Add the relevant random questions to your test {$formData.is_template
-								? 'template'
-								: ''} by selecting tags above
+							No tags selected. Please select tags to enable random question for the test.
 						</p>
 					</div>
 				{:else}
 					<div class="flex h-full w-full flex-col gap-4 overflow-auto">
 						<div class="flex flex-col">
-							<p class="text-lg font-bold">Tags Selected for Randomization</p>
-							<p class="text-sm text-gray-400">
-								Enter count of questions to be selected from each tag
-							</p>
+							<p class="text-lg font-bold">Random Configuration</p>
+							<p class="text-sm text-gray-400">Enter number of questions for the selected Tags</p>
 						</div>
 						<div class="flex flex-col">
 							{#each $formData.random_tag_count as tag (tag.id)}
@@ -178,12 +170,12 @@
 									<div class="w-3/4">
 										<Input
 											type="number"
-											placeholder="Enter random questions expected for - {tag.name}"
+											placeholder="No of questions"
 											class="ml-2 rounded border p-2"
 											bind:value={tag.count}
 										/>
 										<small class="ml-2 text-red-400"
-											>{isNaN(Number(tag.count)) || Number(tag.count) <= 0
+											>{tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)
 												? 'Enter a positive integer'
 												: ''}</small
 										>

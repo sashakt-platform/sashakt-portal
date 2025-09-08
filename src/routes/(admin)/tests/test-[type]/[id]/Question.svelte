@@ -11,7 +11,7 @@
 
 	let { formData, questions } = $props();
 	let dialogOpen = $state(false);
-	let questionSelectionMode: 'manual' | 'tagBased' = $state('tagBased');
+	let questionSelectionMode: 'manual' | 'tagBased' = $state('manual');
 </script>
 
 <QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />

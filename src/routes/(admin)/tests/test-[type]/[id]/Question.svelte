@@ -8,6 +8,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import TestPaper from '$lib/icons/TestPaper.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
+	import { Input } from '$lib/components/ui/input/index.js';
 
 	let { formData, questions } = $props();
 	let dialogOpen = $state(false);
@@ -174,12 +175,19 @@
 							{#each $formData.random_tag_count as tag (tag.id)}
 								<div class="m-4 flex items-center rounded p-2 text-sm">
 									<span class="w-1/4">{tag.name}</span>
-									<input
-										type="number"
-										placeholder="Enter random questions expected for - {tag.name}"
-										class="ml-2 w-3/4 rounded border p-2"
-										bind:value={tag.count}
-									/>
+									<div class="w-3/4">
+										<Input
+											type="number"
+											placeholder="Enter random questions expected for - {tag.name}"
+											class="ml-2 rounded border p-2"
+											bind:value={tag.count}
+										/>
+										<small class="ml-2 text-red-400"
+											>{isNaN(Number(tag.count)) || Number(tag.count) <= 0
+												? 'Enter a positive integer'
+												: ''}</small
+										>
+									</div>
 								</div>
 							{/each}
 						</div>

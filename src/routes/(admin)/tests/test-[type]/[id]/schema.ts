@@ -32,7 +32,7 @@ export const testSchema = z.object({
 			z.object({
 				id: z.string(),
 				name: z.string(),
-				count: z.coerce.number().int().min(0)
+				count: z.number().int().min(0)
 			})
 		)
 		.default([]),

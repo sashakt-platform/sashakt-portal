@@ -35,6 +35,7 @@
 		enhance,
 		submit
 	} = superForm(questionData || data.form, {
+		applyAction: 'never',
 		validators: zodClient(questionSchema),
 		dataType: 'json',
 		onSubmit: () => {
@@ -52,15 +53,23 @@
 		}
 	});
 
-	questionData &&
-		($formData.state_ids = questionData.locations?.map((state: any) => {
-			return String(state.state_id);
+	if (questionData?.locations?.length) {
+		$formData.state_ids = questionData.locations.map((location) => ({
+			id: String((location as { state_id: string | number }).state_id),
+			name: (location as { state_name: string }).state_name
 		}));
+	}
 
-	questionData &&
-		($formData.tag_ids = questionData.tags?.map((tag: any) => {
-			return String(tag.id);
-		}));
+	if (questionData?.tags?.length) {
+		$formData.tag_ids = questionData.tags.map((tag) => {
+			const tagName = tag.name;
+			const tagTypeName = tag.tag_type?.name;
+			return {
+				id: String((tag as { id: string | number }).id),
+				name: tagTypeName ? `${tagName} (${tagTypeName})` : tagName
+			};
+		});
+	}
 
 	if (questionData && !questionData.marking_scheme) {
 		$formData.marking_scheme = {

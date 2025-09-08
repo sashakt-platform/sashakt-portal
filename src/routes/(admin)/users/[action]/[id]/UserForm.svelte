@@ -7,6 +7,7 @@
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import StateSelection from '$lib/components/StateSelection.svelte';
+	import type { Filter } from '$lib/types/filters';
 
 	let { data }: { data: any } = $props();
 
@@ -15,6 +16,7 @@
 	const schema = isEditMode ? editUserSchema : createUserSchema;
 
 	const form = superForm(userData || data.form, {
+		applyAction: 'never',
 		validators: zodClient(schema),
 		dataType: 'json'
 	});
@@ -22,7 +24,8 @@
 	const { form: formData, enhance } = form;
 
 	if (userData) {
-		$formData.state_ids = userData?.states?.map((state: { id: String }) => String(state.id)) || [];
+		$formData.state_ids =
+			userData?.states?.map((state: Filter) => ({ id: String(state.id), name: state.name })) || [];
 	}
 </script>
 

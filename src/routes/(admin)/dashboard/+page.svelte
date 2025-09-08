@@ -1,16 +1,19 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import { type Filter } from '$lib/types/filters.js';
 	import Info from '@lucide/svelte/icons/info';
 
 	let { data } = $props();
 
-	let filteredStates: string[] = $state([]);
-	let filteredTagtypes: string[] = $state([]);
+	let filteredStates: Filter[] = $state([]);
+	let filteredTagtypes: Filter[] = $state([]);
+	let filteredDistricts: Filter[] = $state([]);
 
 	const information = [
 		{
@@ -140,35 +143,14 @@
 					<p class="text-sm">Overall performance of all candidates</p>
 				</div>
 				<div class="w-1/3">
-					<StateSelection
-						bind:states={filteredStates}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('state_ids');
-								filteredStates.map((state_id: string) => {
-									url.searchParams.append('state_ids', state_id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
 
 				<div class="w-1/3">
-					<TagTypeSelection
-						bind:tagtypes={filteredTagtypes}
-						onOpenChange={(e: boolean) => {
-							if (!e) {
-								const url = new URL(page.url);
-								url.searchParams.delete('tag_type_ids');
-								filteredTagtypes.map((tagtype_id: string) => {
-									url.searchParams.append('tag_type_ids', tagtype_id);
-								});
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}
-						}}
-					/>
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+				</div>
+				<div class="w-1/3">
+					<DistrictSelection bind:districts={filteredDistricts} filteration={true} />
 				</div>
 			</div>
 			<hr class="my-4 border-gray-300" />

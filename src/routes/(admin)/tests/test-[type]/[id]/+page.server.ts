@@ -120,6 +120,13 @@ export const actions: Actions = {
 			);
 			return fail(400, { form });
 		}
+		const transformedFormData = {
+			...form.data,
+			state_ids: form.data.state_ids.map((s) => s.id),
+			tag_ids: form.data.tag_ids.map((t) => t.id),
+			district_ids: form.data.district_ids.map((d) => d.id),
+			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
+		};
 		const response = await fetch(
 			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : ''}`,
 			{
@@ -128,7 +135,7 @@ export const actions: Actions = {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify(form.data)
+				body: JSON.stringify(transformedFormData)
 			}
 		);
 

@@ -27,12 +27,22 @@ export const testSchema = z.object({
 	shuffle: z.boolean().optional().default(false),
 	random_questions: z.boolean().optional().default(false),
 	no_of_random_questions: z.number().nullable().optional(),
+	random_tag_count: z
+		.array(
+			z.object({
+				id: z.string(),
+				name: z.string(),
+				count: z.number().int().min(0)
+			})
+		)
+		.default([]),
 	question_pagination: z.number().min(0).optional().default(0),
 	is_template: z.boolean().optional().default(false),
 	template_id: z.string().nullable().optional(),
-	tag_ids: z.array(z.string()).default([]),
+	tag_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	question_revision_ids: z.array(z.number()).default([]),
-	state_ids: z.array(z.string()).default([]),
+	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().optional().default(true)
 });
 

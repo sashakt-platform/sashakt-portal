@@ -9,6 +9,7 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { testSchema, type FormSchema } from './schema';
+	import type { Filter } from '$lib/types/filters';
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
@@ -31,6 +32,7 @@
 		enhance,
 		submit
 	} = superForm(testData || data.form, {
+		applyAction: 'never',
 		validators: zodClient(testSchema),
 		applyAction: 'never',
 		dataType: 'json',
@@ -45,10 +47,36 @@
 	});
 
 	if (testData) {
-		$formData.tag_ids = testData?.tags?.map((tag: { id: String }) => String(tag.id)) || [];
-		$formData.state_ids = testData?.states?.map((state: { id: String }) => String(state.id)) || [];
+		$formData.state_ids =
+			testData?.states?.map((state: Filter) => ({
+				id: String(state.id),
+				name: state.name
+			})) || [];
+
+		$formData.district_ids =
+			testData?.districts?.map((district: Filter) => ({
+				id: String(district.id),
+				name: district.name
+			})) || [];
+
+		$formData.tag_ids =
+			testData?.tags?.map((tag: Filter) => ({
+				id: String(tag.id),
+				name: tag.name
+			})) || [];
 		$formData.question_revision_ids =
 			testData?.question_revisions?.map((q: { id: number }) => q.id) || [];
+
+		$formData.random_tag_count =
+			(
+				testData?.random_tag_counts as
+					| Array<{ tag: { id: string; name: string; tag_type?: { name: string } }; count: number }>
+					| undefined
+			)?.map((t) => ({
+				id: String(t.tag.id),
+				name: t.tag.name + (t.tag.tag_type?.name ? `- (${t.tag.tag_type?.name})` : ''),
+				count: t.count
+			})) || [];
 	}
 </script>
 

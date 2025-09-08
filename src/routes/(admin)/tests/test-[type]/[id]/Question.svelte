@@ -65,7 +65,7 @@
 			</RadioGroup.Root>
 		</div>
 		<div
-			class=" mb-2 flex h-1/6 items-center gap-4 rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg"
+			class=" mb-2 flex min-h-1/6 items-center gap-4 rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg"
 		>
 			<div class="flex h-full items-center">
 				<TestPaper />

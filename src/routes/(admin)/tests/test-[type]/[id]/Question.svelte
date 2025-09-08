@@ -12,6 +12,16 @@
 	let { formData, questions } = $props();
 	let dialogOpen = $state(false);
 	let questionSelectionMode: 'manual' | 'tagBased' = $state('manual');
+
+	let totalSelectedCount = $derived(
+		$formData.question_revision_ids.length > 0
+			? $formData.question_revision_ids.length
+			: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
+	);
+	// Optional: auto-select mode on load when tags exist
+	if ($formData.random_tag_count.length > 0 && $formData.question_revision_ids.length === 0) {
+		questionSelectionMode = 'tagBased';
+	}
 </script>
 
 <QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />
@@ -71,9 +81,8 @@
 							>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
 						>
 						<span class="text-gray-500"
-							>{$formData.question_revision_ids.length ||
-								$formData.random_tag_count.map((t) => t.count).reduce((a, b) => a + b, 0)}
-							{$formData.question_revision_ids.length == 1 ? 'question' : 'questions'}
+							>{totalSelectedCount}
+							{totalSelectedCount === 1 ? 'question' : 'questions'}
 						</span>
 					</div>
 				</div>

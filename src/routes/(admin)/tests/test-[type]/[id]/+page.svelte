@@ -32,6 +32,7 @@
 		submit
 	} = superForm(testData || data.form, {
 		validators: zodClient(testSchema),
+		applyAction: 'never',
 		dataType: 'json',
 		onSubmit() {
 			if ($formData.template_id) {

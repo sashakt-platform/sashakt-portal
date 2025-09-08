@@ -183,7 +183,6 @@
 								</div>
 							{/each}
 						</div>
-						{JSON.stringify($formData.random_tag_count)}
 					</div>
 				{/if}
 			{/if}

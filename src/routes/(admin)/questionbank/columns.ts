@@ -1,7 +1,8 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import {
 	createSortableColumn,
-	createActionsColumn
+	createActionsColumn,
+	createSelectionColumn
 } from '$lib/components/data-table/column-helpers';
 import { formatDate } from '$lib/utils';
 import Eye from '@lucide/svelte/icons/eye';
@@ -19,8 +20,10 @@ export interface Question {
 export const createQuestionColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
-	handleSort: (columnId: string) => void
+	handleSort: (columnId: string) => void,
+	enableSelection: boolean = false
 ): ColumnDef<Question>[] => [
+	...(enableSelection ? [createSelectionColumn<Question>()] : []),
 	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
 	{
 		id: 'answers',

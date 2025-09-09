@@ -89,6 +89,18 @@
 		initializeSelectedQuestions()
 	);
 
+	// sync allSelectedQuestions when questions are removed on the listing page
+	$effect(() => {
+		if ($formData?.question_revisions) {
+			// rebuild the map based on current formData
+			const newMap = new Map<string, QuestionForSelection>();
+			$formData.question_revisions.forEach((question: any) => {
+				newMap.set(String(question.id), question);
+			});
+			allSelectedQuestions = newMap;
+		}
+	});
+
 	const handleSelectionChange = (
 		selectedRows: QuestionForSelection[],
 		selectedRowIds: string[]

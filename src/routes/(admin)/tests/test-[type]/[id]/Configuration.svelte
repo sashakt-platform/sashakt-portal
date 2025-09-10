@@ -238,5 +238,18 @@
 				</RadioGroup.Root>
 			</div>
 		</ConfigureBox>
+		<ConfigureBox title="Candidate Profile" Icon={ClipboardPenLine}>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.candidate_profile} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Candidate profile',
+						'Configure to include candidate profile during test attempt'
+					)}
+				</div>
+			</div>
+		</ConfigureBox>
 	</div>
 </div>

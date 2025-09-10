@@ -246,7 +246,7 @@
 				<div class="w-full">
 					{@render headingSubheading(
 						'Candidate profile',
-						'Configure candidate profile to get entity from user'
+						'Configure to include candidate profile during test attempt'
 					)}
 				</div>
 			</div>

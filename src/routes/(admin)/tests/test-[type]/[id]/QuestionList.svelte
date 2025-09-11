@@ -1,16 +1,14 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
-	import QuestionDialog from './QuestionDialog.svelte';
-	import { columns } from './question_table/columns.js';
-	import GripVertical from '@lucide/svelte/icons/grip-vertical';
-	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import QuestionSelectionDialog from './question-selection/QuestionSelectionDialog.svelte';
+	import SelectedQuestionsList from './question-selection/SelectedQuestionsList.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { Label } from '$lib/components/ui/label';
 	import TestPaper from '$lib/icons/TestPaper.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import { Input } from '$lib/components/ui/input/index.js';
 
-	let { formData, questions } = $props();
+	let { formData, questions, questionParams } = $props();
 	let dialogOpen = $state(false);
 	let questionSelectionMode: 'manual' | 'tagBased' = $state('manual');
 
@@ -19,13 +17,24 @@
 			? $formData.question_revision_ids.length
 			: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
+
 	// Optional: auto-select mode on load when tags exist
 	if ($formData.random_tag_count.length > 0 && $formData.question_revision_ids.length === 0) {
 		questionSelectionMode = 'tagBased';
 	}
+
+	const handleRemoveQuestion = (questionId: number) => {
+		// remove from both IDs and question data
+		$formData.question_revision_ids = $formData.question_revision_ids.filter(
+			(id: number) => id !== questionId
+		);
+		$formData.question_revisions = $formData.question_revisions.filter(
+			(question: { id: number }) => question.id !== questionId
+		);
+	};
 </script>
 
-<QuestionDialog bind:open={dialogOpen} {questions} {columns} {formData} />
+<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} />
 
 <div class="mx-auto flex h-dvh">
 	<div class=" mx-auto w-full p-20">
@@ -113,42 +122,11 @@
 						>
 					</div>
 				{:else}
-					<div class="flex h-full w-full flex-col overflow-auto">
-						{#each questions.items.filter( (row) => $formData.question_revision_ids.includes(row.latest_question_revision_id) ) as d (d.latest_question_revision_id)}
-							<div class="group mx-2 mt-2 flex flex-row">
-								<div class="my-auto w-fit">
-									<GripVertical />
-								</div>
-								<div
-									class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
-								>
-									<p class="w-4/6">
-										{d.question_text}
-									</p>
-									<span class="w-2/6">
-										{#if d.tags.length > 0}
-											<p>
-												<span class="font-bold">Tags:</span>
-												{d.tags.map((tag) => tag?.name).join(', ')}
-											</p>
-										{/if}
-									</span>
-								</div>
-								<div class="my-auto ml-2 hidden w-fit group-hover:block">
-									<button
-										onclick={(e) => {
-											$formData.question_revision_ids = $formData.question_revision_ids.filter(
-												(id) => id !== d.latest_question_revision_id
-											);
-										}}
-										class="cursor-pointer"
-									>
-										<Trash2 />
-									</button>
-								</div>
-							</div>
-						{/each}
-					</div>
+					<SelectedQuestionsList
+						selectedQuestions={$formData.question_revisions || []}
+						bind:selectedQuestionIds={$formData.question_revision_ids}
+						onRemoveQuestion={handleRemoveQuestion}
+					/>
 				{/if}
 			{:else if questionSelectionMode == 'tagBased'}
 				{#if $formData.random_tag_count.length == 0}

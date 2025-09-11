@@ -1,7 +1,12 @@
 <script lang="ts" generics="TData, TValue">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { type ColumnDef, getCoreRowModel, getExpandedRowModel } from '@tanstack/table-core';
+	import {
+		type ColumnDef,
+		type RowSelectionState,
+		getCoreRowModel,
+		getExpandedRowModel
+	} from '@tanstack/table-core';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table/index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
@@ -19,6 +24,10 @@
 		emptyStateMessage?: string; // custom empty state message
 		emptyStateContent?: () => any; // custom empty state content
 		expandColumnId?: string; // column ID that should handle expand functionality
+		enableSelection?: boolean; // enable row selection
+		onSelectionChange?: (selectedRows: TData[], selectedRowIds: string[]) => void; // callback when selection changes
+		getRowId?: (row: TData) => string; // function to get unique row ID
+		preSelectedIds?: (string | number)[]; // pre-selected row IDs
 	};
 
 	let {
@@ -33,29 +42,45 @@
 		renderExpandedRow,
 		emptyStateMessage = 'No results.',
 		emptyStateContent,
-		expandColumnId
+		expandColumnId,
+		enableSelection = false,
+		onSelectionChange,
+		getRowId = (row: unknown) => String((row as { id: string | number }).id),
+		preSelectedIds = []
 	}: DataTableProps<TData, TValue> = $props();
 
 	// pagination
 	function goToPage(newPage: number) {
 		const url = new URL(page.url);
-		const paramName = paramPrefix
-			? paramPrefix + 'Page'
-			: 'page';
+		const paramName = paramPrefix ? paramPrefix + 'Page' : 'page';
 		url.searchParams.set(paramName, newPage.toString());
 		goto(url.toString(), { replaceState: false });
 	}
 
-	// State for expanded rows
+	// state for expanded rows
 	let expanded = $state({});
 
-	// create table
+	// initialize row selection state with preselected IDs
+	const initialSelection: RowSelectionState = {};
+	if (enableSelection && preSelectedIds.length > 0) {
+		preSelectedIds.forEach((id) => {
+			const rowId = String(id);
+			initialSelection[rowId] = true;
+		});
+	}
 
+	// state for row selection
+	let rowSelection = $state<RowSelectionState>(initialSelection);
+
+	// create table
 	const table = $derived(
 		createSvelteTable({
 			data,
 			columns,
-			state: expandable ? { expanded } : {},
+			state: {
+				...(expandable && { expanded }),
+				...(enableSelection && { rowSelection })
+			},
 			onExpandedChange: expandable
 				? (updater) => {
 						if (typeof updater === 'function') {
@@ -65,10 +90,33 @@
 						}
 					}
 				: undefined,
+			onRowSelectionChange: enableSelection
+				? (updater) => {
+						if (typeof updater === 'function') {
+							rowSelection = updater(rowSelection);
+						} else {
+							rowSelection = updater;
+						}
+						if (onSelectionChange) {
+							// get all selected row IDs from the complete selection state
+							const selectedRowIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+
+							// NOTE: tanstack does not provide a way to get full selected rows across all pages
+							// get full data for current page rows
+							const currentPageSelectedRows = table
+								.getFilteredSelectedRowModel()
+								.rows.map((row) => row.original);
+
+							onSelectionChange(currentPageSelectedRows, selectedRowIds);
+						}
+					}
+				: undefined,
 			getCoreRowModel: getCoreRowModel(),
 			getExpandedRowModel: expandable ? getExpandedRowModel() : undefined,
 			enableExpanding: expandable,
 			getRowCanExpand: expandable ? () => true : undefined,
+			enableRowSelection: enableSelection,
+			getRowId: enableSelection ? getRowId : undefined,
 			manualPagination: true,
 			manualSorting: true,
 			manualFiltering: true
@@ -96,14 +144,24 @@
 		</Table.Header>
 		<Table.Body>
 			{#each table.getRowModel().rows as row (row.id)}
-				<Table.Row
-					data-state={row.getIsSelected() && 'selected'}
-				>
+				<Table.Row data-state={row.getIsSelected() && 'selected'}>
 					{#each row.getVisibleCells() as cell (cell.id)}
 						<Table.Cell
-							class={expandable && expandColumnId && cell.column.id === expandColumnId ? 'cursor-pointer' : ''}
-							onclick={expandable && expandColumnId && cell.column.id === expandColumnId && row.getCanExpand() ? () => row.toggleExpanded() : undefined}
-							title={expandable && expandColumnId && cell.column.id === expandColumnId && row.getCanExpand() ? 'View details' : undefined}
+							class={expandable && expandColumnId && cell.column.id === expandColumnId
+								? 'cursor-pointer'
+								: ''}
+							onclick={expandable &&
+							expandColumnId &&
+							cell.column.id === expandColumnId &&
+							row.getCanExpand()
+								? () => row.toggleExpanded()
+								: undefined}
+							title={expandable &&
+							expandColumnId &&
+							cell.column.id === expandColumnId &&
+							row.getCanExpand()
+								? 'View details'
+								: undefined}
 						>
 							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 						</Table.Cell>
@@ -134,6 +192,11 @@
 	</Table.Root>
 	<div class="flex items-center justify-between space-x-2 py-4">
 		<div class="text-muted-foreground flex-1 text-sm">
+			{#if enableSelection}
+				{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows
+					.length} selected
+				<span class="mx-2">•</span>
+			{/if}
 			Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)} of
 			{totalItems} entries
 		</div>

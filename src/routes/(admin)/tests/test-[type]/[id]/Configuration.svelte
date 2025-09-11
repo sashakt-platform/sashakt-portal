@@ -246,7 +246,7 @@
 				<div class="w-full">
 					{@render headingSubheading(
 						'Candidate profile',
-						'Configure to include candidate profile during test attempt'
+						'Configure to collect candidate information during the test.'
 					)}
 				</div>
 			</div>

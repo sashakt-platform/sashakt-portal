@@ -198,13 +198,12 @@
 				<div class="w-1/3">
 					<TagsSelection bind:tags={filteredTags} filteration={true} />
 				</div>
-
 				<div class="w-1/3">
-					<StateSelection bind:states={filteredStates} filteration={true} />
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
 
 				<div class="w-1/3">
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
 
 				<div class="w-1/3">

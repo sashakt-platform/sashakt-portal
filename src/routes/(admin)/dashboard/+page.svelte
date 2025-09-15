@@ -142,13 +142,14 @@
 					<p class="font-semibold">Score & Duration Analysis</p>
 					<p class="text-sm">Overall performance of all candidates</p>
 				</div>
-				<div class="w-1/3">
-					<StateSelection bind:states={filteredStates} filteration={true} />
-				</div>
 
 				<div class="w-1/3">
 					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
+				<div class="w-1/3">
+					<StateSelection bind:states={filteredStates} filteration={true} />
+				</div>
+
 				<div class="w-1/3">
 					<DistrictSelection bind:districts={filteredDistricts} filteration={true} />
 				</div>

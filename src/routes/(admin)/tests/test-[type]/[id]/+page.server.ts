@@ -48,8 +48,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const questionPage = Number(url.searchParams.get('questionPage')) || 1;
 	const questionSize = Number(url.searchParams.get('questionSize')) || DEFAULT_PAGE_SIZE;
 	const questionSearch = url.searchParams.get('questionSearch') || '';
-	const questionTags = url.searchParams.get('questionTags') || '';
-	const questionStates = url.searchParams.get('questionStates') || '';
+	const questionTags = url.searchParams.get('tag_ids') || '';
+	const questionStates = url.searchParams.get('state_ids') || '';
 	const questionSortBy = url.searchParams.get('questionSortBy') || '';
 	const questionSortOrder = url.searchParams.get('questionSortOrder') || 'asc';
 

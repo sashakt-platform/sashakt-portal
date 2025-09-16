@@ -194,24 +194,10 @@
 						></Input>
 					</div>
 					<div class="w-1/3">
-						<TagsSelection
-							bind:tags
-							onOpenChange={(e: boolean) => {
-								if (!e) {
-									updateFilters();
-								}
-							}}
-						/>
+						<TagsSelection bind:tags filteration={true} />
 					</div>
 					<div class="w-1/3">
-						<StateSelection
-							bind:states
-							onOpenChange={(e: boolean) => {
-								if (!e) {
-									updateFilters();
-								}
-							}}
-						/>
+						<StateSelection bind:states filteration={true} />
 					</div>
 				</div>
 				<div class="relative flex flex-1 flex-col">

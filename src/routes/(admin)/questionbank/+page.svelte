@@ -32,6 +32,7 @@
 	let selectedQuestions: Question[] = $state([]);
 	let selectedQuestionIds: string[] = $state([]);
 	let batchDeleteMode = $state(false);
+	let clearTableSelection = $state(false);
 
 	// extract data and pagination info
 	const tableData = $derived(data?.questions?.items || []);
@@ -108,7 +109,7 @@
 
 	// handle batch delete confirmation
 	const handleBatchDeleteConfirm = () => {
-		// Submit the hidden form which will trigger the server action
+		// submit the hidden form which will trigger the server action
 		const form = document.getElementById('batch-delete-form') as HTMLFormElement;
 		if (form) {
 			form.requestSubmit();
@@ -125,6 +126,12 @@
 		selectedQuestions = [];
 		selectedQuestionIds = [];
 		batchDeleteMode = false;
+		clearTableSelection = true;
+
+		// reset the flag after a brief delay
+		setTimeout(() => {
+			clearTableSelection = false;
+		}, 0);
 	};
 
 	// render expanded row content
@@ -319,6 +326,7 @@
 				{enableSelection}
 				onSelectionChange={handleSelectionChange}
 				getRowId={(row) => row.id}
+				clearSelection={clearTableSelection}
 			/>
 		</div>
 	{/if}

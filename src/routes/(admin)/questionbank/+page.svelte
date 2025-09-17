@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { DataTable } from '$lib/components/data-table';
-	import { createQuestionColumns } from './columns';
+	import { createQuestionColumns, type Question } from './columns';
+	import BatchActionsToolbar from '$lib/components/data-table/BatchActionsToolbar.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
@@ -16,6 +17,8 @@
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import { type Filter } from '$lib/types/filters';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
+	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -25,7 +28,12 @@
 	let filteredTagtypes: Filter[] = $state([]);
 	let searchTimeout: ReturnType<typeof setTimeout>;
 
-	// Extract data and pagination info
+	// batch selection state
+	let selectedQuestions: Question[] = $state([]);
+	let selectedQuestionIds: string[] = $state([]);
+	let batchDeleteMode = $state(false);
+
+	// extract data and pagination info
 	const tableData = $derived(data?.questions?.items || []);
 	const totalItems = $derived(data?.questions?.total || 0);
 
@@ -67,7 +75,7 @@
 	});
 
 	// handle sorting
-	function handleSort(columnId: string) {
+	const handleSort = (columnId: string) => {
 		const url = new URL(page.url);
 		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
 
@@ -76,13 +84,51 @@
 		url.searchParams.set('page', '1');
 
 		goto(url.toString(), { replaceState: false });
-	}
+	};
 
-	// Create columns (reactive)
-	const columns = $derived(createQuestionColumns(sortBy, sortOrder, handleSort));
+	// enable selection
+	const enableSelection = $derived(!noQuestionCreatedYet);
+	// create question columns
+	const columns = $derived(createQuestionColumns(sortBy, sortOrder, handleSort, enableSelection));
 
-	// Render expanded row content
-	function expandedRowContent(question: any) {
+	// handle selection change
+	const handleSelectionChange = (selectedRows: Question[], selectedRowIds: string[]) => {
+		selectedQuestions = selectedRows;
+		selectedQuestionIds = selectedRowIds;
+	};
+
+	// handle batch actions
+	const handleBatchAction = (actionId: string) => {
+		switch (actionId) {
+			case 'delete':
+				batchDeleteMode = true;
+				break;
+		}
+	};
+
+	// handle batch delete confirmation
+	const handleBatchDeleteConfirm = () => {
+		// Submit the hidden form which will trigger the server action
+		const form = document.getElementById('batch-delete-form') as HTMLFormElement;
+		if (form) {
+			form.requestSubmit();
+		}
+	};
+
+	// handle batch delete cancellation
+	const handleBatchDeleteCancel = () => {
+		batchDeleteMode = false;
+	};
+
+	// clear selection
+	const handleClearSelection = () => {
+		selectedQuestions = [];
+		selectedQuestionIds = [];
+		batchDeleteMode = false;
+	};
+
+	// render expanded row content
+	const expandedRowContent = (question: any) => {
 		return `
 			<div class="flex h-fit flex-col">
 				${question.options
@@ -102,10 +148,40 @@
 					.join('')}
 			</div>
 		`;
-	}
+	};
 </script>
 
-<DeleteDialog bind:action={deleteAction} elementName="Question" />
+<DeleteDialog
+	bind:action={deleteAction}
+	elementName="Question"
+	batchMode={batchDeleteMode}
+	selectedCount={selectedQuestionIds.length}
+	selectedItems={selectedQuestions}
+	onBatchConfirm={handleBatchDeleteConfirm}
+	onBatchCancel={handleBatchDeleteCancel}
+/>
+
+<form
+	id="batch-delete-form"
+	method="POST"
+	action="?/batchDelete"
+	style="display: none;"
+	use:enhance={() => {
+		return async ({ result }) => {
+			batchDeleteMode = false;
+			handleClearSelection();
+
+			// invalidate all data to refresh the page and show flash messages
+			await invalidateAll();
+
+			if (result.type === 'failure') {
+				console.error('Batch delete failed');
+			}
+		};
+	}}
+>
+	<input type="hidden" name="questionIds" value={JSON.stringify(selectedQuestionIds)} />
+</form>
 
 <div>
 	<div class="mx-10 flex flex-row py-4">
@@ -186,38 +262,49 @@
 		</WhiteEmptyBox>
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">
-			<div class="flex flex-row items-center gap-4">
-				<div class="mr-8 w-1/3">
-					<Input
-						placeholder="Search questions..."
-						value={search}
-						oninput={(event) => {
-							const url = new URL(page.url);
-							clearTimeout(searchTimeout);
-							searchTimeout = setTimeout(() => {
-								if (event.target?.value) {
-									url.searchParams.set('search', event.target.value);
-								} else {
-									url.searchParams.delete('search');
-								}
-								url.searchParams.set('page', '1');
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}, 300);
-						}}
-					/>
-				</div>
+			<!-- batch actions toolbar -->
+			<BatchActionsToolbar
+				selectedCount={selectedQuestionIds.length}
+				selectedRows={selectedQuestions}
+				selectedRowIds={selectedQuestionIds}
+				onAction={handleBatchAction}
+				onClearSelection={handleClearSelection}
+			/>
 
-				<div class="w-1/3">
-					<TagsSelection bind:tags={filteredTags} filteration={true} />
-				</div>
+			{#if selectedQuestionIds.length === 0}
+				<div class="flex flex-row items-center gap-4">
+					<div class="mr-8 w-1/3">
+						<Input
+							placeholder="Search questions..."
+							value={search}
+							oninput={(event) => {
+								const url = new URL(page.url);
+								clearTimeout(searchTimeout);
+								searchTimeout = setTimeout(() => {
+									if (event.target?.value) {
+										url.searchParams.set('search', event.target.value);
+									} else {
+										url.searchParams.delete('search');
+									}
+									url.searchParams.set('page', '1');
+									goto(url, { keepFocus: true, invalidateAll: true });
+								}, 300);
+							}}
+						/>
+					</div>
 
-				<div class="w-1/3">
-					<StateSelection bind:states={filteredStates} filteration={true} />
+					<div class="w-1/3">
+						<TagsSelection bind:tags={filteredTags} filteration={true} />
+					</div>
+
+					<div class="w-1/3">
+						<StateSelection bind:states={filteredStates} filteration={true} />
+					</div>
+					<div class="w-1/3">
+						<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+					</div>
 				</div>
-				<div class="w-1/3">
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
-				</div>
-			</div>
+			{/if}
 			<DataTable
 				data={tableData}
 				{columns}
@@ -229,6 +316,9 @@
 				expandColumnId="answers"
 				renderExpandedRow={expandedRowContent}
 				emptyStateMessage="No questions found matching your criteria."
+				{enableSelection}
+				onSelectionChange={handleSelectionChange}
+				getRowId={(row) => row.id}
 			/>
 		</div>
 	{/if}

@@ -1,8 +1,9 @@
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth';
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ cookies, url }) => {
 	const token = getSessionTokenCookie();
@@ -22,7 +23,9 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		statesList.length > 0 ? statesList.map((state) => `state_ids=${state}`).join('&') : '';
 	const tagtypeIdsList = url.searchParams.getAll('tag_type_ids') || [];
 	const tagtypeParams =
-		tagtypeIdsList.length > 0 ? tagtypeIdsList.map((tagtypeId) => `tag_type_ids=${tagtypeId}`).join('&') : '';
+		tagtypeIdsList.length > 0
+			? tagtypeIdsList.map((tagtypeId) => `tag_type_ids=${tagtypeId}`).join('&')
+			: '';
 
 	// build query string
 	const queryParams = new URLSearchParams({
@@ -34,7 +37,9 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	});
 
 	// add tag and state params if they exist
-	const queryString = [queryParams.toString(), tagParams, stateParams, tagtypeParams].filter(Boolean).join('&');
+	const queryString = [queryParams.toString(), tagParams, stateParams, tagtypeParams]
+		.filter(Boolean)
+		.join('&');
 
 	const response = await fetch(`${BACKEND_URL}/questions?${queryString}`, {
 		method: 'GET',
@@ -66,4 +71,55 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		totalPages: questions.pages || 0,
 		params: { page, size, search, sortBy, sortOrder }
 	};
+};
+
+export const actions: Actions = {
+	batchDelete: async ({ request, cookies }) => {
+		const token = getSessionTokenCookie();
+		const formData = await request.formData();
+		const questionIds = JSON.parse(formData.get('questionIds') as string);
+
+		try {
+			const response = await fetch(`${BACKEND_URL}/questions`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: formData.get('questionIds')
+			});
+
+			if (!response.ok) {
+				const errorMessage = await response.json();
+				setFlash(
+					{
+						type: 'error',
+						message: `Failed to delete questions: ${errorMessage.detail[0].msg || response.statusText}`
+					},
+					cookies
+				);
+				return fail(500);
+			}
+
+			setFlash(
+				{
+					type: 'success',
+					message: `Successfully deleted ${questionIds.length} question${questionIds.length !== 1 ? 's' : ''}`
+				},
+				cookies
+			);
+		} catch (error) {
+			console.error('Batch delete error:', error);
+			setFlash(
+				{
+					type: 'error',
+					message: 'Failed to delete questions'
+				},
+				cookies
+			);
+			return fail(500);
+		}
+
+		return { success: true };
+	}
 };

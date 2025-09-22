@@ -145,11 +145,11 @@
 		<Configuration {formData} />
 	{/if}
 
-	<div class="sticky bottom-0 my-4 flex w-full justify-between border-t-4 bg-white p-4">
+	<div class="fixed bottom-0 flex w-[calc(100%-15rem)] justify-between border-t-4 bg-white p-4">
 		<Button href="./" variant="outline" class="text-primary border-primary border-1">Cancel</Button>
 
 		<Button
-			class="bg-primary"
+			class="bg-primary mx-4 "
 			disabled={(currentScreen === typeOfScreen.primary &&
 				($formData.name.trim() === '' || $formData.description.trim() === '')) ||
 				(currentScreen === typeOfScreen.configuration &&

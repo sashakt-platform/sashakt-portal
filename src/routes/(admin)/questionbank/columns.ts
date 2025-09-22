@@ -21,7 +21,11 @@ export const createQuestionColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
 	handleSort: (columnId: string) => void,
-	enableSelection: boolean = false
+	enableSelection: boolean = false,
+	permissions?: {
+		canEdit?: boolean;
+		canDelete?: boolean;
+	}
 ): ColumnDef<Question>[] => [
 	...(enableSelection ? [createSelectionColumn<Question>()] : []),
 	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
@@ -47,5 +51,5 @@ export const createQuestionColumns = (
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)
 	}),
-	createActionsColumn<Question>('Question', '/questionbank/single-question')
+	createActionsColumn<Question>('Question', '/questionbank/single-question', permissions)
 ];

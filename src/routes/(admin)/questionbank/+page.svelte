@@ -19,6 +19,7 @@
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -90,7 +91,12 @@
 	// enable selection
 	const enableSelection = $derived(!noQuestionCreatedYet);
 	// create question columns
-	const columns = $derived(createQuestionColumns(sortBy, sortOrder, handleSort, enableSelection));
+	const columns = $derived(
+		createQuestionColumns(sortBy, sortOrder, handleSort, enableSelection, {
+			canEdit: canUpdate(data.user, 'question'),
+			canDelete: canDelete(data.user, 'question')
+		})
+	);
 
 	// handle selection change
 	const handleSelectionChange = (selectedRows: Question[], selectedRowIds: string[]) => {
@@ -209,10 +215,13 @@
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
 			{#if !noQuestionCreatedYet}
-				<a href="/questionbank/single-question/add/new"
-					><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
-				>
-				<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a>
+				{#if canCreate(data.user, 'question')}
+					<a href="/questionbank/single-question/add/new"
+						><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
+					>
+					<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a
+					>
+				{/if}
 			{/if}
 		</div>
 	</div>
@@ -249,23 +258,25 @@
 			<p class="mt-4 text-gray-400">
 				Click on the button to create questions to be uploaded in the test template and tests
 			</p>
-			<div class="mt-4">
-				<a href="/questionbank/single-question/add/new"
-					><Button
-						variant="outline"
-						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
-						><Plus /> Create a Question</Button
-					></a
-				>
-				<a href="/questionbank/import"
-					><Button
-						variant="outline"
-						class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+			{#if canCreate(data.user, 'question')}
+				<div class="mt-4">
+					<a href="/questionbank/single-question/add/new"
+						><Button
+							variant="outline"
+							class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+							><Plus /> Create a Question</Button
+						></a
 					>
-						<FileUp />Bulk Upload
-					</Button></a
-				>
-			</div>
+					<a href="/questionbank/import"
+						><Button
+							variant="outline"
+							class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+						>
+							<FileUp />Bulk Upload
+						</Button></a
+					>
+				</div>
+			{/if}
 		</WhiteEmptyBox>
 	{:else}
 		<div class="mx-8 mt-10 flex flex-col gap-8">

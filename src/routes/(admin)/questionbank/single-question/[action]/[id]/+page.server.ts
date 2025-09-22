@@ -2,13 +2,24 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { questionSchema, tagSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { getSessionTokenCookie } from '$lib/server/auth.js';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params }: any) => {
+	const user = requireLogin();
 	const token = getSessionTokenCookie();
+
+	// Check permissions based on action
+	if (params.action === 'add') {
+		requirePermission(user, PERMISSIONS.CREATE_QUESTION);
+	} else if (params.action === 'edit') {
+		requirePermission(user, PERMISSIONS.UPDATE_QUESTION);
+	} else if (params.action === 'delete') {
+		requirePermission(user, PERMISSIONS.DELETE_QUESTION);
+	}
 	let questionData = null;
 
 	try {
@@ -66,7 +77,15 @@ export const load: PageServerLoad = async ({ params }: any) => {
 
 export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
+		const user = requireLogin();
 		const token = getSessionTokenCookie();
+
+		// Check permissions based on action
+		if (params.action === 'edit') {
+			requirePermission(user, PERMISSIONS.UPDATE_QUESTION);
+		} else if (params.action === 'add') {
+			requirePermission(user, PERMISSIONS.CREATE_QUESTION);
+		}
 		const form = await superValidate(request, zod(questionSchema));
 		if (!form.valid) {
 			setFlash(
@@ -126,7 +145,7 @@ export const actions: Actions = {
 				);
 				return fail(500, { form });
 			}
-			
+
 			// Transform tag_ids array into the required format
 			const tagsDataArray = form.data.tag_ids.map((tagId) => tagId.id);
 			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags`, {
@@ -207,6 +226,8 @@ export const actions: Actions = {
 		setFlash({ type: 'success', message: 'Tag saved successfully' }, cookies);
 	},
 	delete: async ({ params, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_QUESTION);
 		const token = getSessionTokenCookie();
 		const response = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
 			method: 'DELETE',

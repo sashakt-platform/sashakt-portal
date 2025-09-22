@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { createSortableColumn } from '$lib/components/data-table/column-helpers';
-import { formatDate, downloadQRCode } from '$lib/utils';
+import { formatDate, downloadQRCode, hasPermission } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 
@@ -55,7 +55,8 @@ export const createTestColumns = (
 				customActions.push({
 					label: 'Make a Test',
 					href: `/tests/test-session/convert/?template_id=${test.id}`,
-					icon: 'file-plus'
+					icon: 'file-plus',
+					permission: hasPermission('create_test')
 				});
 			} else {
 				// Add session-specific actions
@@ -63,14 +64,16 @@ export const createTestColumns = (
 					label: 'Clone',
 					href: `${baseUrl}/${test.id}?/clone`,
 					icon: 'copy',
-					method: 'POST'
+					method: 'POST',
+					permission: hasPermission('create_test')
 				});
 
 				if (test.link) {
 					customActions.push({
 						label: 'Conduct Test',
 						action: () => window.open(`${testTakerUrl}/test/${test.link}`, '_blank'),
-						icon: 'external-link'
+						icon: 'external-link',
+						permission: hasPermission('read_test')
 					});
 
 					customActions.push({
@@ -83,7 +86,8 @@ export const createTestColumns = (
 								console.error('Failed to download QR code:', error);
 							}
 						},
-						icon: 'qr-code'
+						icon: 'qr-code',
+						permission: hasPermission('read_test')
 					});
 				}
 			}

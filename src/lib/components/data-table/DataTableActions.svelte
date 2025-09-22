@@ -16,6 +16,7 @@
 		action?: () => void;
 		icon?: string;
 		method?: string;
+		permission?: boolean;
 	}
 
 	let {
@@ -70,48 +71,56 @@
 		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
-		<a href={editUrl}>
-			<DropdownMenu.Item class="cursor-pointer">
+		<DropdownMenu.Item class="cursor-pointer p-0">
+			<Button href={editUrl} variant="ghost" size="sm" class="h-auto w-full justify-start p-2">
 				<Pencil />
 				Edit
-			</DropdownMenu.Item>
-		</a>
+			</Button>
+		</DropdownMenu.Item>
+
 		<DropdownMenu.Item onclick={handleDelete}>
 			<Trash_2 />
 			Delete
 		</DropdownMenu.Item>
 
 		{#each customActions as action}
-			{#if action.href && action.method === 'POST'}
-				<form action={action.href} method="POST">
-					<DropdownMenu.Item class="cursor-pointer p-0">
-						<Button type="submit" variant="ghost" size="sm" class="h-auto w-full justify-start p-2">
+			{#if action.permission}
+				{#if action.href && action.method === 'POST'}
+					<form action={action.href} method="POST">
+						<DropdownMenu.Item class="cursor-pointer p-0">
+							<Button
+								type="submit"
+								variant="ghost"
+								size="sm"
+								class="h-auto w-full justify-start p-2"
+							>
+								{@const IconComponent = getIcon(action.icon)}
+								{#if IconComponent}
+									<IconComponent class="h-4 w-4" />
+								{/if}
+								{action.label}
+							</Button>
+						</DropdownMenu.Item>
+					</form>
+				{:else if action.href}
+					<a href={action.href}>
+						<DropdownMenu.Item class="cursor-pointer">
 							{@const IconComponent = getIcon(action.icon)}
 							{#if IconComponent}
-								<IconComponent class="mr-2 h-4 w-4" />
+								<IconComponent />
 							{/if}
 							{action.label}
-						</Button>
-					</DropdownMenu.Item>
-				</form>
-			{:else if action.href}
-				<a href={action.href}>
-					<DropdownMenu.Item class="cursor-pointer">
+						</DropdownMenu.Item>
+					</a>
+				{:else if action.action}
+					<DropdownMenu.Item onclick={action.action}>
 						{@const IconComponent = getIcon(action.icon)}
 						{#if IconComponent}
 							<IconComponent />
 						{/if}
 						{action.label}
 					</DropdownMenu.Item>
-				</a>
-			{:else if action.action}
-				<DropdownMenu.Item onclick={action.action}>
-					{@const IconComponent = getIcon(action.icon)}
-					{#if IconComponent}
-						<IconComponent />
-					{/if}
-					{action.label}
-				</DropdownMenu.Item>
+				{/if}
 			{/if}
 		{/each}
 	</DropdownMenu.Content>

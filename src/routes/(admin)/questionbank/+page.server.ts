@@ -77,7 +77,6 @@ export const actions: Actions = {
 	batchDelete: async ({ request, cookies }) => {
 		const token = getSessionTokenCookie();
 		const formData = await request.formData();
-		const questionIds = JSON.parse(formData.get('questionIds') as string);
 
 		try {
 			const response = await fetch(`${BACKEND_URL}/questions`, {

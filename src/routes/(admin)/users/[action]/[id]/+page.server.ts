@@ -4,11 +4,22 @@ import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createUserSchema, editUserSchema } from './schema';
-import { getSessionTokenCookie } from '$lib/server/auth.js';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { redirect } from 'sveltekit-flash-message/server';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params }) => {
+	const user = requireLogin();
 	const token = getSessionTokenCookie();
+
+	// Check permissions based on action
+	if (params.action === 'add') {
+		requirePermission(user, PERMISSIONS.CREATE_USER);
+	} else if (params.action === 'edit') {
+		requirePermission(user, PERMISSIONS.UPDATE_USER);
+	} else if (params.action === 'delete') {
+		requirePermission(user, PERMISSIONS.DELETE_USER);
+	}
 
 	let userData = null;
 
@@ -109,7 +120,16 @@ export const load: PageServerLoad = async ({ params }) => {
 
 export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
+		const user = requireLogin();
 		const token = getSessionTokenCookie();
+
+		// Check permissions based on action
+		if (params.action === 'edit') {
+			requirePermission(user, PERMISSIONS.UPDATE_USER);
+		} else if (params.action === 'add') {
+			requirePermission(user, PERMISSIONS.CREATE_USER);
+		}
+
 		// Use appropriate schema based on action
 		const schema = params.action === 'edit' ? editUserSchema : createUserSchema;
 		const form = await superValidate(request, zod(schema));
@@ -175,6 +195,8 @@ export const actions: Actions = {
 		throw redirect(303, `/users`, { type: 'success', message: `User Saved Successfully` }, cookies);
 	},
 	delete: async ({ params, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_USER);
 		const token = getSessionTokenCookie();
 		const res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
 			method: 'DELETE',

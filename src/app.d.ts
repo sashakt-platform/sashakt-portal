@@ -8,6 +8,16 @@ declare global {
 				id: string;
 				full_name: string;
 				email: string;
+				phone?: string;
+				role_id: number;
+				organization_id: number;
+				created_by_id?: number | null;
+				is_active: boolean;
+				created_date: string;
+				modified_date: string;
+				is_deleted: boolean;
+				states: any[];
+				permissions: string[];
 			} | null;
 			session: string | null;
 		}

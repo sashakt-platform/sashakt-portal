@@ -9,6 +9,7 @@
 	import { page } from '$app/state';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import { hasPermission, canUpdate, canDelete, PERMISSIONS } from '$lib/utils/permissions.js';
 
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -35,7 +36,12 @@
 	}
 
 	// create columns for the data table
-	const columns = $derived(createColumns(sortBy, sortOrder, handleSort));
+	const columns = $derived(
+		createColumns(sortBy, sortOrder, handleSort, {
+			canEdit: canUpdate(data.user, 'user'),
+			canDelete: canDelete(data.user, 'user')
+		})
+	);
 </script>
 
 <div class="mx-10 flex flex-row py-4">
@@ -53,7 +59,9 @@
 		<Label class="my-auto align-middle text-sm font-extralight">Manage users</Label>
 	</div>
 	<div class="my-auto ml-auto flex gap-3 p-4">
-		<a href="/users/add/new"><Button class="font-bold"><Plus />Add User</Button></a>
+		{#if hasPermission(data.user, PERMISSIONS.CREATE_USER)}
+			<a href="/users/add/new"><Button class="font-bold"><Plus />Add User</Button></a>
+		{/if}
 	</div>
 </div>
 
@@ -78,12 +86,5 @@
 			class="max-w-sm"
 		/>
 	</div>
-	<DataTable
-		data={tableData}
-		{columns}
-		{totalItems}
-		{totalPages}
-		{currentPage}
-		{pageSize}
-	/>
+	<DataTable data={tableData} {columns} {totalItems} {totalPages} {currentPage} {pageSize} />
 </div>

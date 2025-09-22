@@ -28,6 +28,7 @@
 		onSelectionChange?: (selectedRows: TData[], selectedRowIds: string[]) => void; // callback when selection changes
 		getRowId?: (row: TData) => string; // function to get unique row ID
 		preSelectedIds?: (string | number)[]; // pre-selected row IDs
+		clearSelection?: boolean; // set to true to clear selection
 	};
 
 	let {
@@ -46,7 +47,8 @@
 		enableSelection = false,
 		onSelectionChange,
 		getRowId = (row: unknown) => String((row as { id: string | number }).id),
-		preSelectedIds = []
+		preSelectedIds = [],
+		clearSelection = false
 	}: DataTableProps<TData, TValue> = $props();
 
 	// pagination
@@ -71,6 +73,13 @@
 
 	// state for row selection
 	let rowSelection = $state<RowSelectionState>(initialSelection);
+
+	// effect to clear selection when clearSelection is true
+	$effect(() => {
+		if (clearSelection) {
+			rowSelection = {};
+		}
+	});
 
 	// create table
 	const table = $derived(

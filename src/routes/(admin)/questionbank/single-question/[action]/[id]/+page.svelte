@@ -17,6 +17,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
+	import { hasPermission } from '$lib/utils';
 
 	const {
 		data
@@ -220,6 +221,7 @@
 						<Dialog.Root bind:open={openTagDialog}>
 							<Label
 								onclick={() => (openTagDialog = true)}
+								hidden={!hasPermission('create_tag')}
 								class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
 								><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
 							>

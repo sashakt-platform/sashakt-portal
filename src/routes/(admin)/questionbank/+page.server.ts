@@ -99,15 +99,16 @@ export const actions: Actions = {
 					cookies
 				);
 				return fail(500);
+			} else {
+				const deleteResponse = await response.json();
+				setFlash(
+					{
+						type: deleteResponse.delete_failure_list ? 'error' : 'success',
+						message: `Deletion complete: ${deleteResponse.delete_success_count} successful, ${deleteResponse.delete_failure_list?.length || 0} failed.`
+					},
+					cookies
+				);
 			}
-
-			setFlash(
-				{
-					type: 'success',
-					message: `Successfully deleted ${questionIds.length} question${questionIds.length !== 1 ? 's' : ''}`
-				},
-				cookies
-			);
 		} catch (error) {
 			console.error('Batch delete error:', error);
 			setFlash(

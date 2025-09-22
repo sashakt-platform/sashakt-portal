@@ -16,6 +16,7 @@
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
+	import { hasPermission } from '$lib/utils.js';
 
 	let {
 		data
@@ -41,6 +42,12 @@
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
 	let noTestCreatedYet = $state(true);
+
+	const createUpdatePermissions = $derived(
+		data?.is_template
+			? hasPermission('create_test_template', 'update_test_template', 'delete_test_template')
+			: hasPermission('create_test', 'update_test', 'delete_test')
+	);
 
 	$effect(() => {
 		// check if there are any meaningful search/filter parameters (exclude pagination params)
@@ -141,7 +148,10 @@
 		</div>
 		<div class="my-auto ml-auto p-4">
 			{#if !noTestCreatedYet}
-				<Button class="font-bold" href={page.url.pathname + '/new'}
+				<Button
+					class="font-bold"
+					href={page.url.pathname + '/new'}
+					disabled={!createUpdatePermissions}
 					><Plus />{data?.is_template ? 'Create a test template' : 'Create a test session'}</Button
 				>
 			{/if}
@@ -161,7 +171,8 @@
 				link: '/tests/test-' + (data?.is_template ? 'template' : 'session') + '/new',
 				click: () => {
 					return null;
-				}
+				},
+				disabled: !createUpdatePermissions
 			}}
 			rightButton={!data?.is_template
 				? {

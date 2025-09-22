@@ -7,17 +7,28 @@
 	interface OptionButtons {
 		title: string;
 		link?: string;
+		disabled?: boolean;
 		click: () => void;
 	}
-	export let title;
-	export let subtitle;
-	export let leftButton: OptionButtons;
-	export let rightButton: OptionButtons | null = null;
+	let {
+		title,
+		subtitle,
+		leftButton,
+		rightButton,
+		hidden = false,
+		...rest
+	}: {
+		title: string;
+		subtitle: string;
+		leftButton: OptionButtons;
+		rightButton: OptionButtons | null;
+		hidden?: boolean;
+	} = $props();
 </script>
 
 <!-- <div class="m-10 h-screen w-3/4 rounded-2xl bg-white text-center align-middle shadow-2xl">
 	<div class="flex h-full flex-col items-center justify-center"> -->
-<WhiteEmptyBox>
+<WhiteEmptyBox {hidden} {...rest}>
 	<svg
 		width="100"
 		height="100"
@@ -51,24 +62,26 @@
 	</p>
 	<div class="mt-4">
 		{#if leftButton}
-			<a href={leftButton.link}>
-				<Button
-					variant="outline"
-					class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
-					onclick={leftButton.click}><Plus /> {leftButton.title}</Button
-				>
-			</a>
+			<Button
+				variant="outline"
+				href={leftButton.link}
+				class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+				onclick={leftButton.click}
+				disabled={leftButton.disabled}
+				><Plus />
+				{leftButton.title}
+			</Button>
 		{/if}
 		{#if rightButton}
-			<a href={rightButton.link}>
-				<Button
-					variant="outline"
-					class="bg-primary mr-4 h-12 cursor-pointer text-white"
-					onclick={rightButton.click}
-				>
-					<FileUp />{rightButton.title}
-				</Button></a
+			<Button
+				href={rightButton.link}
+				variant="outline"
+				class="bg-primary mr-4 h-12 cursor-pointer text-white"
+				onclick={rightButton.click}
+				disabled={rightButton.disabled}
 			>
+				<FileUp />{rightButton.title}
+			</Button>
 		{/if}
 	</div>
 </WhiteEmptyBox>

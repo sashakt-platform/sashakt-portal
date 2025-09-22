@@ -9,6 +9,7 @@
 	import User from '@lucide/svelte/icons/user';
 	import Tags from '@lucide/svelte/icons/tags';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { hasPermission } from '$lib/utils';
 
 	// Menu items.
 	const menu_items = {
@@ -20,7 +21,8 @@
 		question: {
 			title: 'Question Bank',
 			url: '/questionbank',
-			icon: FileQuestion
+			icon: FileQuestion,
+			hidden: !hasPermission('create_question', 'update_question', 'delete_question')
 		},
 		tests: {
 			title: 'Test Management',
@@ -29,23 +31,27 @@
 			submenu: {
 				test_template: {
 					title: 'Test Template',
-					url: '/tests/test-template'
+					url: '/tests/test-template',
+					hidden: !hasPermission('read_test_template')
 				},
 				test_sessions: {
 					title: 'Test Sessions',
-					url: '/tests/test-session'
+					url: '/tests/test-session',
+					hidden: !hasPermission('read_test')
 				}
 			}
 		},
 		tags: {
 			title: 'Tag Management',
 			url: '/tags',
-			icon: Tags
+			icon: Tags,
+			hidden: !hasPermission('create_tag', 'update_tag', 'delete_tag')
 		},
 		user: {
 			title: 'User Management',
 			url: '/users',
-			icon: User
+			icon: User,
+			hidden: !hasPermission('create_user', 'update_user', 'delete_user')
 		}
 	};
 
@@ -54,7 +60,7 @@
 </script>
 
 {#snippet sidebaritems(item: any)}
-	<Sidebar.MenuItem class="text-secondary-foreground m-1">
+	<Sidebar.MenuItem class="text-secondary-foreground m-1" hidden={item.hidden}>
 		<Sidebar.MenuButton
 			isActive={currentitem == item.title}
 			onclick={() => (currentitem = item.title)}
@@ -107,6 +113,7 @@
 									<Sidebar.MenuButton
 										isActive={currentitem == menu_items.tests.submenu.test_template.title}
 										onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
+										hidden={menu_items.tests.submenu.test_template.hidden}
 									>
 										{#snippet child({ props })}
 											<a href={menu_items.tests.submenu.test_template.url} {...props}>
@@ -117,6 +124,7 @@
 									<Sidebar.MenuButton
 										isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
 										onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
+										hidden={menu_items.tests.submenu.test_sessions.hidden}
 									>
 										{#snippet child({ props })}
 											<a href={menu_items.tests.submenu.test_sessions.url} {...props}>

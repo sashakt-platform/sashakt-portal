@@ -9,7 +9,7 @@
 	import { page } from '$app/state';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
-	import { hasPermission, canUpdate, canDelete, PERMISSIONS } from '$lib/utils/permissions.js';
+	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -59,7 +59,7 @@
 		<Label class="my-auto align-middle text-sm font-extralight">Manage users</Label>
 	</div>
 	<div class="my-auto ml-auto flex gap-3 p-4">
-		{#if hasPermission(data.user, PERMISSIONS.CREATE_USER)}
+		{#if canCreate(data.user, 'user')}
 			<a href="/users/add/new"><Button class="font-bold"><Plus />Add User</Button></a>
 		{/if}
 	</div>

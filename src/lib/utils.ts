@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { createQrPngDataUrl } from '@svelte-put/qr';
+import { page } from '$app/state';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -51,4 +52,9 @@ export const downloadQRCode = async (url: string, filename: string = 'qr-code'):
 		console.error('Failed to generate QR code:', error);
 		throw error;
 	}
+};
+
+export const hasPermission = (...permissions: string[]): boolean => {
+	const userPermissions = page.data.user.permissions || '[]';
+	return permissions.some((permission) => userPermissions.includes(permission));
 };

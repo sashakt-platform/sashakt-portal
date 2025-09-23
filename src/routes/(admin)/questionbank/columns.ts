@@ -11,7 +11,7 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 export interface Question {
 	id: string;
 	question_text: string;
-	tags?: Array<{ name: string }>;
+	tags?: Array<{ name: string, tag_type?: { name: string } }>;
 	modified_date: string;
 	options: Array<{ id: string; key: string; value: string }>;
 	correct_answer: string[];
@@ -23,29 +23,32 @@ export const createQuestionColumns = (
 	handleSort: (columnId: string) => void,
 	enableSelection: boolean = false
 ): ColumnDef<Question>[] => [
-	...(enableSelection ? [createSelectionColumn<Question>()] : []),
-	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
-	{
-		id: 'answers',
-		header: 'Answers',
-		cell: ({ row }) => {
-			return renderComponent(Eye, { class: 'text-gray-400' });
+		...(enableSelection ? [createSelectionColumn<Question>()] : []),
+		createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
+		{
+			id: 'answers',
+			header: 'Answers',
+			cell: ({ row }) => {
+				return renderComponent(Eye, { class: 'text-gray-400' });
+			},
+			size: 80
 		},
-		size: 80
-	},
-	{
-		accessorKey: 'tags',
-		header: 'Tags',
-		cell: ({ row }) => {
-			const tags = row.original.tags;
-			if (tags && tags.length > 0) {
-				return tags.map((tag) => tag.name).join(', ');
+		{
+			accessorKey: 'tags',
+			header: 'Tags',
+			cell: ({ row }) => {
+				const tags = row.original.tags;
+				if (tags && tags.length > 0) {
+					return tags.map((tag) => {
+						const tagTypeName = tag.tag_type?.name ?? '';
+						return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
+					}).join(', ');
+				}
+				return '';
 			}
-			return '';
-		}
-	},
-	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
-	}),
-	createActionsColumn<Question>('Question', '/questionbank/single-question')
-];
+		},
+		createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
+			cell: ({ row }) => formatDate(row.original.modified_date)
+		}),
+		createActionsColumn<Question>('Question', '/questionbank/single-question')
+	];

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
@@ -44,25 +42,22 @@
 
 	const stats_box = [
 		{
-			title: 'Total Questions',
-			description: 'Total Questions created for the organization',
+			title: 'No of Questions',
 			count: data?.stats?.total_questions
 		},
 		{
-			title: 'Tests',
-			description: 'Total Tests created for the organization',
+			title: 'No of Tests',
 			count: data?.stats?.total_tests
 		},
 		{
-			title: 'Users',
-			description: 'Total Users created for the organization',
+			title: 'No of Users',
 			count: data?.stats?.total_users
 		}
 	];
 </script>
 
 {#snippet dataBox(title: string, description: string, count: number, percent: boolean = false)}
-	<div class="m-4 w-full rounded-xl border border-gray-100 bg-white p-4">
+	<div class=" m-4 w-full justify-items-center rounded-xl border border-gray-100 bg-white p-4">
 		<p class="font-semibold">{title}</p>
 		<p class="text-sm">{description}</p>
 		<div class="p-12 text-5xl">{count}{percent ? '%' : ''}</div>
@@ -101,38 +96,26 @@
 <div class="mx-8 my-4 flex flex-col gap-6">
 	<div class="flex flex-row">
 		{#each stats_box as stat (stat.title)}
-			{@render dataBox(stat.title, stat.description, stat.count)}
+			{@render dataBox(stat.title, '', stat.count)}
 		{/each}
 	</div>
 	<div class="flex flex-col rounded-xl bg-white p-4">
 		<div class="flex flex-row">
 			<div class="my-auto flex w-1/2 flex-col">
-				<p class="font-semibold">Test Attempt Summary</p>
-				<p class="text-sm">Details of the attempts made by the candidate</p>
+				<p class="font-semibold">Summary</p>
+				<!-- <p class="text-sm">Details of the attempts made by the candidate</p> -->
 			</div>
 		</div>
-		<hr class="my-4 border-gray-300" />
+		<!-- <hr class="my-4 border-gray-300" /> -->
 		<div class="flex flex-row">
-			{@render dataBox(
-				'Submitted Test Attempts',
-				'Number of test attempts submitted by candidates',
-				data.testAttemptStats?.total_test_submitted
-			)}
+			{@render dataBox('Submitted Test Attempts', '', data.testAttemptStats?.total_test_submitted)}
 			{@render dataBox(
 				'Non-Submitted Test Attempts',
-				'Number of test attempts not submitted by candidates',
+				'',
 				data.testAttemptStats?.total_test_not_submitted
 			)}
-			{@render dataBox(
-				'Active Test Attempts',
-				'Non-submitted test attempts that are currently active',
-				data.testAttemptStats?.not_submitted_active
-			)}
-			{@render dataBox(
-				'Inactive Test Attempts',
-				'Non-submitted test attempts that are now inactive',
-				data.testAttemptStats?.not_submitted_inactive
-			)}
+			{@render dataBox('Active Test Attempts', '', data.testAttemptStats?.not_submitted_active)}
+			{@render dataBox('Inactive Test Attempts', '', data.testAttemptStats?.not_submitted_inactive)}
 		</div>
 	</div>
 	<div class="flex flex-row justify-between">
@@ -140,34 +123,33 @@
 			<div class="flex flex-row gap-8">
 				<div class="flex w-3/4 flex-col">
 					<p class="font-semibold">Score & Duration Analysis</p>
-					<p class="text-sm">Overall performance of all candidates</p>
+					<!-- <p class="text-sm">Overall performance of all candidates</p> -->
 				</div>
 				<div class="w-1/3">
 					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
-
-				<div class="w-1/3">
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
-				</div>
 				<div class="w-1/3">
 					<DistrictSelection bind:districts={filteredDistricts} filteration={true} />
 				</div>
+				<div class="w-1/3">
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+				</div>
 			</div>
-			<hr class="my-4 border-gray-300" />
+			<!-- <hr class="my-4 border-gray-300" /> -->
 
 			<div class=" flex flex-row gap-8">
 				<div class="item-center flex w-1/2 flex-col items-center p-2">
 					{@render dataBox(
-						'Overall Score Percentage',
-						'Percentage of overall score achieved by candidates',
+						'Percentage Scored',
+						'',
 						data.overallAnalyticsStats?.overall_score_percent,
 						true
 					)}
 				</div>
 				<div class=" flex w-1/2 flex-col items-center p-2">
 					{@render dataBox(
-						'Overall Average Time (Minutes)',
-						'Overall average time taken by candidates to complete test',
+						'Average Time Taken (Minutes)',
+						'',
 						data.overallAnalyticsStats?.overall_avg_time_minutes
 					)}
 				</div>

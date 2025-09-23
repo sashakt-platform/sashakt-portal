@@ -123,7 +123,7 @@
 					</div>
 				</div>
 				<Label class="my-auto align-middle text-sm font-extralight">
-					{questionData ? 'Edit Existing Question' : 'Add questions with tags and details'}
+					<!-- {questionData ? 'Edit Existing Question' : 'Add questions with tags and details'} -->
 				</Label>
 			</div>
 			<div
@@ -137,11 +137,11 @@
 			<div class="flex flex-row">
 				<div class="flex w-3/5 flex-col gap-4 pr-8">
 					<div class="flex flex-col gap-2">
-						{@render snippetHeading('Your Question')}
+						{@render snippetHeading('Question')}
 						<Textarea
 							name="questionText"
 							bind:value={$formData.question_text}
-							placeholder="Your Question..."
+							placeholder="Enter your Question..."
 						/>
 						<div class="flex flex-row gap-2">
 							<Checkbox bind:checked={$formData.is_mandatory} />
@@ -247,25 +247,20 @@
 				<div class="flex w-1/2 flex-row gap-4">
 					<div class="flex w-full flex-col gap-2">
 						{@render snippetHeading('Additional Instructions')}
-						<Textarea
-							name="instructions"
-							bind:value={$formData.instructions}
-							placeholder="Additional Instructions for the question..."
-						/>
+						<Textarea name="instructions" bind:value={$formData.instructions} placeholder="" />
 					</div>
 				</div>
 				<div class="flex w-1/2 flex-row gap-4">
 					<div class="flex w-full flex-col gap-2">
 						{@render snippetHeading('Marking Scheme')}
 						<div class="flex h-full flex-row gap-2 rounded-lg border border-gray-100 p-4">
-							<p class="my-auto w-1/2">Set Marks for Correct Answer</p>
+							<p class="my-auto w-1/2">Marks for correct answer</p>
 							<input
 								type="number"
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
 								min="1"
 								class=" rounded-sm border-1 border-gray-300 p-2"
-								placeholder="Marks for correct answer"
 							/>
 						</div>
 					</div>

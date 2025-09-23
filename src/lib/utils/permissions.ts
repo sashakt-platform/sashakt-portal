@@ -1,3 +1,5 @@
+import { error } from '@sveltejs/kit';
+
 export type User = NonNullable<App.Locals['user']>;
 export type Permission = string;
 
@@ -155,7 +157,7 @@ export const ENTITY_PERMISSIONS = {
  */
 export function requirePermission(user: User | null, permission: Permission): asserts user is User {
 	if (!hasPermission(user, permission)) {
-		throw new Error(`Access denied: Missing permission '${permission}'`);
+		throw error(403, `Access denied: Missing permission '${permission}'`);
 	}
 }
 
@@ -167,6 +169,6 @@ export function requireAnyPermission(
 	permissions: Permission[]
 ): asserts user is User {
 	if (!hasAnyPermission(user, permissions)) {
-		throw new Error(`Access denied: Missing any of permissions: ${permissions.join(', ')}`);
+		throw error(403, `Access denied: Missing any of permissions: ${permissions.join(', ')}`);
 	}
 }

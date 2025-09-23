@@ -32,7 +32,11 @@ export const createSortableColumn = <T>(
  */
 export const createActionsColumn = <T extends { id: string | number }>(
 	entityName: string,
-	baseUrl: string
+	baseUrl: string,
+	options?: {
+		canEdit?: boolean;
+		canDelete?: boolean;
+	}
 ): ColumnDef<T> => ({
 	id: 'actions',
 	enableSorting: false,
@@ -42,7 +46,9 @@ export const createActionsColumn = <T extends { id: string | number }>(
 			id: row.original.id,
 			entityName,
 			editUrl: `${baseUrl}/edit/${row.original.id}`,
-			deleteUrl: `${baseUrl}/delete/${row.original.id}?/delete`
+			deleteUrl: `${baseUrl}/delete/${row.original.id}?/delete`,
+			canEdit: options?.canEdit ?? true,
+			canDelete: options?.canDelete ?? true
 		});
 	}
 });

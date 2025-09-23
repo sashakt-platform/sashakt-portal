@@ -1,10 +1,13 @@
 import { BACKEND_URL } from '$env/static/private';
-import { getSessionTokenCookie } from '$lib/server/auth';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import type { PageServerLoad } from './$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ cookies, url }) => {
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.READ_TAG);
 	const token = getSessionTokenCookie();
 
 	// extract query parameters for tags

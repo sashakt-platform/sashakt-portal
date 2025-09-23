@@ -16,6 +16,7 @@
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
+	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 
 	let {
 		data
@@ -94,6 +95,7 @@
 	}
 
 	// create columns
+	const entityType = $derived(data?.is_template ? 'test-template' : 'test');
 	const columns = $derived(
 		createTestColumns(
 			sortBy,
@@ -103,7 +105,11 @@
 			pageSize,
 			data?.is_template,
 			data?.test_taker_url,
-			handleDelete
+			handleDelete,
+			{
+				canEdit: canUpdate(data.user, entityType),
+				canDelete: canDelete(data.user, entityType)
+			}
 		)
 	);
 
@@ -141,9 +147,15 @@
 		</div>
 		<div class="my-auto ml-auto p-4">
 			{#if !noTestCreatedYet}
-				<Button class="font-bold" href={page.url.pathname + '/new'}
-					><Plus />{data?.is_template ? 'Create a test template' : 'Create a test session'}</Button
-				>
+				{#if data?.is_template && canCreate(data.user, 'test-template')}
+					<Button class="font-bold" href={page.url.pathname + '/new'}
+						><Plus />Create a test template</Button
+					>
+				{:else if !data?.is_template && canCreate(data.user, 'test')}
+					<Button class="font-bold" href={page.url.pathname + '/new'}
+						><Plus />Create a test session</Button
+					>
+				{/if}
 			{/if}
 		</div>
 	</div>

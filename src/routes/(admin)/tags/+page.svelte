@@ -12,6 +12,7 @@
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -64,9 +65,17 @@
 	// get active tab from URL parameter
 	const activeTab = $derived(page.url.searchParams.get('tab') === 'tagtype' ? 'tagtype' : 'tag');
 
-	const tagsColumns = $derived(createTagsColumns(tagsSortBy, tagsSortOrder, handleTagsSort));
+	const tagsColumns = $derived(
+		createTagsColumns(tagsSortBy, tagsSortOrder, handleTagsSort, {
+			canEdit: canUpdate(data.user, 'tag'),
+			canDelete: canDelete(data.user, 'tag')
+		})
+	);
 	const tagTypesColumns = $derived(
-		createTagTypesColumns(tagTypesSortBy, tagTypesSortOrder, handleTagTypesSort)
+		createTagTypesColumns(tagTypesSortBy, tagTypesSortOrder, handleTagTypesSort, {
+			canEdit: canUpdate(data.user, 'tag'),
+			canDelete: canDelete(data.user, 'tag')
+		})
 	);
 </script>
 
@@ -92,12 +101,14 @@
 			>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
-			<a href="/tags/tag/add/new"
-				><Button class="font-bold" variant="outline"><Plus />Create a Tag</Button></a
-			>
-			<a href="/tags/tagtype/add/new"
-				><Button class=" font-bold "><Plus />Create Tag Type</Button></a
-			>
+			{#if canCreate(data.user, 'tag')}
+				<a href="/tags/tag/add/new"
+					><Button class="font-bold" variant="outline"><Plus />Create a Tag</Button></a
+				>
+				<a href="/tags/tagtype/add/new"
+					><Button class=" font-bold "><Plus />Create Tag Type</Button></a
+				>
+			{/if}
 		</div>
 	</div>
 

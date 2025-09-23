@@ -21,7 +21,11 @@ export const createTestColumns = (
 	pageSize: number,
 	isTemplate: boolean,
 	testTakerUrl: string,
-	onDelete: (testId: string) => void
+	onDelete: (testId: string) => void,
+	permissions?: {
+		canEdit?: boolean;
+		canDelete?: boolean;
+	}
 ): ColumnDef<Test>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
 	{
@@ -94,7 +98,9 @@ export const createTestColumns = (
 				editUrl: `${baseUrl}/${test.id}/`,
 				deleteUrl: `${baseUrl}/${test.id}?/delete`,
 				customActions,
-				onDelete: () => onDelete(test.id)
+				onDelete: () => onDelete(test.id),
+				canEdit: permissions?.canEdit ?? true,
+				canDelete: permissions?.canDelete ?? true
 			});
 		}
 	}

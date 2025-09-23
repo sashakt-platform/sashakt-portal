@@ -3,9 +3,13 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types.js';
 import { schema } from './schema.js';
 import { BACKEND_URL } from '$env/static/private';
-import { getSessionTokenCookie } from '$lib/server/auth.js';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async () => {
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.CREATE_QUESTION);
+
 	// Create a form with the default values
 	const form = await superValidate(zod(schema));
 
@@ -16,6 +20,8 @@ export const load: PageServerLoad = async () => {
 
 export const actions = {
 	default: async ({ request }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.CREATE_QUESTION);
 		const token = getSessionTokenCookie();
 		const form = await superValidate(request, zod(schema));
 

@@ -2,17 +2,34 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { testSchema } from './schema';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { getSessionTokenCookie } from '$lib/server/auth.js';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params, url }) => {
+	const user = requireLogin();
 	const token = getSessionTokenCookie();
 	let testData = null;
 	let templateID = url.searchParams.get('template_id') || null;
 	const is_template = params?.type === 'template';
+
+	// Check permissions based on action and type
+	if (params?.id === 'new') {
+		if (is_template) {
+			requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
+		} else {
+			requirePermission(user, PERMISSIONS.CREATE_TEST);
+		}
+	} else {
+		if (is_template) {
+			requirePermission(user, PERMISSIONS.UPDATE_TEST_TEMPLATE);
+		} else {
+			requirePermission(user, PERMISSIONS.UPDATE_TEST);
+		}
+	}
 	try {
 		if (params?.id !== 'new') {
 			let id = templateID || params.id;
@@ -111,7 +128,24 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
+		const user = requireLogin();
 		const token = getSessionTokenCookie();
+		const is_template = params?.type === 'template';
+
+		// Check permissions based on action and type
+		if (params?.id === 'new') {
+			if (is_template) {
+				requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
+			} else {
+				requirePermission(user, PERMISSIONS.CREATE_TEST);
+			}
+		} else {
+			if (is_template) {
+				requirePermission(user, PERMISSIONS.UPDATE_TEST_TEMPLATE);
+			} else {
+				requirePermission(user, PERMISSIONS.UPDATE_TEST);
+			}
+		}
 		const form = await superValidate(request, zod(testSchema));
 		if (!form.valid) {
 			setFlash(
@@ -160,8 +194,17 @@ export const actions: Actions = {
 		);
 	},
 	delete: async ({ params, cookies }) => {
+		const user = requireLogin();
 		const token = getSessionTokenCookie();
 		const test_type = params.type === 'template' ? 'template' : 'session';
+		const is_template = params.type === 'template';
+
+		// Check delete permissions
+		if (is_template) {
+			requirePermission(user, PERMISSIONS.DELETE_TEST_TEMPLATE);
+		} else {
+			requirePermission(user, PERMISSIONS.DELETE_TEST);
+		}
 		const response = await fetch(`${BACKEND_URL}/test/${params.id}`, {
 			method: 'DELETE',
 			headers: {
@@ -188,7 +231,16 @@ export const actions: Actions = {
 		);
 	},
 	clone: async ({ params, cookies }) => {
+		const user = requireLogin();
 		const token = getSessionTokenCookie();
+		const is_template = params.type === 'template';
+
+		// Check create permissions (cloning creates a new test/template)
+		if (is_template) {
+			requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
+		} else {
+			requirePermission(user, PERMISSIONS.CREATE_TEST);
+		}
 		const response = await fetch(`${BACKEND_URL}/test/${params.id}/clone`, {
 			method: 'POST',
 			headers: {

@@ -1,11 +1,20 @@
 import type { PageServerLoad } from './$types.js';
 import { BACKEND_URL, TEST_TAKER_URL } from '$env/static/private';
-import { getSessionTokenCookie } from '$lib/server/auth';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params, url, cookies }) => {
+	const user = requireLogin();
 	const is_template = params.type === 'template';
+
+	// Check permissions based on type
+	if (is_template) {
+		requirePermission(user, PERMISSIONS.READ_TEST_TEMPLATE);
+	} else {
+		requirePermission(user, PERMISSIONS.READ_TEST);
+	}
 
 	// extract query parameters for DataTable
 	const page = Number(url.searchParams.get('page')) || 1;

@@ -1,11 +1,14 @@
 import { BACKEND_URL } from '$env/static/private';
-import { getSessionTokenCookie } from '$lib/server/auth';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import type { PageServerLoad, Actions } from './$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 import { fail } from '@sveltejs/kit';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ cookies, url }) => {
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.READ_QUESTION);
 	const token = getSessionTokenCookie();
 
 	// extract query parameters
@@ -75,6 +78,8 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 
 export const actions: Actions = {
 	batchDelete: async ({ request, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_QUESTION);
 		const token = getSessionTokenCookie();
 		const formData = await request.formData();
 

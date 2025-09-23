@@ -9,6 +9,7 @@
 	import User from '@lucide/svelte/icons/user';
 	import Tags from '@lucide/svelte/icons/tags';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { canRead } from '$lib/utils/permissions.js';
 
 	// Menu items.
 	const menu_items = {
@@ -82,56 +83,70 @@
 			<Sidebar.GroupContent class="pt-4 text-base leading-1 ">
 				<Sidebar.Menu>
 					{@render sidebaritems(menu_items.dashboard)}
-					{@render sidebaritems(menu_items.question)}
+
+					{#if canRead(data.user, 'question')}
+						{@render sidebaritems(menu_items.question)}
+					{/if}
 
 					<!---- Collapsible menu for Tests ---->
-					<Collapsible.Root class="group/collapsible m-1 ">
-						<Sidebar.MenuItem>
-							<Collapsible.Trigger>
-								<Sidebar.MenuButton
-									onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
-								>
-									{#snippet child({ props })}
-										<a href={menu_items.tests.submenu.test_template.url} {...props}>
-											<ClipboardList />
-											<span>{menu_items.tests.title}</span>
-											<ChevronRight
-												class="ml-auto items-end transition-transform group-data-[state=open]/collapsible:rotate-90 "
-											/>
-										</a>
-									{/snippet}
-								</Sidebar.MenuButton>
-							</Collapsible.Trigger>
-							<Collapsible.Content>
-								<Sidebar.MenuSub>
+					{#if canRead(data.user, 'test') || canRead(data.user, 'test-template')}
+						<Collapsible.Root class="group/collapsible m-1 ">
+							<Sidebar.MenuItem>
+								<Collapsible.Trigger>
 									<Sidebar.MenuButton
-										isActive={currentitem == menu_items.tests.submenu.test_template.title}
 										onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
 									>
 										{#snippet child({ props })}
 											<a href={menu_items.tests.submenu.test_template.url} {...props}>
-												<span>{menu_items.tests.submenu.test_template.title}</span>
+												<ClipboardList />
+												<span>{menu_items.tests.title}</span>
+												<ChevronRight
+													class="ml-auto items-end transition-transform group-data-[state=open]/collapsible:rotate-90 "
+												/>
 											</a>
 										{/snippet}
 									</Sidebar.MenuButton>
-									<Sidebar.MenuButton
-										isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
-										onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
-									>
-										{#snippet child({ props })}
-											<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
-												<span>{menu_items.tests.submenu.test_sessions.title}</span>
-											</a>
-										{/snippet}
-									</Sidebar.MenuButton>
-								</Sidebar.MenuSub>
-							</Collapsible.Content>
-						</Sidebar.MenuItem>
-					</Collapsible.Root>
+								</Collapsible.Trigger>
+								<Collapsible.Content>
+									<Sidebar.MenuSub>
+										{#if canRead(data.user, 'test-template')}
+											<Sidebar.MenuButton
+												isActive={currentitem == menu_items.tests.submenu.test_template.title}
+												onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
+											>
+												{#snippet child({ props })}
+													<a href={menu_items.tests.submenu.test_template.url} {...props}>
+														<span>{menu_items.tests.submenu.test_template.title}</span>
+													</a>
+												{/snippet}
+											</Sidebar.MenuButton>
+										{/if}
+										{#if canRead(data.user, 'test')}
+											<Sidebar.MenuButton
+												isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
+												onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
+											>
+												{#snippet child({ props })}
+													<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
+														<span>{menu_items.tests.submenu.test_sessions.title}</span>
+													</a>
+												{/snippet}
+											</Sidebar.MenuButton>
+										{/if}
+									</Sidebar.MenuSub>
+								</Collapsible.Content>
+							</Sidebar.MenuItem>
+						</Collapsible.Root>
+					{/if}
 					<!---- Collapsible menu for Tests ---->
 
-					{@render sidebaritems(menu_items.tags)}
-					{@render sidebaritems(menu_items.user)}
+					{#if canRead(data.user, 'tag')}
+						{@render sidebaritems(menu_items.tags)}
+					{/if}
+
+					{#if canRead(data.user, 'user')}
+						{@render sidebaritems(menu_items.user)}
+					{/if}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>

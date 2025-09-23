@@ -2,16 +2,28 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { tagSchema, tagTypeSchema } from './schema';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { getSessionTokenCookie } from '$lib/server/auth.js';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params, cookies }: any) => {
 	if (params.type != 'tag' && params.type != 'tagtype') {
 		throw new Error('Invalid type parameter');
 	}
+
+	const user = requireLogin();
 	const token = getSessionTokenCookie();
+
+	// Check permissions based on action
+	if (params.action === 'add') {
+		requirePermission(user, PERMISSIONS.CREATE_TAG);
+	} else if (params.action === 'edit') {
+		requirePermission(user, PERMISSIONS.UPDATE_TAG);
+	} else if (params.action === 'delete') {
+		requirePermission(user, PERMISSIONS.DELETE_TAG);
+	}
 	let tagData = null;
 
 	try {
@@ -73,7 +85,16 @@ export const actions: Actions = {
 		if (params.type != 'tag' && params.type != 'tagtype') {
 			throw new Error('Invalid type parameter');
 		}
+
+		const user = requireLogin();
 		const token = getSessionTokenCookie();
+
+		// Check permissions based on action
+		if (params.action === 'edit') {
+			requirePermission(user, PERMISSIONS.UPDATE_TAG);
+		} else if (params.action === 'add') {
+			requirePermission(user, PERMISSIONS.CREATE_TAG);
+		}
 		const form = await superValidate(
 			request,
 			zod(params.type == 'tag' ? tagSchema : tagTypeSchema)
@@ -145,6 +166,9 @@ export const actions: Actions = {
 		if (params.type != 'tag' && params.type != 'tagtype') {
 			throw new Error('Invalid type parameter');
 		}
+
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_TAG);
 		const token = getSessionTokenCookie();
 		const response = await fetch(`${BACKEND_URL}/${params.type}/${params.id}/`, {
 			method: 'DELETE',

@@ -17,7 +17,11 @@ export interface Tag {
 export const createTagsColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
-	handleSort: (columnId: string) => void
+	handleSort: (columnId: string) => void,
+	permissions?: {
+		canEdit?: boolean;
+		canDelete?: boolean;
+	}
 ): ColumnDef<Tag>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
 	{
@@ -28,5 +32,5 @@ export const createTagsColumns = (
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)
 	}),
-	createActionsColumn<Tag>('Tag', '/tags/tag')
+	createActionsColumn<Tag>('Tag', '/tags/tag', permissions)
 ];

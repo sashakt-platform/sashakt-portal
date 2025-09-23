@@ -1,8 +1,11 @@
 import { BACKEND_URL } from '$env/static/private';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants.js';
-import { getSessionTokenCookie } from '$lib/server/auth';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load = async ({ url }) => {
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.READ_USER);
 	const token = getSessionTokenCookie();
 
 	// extract query params

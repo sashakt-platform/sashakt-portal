@@ -14,11 +14,15 @@ export interface TagType {
 export const createTagTypesColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
-	handleSort: (columnId: string) => void
+	handleSort: (columnId: string) => void,
+	permissions?: {
+		canEdit?: boolean;
+		canDelete?: boolean;
+	}
 ): ColumnDef<TagType>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)
 	}),
-	createActionsColumn<TagType>('Tag Type', '/tags/tagtype')
+	createActionsColumn<TagType>('Tag Type', '/tags/tagtype', permissions)
 ];

@@ -3,17 +3,19 @@ import { fail, redirect } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { loginSchema } from './schema';
+import { loginSchema, resetSchema } from './schema';
 import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
+import { setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async () => {
 	return {
-		form: await superValidate(zod(loginSchema))
+		loginForm: await superValidate(zod(loginSchema)),
+		resetForm: await superValidate(zod(resetSchema))
 	};
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	login: async ({ request, cookies }) => {
 		const form = await superValidate(request, zod(loginSchema));
 		if (!form.valid) {
 			return fail(400, {
@@ -45,5 +47,31 @@ export const actions: Actions = {
 		setRefreshTokenCookie(cookies, refresh_token);
 
 		throw redirect(303, '/dashboard');
+	},
+	reset: async ({ fetch, request, cookies }) => {
+		const form = await superValidate(request, zod(resetSchema));
+		if (!form.valid) {
+			return fail(400, { form });
+		}
+		const res = await fetch(`${BACKEND_URL}/password-recovery/${form.data.email}`, {
+			method: 'POST',
+			headers: { accept: 'application/json' }
+		});
+		const data = await res.json();
+		if (!res.ok) {
+			if (res.status == 404) {
+				setFlash(
+					{
+						type: 'error',
+						message: `Failed to send reset link: ${data.detail}`
+					},
+					cookies
+				);
+			}
+			form.errors = { email: [data.detail ?? 'Failed to send reset link'] };
+			return fail(res.status, { form });
+		}
+		form.message = 'Reset link sent successfully!';
+		return { form };
 	}
 };

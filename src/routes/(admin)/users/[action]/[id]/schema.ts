@@ -6,8 +6,8 @@ const baseUserSchema = z.object({
 	full_name: z.string().min(1, { message: 'Full name is required' }),
 	email: z.string().email({ message: 'Invalid email address' }),
 	phone: z.string().optional(),
-	organization_id: z.number({ message: 'Organization is required' }),
-	role_id: z.number({ message: 'Role is required' }),
+	organization_id: z.coerce.number().min(1, { message: 'Organization is required' }),
+	role_id: z.coerce.number().min(1, { message: 'Role is required' }),
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	is_active: z.boolean().optional().default(true)
 });

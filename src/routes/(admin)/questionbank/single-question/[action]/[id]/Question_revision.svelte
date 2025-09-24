@@ -70,6 +70,10 @@
 							</p>
 						</div>
 					{/each}
+				{:else}
+					<div class="m-10 flex items-center gap-2 text-sm text-gray-500">
+						<History class="h-4 w-4" /> No revisions found.
+					</div>
 				{/if}
 			</div>
 		</Dialog.Content>

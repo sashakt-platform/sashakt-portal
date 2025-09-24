@@ -1,13 +1,25 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
+	import { getFlash } from 'sveltekit-flash-message';
 	import type { PageData } from './$types.js';
 	import LoginForm from './LoginForm.svelte';
 	import ResetPasswordForm from './ResetPasswordForm.svelte';
+	import { toast } from 'svelte-sonner';
+	import { page } from '$app/state';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	let { data, event }: { data: PageData; event: Event } = $props();
 
 	let showReset = $state(false);
+	const flash = getFlash(page);
+	$effect(() => {
+		if (!$flash) return;
+		$flash.type === 'error' ? toast.error($flash.message) : toast.success($flash.message);
+	});
 </script>
 
+<div>
+	<Toaster richColors />
+</div>
 <div class="flex h-screen items-center justify-center">
 	<Card.Root class="w-[350px]">
 		<Card.Header>

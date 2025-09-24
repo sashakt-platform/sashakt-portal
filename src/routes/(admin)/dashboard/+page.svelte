@@ -102,20 +102,16 @@
 	<div class="flex flex-col rounded-xl bg-white p-4">
 		<div class="flex flex-row">
 			<div class="my-auto flex w-1/2 flex-col">
-				<p class="font-semibold">Summary</p>
+				<p class="font-semibold">Summary of Test Attempts</p>
 				<!-- <p class="text-sm">Details of the attempts made by the candidate</p> -->
 			</div>
 		</div>
 		<!-- <hr class="my-4 border-gray-300" /> -->
 		<div class="flex flex-row">
-			{@render dataBox('Submitted Test Attempts', '', data.testAttemptStats?.total_test_submitted)}
-			{@render dataBox(
-				'Non-Submitted Test Attempts',
-				'',
-				data.testAttemptStats?.total_test_not_submitted
-			)}
-			{@render dataBox('Active Test Attempts', '', data.testAttemptStats?.not_submitted_active)}
-			{@render dataBox('Inactive Test Attempts', '', data.testAttemptStats?.not_submitted_inactive)}
+			{@render dataBox('Submitted', '', data.testAttemptStats?.total_test_submitted)}
+			{@render dataBox('Non-Submitted', '', data.testAttemptStats?.total_test_not_submitted)}
+			{@render dataBox('Active', '', data.testAttemptStats?.not_submitted_active)}
+			{@render dataBox('Inactive', '', data.testAttemptStats?.not_submitted_inactive)}
 		</div>
 	</div>
 	<div class="flex flex-row justify-between">

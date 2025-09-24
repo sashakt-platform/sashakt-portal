@@ -21,6 +21,7 @@ export const load: PageServerLoad = async ({ params }: any) => {
 		requirePermission(user, PERMISSIONS.DELETE_QUESTION);
 	}
 	let questionData = null;
+	let questionRevisions = null;
 
 	try {
 		if (params.id && params.id !== 'new') {
@@ -64,6 +65,27 @@ export const load: PageServerLoad = async ({ params }: any) => {
 		console.error('Error fetching tag types:', error);
 	}
 
+	try {
+		const questionRevisionsResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			}
+		});
+		if (!questionRevisionsResponse.ok) {
+			console.error(`Failed to fetch Question Revision: ${questionRevisionsResponse.statusText}`);
+			throw new Error('Failed to fetch Question Revision');
+		}
+
+		questionRevisions = await questionRevisionsResponse.json();
+	} catch (error) {
+		console.error('Error fetching Question Revision:', error);
+	}
+
+
+
+
 	const form = await superValidate(zod(questionSchema));
 	const tagForm = await superValidate(zod(tagSchema));
 
@@ -71,7 +93,8 @@ export const load: PageServerLoad = async ({ params }: any) => {
 		form,
 		tagForm,
 		questionData,
-		tagTypes
+		tagTypes,
+		questionRevisions
 	};
 };
 

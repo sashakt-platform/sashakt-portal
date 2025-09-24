@@ -23,13 +23,15 @@
 				<Input
 					type="text"
 					id="template-name"
-					placeholder="Enter the test name"
+					placeholder=""
 					class="h-12"
 					name="name"
 					bind:value={$formData.name}
 				/>
 				<span class="text-xs text-gray-500"
-					>Enter a unique test name to differentiate from the other tests</span
+					>Enter a unique name so it can be easily distinguished from other {$formData.is_template
+						? 'test templates.'
+						: 'tests.'}.</span
 				>
 			</div>
 
@@ -39,11 +41,7 @@
 						><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 					>
 				</div>
-				<Textarea
-					placeholder="Enter the test description here..."
-					name="description"
-					bind:value={$formData.description}
-				/>
+				<Textarea placeholder="" name="description" bind:value={$formData.description} />
 			</div>
 
 			<div class="flex flex-row gap-8">

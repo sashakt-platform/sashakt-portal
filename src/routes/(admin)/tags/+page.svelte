@@ -96,17 +96,13 @@
 					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 				</div>
 			</div>
-			<Label class="my-auto align-middle text-sm font-extralight"
-				>Create, edit and update all the Tags and Tag Types</Label
-			>
+			<Label class="my-auto align-middle text-sm font-extralight">Manage Tags and Tag Types</Label>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
 			{#if canCreate(data.user, 'tag')}
-				<a href="/tags/tag/add/new"
-					><Button class="font-bold" variant="outline"><Plus />Create a Tag</Button></a
-				>
+				<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>
 				<a href="/tags/tagtype/add/new"
-					><Button class=" font-bold "><Plus />Create Tag Type</Button></a
+					><Button class="font-bold "><Plus />Create Tag Type</Button></a
 				>
 			{/if}
 		</div>

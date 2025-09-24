@@ -31,7 +31,7 @@
 			<Dialog.Title class="mb-4 inline-flex items-center gap-2 text-xl font-semibold">
 				{#if $message.failed_questions}
 					<TriangleAlert color="#C7584A" size={28} />
-					File upload error
+					Import error(s)
 				{:else}
 					<CircleCheck color="#1E8F36" size={28} />
 					File upload successful
@@ -168,7 +168,7 @@
 						<p class="text-lg font-bold text-blue-400" style="color:#0369A1">
 							Click to upload Questions
 						</p>
-						<p class="text-sm text-gray-400">CSV | File Size Limit:20MB</p>
+						<p class="text-sm text-gray-400">CSV | File size limit: 20MB</p>
 					</div>
 					{#if $form.file}
 						<div class="flex flex-row gap-2 bg-[#F0F9FF] p-4">

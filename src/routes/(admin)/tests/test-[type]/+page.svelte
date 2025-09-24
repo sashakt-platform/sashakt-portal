@@ -140,9 +140,7 @@
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight"
-				>{data?.is_template
-					? 'Create, edit and update all the test templates'
-					: 'Create, edit,conduct and update all the test session'}</Label
+				>{data?.is_template ? 'Manage test templates' : 'Manage test sessions'}</Label
 			>
 		</div>
 		<div class="my-auto ml-auto p-4">
@@ -208,19 +206,19 @@
 				</div>
 
 				<div class="w-1/3">
-					<TagsSelection bind:tags={filteredTags} filteration={true} />
-				</div>
-
-				<div class="w-1/3">
 					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
 
 				<div class="w-1/3">
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+					<DistrictSelection bind:districts={filteredDistricts} filteration={true} />
 				</div>
 
 				<div class="w-1/3">
-					<DistrictSelection bind:districts={filteredDistricts} filteration={true} />
+					<TagsSelection bind:tags={filteredTags} filteration={true} />
+				</div>
+
+				<div class="w-1/3">
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
 			</div>
 

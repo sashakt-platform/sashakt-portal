@@ -58,7 +58,7 @@
 					{...props}
 					type="password"
 					bind:value={$formData.password}
-					placeholder={isEditMode ? 'Leave blank to keep current password' : 'Enter password'}
+					placeholder={isEditMode ? 'Leave blank to keep current password' : ''}
 				/>
 			{/snippet}
 		</Form.Control>
@@ -74,7 +74,7 @@
 					{...props}
 					type="password"
 					bind:value={$formData.confirm_password}
-					placeholder={isEditMode ? 'Confirm new password if changing' : 'Confirm password'}
+					placeholder={isEditMode ? 'Confirm new password if changing' : ''}
 				/>
 			{/snippet}
 		</Form.Control>
@@ -98,9 +98,9 @@
 						{#if $formData.organization_id}
 							{data.organizations.find(
 								(organization) => organization.id === $formData.organization_id
-							)?.name || '--select--'}
+							)?.name || 'Select organization'}
 						{:else}
-							--select--
+							Select organization
 						{/if}
 					</Select.Trigger>
 					<Select.Content>
@@ -120,9 +120,9 @@
 				<Select.Root type="single" bind:value={$formData.role_id} name={props.name}>
 					<Select.Trigger class="w-[180px]" {...props}>
 						{#if $formData.role_id}
-							{data.roles.find((role) => role.id === $formData.role_id)?.label || '--select--'}
+							{data.roles.find((role) => role.id === $formData.role_id)?.label || 'Select role'}
 						{:else}
-							--select--
+							Select role
 						{/if}
 					</Select.Trigger>
 					<Select.Content>

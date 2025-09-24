@@ -209,9 +209,7 @@
 					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 				</div>
 			</div>
-			<Label class="my-auto align-middle text-sm font-extralight"
-				>Create, edit and update all the questions</Label
-			>
+			<Label class="my-auto align-middle text-sm font-extralight">Manage question bank</Label>
 		</div>
 		<div class={['my-auto ml-auto gap-3 p-4']}>
 			{#if !noQuestionCreatedYet}
@@ -312,12 +310,13 @@
 					</div>
 
 					<div class="w-1/3">
-						<TagsSelection bind:tags={filteredTags} filteration={true} />
+						<StateSelection bind:states={filteredStates} filteration={true} />
 					</div>
 
 					<div class="w-1/3">
-						<StateSelection bind:states={filteredStates} filteration={true} />
+						<TagsSelection bind:tags={filteredTags} filteration={true} />
 					</div>
+
 					<div class="w-1/3">
 						<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 					</div>

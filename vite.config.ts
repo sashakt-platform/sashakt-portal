@@ -13,6 +13,7 @@ export default defineConfig({
 				test: {
 					name: 'client',
 					environment: 'jsdom',
+					globals: true,
 					clearMocks: true,
 					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
 					exclude: ['src/lib/server/**'],
@@ -23,6 +24,7 @@ export default defineConfig({
 				extends: './vite.config.ts',
 				test: {
 					name: 'server',
+					globals: true,
 					environment: 'node',
 					include: ['src/**/*.{test,spec}.{js,ts}'],
 					exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']

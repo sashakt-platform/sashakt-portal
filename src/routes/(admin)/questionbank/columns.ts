@@ -11,7 +11,7 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 export interface Question {
 	id: string;
 	question_text: string;
-	tags?: Array<{ name: string }>;
+	tags?: Array<{ name: string; tag_type?: { name: string } }>;
 	modified_date: string;
 	options: Array<{ id: string; key: string; value: string }>;
 	correct_answer: string[];
@@ -43,7 +43,12 @@ export const createQuestionColumns = (
 		cell: ({ row }) => {
 			const tags = row.original.tags;
 			if (tags && tags.length > 0) {
-				return tags.map((tag) => tag.name).join(', ');
+				return tags
+					.map((tag) => {
+						const tagTypeName = tag.tag_type?.name ?? '';
+						return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
+					})
+					.join(', ');
 			}
 			return '';
 		}

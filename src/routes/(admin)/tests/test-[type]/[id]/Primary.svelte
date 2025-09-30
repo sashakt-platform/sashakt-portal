@@ -68,7 +68,10 @@
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					<DistrictSelection bind:districts={$formData.district_ids} />
+					<DistrictSelection
+						bind:districts={$formData.district_ids}
+						selectedStates={$formData.state_ids}
+					/>
 				</div>
 			</div>
 		</div>

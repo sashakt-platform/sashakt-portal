@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	// get user data in edit mode
 	try {
 		if (params.id && params.action === 'edit') {
-			const userResponse = await fetch(`${BACKEND_URL}/users/${params.id}`, {
+			const userResponse = await fetch(`${BACKEND_URL}/users/${params.id}/`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	// get roles from the backend
 	let formattedRoles = [];
 	try {
-		const roleResponse = await fetch(`${BACKEND_URL}/roles`, {
+		const roleResponse = await fetch(`${BACKEND_URL}/roles/`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ export const actions: Actions = {
 				updateData.password = form.data.password;
 			}
 
-			res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
+			res = await fetch(`${BACKEND_URL}/users/${params.id}/`, {
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ export const actions: Actions = {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_USER);
 		const token = getSessionTokenCookie();
-		const res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
+		const res = await fetch(`${BACKEND_URL}/users/${params.id}/`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',

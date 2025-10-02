@@ -29,7 +29,7 @@ export const actions: Actions = {
 			new_password: form.data.new_password
 		};
 
-		const response = await fetch(`${BACKEND_URL}/users/me/password`, {
+		const response = await fetch(`${BACKEND_URL}/users/me/password/`, {
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json',

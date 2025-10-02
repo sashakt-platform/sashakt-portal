@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ params }: any) => {
 
 	try {
 		if (params.id && params.id !== 'new') {
-			const questionResponse = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
+			const questionResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -66,13 +66,16 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	}
 
 	try {
-		const questionRevisionsResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
+		const questionRevisionsResponse = await fetch(
+			`${BACKEND_URL}/questions/${params.id}/revisions/`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
 			}
-		});
+		);
 		if (!questionRevisionsResponse.ok) {
 			console.error(`Failed to fetch Question Revision: ${questionRevisionsResponse.statusText}`);
 			throw new Error('Failed to fetch Question Revision');
@@ -82,9 +85,6 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	} catch (error) {
 		console.error('Error fetching Question Revision:', error);
 	}
-
-
-
 
 	const form = await superValidate(zod(questionSchema));
 	const tagForm = await superValidate(zod(tagSchema));
@@ -171,7 +171,7 @@ export const actions: Actions = {
 
 			// Transform tag_ids array into the required format
 			const tagsDataArray = form.data.tag_ids.map((tagId) => tagId.id);
-			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags`, {
+			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags/`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -198,7 +198,7 @@ export const actions: Actions = {
 			}));
 
 			// Send the transformed array to the API
-			const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations`, {
+			const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations/`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ export const actions: Actions = {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_QUESTION);
 		const token = getSessionTokenCookie();
-		const response = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
+		const response = await fetch(`${BACKEND_URL}/questions/${params.id}/`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',

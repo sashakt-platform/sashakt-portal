@@ -125,7 +125,7 @@ export const actions: Actions = {
 		};
 
 		if (params.id === 'new') {
-			const response = await fetch(`${BACKEND_URL}/questions`, {
+			const response = await fetch(`${BACKEND_URL}/questions/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ export const actions: Actions = {
 		}
 
 		if (params.id !== 'new') {
-			const response = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions`, {
+			const response = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -229,7 +229,7 @@ export const actions: Actions = {
 			setFlash({ type: 'error', message: `Tag Details not Valid` }, cookies);
 			return fail(400, { tagForm });
 		}
-		const response = await fetch(`${BACKEND_URL}/tag`, {
+		const response = await fetch(`${BACKEND_URL}/tag/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

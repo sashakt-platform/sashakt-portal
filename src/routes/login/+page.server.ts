@@ -21,7 +21,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const res = await fetch(`${BACKEND_URL}/login/access-token`, {
+		const res = await fetch(`${BACKEND_URL}/login/access-token/`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: new URLSearchParams({

@@ -166,7 +166,7 @@ export const actions: Actions = {
 				body: JSON.stringify(updateData)
 			});
 		} else if (params.action === 'add') {
-			res = await fetch(`${BACKEND_URL}/users`, {
+			res = await fetch(`${BACKEND_URL}/users/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

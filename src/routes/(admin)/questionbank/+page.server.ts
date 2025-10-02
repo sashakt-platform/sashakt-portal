@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		.filter(Boolean)
 		.join('&');
 
-	const response = await fetch(`${BACKEND_URL}/questions?${queryString}`, {
+	const response = await fetch(`${BACKEND_URL}/questions/?${queryString}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

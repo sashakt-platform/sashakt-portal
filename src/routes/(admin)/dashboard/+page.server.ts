@@ -71,7 +71,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		Object.assign(stats, { total_questions, total_users, total_tests });
 	}
 	const responsePerformance = await fetch(
-		`${BACKEND_URL}/candidate/overall-analytics?${queryString}`,
+		`${BACKEND_URL}/candidate/overall-analytics/?${queryString}`,
 		{
 			method: 'GET',
 			headers: {

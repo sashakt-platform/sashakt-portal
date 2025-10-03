@@ -69,7 +69,7 @@ export const createTestColumns = (
 			} else {
 				// Add session-specific actions
 				customActions.push({
-					label: 'Clone',
+					label: 'Make a Copy',
 					href: `/tests/test-session/${test.id}?/clone`,
 					icon: 'copy',
 					method: 'POST'
@@ -101,7 +101,7 @@ export const createTestColumns = (
 				id: test.id,
 				entityName: isTemplate ? 'Test Template' : 'Test Session',
 				editUrl: `${baseUrl}/${test.id}/`,
-				deleteUrl: `/tests/test-session/${test.id}?/delete`,
+				deleteUrl: `${baseUrl}/${test.id}?/delete`,
 				customActions,
 				onDelete: () => onDelete(test.id),
 				canEdit: permissions?.canEdit ?? true,

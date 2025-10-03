@@ -28,10 +28,10 @@
 				goto(url, { keepFocus: true, invalidateAll: true, replaceState: true });
 			}
 
-			// remove districts that don't belong to selected states
-			if (selectedStates && districts) {
+			// only filter districts when states actually change
+			if (selectedStates && districts && page?.data?.districts?.items) {
 				const selectedStateIds = selectedStates.map((state) => String(state.id));
-				const currentDistricts = page?.data?.districts?.items ?? [];
+				const currentDistricts = page.data.districts.items;
 
 				const validDistricts = districts.filter((district) => {
 					const districtStateId = currentDistricts.find(

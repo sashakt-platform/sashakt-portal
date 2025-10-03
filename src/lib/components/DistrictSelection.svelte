@@ -28,8 +28,8 @@
 				goto(url, { keepFocus: true, invalidateAll: true, replaceState: true });
 			}
 
-			// remove districts that don't belong to selected states
-			if (selectedStates && districts) {
+			// only filter districts when states actually change
+			if (selectedStates && districts && page?.data?.districts?.items) {
 				const selectedStateIds = selectedStates.map((state) => String(state.id));
 
 				// get districts from derived districtList which includes layout data

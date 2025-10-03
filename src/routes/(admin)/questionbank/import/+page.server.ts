@@ -38,7 +38,7 @@ export const actions = {
 		formData.append('file', file);
 		formData.append('user_id', String(form.data.user_id));
 
-		const response = await fetch(`${BACKEND_URL}/questions/bulk-upload/`, {
+		const response = await fetch(`${BACKEND_URL}/questions/bulk-upload`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${token}`

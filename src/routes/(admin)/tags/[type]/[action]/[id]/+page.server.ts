@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ params, cookies }: any) => {
 
 	try {
 		if (params.id && params.id !== 'new') {
-			const tagResponse = await fetch(`${BACKEND_URL}/${params.type}/${params.id}/`, {
+			const tagResponse = await fetch(`${BACKEND_URL}/${params.type}/${params.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',

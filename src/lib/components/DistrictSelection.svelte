@@ -31,17 +31,21 @@
 			// only filter districts when states actually change
 			if (selectedStates && districts && page?.data?.districts?.items) {
 				const selectedStateIds = selectedStates.map((state) => String(state.id));
-				const currentDistricts = page.data.districts.items;
 
-				const validDistricts = districts.filter((district) => {
-					const districtStateId = currentDistricts.find(
-						(d) => String(d.id) === String(district.id)
-					)?.state_id;
-					return selectedStateIds.includes(String(districtStateId));
-				});
+				// get districts from derived districtList which includes layout data
+				const currentDistricts = districtList;
 
-				if (validDistricts.length !== districts.length) {
-					districts = validDistricts;
+				if (currentDistricts.length > 0) {
+					const validDistricts = districts.filter((district) => {
+						const districtStateId = currentDistricts.find(
+							(d) => String(d.id) === String(district.id)
+						)?.state_id;
+						return selectedStateIds.includes(String(districtStateId));
+					});
+
+					if (validDistricts.length !== districts.length) {
+						districts = validDistricts;
+					}
 				}
 			}
 		}

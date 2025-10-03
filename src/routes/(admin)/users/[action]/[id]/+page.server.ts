@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	// get user data in edit mode
 	try {
 		if (params.id && params.action === 'edit') {
-			const userResponse = await fetch(`${BACKEND_URL}/users/${params.id}/`, {
+			const userResponse = await fetch(`${BACKEND_URL}/users/${params.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',

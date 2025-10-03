@@ -26,7 +26,7 @@
 			goto(url, { keepFocus: true, invalidateAll: true, replaceState: true });
 
 			// only filter districts when states actually change
-			if (selectedStates && districts && page?.data?.districts?.items) {
+			if (selectedStates && districts && districtList.length > 0) {
 				const selectedStateIds = selectedStates.map((state) => String(state.id));
 
 				// get districts from derived districtList which includes layout data

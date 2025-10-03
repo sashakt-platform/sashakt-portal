@@ -16,17 +16,14 @@
 			previousStateIds = stateIds;
 
 			const url = new URL(page.url);
-			const currentStateIds = url.searchParams.get('selected_state_ids') || '';
 
-			// update URL if it's different from current
-			if (stateIds !== currentStateIds) {
-				if (stateIds) {
-					url.searchParams.set('selected_state_ids', stateIds);
-				} else {
-					url.searchParams.delete('selected_state_ids');
-				}
-				goto(url, { keepFocus: true, invalidateAll: true, replaceState: true });
+			// let's use values in state for updating url
+			if (stateIds) {
+				url.searchParams.set('selected_state_ids', stateIds);
+			} else {
+				url.searchParams.delete('selected_state_ids');
 			}
+			goto(url, { keepFocus: true, invalidateAll: true, replaceState: true });
 
 			// only filter districts when states actually change
 			if (selectedStates && districts && page?.data?.districts?.items) {

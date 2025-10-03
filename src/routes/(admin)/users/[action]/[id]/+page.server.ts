@@ -157,7 +157,7 @@ export const actions: Actions = {
 				updateData.password = form.data.password;
 			}
 
-			res = await fetch(`${BACKEND_URL}/users/${params.id}/`, {
+			res = await fetch(`${BACKEND_URL}/users/${params.id}`, {
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',

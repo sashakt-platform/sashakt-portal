@@ -57,7 +57,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		not_submitted_inactive: 0
 	};
 
-	const responseStats = await fetch(`${BACKEND_URL}/organization/aggregated_data/`, {
+	const responseStats = await fetch(`${BACKEND_URL}/organization/aggregated_data`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -71,7 +71,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		Object.assign(stats, { total_questions, total_users, total_tests });
 	}
 	const responsePerformance = await fetch(
-		`${BACKEND_URL}/candidate/overall-analytics/?${queryString}`,
+		`${BACKEND_URL}/candidate/overall-analytics?${queryString}`,
 		{
 			method: 'GET',
 			headers: {
@@ -91,7 +91,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		});
 	}
 
-	const responseTestStats = await fetch(`${BACKEND_URL}/candidate/summary/`, {
+	const responseTestStats = await fetch(`${BACKEND_URL}/candidate/summary`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

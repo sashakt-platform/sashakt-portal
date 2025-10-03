@@ -131,7 +131,7 @@ export const actions: Actions = {
 		}
 
 		if (params.id !== 'new') {
-			const response = await fetch(`${BACKEND_URL}/${params.type}/${params.id}/`, {
+			const response = await fetch(`${BACKEND_URL}/${params.type}/${params.id}`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',

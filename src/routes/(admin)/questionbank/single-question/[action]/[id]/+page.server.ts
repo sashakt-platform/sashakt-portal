@@ -148,7 +148,7 @@ export const actions: Actions = {
 		}
 
 		if (params.id !== 'new') {
-			const response = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions/`, {
+			const response = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

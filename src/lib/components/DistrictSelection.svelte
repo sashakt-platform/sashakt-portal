@@ -11,38 +11,24 @@
 	$effect(() => {
 		const stateIds = selectedStates?.map((state) => String(state.id)).join(',') || '';
 
-		// update if state selection actually changed
-		if (stateIds !== previousStateIds) {
+		// only filter districts when states actually change
+		if (stateIds !== previousStateIds && selectedStates && districts && districtList.length > 0) {
 			previousStateIds = stateIds;
+			const selectedStateIds = selectedStates.map((state) => String(state.id));
 
-			const url = new URL(page.url);
+			// get districts from derived districtList which includes layout data
+			const currentDistricts = districtList;
 
-			// let's use values in state for updating url
-			if (stateIds) {
-				url.searchParams.set('selected_state_ids', stateIds);
-			} else {
-				url.searchParams.delete('selected_state_ids');
-			}
-			goto(url, { keepFocus: true, invalidateAll: true, replaceState: true });
+			if (currentDistricts.length > 0) {
+				const validDistricts = districts.filter((district) => {
+					const districtStateId = currentDistricts.find(
+						(d) => String(d.id) === String(district.id)
+					)?.state_id;
+					return selectedStateIds.includes(String(districtStateId));
+				});
 
-			// only filter districts when states actually change
-			if (selectedStates && districts && districtList.length > 0) {
-				const selectedStateIds = selectedStates.map((state) => String(state.id));
-
-				// get districts from derived districtList which includes layout data
-				const currentDistricts = districtList;
-
-				if (currentDistricts.length > 0) {
-					const validDistricts = districts.filter((district) => {
-						const districtStateId = currentDistricts.find(
-							(d) => String(d.id) === String(district.id)
-						)?.state_id;
-						return selectedStateIds.includes(String(districtStateId));
-					});
-
-					if (validDistricts.length !== districts.length) {
-						districts = validDistricts;
-					}
+				if (validDistricts.length !== districts.length) {
+					districts = validDistricts;
 				}
 			}
 		}

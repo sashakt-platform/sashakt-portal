@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const tagSearch = url.searchParams.get('tag_search') || '';
 	const tagTypeSearch = url.searchParams.get('tag_type_search') || '';
 	const districtSearch = url.searchParams.get('district_search') || '';
-	const selectedStateIds = url.searchParams.get('selected_state_ids') || '';
+	const selectedStateIds = url.searchParams.getAll('state_ids').join(',') || '';
 
 	const responseState = await fetch(
 		`${BACKEND_URL}/location/state/?name=${encodeURIComponent(stateSearch)}`,

@@ -164,7 +164,7 @@ export const actions: Actions = {
 			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
 		};
 		const response = await fetch(
-			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : ''}/`,
+			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : '/'}`,
 			{
 				method: `${params.id !== 'new' && params.id !== 'convert' ? 'PUT' : 'POST'}`,
 				headers: {

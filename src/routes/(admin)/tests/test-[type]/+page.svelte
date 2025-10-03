@@ -210,7 +210,7 @@
 				</div>
 
 				<div class="w-1/3">
-					<DistrictSelection bind:districts={filteredDistricts} filteration={true} />
+					<DistrictSelection bind:districts={filteredDistricts} selectedStates={filteredStates} filteration={true} />
 				</div>
 
 				<div class="w-1/3">

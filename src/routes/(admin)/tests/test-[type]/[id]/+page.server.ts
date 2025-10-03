@@ -205,7 +205,7 @@ export const actions: Actions = {
 		} else {
 			requirePermission(user, PERMISSIONS.DELETE_TEST);
 		}
-		const response = await fetch(`${BACKEND_URL}/test/${params.id}/`, {
+		const response = await fetch(`${BACKEND_URL}/test/${params.id}`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',

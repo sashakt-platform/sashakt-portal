@@ -170,7 +170,7 @@ export const actions: Actions = {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_TAG);
 		const token = getSessionTokenCookie();
-		const response = await fetch(`${BACKEND_URL}/${params.type}/${params.id}/`, {
+		const response = await fetch(`${BACKEND_URL}/${params.type}/${params.id}`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',

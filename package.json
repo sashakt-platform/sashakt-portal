@@ -63,6 +63,7 @@
 		]
 	},
 	"dependencies": {
+		"@sentry/sveltekit": "^10.17.0",
 		"@tanstack/table-core": "^8.21.3",
 		"svelte-headless-table": "^0.18.3"
 	}

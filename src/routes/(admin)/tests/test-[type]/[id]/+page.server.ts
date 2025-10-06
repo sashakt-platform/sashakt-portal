@@ -243,7 +243,7 @@ export const actions: Actions = {
 		} else {
 			requirePermission(user, PERMISSIONS.CREATE_TEST);
 		}
-		const response = await fetch(`${BACKEND_URL}/test/${params.id}/clone/`, {
+		const response = await fetch(`${BACKEND_URL}/test/${params.id}/clone`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

@@ -16,6 +16,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const tagSearch = url.searchParams.get('tag_search') || '';
 	const tagTypeSearch = url.searchParams.get('tag_type_search') || '';
 	const districtSearch = url.searchParams.get('district_search') || '';
+	const selectedStateIds = url.searchParams.getAll('state_ids').join(',') || '';
 
 	const responseState = await fetch(
 		`${BACKEND_URL}/location/state/?name=${encodeURIComponent(stateSearch)}`,
@@ -55,8 +56,19 @@ export const load: PageServerLoad = async ({ url }) => {
 		};
 	}
 
+	const districtParams = new URLSearchParams({
+		name: districtSearch
+	});
+
+	if (selectedStateIds) {
+		const stateIds = selectedStateIds.split(',').filter(Boolean);
+		for (const id of stateIds) {
+			districtParams.append('state_ids', id);
+		}
+	}
+
 	const responseDistricts = await fetch(
-		`${BACKEND_URL}/location/district/?name=${encodeURIComponent(districtSearch)}`,
+		`${BACKEND_URL}/location/district/?${districtParams.toString()}`,
 		{
 			method: 'GET',
 			headers: {

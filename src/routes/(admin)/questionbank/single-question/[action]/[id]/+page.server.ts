@@ -21,10 +21,11 @@ export const load: PageServerLoad = async ({ params }: any) => {
 		requirePermission(user, PERMISSIONS.DELETE_QUESTION);
 	}
 	let questionData = null;
+	let questionRevisions = null;
 
 	try {
 		if (params.id && params.id !== 'new') {
-			const questionResponse = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
+			const questionResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -64,6 +65,27 @@ export const load: PageServerLoad = async ({ params }: any) => {
 		console.error('Error fetching tag types:', error);
 	}
 
+	try {
+		const questionRevisionsResponse = await fetch(
+			`${BACKEND_URL}/questions/${params.id}/revisions/`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
+			}
+		);
+		if (!questionRevisionsResponse.ok) {
+			console.error(`Failed to fetch Question Revision: ${questionRevisionsResponse.statusText}`);
+			throw new Error('Failed to fetch Question Revision');
+		}
+
+		questionRevisions = await questionRevisionsResponse.json();
+	} catch (error) {
+		console.error('Error fetching Question Revision:', error);
+	}
+
 	const form = await superValidate(zod(questionSchema));
 	const tagForm = await superValidate(zod(tagSchema));
 
@@ -71,7 +93,8 @@ export const load: PageServerLoad = async ({ params }: any) => {
 		form,
 		tagForm,
 		questionData,
-		tagTypes
+		tagTypes,
+		questionRevisions
 	};
 };
 
@@ -102,7 +125,7 @@ export const actions: Actions = {
 		};
 
 		if (params.id === 'new') {
-			const response = await fetch(`${BACKEND_URL}/questions`, {
+			const response = await fetch(`${BACKEND_URL}/questions/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -148,7 +171,7 @@ export const actions: Actions = {
 
 			// Transform tag_ids array into the required format
 			const tagsDataArray = form.data.tag_ids.map((tagId) => tagId.id);
-			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags`, {
+			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags/`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -175,7 +198,7 @@ export const actions: Actions = {
 			}));
 
 			// Send the transformed array to the API
-			const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations`, {
+			const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations/`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -206,7 +229,7 @@ export const actions: Actions = {
 			setFlash({ type: 'error', message: `Tag Details not Valid` }, cookies);
 			return fail(400, { tagForm });
 		}
-		const response = await fetch(`${BACKEND_URL}/tag`, {
+		const response = await fetch(`${BACKEND_URL}/tag/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

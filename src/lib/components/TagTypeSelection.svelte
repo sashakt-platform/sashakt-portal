@@ -10,6 +10,6 @@
 	bind:items={tagTypes}
 	itemName="tag_type"
 	bind:itemList={tagTypeList}
-	label="Type of Tag"
+	label="tag type"
 	{...rest}
 />

@@ -40,13 +40,13 @@
 				<div class="w-2/5">
 					{@render headingSubheading(
 						'Pre-test guidelines',
-						'Detailed instructions before attempting the test'
+						'Instructions displayed before attempting the test.'
 					)}
 				</div>
 				<div class="w-3/5">
 					<Textarea
 						name="start_instructions"
-						placeholder="Enter your instructions here..."
+						placeholder=""
 						bind:value={$formData.start_instructions}
 					/>
 				</div>
@@ -55,13 +55,13 @@
 				<div class="w-2/5">
 					{@render headingSubheading(
 						'Completion message',
-						'Message content after the test completion'
+						'Message displayed after test completion.'
 					)}
 				</div>
 				<div class="w-3/5">
 					<Textarea
 						name="completion_message"
-						placeholder="Enter your instructions here..."
+						placeholder=""
 						bind:value={$formData.completion_message}
 					/>
 				</div>
@@ -71,7 +71,10 @@
 		<ConfigureBox title="Timer Settings" Icon={Timer}>
 			<div class="flex flex-row" hidden={$formData.is_template}>
 				<div class="my-auto w-2/5 align-middle">
-					{@render headingSubheading('Start & end time', 'Set the start and end time of the test')}
+					{@render headingSubheading(
+						'Test Schedule',
+						'Set the date and time when the test will be available.'
+					)}
 				</div>
 				<div class=" flex w-3/5 flex-row gap-4">
 					<div class="flex w-1/2 flex-col gap-2">
@@ -97,7 +100,10 @@
 
 			<div class="flex flex-row">
 				<div class="w-2/5">
-					{@render headingSubheading('Time limit', 'Set the maximum time allowed for the test')}
+					{@render headingSubheading(
+						'Time limit',
+						'Set the maximum duration allowed to complete the test.'
+					)}
 				</div>
 				<div class=" flex w-3/5 flex-row gap-4">
 					<Input
@@ -116,12 +122,12 @@
 					<div class="w-1/2">
 						{@render headingSubheading(
 							'Questions Per Page',
-							"Enter the number of questions to display per page. Enter '0' to display all questions on a single page"
+							"Enter the number of questions to display on each page. Enter '0' to show all questions on a single page."
 						)}
 					</div>
 					<div class=" flex w-1/2 flex-row gap-4">
 						<Input
-							placeholder="Enter Count of Questions"
+							placeholder=""
 							type="number"
 							name="question_pagination"
 							bind:value={$formData.question_pagination}
@@ -137,7 +143,7 @@
 				<div class="w-full">
 					{@render headingSubheading(
 						'Show Result',
-						'Configure if results should be shown post test completion'
+						'Choose whether to display the test results after completion.'
 					)}
 				</div>
 			</div>
@@ -157,7 +163,7 @@
 					<div class="w-full">
 						{@render headingSubheading(
 							'Shuffle Questions',
-							'Configure if selected questions should be shuffled during the test'
+							'Choose whether to shuffle the selected questions during the test.'
 						)}
 					</div>
 				</div>
@@ -178,7 +184,7 @@
 					<div class="w-1/2">
 						{@render headingSubheading(
 							'Randomize Questions',
-							'Set the number of random questions to assign from the earlier selected questions.'
+							'Specify the number of random questions to assign from the previously selected questions.'
 						)}
 					</div>
 					<div class="gap- my-auto flex w-1/2 flex-col">
@@ -186,7 +192,7 @@
 							type="number"
 							id="random_count"
 							name="no_of_random_questions"
-							placeholder="Enter total random questions required"
+							placeholder=""
 							hidden={!$formData.random_questions}
 							bind:value={$formData.no_of_random_questions}
 						/>
@@ -194,7 +200,7 @@
 							<small class="mt-1 text-red-400">Enter a positive integer</small>
 						{:else if $formData.random_questions && $formData.no_of_random_questions > 0 && $formData.question_revision_ids.length < $formData.no_of_random_questions}
 							<small class="mt-1 text-red-400">
-								Number of random questions cannot exceed the total number of questions selected
+								Number of random questions cannot exceed the total number of questions selected.
 							</small>
 						{/if}
 					</div>
@@ -210,7 +216,7 @@
 						<Label for="question_level"
 							>{@render headingSubheading(
 								'Question Level Marking Scheme',
-								'Set Marks Individually (per question) for each question of the test'
+								'Assign marks individually for each question in the test.'
 							)}</Label
 						>
 					</div>
@@ -220,16 +226,16 @@
 							<Label for="test_level"
 								>{@render headingSubheading(
 									'Test Level Marking Scheme',
-									'Set uniform Marks for all the questions in the test'
+									'Assign the same marks to all questions in the test.'
 								)}</Label
 							>
 						</div>
 						<div class="flex w-1/2 flex-col gap-1" hidden={$formData.marks_level !== 'test'}>
-							<small class="text-gray-500">Marks for Correct Answer at Test Level</small>
+							<small class="text-gray-500">Marks for Correct Answer (Test Level)</small>
 							<Input
 								class="flex w-full"
 								type="number"
-								placeholder="Enter Marks for Correct Answer"
+								placeholder=""
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
 							/>
@@ -246,7 +252,7 @@
 				<div class="w-full">
 					{@render headingSubheading(
 						'Candidate profile',
-						'Configure to collect candidate information during the test.'
+						'Enable this option to collect candidate information during the test.'
 					)}
 				</div>
 			</div>

@@ -1,0 +1,72 @@
+name: Deploy Sashakt portal to production
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout tagged version
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu
+            rm -rf sashakt-portal
+
+            git clone https://github.com/sashakt-platform/sashakt-portal.git
+            cd sashakt-portal
+
+            echo "Checking out version tag..."
+            git checkout ${{ github.ref_name }}
+
+            echo "Ensuring pnpm is installed..."
+            if ! command -v pnpm &> /dev/null; then
+              npm install -g pnpm
+            fi
+
+            echo "Ensuring pm2 is installed..."
+            if ! command -v pm2 &> /dev/null; then
+              npm install -g pm2
+            fi
+
+            echo "Setting up environment variables..."
+            if [ -z "${{ vars.BACKEND_URL }}" ]; then
+              echo "Error: BACKEND_URL is not defined."
+              exit 1
+            fi
+
+            if [ -z "${{ vars.TEST_TAKER_URL }}" ]; then
+              echo "Error: TEST_TAKER_URL is not defined."
+              exit 1
+            fi
+
+            echo "BACKEND_URL=${{ vars.BACKEND_URL }}" > .env
+            echo "TEST_TAKER_URL=${{ vars.TEST_TAKER_URL }}" >> .env
+
+            corepack enable
+            sudo corepack prepare pnpm@latest --activate
+
+            echo "Installing dependencies..."
+            pnpm install
+
+            echo "Building the project..."
+            pnpm run build
+
+            echo "Restarting or starting the application with pm2..."
+            if [ -f "build/index.js" ]; then
+              pm2 restart sashakt-portal --update-env || PORT=3001 pm2 start build/index.js --name sashakt-portal
+            else
+              echo "Build output not found: build/index.js"
+              exit 1
+            fi

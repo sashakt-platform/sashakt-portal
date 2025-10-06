@@ -79,15 +79,8 @@
 	}
 </script>
 
-<form method="POST" action="?/save" use:enhance>
+<form method="POST" action="?/save" use:enhance class="pb-48 md:pb-28">
 	<div class="flex border-b-2 py-2">
-		<!-- <div class="flex justify-start"> -->
-		<!-- 	<Button variant="link" class=" text-gray-500" href="./" -->
-		<!-- 		><CircleChevronLeft />Back to test {$formData.is_template -->
-		<!-- 			? 'templates' -->
-		<!-- 			: 'sessions'}</Button -->
-		<!-- 	> -->
-		<!-- </div> -->
 		<div class="mx-auto flex">
 			{#snippet headerNumbers(
 				number: number,
@@ -145,11 +138,12 @@
 		<Configuration {formData} />
 	{/if}
 
-	<div class="sticky bottom-0 my-4 flex w-full justify-between border-t-4 bg-white p-4">
+	<div
+		class="fixed right-0 bottom-0 left-0 z-40 flex justify-between gap-4 border-t bg-white px-4 py-3 md:left-[var(--sidebar-width)]"
+	>
 		<Button href="./" variant="outline" class="text-primary border-primary border-1">Cancel</Button>
-
 		<Button
-			class="bg-primary"
+			class="bg-primary mx-4 "
 			disabled={(currentScreen === typeOfScreen.primary &&
 				($formData.name.trim() === '' || $formData.description.trim() === '')) ||
 				(currentScreen === typeOfScreen.configuration &&

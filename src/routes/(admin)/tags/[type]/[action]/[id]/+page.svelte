@@ -40,7 +40,7 @@
 
 	const triggerContent = $derived(
 		data.type == 'tag' &&
-			(data.tagTypes.find((f) => f.id === $formData.tag_type_id)?.name ?? 'Select Tag Type')
+			(data.tagTypes.find((f) => f.id === $formData.tag_type_id)?.name ?? 'Select tag type')
 	);
 
 	tagData && data.type == 'tag' && ($formData.tag_type_id = tagData?.tag_type?.id || null);
@@ -70,31 +70,22 @@
 					</div>
 				</div>
 				<Label class="my-auto align-middle text-sm font-extralight">
-					{tagData ? `Edit Existing ${title}` : `Add ${title}`}
+					<!-- {tagData ? `Edit Existing ${title}` : `Add ${title}`} -->
 				</Label>
 			</div>
 		</div>
 		<div class="mx-10 flex flex-col gap-10 bg-white p-9">
 			<div class="flex w-full flex-col gap-2 pr-8">
-				{@render snippetHeading(`Name of the ${title}`)}
-				<Input
-					type="text"
-					name="name"
-					bind:value={$formData.name}
-					placeholder={`Enter Name of the ${title}...`}
-				/>
+				<h2 class="font-semibold">Name</h2>
+				<Input type="text" name="name" bind:value={$formData.name} />
 			</div>
 			<div class="flex w-full flex-col gap-2 pr-8">
-				{@render snippetHeading(`Description of the ${title}`)}
-				<Textarea
-					name="description"
-					bind:value={$formData.description}
-					placeholder={`Enter Description of the ${title}...`}
-				/>
+				<h2 class="font-semibold">Description</h2>
+				<Textarea name="description" bind:value={$formData.description} />
 			</div>
 			{#if data.type == 'tag'}
 				<div class="flex w-full flex-col gap-2 pr-8">
-					<h2 class="font-semibold">Select Tag Type</h2>
+					<h2 class="font-semibold">Tag Type</h2>
 					<Select.Root type="single" name="tag_type_id" bind:value={$formData.tag_type_id}>
 						<Select.Trigger>
 							{triggerContent}

@@ -108,7 +108,7 @@
 		</div>
 
 		<div
-			class="my-auto flex h-full justify-center rounded-t-sm rounded-b-xl border bg-white p-4 shadow-lg"
+			class="my-auto flex h-full justify-center rounded-t-sm rounded-b-xl border bg-white p-4 pb-48 shadow-lg md:pb-28"
 		>
 			{#if questionSelectionMode == 'manual'}
 				{#if $formData.question_revision_ids.length == 0}

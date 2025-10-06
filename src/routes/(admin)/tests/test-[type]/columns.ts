@@ -7,7 +7,7 @@ import { DataTableActions } from '$lib/components/data-table/index.js';
 export interface Test {
 	id: string;
 	name: string;
-	tags?: Array<{ name: string }>;
+	tags?: Array<{ name: string; tag_type?: { name: string } }>;
 	modified_date: string;
 	is_template: boolean;
 	link?: string;
@@ -34,7 +34,12 @@ export const createTestColumns = (
 		cell: ({ row }) => {
 			const tags = row.original.tags;
 			if (tags && tags.length > 0) {
-				return tags.map((tag) => tag.name).join(', ');
+				return tags
+					.map((tag) => {
+						const tagTypeName = tag.tag_type?.name ?? '';
+						return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
+					})
+					.join(', ');
 			}
 			return '';
 		}
@@ -64,8 +69,8 @@ export const createTestColumns = (
 			} else {
 				// Add session-specific actions
 				customActions.push({
-					label: 'Clone',
-					href: `${baseUrl}/${test.id}?/clone`,
+					label: 'Make a Copy',
+					href: `/tests/test-session/${test.id}?/clone`,
 					icon: 'copy',
 					method: 'POST'
 				});

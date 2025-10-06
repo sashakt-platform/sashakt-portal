@@ -11,7 +11,6 @@ import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
-	const token = getSessionTokenCookie();
 	let testData = null;
 	let templateID = url.searchParams.get('template_id') || null;
 	const is_template = params?.type === 'template';
@@ -30,10 +29,13 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			requirePermission(user, PERMISSIONS.UPDATE_TEST);
 		}
 	}
+
+	const token = getSessionTokenCookie();
+
 	try {
 		if (params?.id !== 'new') {
 			let id = templateID || params.id;
-			const testResponse = await fetch(`${BACKEND_URL}/test/${id}/?is_template=${is_template}`, {
+			const testResponse = await fetch(`${BACKEND_URL}/test/${id}?is_template=${is_template}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -42,8 +44,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			});
 
 			if (!testResponse.ok) {
-				console.error(`Failed to fetch question data: ${testResponse.statusText}`);
-				throw new Error('Failed to fetch question data');
+				console.error(`Failed to fetch test data: ${testResponse.statusText}`);
+				throw new Error('Failed to fetch test data');
 			}
 
 			testData = await testResponse.json();
@@ -162,7 +164,7 @@ export const actions: Actions = {
 			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
 		};
 		const response = await fetch(
-			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : ''}`,
+			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : '/'}`,
 			{
 				method: `${params.id !== 'new' && params.id !== 'convert' ? 'PUT' : 'POST'}`,
 				headers: {

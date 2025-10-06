@@ -17,6 +17,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
+	import QuestionRevision from './Question_revision.svelte';
 
 	const {
 		data
@@ -129,8 +130,9 @@
 			<div
 				class={['text-primary my-auto ml-auto flex cursor-pointer flex-row gap-2 p-4 font-bold']}
 			>
-				<History />
-				<p>Revision History</p>
+				{#if questionData}
+					<QuestionRevision {data} />
+				{/if}
 			</div>
 		</div>
 		<div class="mx-10 flex flex-col gap-8 bg-white p-9">

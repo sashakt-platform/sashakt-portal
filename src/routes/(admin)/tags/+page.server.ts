@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		...(tagsSortOrder && { sort_order: tagsSortOrder })
 	});
 
-	const response = await fetch(`${BACKEND_URL}/tag?${tagsQueryParams}`, {
+	const response = await fetch(`${BACKEND_URL}/tag/?${tagsQueryParams}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -77,7 +77,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		...(tagTypesSortOrder && { sort_order: tagTypesSortOrder })
 	});
 
-	const responseTagTypes = await fetch(`${BACKEND_URL}/tagtype?${tagTypesQueryParams}`, {
+	const responseTagTypes = await fetch(`${BACKEND_URL}/tagtype/?${tagTypesQueryParams}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`

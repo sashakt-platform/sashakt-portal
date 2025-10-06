@@ -8,7 +8,7 @@ export const refreshCookieName = 'sashakt-refresh';
 
 export async function refreshAccessToken(refreshToken: string) {
 	try {
-		const res = await fetch(`${BACKEND_URL}/login/refresh-token`, {
+		const res = await fetch(`${BACKEND_URL}/login/refresh-token/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ export function deleteAllTokenCookies(cookies: Cookies) {
 
 export async function logoutFromBackend(accessToken: string) {
 	try {
-		const res = await fetch(`${BACKEND_URL}/login/logout`, {
+		const res = await fetch(`${BACKEND_URL}/login/logout/`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${accessToken}`

@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		.filter(Boolean)
 		.join('&');
 
-	const response = await fetch(`${BACKEND_URL}/questions?${queryString}`, {
+	const response = await fetch(`${BACKEND_URL}/questions/?${queryString}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -84,7 +84,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/questions`, {
+			const response = await fetch(`${BACKEND_URL}/questions/`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

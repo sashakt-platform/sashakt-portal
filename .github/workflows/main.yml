@@ -3,7 +3,7 @@ name: Deploy Sashakt portal to production
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 
 jobs:
   deploy:
@@ -51,8 +51,14 @@ jobs:
               exit 1
             fi
 
+            if [ -z "${{ vars.SENTRY_AUTH_TOKEN }}" ]; then
+              echo "Error: SENTRY_AUTH_TOKEN is not defined."
+              exit 1
+            fi
+
             echo "BACKEND_URL=${{ vars.BACKEND_URL }}" > .env
             echo "TEST_TAKER_URL=${{ vars.TEST_TAKER_URL }}" >> .env
+            echo "SENTRY_AUTH_TOKEN=${{ vars.SENTRY_AUTH_TOKEN}}" >> .env
 
             corepack enable
             sudo corepack prepare pnpm@latest --activate

@@ -34,5 +34,5 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Button>Login</Form.Button>
+	<Form.Button class=" mt-4 w-full  py-5 ">Login</Form.Button>
 </form>

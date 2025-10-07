@@ -33,5 +33,5 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Button>Update Password</Form.Button>
+	<Form.Button class=" mt-4 w-full  py-5 ">Update Password</Form.Button>
 </form>

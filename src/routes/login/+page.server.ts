@@ -71,7 +71,10 @@ export const actions: Actions = {
 			form.errors = { email: [data.detail ?? 'Failed to send reset link'] };
 			return fail(res.status, { form });
 		}
-		setFlash({ type: 'success', message: 'Password reset email sent successfully' }, cookies);
+		setFlash(
+			{ type: 'success', message: 'Password reset email sent successfully', source: 'reset_email' },
+			cookies
+		);
 		return { form };
 	}
 };

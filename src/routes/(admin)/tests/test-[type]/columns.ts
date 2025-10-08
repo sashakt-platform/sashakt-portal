@@ -59,6 +59,13 @@ export const createTestColumns = (
 			// Create custom actions array
 			const customActions = [];
 
+			customActions.push({
+				label: 'Make a Copy',
+				href: `${baseUrl}/${test.id}?/clone`,
+				icon: 'copy',
+				method: 'POST'
+			});
+
 			// Add template-specific actions
 			if (isTemplate) {
 				customActions.push({
@@ -68,12 +75,6 @@ export const createTestColumns = (
 				});
 			} else {
 				// Add session-specific actions
-				customActions.push({
-					label: 'Make a Copy',
-					href: `/tests/test-session/${test.id}?/clone`,
-					icon: 'copy',
-					method: 'POST'
-				});
 
 				if (test.link) {
 					customActions.push({

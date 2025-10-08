@@ -236,6 +236,7 @@ export const actions: Actions = {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
 		const is_template = params.type === 'template';
+		const test_type = params.type === 'template' ? 'template' : 'session';
 
 		// Check create permissions (cloning creates a new test/template)
 		if (is_template) {
@@ -264,8 +265,8 @@ export const actions: Actions = {
 			);
 		}
 		redirect(
-			`/tests/test-session`,
-			{ type: 'success', message: `Test session cloned successfully` },
+			`/tests/test-${test_type}`,
+			{ type: 'success', message: `Test ${test_type} cloned successfully` },
 			cookies
 		);
 	}

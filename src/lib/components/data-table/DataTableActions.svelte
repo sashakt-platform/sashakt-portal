@@ -102,7 +102,7 @@
 							>
 								{@const IconComponent = getIcon(action.icon)}
 								{#if IconComponent}
-									<IconComponent class="mr-2 h-4 w-4" />
+									<IconComponent class="h-4 w-4" />
 								{/if}
 								{action.label}
 							</Button>

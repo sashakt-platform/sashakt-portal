@@ -30,28 +30,6 @@
 		})) || []
 	);
 
-	// handle filter changes by updating URL params
-	const updateFilters = () => {
-		const url = new URL(page.url);
-
-		if (tags.length > 0) {
-			url.searchParams.set('questionTags', tags.join(','));
-		} else {
-			url.searchParams.delete('questionTags');
-		}
-
-		if (states.length > 0) {
-			url.searchParams.set('questionStates', states.join(','));
-		} else {
-			url.searchParams.delete('questionStates');
-		}
-
-		// reset to first page when filters change
-		url.searchParams.set('questionPage', '1');
-
-		goto(url.toString());
-	};
-
 	// handle sorting in dialog
 	const handleSort = (columnId: string) => {
 		const url = new URL(page.url);

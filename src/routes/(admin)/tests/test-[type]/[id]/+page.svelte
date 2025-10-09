@@ -1,5 +1,4 @@
 <script lang="ts">
-	import CircleChevronLeft from '@lucide/svelte/icons/circle-chevron-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Primary from './Primary.svelte';

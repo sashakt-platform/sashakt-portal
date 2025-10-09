@@ -6,7 +6,7 @@ import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { requirePermission, PERMISSIONS, hasPermission } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params }: any) => {
 	const user = requireLogin();
@@ -192,31 +192,33 @@ export const actions: Actions = {
 				return fail(500, { form });
 			}
 
-			// Transform state_ids array into the required format
-			const stateDataArray = form.data.state_ids.map((stateId) => ({
-				state_id: stateId.id
-			}));
+			if (hasPermission(user, PERMISSIONS.UPDATE_QUESTION_LOCATION)) {
+				// Transform state_ids array into the required format
+				const stateDataArray = form.data.state_ids.map((stateId) => ({
+					state_id: stateId.id
+				}));
 
-			// Send the transformed array to the API
-			const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations/`, {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
-				},
-				body: JSON.stringify({ locations: stateDataArray })
-			});
-
-			if (!stateResponse.ok) {
-				const errorMessage = await stateResponse.json();
-				setFlash(
-					{
-						type: 'error',
-						message: `Failed to update states: ${errorMessage.detail || stateResponse.statusText}`
+				// Send the transformed array to the API
+				const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations/`, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`
 					},
-					cookies
-				);
-				return fail(500, { form });
+					body: JSON.stringify({ locations: stateDataArray })
+				});
+
+				if (!stateResponse.ok) {
+					const errorMessage = await stateResponse.json();
+					setFlash(
+						{
+							type: 'error',
+							message: `Failed to update states: ${errorMessage.detail || stateResponse.statusText}`
+						},
+						cookies
+					);
+					return fail(500, { form });
+				}
 			}
 		}
 		redirect('/questionbank', { type: 'success', message: 'Question saved successfully' }, cookies);

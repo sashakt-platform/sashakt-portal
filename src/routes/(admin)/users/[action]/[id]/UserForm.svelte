@@ -31,10 +31,15 @@
 
 	const { form: formData, enhance } = form;
 
-	if (userData) {
-		$formData.state_ids =
-			userData?.states?.map((state: Filter) => ({ id: String(state.id), name: state.name })) || [];
+	let selectedStates = $state([]);
+
+	if (userData?.states?.length > 0) {
+		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
 	}
+
+	$effect(() => {
+		$formData.state_ids = selectedStates.length > 0 ? [parseInt(selectedStates[0].id, 10)] : [];
+	});
 
 	// for non-Super Admins, automatically set organization_id to current user's organization
 	if (!isSuperAdmin && data.currentUser?.organization_id && !isEditMode) {
@@ -181,8 +186,8 @@
 		<Form.Field {form} name="state_ids">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>States</Form.Label>
-					<StateSelection {...props} bind:states={$formData.state_ids} />
+					<Form.Label>State</Form.Label>
+					<StateSelection {...props} bind:states={selectedStates} multiple={false} />
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />

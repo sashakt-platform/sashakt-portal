@@ -31,7 +31,7 @@
 
 	const { form: formData, enhance } = form;
 
-	let selectedStates = $state([]);
+	let selectedStates = $state<Filter[]>([]);
 
 	if (userData?.states?.length > 0) {
 		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
@@ -138,7 +138,7 @@
 							<Select.Trigger {...props}>
 								{#if $formData.organization_id}
 									{data.organizations.find(
-										(organization) => organization.id === $formData.organization_id
+										(organization: any) => organization.id === $formData.organization_id
 									)?.name || 'Select organization'}
 								{:else}
 									Select organization
@@ -162,7 +162,8 @@
 					<Select.Root type="single" bind:value={$formData.role_id} name={props.name}>
 						<Select.Trigger {...props}>
 							{#if $formData.role_id}
-								{data.roles.find((role) => role.id === $formData.role_id)?.label || 'Select role'}
+								{data.roles.find((role: any) => role.id === $formData.role_id)?.label ||
+									'Select role'}
 							{:else}
 								Select role
 							{/if}
@@ -180,7 +181,7 @@
 	</div>
 
 	{#if data.roles
-		.find((role) => role.id === $formData.role_id)
+		.find((role: any) => role.id === $formData.role_id)
 		?.label?.toLowerCase()
 		?.includes('state')}
 		<Form.Field {form} name="state_ids">

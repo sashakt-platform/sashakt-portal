@@ -1,13 +1,14 @@
 <script lang="ts">
+	import type { Component } from 'svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
 	import Info from '@lucide/svelte/icons/info';
 
 	// lazy-loaded components
-	let DistrictSelection: any = $state();
-	let StateSelection: any = $state();
-	let TagTypeSelection: any = $state();
+	let DistrictSelection: Component | null = $state(null);
+	let StateSelection: Component | null = $state(null);
+	let TagTypeSelection: Component | null = $state(null);
 
 	// state for dashboard data
 	let dashboardStats = $state({

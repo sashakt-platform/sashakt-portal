@@ -74,13 +74,12 @@
 		// reset all URL parameters for both tabs when switching
 		const paramsToReset = [
 			'tagsPage',
-			'tagsSearch',
 			'tagsSortBy',
 			'tagsSortOrder',
 			'tagTypesPage',
-			'tagTypesSearch',
 			'tagTypesSortBy',
-			'tagTypesSortOrder'
+			'tagTypesSortOrder',
+			'search'
 		];
 
 		paramsToReset.forEach((param) => {
@@ -149,9 +148,9 @@
 							clearTimeout(tagsSearchTimeout);
 							tagsSearchTimeout = setTimeout(() => {
 								if (event.target?.value) {
-									url.searchParams.set('tagsSearch', event.target.value);
+									url.searchParams.set('search', event.target.value);
 								} else {
-									url.searchParams.delete('tagsSearch');
+									url.searchParams.delete('search');
 								}
 								url.searchParams.set('tagsPage', '1');
 								goto(url, { keepFocus: true, invalidateAll: true });
@@ -180,9 +179,9 @@
 							clearTimeout(tagTypesSearchTimeout);
 							tagTypesSearchTimeout = setTimeout(() => {
 								if (event.target?.value) {
-									url.searchParams.set('tagTypesSearch', event.target.value);
+									url.searchParams.set('search', event.target.value);
 								} else {
-									url.searchParams.delete('tagTypesSearch');
+									url.searchParams.delete('search');
 								}
 								url.searchParams.set('tagTypesPage', '1');
 								goto(url, { keepFocus: true, invalidateAll: true });

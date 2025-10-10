@@ -119,28 +119,30 @@
 	}) {
 		try {
 			isLoadingAnalytics = true;
-			const searchParams = new URLSearchParams();
+			const queryParts: string[] = [];
 
 			// Add state filters
 			if (filters?.states?.length) {
-				filters.states.forEach((state) => searchParams.append('state_ids', String(state.id)));
+				filters.states.forEach((state) =>
+					queryParts.push(`state_ids=${encodeURIComponent(String(state.id))}`)
+				);
 			}
 
 			// Add district filters
 			if (filters?.districts?.length) {
 				filters.districts.forEach((district) =>
-					searchParams.append('district_ids', String(district.id))
+					queryParts.push(`district_ids=${encodeURIComponent(String(district.id))}`)
 				);
 			}
 
 			// Add tag type filters
 			if (filters?.tagTypes?.length) {
 				filters.tagTypes.forEach((tagType) =>
-					searchParams.append('tag_type_ids', String(tagType.id))
+					queryParts.push(`tag_type_ids=${encodeURIComponent(String(tagType.id))}`)
 				);
 			}
 
-			const queryString = searchParams.toString();
+			const queryString = queryParts.join('&');
 			const url = queryString
 				? `/api/dashboard/analytics?${queryString}`
 				: '/api/dashboard/analytics';

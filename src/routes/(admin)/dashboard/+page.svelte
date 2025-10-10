@@ -192,17 +192,11 @@
 
 	// initial load effect
 	$effect(() => {
-		loadDashboardStats();
-
-		setTimeout(() => {
-			loadTestAttemptStats();
-		}, 100);
-
-		// load analytics data and filters after everything else
-		setTimeout(() => {
-			loadAnalyticsStats();
-			loadFilterComponents();
-		}, 200);
+		(async () => {
+			await loadDashboardStats();
+			await loadTestAttemptStats();
+			await Promise.all([loadAnalyticsStats(), loadFilterComponents()]);
+		})();
 	});
 </script>
 

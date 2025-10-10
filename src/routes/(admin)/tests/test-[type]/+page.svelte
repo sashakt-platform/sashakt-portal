@@ -199,6 +199,8 @@
 								} else {
 									url.searchParams.delete('search');
 								}
+								// reset pagination to page 1 when search changes
+								url.searchParams.set('page', '1');
 								goto(url, { keepFocus: true, invalidateAll: true });
 							}, 300);
 						}}
@@ -210,7 +212,11 @@
 				</div>
 
 				<div class="w-1/3">
-					<DistrictSelection bind:districts={filteredDistricts} selectedStates={filteredStates} filteration={true} />
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						selectedStates={filteredStates}
+						filteration={true}
+					/>
 				</div>
 
 				<div class="w-1/3">

@@ -32,6 +32,8 @@
 			if (searchQuery) url.searchParams.set(itemName + '_search', searchQuery.toLowerCase());
 			else url.searchParams.delete(itemName + '_search');
 
+			// reset pagination to first page user searches
+			url.searchParams.set('page', '1');
 			goto(url, { keepFocus: true, invalidateAll: true });
 		}, 300);
 	}

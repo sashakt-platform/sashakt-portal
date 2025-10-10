@@ -65,6 +65,31 @@
 	// get active tab from URL parameter
 	const activeTab = $derived(page.url.searchParams.get('tab') === 'tagtype' ? 'tagtype' : 'tag');
 
+	function handleTabChange(value: string) {
+		const url = new URL(page.url);
+
+		// set the tab parameter
+		url.searchParams.set('tab', value);
+
+		// reset all URL parameters for both tabs when switching
+		const paramsToReset = [
+			'tagsPage',
+			'tagsSearch',
+			'tagsSortBy',
+			'tagsSortOrder',
+			'tagTypesPage',
+			'tagTypesSearch',
+			'tagTypesSortBy',
+			'tagTypesSortOrder'
+		];
+
+		paramsToReset.forEach((param) => {
+			url.searchParams.delete(param);
+		});
+
+		goto(url.toString(), { replaceState: false });
+	}
+
 	const tagsColumns = $derived(
 		createTagsColumns(tagsSortBy, tagsSortOrder, handleTagsSort, {
 			canEdit: canUpdate(data.user, 'tag'),
@@ -109,7 +134,7 @@
 	</div>
 
 	<div class="mx-8 mt-10 flex flex-col gap-8">
-		<Tabs.Root value={activeTab} class="w-full">
+		<Tabs.Root value={activeTab} onValueChange={handleTabChange} class="w-full">
 			<Tabs.List>
 				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>
 				<Tabs.Trigger value="tagtype">Tag Types</Tabs.Trigger>

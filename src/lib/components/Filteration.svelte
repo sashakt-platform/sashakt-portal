@@ -51,6 +51,10 @@
 				e.stopPropagation();
 				const url = new URL(page.url);
 				url.searchParams.delete(itemName + '_ids', String(children.id));
+
+				// reset pagination to first page when filters removed
+				url.searchParams.set('page', '1');
+
 				goto(url, { keepFocus: true, invalidateAll: true });
 				items = items.filter((s: Filter) => s.id !== children.id);
 			}}>&times;</button
@@ -75,6 +79,9 @@
 				items.map((item: Filter) => {
 					url.searchParams.append(itemName + '_ids', item.id);
 				});
+
+				// reset pagination to first page when filters change
+				url.searchParams.set('page', '1');
 			}
 			goto(url, { keepFocus: true, invalidateAll: true });
 		}

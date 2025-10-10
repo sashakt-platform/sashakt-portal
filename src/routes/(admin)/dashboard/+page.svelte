@@ -1,4 +1,5 @@
 <script lang="ts">
+	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
@@ -89,7 +90,10 @@
 		>
 			Dashboard
 		</h2>
-		<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+		<TooltipInfo
+			label="Help: Dashboard"
+			description="Dashboard provides a quick overview of your organization's activity, including total questions, tests, and users. Use it to manage question banks, create and assign tests, and monitor analytics for better insights."
+		/>
 	</span>
 </div>
 
@@ -125,7 +129,11 @@
 					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
 				<div class="w-1/3">
-					<DistrictSelection bind:districts={filteredDistricts} selectedStates={filteredStates} filteration={true} />
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						selectedStates={filteredStates}
+						filteration={true}
+					/>
 				</div>
 				<div class="w-1/3">
 					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />

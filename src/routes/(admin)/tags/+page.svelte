@@ -13,6 +13,7 @@
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -93,7 +94,10 @@
 					>
 						Tag Management
 					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+					<TooltipInfo
+						label="Help: Tag Management"
+						description="Manage all tags and tag types here. You can create, edit, or delete tags and tag types using the available actions."
+					/>
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight">Manage Tags and Tag Types</Label>

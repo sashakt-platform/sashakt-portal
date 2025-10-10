@@ -20,6 +20,7 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -206,7 +207,10 @@
 					>
 						Question Bank
 					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+					<TooltipInfo
+						label="Help: Question Bank"
+						description="Question Bank allows you to create, manage, and categorize questions that can be reused in multiple tests. Use filters to quickly find and organize questions by topic or difficulty."
+					/>
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight">Manage question bank</Label>

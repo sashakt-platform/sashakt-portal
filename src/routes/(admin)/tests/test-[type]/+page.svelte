@@ -17,6 +17,7 @@
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	let {
 		data
@@ -136,7 +137,12 @@
 					>
 						{data?.is_template ? 'Test templates' : 'Test sessions'}
 					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+					<TooltipInfo
+						label={data?.is_template ? 'Help: Test templates' : 'Help: Test sessions'}
+						description={data?.is_template
+							? 'This panel lists all your test templates. You can create, edit, or delete a template using the available actions.'
+							: 'This panel lists all your test sessions. You can create, edit, or delete a test using the available actions.'}
+					/>
 				</div>
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight"
@@ -210,7 +216,11 @@
 				</div>
 
 				<div class="w-1/3">
-					<DistrictSelection bind:districts={filteredDistricts} selectedStates={filteredStates} filteration={true} />
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						selectedStates={filteredStates}
+						filteration={true}
+					/>
 				</div>
 
 				<div class="w-1/3">

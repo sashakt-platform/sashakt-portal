@@ -52,7 +52,7 @@
 		<div class="border-destructive bg-destructive/10 rounded-md border p-4">
 			<h3 class="text-destructive mb-2 text-sm font-medium">Please fix the following errors:</h3>
 			<ul class="list-inside list-disc space-y-1">
-				{#each $errors._errors as error}
+				{#each $errors._errors as error, index (index)}
 					<li class="text-destructive text-sm">{error}</li>
 				{/each}
 			</ul>

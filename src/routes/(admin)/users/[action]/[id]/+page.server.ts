@@ -113,6 +113,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		action: params.action,
 		id: params.id,
 		user: userData,
+		currentUser: user,
 		roles: formattedRoles,
 		organizations: formattedOrganizations
 	};
@@ -133,6 +134,17 @@ export const actions: Actions = {
 		// Use appropriate schema based on action
 		const schema = params.action === 'edit' ? editUserSchema : createUserSchema;
 		const form = await superValidate(request, zod(schema));
+
+		// For non-Super Admins, automatically set organization_id to current user's organization
+		const isSuperAdmin =
+			user.permissions?.includes(PERMISSIONS.CREATE_ORGANIZATION) ||
+			user.permissions?.includes(PERMISSIONS.UPDATE_ORGANIZATION) ||
+			user.permissions?.includes(PERMISSIONS.DELETE_ORGANIZATION);
+
+		if (!isSuperAdmin && user.organization_id) {
+			form.data.organization_id = user.organization_id;
+		}
+
 		if (!form.valid) {
 			return fail(400, {
 				form

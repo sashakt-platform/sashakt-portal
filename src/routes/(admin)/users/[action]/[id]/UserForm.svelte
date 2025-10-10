@@ -25,7 +25,7 @@
 
 	const form = superForm(userData || data.form, {
 		applyAction: 'never',
-		validators: zodClient(schema),
+		validators: zodClient(schema as any),
 		dataType: 'json'
 	});
 

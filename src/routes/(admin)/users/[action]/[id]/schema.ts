@@ -8,7 +8,7 @@ const baseUserSchema = z.object({
 	phone: z.string().optional(),
 	organization_id: z.coerce.number().min(1, { message: 'Organization is required' }),
 	role_id: z.coerce.number().min(1, { message: 'Role is required' }),
-	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	state_ids: z.array(z.coerce.number()).default([]),
 	is_active: z.boolean().optional().default(true)
 });
 

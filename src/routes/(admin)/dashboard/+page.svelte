@@ -207,7 +207,7 @@
 	percent: boolean = false,
 	loading: boolean = false
 )}
-	<div class=" m-4 w-full justify-items-center rounded-xl border border-gray-100 bg-white p-4">
+	<div class="w-full justify-items-center rounded-xl border border-gray-100 bg-white p-4">
 		<p class="font-semibold">{title}</p>
 		<p class="text-sm">{description}</p>
 		{#if loading}
@@ -238,10 +238,10 @@
 	</Dialog.Content>
 </Dialog.Root>
 
-<div class="mt-10 ml-10 flex items-center align-middle">
+<div class="mt-6 ml-4 flex items-center align-middle sm:mt-10 sm:ml-10">
 	<span class="flex flex-row">
 		<h2
-			class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+			class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 		>
 			Dashboard
 		</h2>
@@ -249,21 +249,17 @@
 	</span>
 </div>
 
-<div class="mx-8 my-4 flex flex-col gap-6">
-	<div class="flex flex-row">
+<div class="mx-4 my-4 flex flex-col gap-6 sm:mx-8">
+	<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
 		{#each stats_box as stat (stat.title)}
 			{@render dataBox(stat.title, '', stat.count, false, isLoadingStats)}
 		{/each}
 	</div>
 	<div class="flex flex-col rounded-xl bg-white p-4">
-		<div class="flex flex-row">
-			<div class="my-auto flex w-1/2 flex-col">
-				<p class="font-semibold">Summary of Test Attempts</p>
-				<!-- <p class="text-sm">Details of the attempts made by the candidate</p> -->
-			</div>
+		<div class="mb-4">
+			<p class="font-semibold">Summary of Test Attempts</p>
 		</div>
-		<!-- <hr class="my-4 border-gray-300" /> -->
-		<div class="flex flex-row">
+		<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
 			{@render dataBox(
 				'Submitted',
 				'',
@@ -294,57 +290,46 @@
 			)}
 		</div>
 	</div>
-	<div class="flex flex-row justify-between">
-		<div class=" flex-1 rounded-xl bg-white p-4">
-			<div class="flex flex-row gap-8">
-				<div class="flex w-3/4 flex-col">
-					<p class="font-semibold">Score & Duration Analysis</p>
-					<!-- <p class="text-sm">Overall performance of all candidates</p> -->
+	<div class="rounded-xl bg-white p-4">
+		<div class="mb-4">
+			<p class="font-semibold">Score & Duration Analysis</p>
+		</div>
+		<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+			{#if areFiltersLoaded && StateSelection && DistrictSelection && TagTypeSelection}
+				<div>
+					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
-				{#if areFiltersLoaded && StateSelection && DistrictSelection && TagTypeSelection}
-					<div class="w-1/3">
-						<StateSelection bind:states={filteredStates} filteration={true} />
-					</div>
-					<div class="w-1/3">
-						<DistrictSelection
-							bind:districts={filteredDistricts}
-							selectedStates={filteredStates}
-							filteration={true}
-						/>
-					</div>
-					<div class="w-1/3">
-						<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
-					</div>
-				{:else}
-					<div class="flex w-1/4 gap-4">
-						<div class="h-10 w-full animate-pulse rounded bg-gray-200"></div>
-						<div class="h-10 w-full animate-pulse rounded bg-gray-200"></div>
-						<div class="h-10 w-full animate-pulse rounded bg-gray-200"></div>
-					</div>
-				{/if}
-			</div>
-			<!-- <hr class="my-4 border-gray-300" /> -->
-
-			<div class=" flex flex-row gap-8">
-				<div class="item-center flex w-1/2 flex-col items-center p-2">
-					{@render dataBox(
-						'Percentage Scored',
-						'',
-						overallAnalyticsStats.overall_score_percent,
-						true,
-						isLoadingAnalytics
-					)}
+				<div>
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						selectedStates={filteredStates}
+						filteration={true}
+					/>
 				</div>
-				<div class=" flex w-1/2 flex-col items-center p-2">
-					{@render dataBox(
-						'Average Time Taken (Minutes)',
-						'',
-						overallAnalyticsStats.overall_avg_time_minutes,
-						false,
-						isLoadingAnalytics
-					)}
+				<div>
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
-			</div>
+			{:else}
+				<div class="h-10 animate-pulse rounded bg-gray-200"></div>
+				<div class="h-10 animate-pulse rounded bg-gray-200"></div>
+				<div class="h-10 animate-pulse rounded bg-gray-200"></div>
+			{/if}
+		</div>
+		<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+			{@render dataBox(
+				'Percentage Scored',
+				'',
+				overallAnalyticsStats.overall_score_percent,
+				true,
+				isLoadingAnalytics
+			)}
+			{@render dataBox(
+				'Average Time Taken (Minutes)',
+				'',
+				overallAnalyticsStats.overall_avg_time_minutes,
+				false,
+				isLoadingAnalytics
+			)}
 		</div>
 	</div>
 </div>

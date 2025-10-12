@@ -185,13 +185,34 @@
 						class="w-[--bits-dropdown-menu-anchor-width]"
 					>
 						<DropdownMenu.Item>
-							<a href="/profile"><span>My Profile</span></a>
+							<a
+								href="/profile"
+								onclick={() => {
+									if (sidebar.isMobile) {
+										sidebar.setOpenMobile(false);
+									}
+								}}><span>My Profile</span></a
+							>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
-							<a href="/profile/password"><span>Change Password</span></a>
+							<a
+								href="/profile/password"
+								onclick={() => {
+									if (sidebar.isMobile) {
+										sidebar.setOpenMobile(false);
+									}
+								}}><span>Change Password</span></a
+							>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
-							<a href="/logout">
+							<a
+								href="/logout"
+								onclick={() => {
+									if (sidebar.isMobile) {
+										sidebar.setOpenMobile(false);
+									}
+								}}
+							>
 								<span>Sign out</span>
 							</a>
 						</DropdownMenu.Item>

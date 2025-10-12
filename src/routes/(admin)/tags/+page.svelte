@@ -108,12 +108,12 @@
 		bind:action={deleteAction}
 		elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
 	/>
-	<div class="mx-10 flex flex-row py-4">
+	<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
 		<div class="my-auto flex flex-col">
-			<div class=" flex w-full items-center align-middle">
+			<div class="flex w-full items-center align-middle">
 				<div class="flex flex-row">
 					<h2
-						class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+						class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 					>
 						Tag Management
 					</h2>
@@ -122,17 +122,17 @@
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight">Manage Tags and Tag Types</Label>
 		</div>
-		<div class={['my-auto ml-auto gap-3 p-4']}>
+		<div class="my-auto flex flex-wrap gap-3 sm:ml-auto sm:p-4">
 			{#if canCreate(data.user, 'tag')}
 				<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>
 				<a href="/tags/tagtype/add/new"
-					><Button class="font-bold "><Plus />Create Tag Type</Button></a
+					><Button class="font-bold"><Plus />Create Tag Type</Button></a
 				>
 			{/if}
 		</div>
 	</div>
 
-	<div class="mx-8 mt-10 flex flex-col gap-8">
+	<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
 		<Tabs.Root value={activeTab} onValueChange={handleTabChange} class="w-full">
 			<Tabs.List>
 				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>

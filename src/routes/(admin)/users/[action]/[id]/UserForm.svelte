@@ -29,7 +29,7 @@
 		dataType: 'json'
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, errors } = form;
 
 	let selectedStates = $state<Filter[]>([]);
 
@@ -48,6 +48,16 @@
 </script>
 
 <form method="POST" use:enhance action="?/save" class="flex flex-col gap-6">
+	{#if $errors._errors && $errors._errors.length > 0}
+		<div class="border-destructive bg-destructive/10 rounded-md border p-4">
+			<h3 class="text-destructive mb-2 text-sm font-medium">Please fix the following errors:</h3>
+			<ul class="list-inside list-disc space-y-1">
+				{#each $errors._errors as error, index (index)}
+					<li class="text-destructive text-sm">{error}</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 		<Form.Field {form} name="full_name">
 			<Form.Control>

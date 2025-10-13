@@ -199,7 +199,7 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const err = await res.json();
-			form.errors = { email: [err.detail] };
+			form.errors = { _errors: [err.detail] };
 			return fail(401, { form });
 		}
 

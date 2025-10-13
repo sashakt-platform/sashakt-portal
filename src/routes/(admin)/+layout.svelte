@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
 	import { getFlash } from 'sveltekit-flash-message';
@@ -21,13 +20,10 @@
 	<AppSidebar {data} />
 	<main class="flex h-screen w-full flex-col overflow-x-hidden">
 		<div class="shadow-lg">
-			<div class={['my-4']}>
-				<Sidebar.Trigger class="mx-4 w-14 rounded-none border-r-2" />
-				<!-- <span class="my-auto align-middle text-sm" -->
-				<!-- 	>... <ChevronRight class="inline w-4 text-sm" /></span -->
-				<!-- > -->
+			<div class="my-4">
+				<Sidebar.Trigger class="mx-2 w-14 rounded-none border-r-2 sm:mx-4" />
 			</div>
-			<hr class="w-screen" />
+			<hr class="w-full" />
 		</div>
 		<div>
 			<Toaster richColors />

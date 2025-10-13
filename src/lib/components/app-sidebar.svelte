@@ -10,6 +10,7 @@
 	import Tags from '@lucide/svelte/icons/tags';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead } from '$lib/utils/permissions.js';
+	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 
 	// Menu items.
 	const menu_items = {
@@ -52,13 +53,23 @@
 
 	let currentitem = $state(menu_items.dashboard.title);
 	let { data } = $props();
+	const sidebar = useSidebar();
+
+	// Helper function to close mobile sidebar when menu item is clicked
+	// also for normal navigation
+	function handleMenuClick(itemTitle: string) {
+		currentitem = itemTitle;
+		if (sidebar.isMobile) {
+			sidebar.setOpenMobile(false);
+		}
+	}
 </script>
 
 {#snippet sidebaritems(item: any)}
 	<Sidebar.MenuItem class="text-secondary-foreground m-1">
 		<Sidebar.MenuButton
 			isActive={currentitem == item.title}
-			onclick={() => (currentitem = item.title)}
+			onclick={() => handleMenuClick(item.title)}
 		>
 			{#snippet child({ props })}
 				<a href={item.url} {...props}>
@@ -75,7 +86,7 @@
 		<Sidebar.Group>
 			<Sidebar.GroupLabel
 				><h4
-					class="w-ful text-primary scroll-m-20 pb-4 text-xl font-extrabold tracking-tighter uppercase"
+					class="text-primary w-full scroll-m-20 pb-4 text-xl font-extrabold tracking-tighter uppercase"
 				>
 					Sashakt
 				</h4></Sidebar.GroupLabel
@@ -112,7 +123,8 @@
 										{#if canRead(data.user, 'test-template')}
 											<Sidebar.MenuButton
 												isActive={currentitem == menu_items.tests.submenu.test_template.title}
-												onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
+												onclick={() =>
+													handleMenuClick(menu_items.tests.submenu.test_template.title)}
 											>
 												{#snippet child({ props })}
 													<a href={menu_items.tests.submenu.test_template.url} {...props}>
@@ -124,7 +136,8 @@
 										{#if canRead(data.user, 'test')}
 											<Sidebar.MenuButton
 												isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
-												onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
+												onclick={() =>
+													handleMenuClick(menu_items.tests.submenu.test_sessions.title)}
 											>
 												{#snippet child({ props })}
 													<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
@@ -172,13 +185,34 @@
 						class="w-[--bits-dropdown-menu-anchor-width]"
 					>
 						<DropdownMenu.Item>
-							<a href="/profile"><span>My Profile</span></a>
+							<a
+								href="/profile"
+								onclick={() => {
+									if (sidebar.isMobile) {
+										sidebar.setOpenMobile(false);
+									}
+								}}><span>My Profile</span></a
+							>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
-							<a href="/profile/password"><span>Change Password</span></a>
+							<a
+								href="/profile/password"
+								onclick={() => {
+									if (sidebar.isMobile) {
+										sidebar.setOpenMobile(false);
+									}
+								}}><span>Change Password</span></a
+							>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item>
-							<a href="/logout">
+							<a
+								href="/logout"
+								onclick={() => {
+									if (sidebar.isMobile) {
+										sidebar.setOpenMobile(false);
+									}
+								}}
+							>
 								<span>Sign out</span>
 							</a>
 						</DropdownMenu.Item>

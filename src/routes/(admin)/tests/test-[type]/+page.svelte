@@ -127,12 +127,12 @@
 />
 
 <div id="mainpage" class="flex flex-col">
-	<div class="mx-10 flex flex-row py-4">
+	<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
 		<div class="my-auto flex flex-col">
-			<div class=" flex w-full items-center align-middle">
+			<div class="flex w-full items-center align-middle">
 				<div class="flex flex-row">
 					<h2
-						class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+						class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 					>
 						{data?.is_template ? 'Test templates' : 'Test sessions'}
 					</h2>
@@ -143,7 +143,7 @@
 				>{data?.is_template ? 'Manage test templates' : 'Manage test sessions'}</Label
 			>
 		</div>
-		<div class="my-auto ml-auto p-4">
+		<div class="my-auto flex gap-3 sm:ml-auto sm:p-4">
 			{#if !noTestCreatedYet}
 				{#if data?.is_template && canCreate(data.user, 'test-template')}
 					<Button class="font-bold" href={page.url.pathname + '/new'}
@@ -184,9 +184,9 @@
 				: null}
 		/>
 	{:else}
-		<div class="mx-8 mt-10 flex flex-col gap-8">
-			<div class="flex flex-row items-center gap-4">
-				<div class="mr-8 w-1/3">
+		<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
+			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+				<div>
 					<Input
 						placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
 						value={search}
@@ -207,11 +207,11 @@
 					/>
 				</div>
 
-				<div class="w-1/3">
+				<div>
 					<StateSelection bind:states={filteredStates} filteration={true} />
 				</div>
 
-				<div class="w-1/3">
+				<div>
 					<DistrictSelection
 						bind:districts={filteredDistricts}
 						selectedStates={filteredStates}
@@ -219,11 +219,11 @@
 					/>
 				</div>
 
-				<div class="w-1/3">
+				<div>
 					<TagsSelection bind:tags={filteredTags} filteration={true} />
 				</div>
 
-				<div class="w-1/3">
+				<div>
 					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
 			</div>

@@ -197,12 +197,12 @@
 </form>
 
 <div>
-	<div class="mx-10 flex flex-row py-4">
+	<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
 		<div class="my-auto flex flex-col">
-			<div class=" flex w-full items-center align-middle">
+			<div class="flex w-full items-center align-middle">
 				<div class="flex flex-row">
 					<h2
-						class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+						class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 					>
 						Question Bank
 					</h2>
@@ -211,14 +211,13 @@
 			</div>
 			<Label class="my-auto align-middle text-sm font-extralight">Manage question bank</Label>
 		</div>
-		<div class={['my-auto ml-auto gap-3 p-4']}>
+		<div class="my-auto flex flex-wrap gap-3 sm:ml-auto sm:p-4">
 			{#if !noQuestionCreatedYet}
 				{#if canCreate(data.user, 'question')}
 					<a href="/questionbank/single-question/add/new"
 						><Button class="font-bold" variant="outline"><Plus />Create a Question</Button></a
 					>
-					<a href="/questionbank/import"><Button class=" font-bold "><Plus />Bulk Upload</Button></a
-					>
+					<a href="/questionbank/import"><Button class="font-bold"><Plus />Bulk Upload</Button></a>
 				{/if}
 			{/if}
 		</div>
@@ -277,7 +276,7 @@
 			{/if}
 		</WhiteEmptyBox>
 	{:else}
-		<div class="mx-8 mt-10 flex flex-col gap-8">
+		<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
 			<!-- batch actions toolbar -->
 			<BatchActionsToolbar
 				selectedCount={selectedQuestionIds.length}
@@ -288,8 +287,8 @@
 			/>
 
 			{#if selectedQuestionIds.length === 0}
-				<div class="flex flex-row items-center gap-4">
-					<div class="mr-8 w-1/3">
+				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+					<div>
 						<Input
 							placeholder="Search questions..."
 							value={search}
@@ -309,15 +308,15 @@
 						/>
 					</div>
 
-					<div class="w-1/3">
+					<div>
 						<StateSelection bind:states={filteredStates} filteration={true} />
 					</div>
 
-					<div class="w-1/3">
+					<div>
 						<TagsSelection bind:tags={filteredTags} filteration={true} />
 					</div>
 
-					<div class="w-1/3">
+					<div>
 						<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 					</div>
 				</div>

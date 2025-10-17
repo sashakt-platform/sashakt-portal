@@ -1,7 +1,6 @@
 <script lang="ts">
 	import EmptyBox from '$lib/components/first-data-box.svelte';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import Info from '@lucide/svelte/icons/info';
+	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { page } from '$app/state';
@@ -126,119 +125,110 @@
 	elementName={data?.is_template ? 'Test template' : 'Test session'}
 />
 
-<div id="mainpage" class="flex flex-col">
-	<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
-		<div class="my-auto flex flex-col">
-			<div class="flex w-full items-center align-middle">
-				<div class="flex flex-row">
-					<h2
-						class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
-					>
-						{data?.is_template ? 'Test templates' : 'Test sessions'}
-					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
-				</div>
-			</div>
-			<Label class="my-auto align-middle text-sm font-extralight"
-				>{data?.is_template ? 'Manage test templates' : 'Manage test sessions'}</Label
-			>
-		</div>
-		<div class="my-auto flex gap-3 sm:ml-auto sm:p-4">
-			{#if !noTestCreatedYet}
-				{#if data?.is_template && canCreate(data.user, 'test-template')}
-					<Button class="font-bold" href={page.url.pathname + '/new'}
-						><Plus />Create a test template</Button
-					>
-				{:else if !data?.is_template && canCreate(data.user, 'test')}
-					<Button class="font-bold" href={page.url.pathname + '/new'}
-						><Plus />Create a test session</Button
-					>
-				{/if}
+<ListingPageLayout
+	title={data?.is_template ? 'Test templates' : 'Test sessions'}
+	subtitle={data?.is_template ? 'Manage test templates' : 'Manage test sessions'}
+	showEmptyState={noTestCreatedYet}
+>
+	{#snippet headerActions()}
+		{#if !noTestCreatedYet}
+			{#if data?.is_template && canCreate(data.user, 'test-template')}
+				<Button class="font-bold" href={page.url.pathname + '/new'}
+					><Plus />Create a test template</Button
+				>
+			{:else if !data?.is_template && canCreate(data.user, 'test')}
+				<Button class="font-bold" href={page.url.pathname + '/new'}
+					><Plus />Create a test session</Button
+				>
 			{/if}
-		</div>
-	</div>
+		{/if}
+	{/snippet}
 
-	{#if noTestCreatedYet}
-		<EmptyBox
-			title={data?.is_template
-				? 'Create your first test template'
-				: 'Create your first test session'}
-			subtitle={data?.is_template
-				? 'Click on create a test template to create test templates to be assigned'
-				: 'Click on create a test to create tests to be conducted'}
-			leftButton={{
-				title: `${data?.is_template ? 'Create Test Template' : 'Create Custom Test'}`,
-				link: '/tests/test-' + (data?.is_template ? 'template' : 'session') + '/new',
-				click: () => {
-					return null;
-				}
-			}}
-			rightButton={!data?.is_template
-				? {
-						title: `Create from test Template`,
-						link: '/tests/test-template',
-						click: () => {
-							return null;
-						}
+	{#snippet emptyState()}
+		{#if noTestCreatedYet}
+			<EmptyBox
+				title={data?.is_template
+					? 'Create your first test template'
+					: 'Create your first test session'}
+				subtitle={data?.is_template
+					? 'Click on create a test template to create test templates to be assigned'
+					: 'Click on create a test to create tests to be conducted'}
+				leftButton={{
+					title: `${data?.is_template ? 'Create Test Template' : 'Create Custom Test'}`,
+					link: '/tests/test-' + (data?.is_template ? 'template' : 'session') + '/new',
+					click: () => {
+						return null;
 					}
-				: null}
-		/>
-	{:else}
-		<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
-			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-				<div>
-					<Input
-						placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
-						value={search}
-						oninput={(event) => {
-							const url = new URL(page.url);
-							clearTimeout(searchTimeout);
-							searchTimeout = setTimeout(() => {
-								if (event.target?.value) {
-									url.searchParams.set('search', event.target.value);
-								} else {
-									url.searchParams.delete('search');
-								}
-								// reset pagination to page 1 when search changes
-								url.searchParams.set('page', '1');
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}, 300);
-						}}
-					/>
-				</div>
+				}}
+				rightButton={!data?.is_template
+					? {
+							title: `Create from test Template`,
+							link: '/tests/test-template',
+							click: () => {
+								return null;
+							}
+						}
+					: null}
+			/>
+		{/if}
+	{/snippet}
 
-				<div>
-					<StateSelection bind:states={filteredStates} filteration={true} />
-				</div>
-
-				<div>
-					<DistrictSelection
-						bind:districts={filteredDistricts}
-						selectedStates={filteredStates}
-						filteration={true}
-					/>
-				</div>
-
-				<div>
-					<TagsSelection bind:tags={filteredTags} filteration={true} />
-				</div>
-
-				<div>
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
-				</div>
+	{#snippet filters()}
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+			<div>
+				<Input
+					placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
+					value={search}
+					oninput={(event) => {
+						const url = new URL(page.url);
+						clearTimeout(searchTimeout);
+						searchTimeout = setTimeout(() => {
+							if (event.target?.value) {
+								url.searchParams.set('search', event.target.value);
+							} else {
+								url.searchParams.delete('search');
+							}
+							// reset pagination to page 1 when search changes
+							url.searchParams.set('page', '1');
+							goto(url, { keepFocus: true, invalidateAll: true });
+						}, 300);
+					}}
+				/>
 			</div>
 
-			<DataTable
-				{columns}
-				data={tableData}
-				{totalItems}
-				{totalPages}
-				{currentPage}
-				{pageSize}
-				emptyStateMessage={data?.is_template
-					? 'No test templates found matching your criteria.'
-					: 'No test sessions found matching your criteria.'}
-			/>
+			<div>
+				<StateSelection bind:states={filteredStates} filteration={true} />
+			</div>
+
+			<div>
+				<DistrictSelection
+					bind:districts={filteredDistricts}
+					selectedStates={filteredStates}
+					filteration={true}
+				/>
+			</div>
+
+			<div>
+				<TagsSelection bind:tags={filteredTags} filteration={true} />
+			</div>
+
+			<div>
+				<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+			</div>
 		</div>
-	{/if}
-</div>
+	{/snippet}
+
+	{#snippet content()}
+		<DataTable
+			{columns}
+			data={tableData}
+			{totalItems}
+			{totalPages}
+			{currentPage}
+			{pageSize}
+			emptyStateMessage={data?.is_template
+				? 'No test templates found matching your criteria.'
+				: 'No test sessions found matching your criteria.'}
+		/>
+	{/snippet}
+</ListingPageLayout>

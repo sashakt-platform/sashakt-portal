@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { DataTable } from '$lib/components/data-table';
+	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
 	import { createTagsColumns } from './tags-columns';
 	import { createTagTypesColumns } from './tag-types-columns';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import Info from '@lucide/svelte/icons/info';
 	import Plus from '@lucide/svelte/icons/plus';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
@@ -103,36 +102,20 @@
 	);
 </script>
 
-<div>
-	<DeleteDialog
-		bind:action={deleteAction}
-		elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
-	/>
-	<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
-		<div class="my-auto flex flex-col">
-			<div class="flex w-full items-center align-middle">
-				<div class="flex flex-row">
-					<h2
-						class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
-					>
-						Tag Management
-					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
-				</div>
-			</div>
-			<Label class="my-auto align-middle text-sm font-extralight">Manage Tags and Tag Types</Label>
-		</div>
-		<div class="my-auto flex flex-wrap gap-3 sm:ml-auto sm:p-4">
-			{#if canCreate(data.user, 'tag')}
-				<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>
-				<a href="/tags/tagtype/add/new"
-					><Button class="font-bold"><Plus />Create Tag Type</Button></a
-				>
-			{/if}
-		</div>
-	</div>
+<DeleteDialog
+	bind:action={deleteAction}
+	elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
+/>
 
-	<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
+<ListingPageLayout title="Tag Management" subtitle="Manage Tags and Tag Types">
+	{#snippet headerActions()}
+		{#if canCreate(data.user, 'tag')}
+			<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>
+			<a href="/tags/tagtype/add/new"><Button class="font-bold"><Plus />Create Tag Type</Button></a>
+		{/if}
+	{/snippet}
+
+	{#snippet content()}
 		<Tabs.Root value={activeTab} onValueChange={handleTabChange} class="w-full">
 			<Tabs.List>
 				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>
@@ -201,5 +184,5 @@
 				/>
 			</Tabs.Content>
 		</Tabs.Root>
-	</div>
-</div>
+	{/snippet}
+</ListingPageLayout>

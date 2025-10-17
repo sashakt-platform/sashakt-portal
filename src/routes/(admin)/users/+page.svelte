@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { DataTable } from '$lib/components/data-table';
+	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
 	import { createColumns } from './columns';
-	import Info from '@lucide/svelte/icons/info';
-	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { goto } from '$app/navigation';
@@ -44,29 +43,14 @@
 	);
 </script>
 
-<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
-	<div class="my-auto flex flex-col">
-		<div class="flex w-full items-center align-middle">
-			<div class="flex flex-row">
-				<h2
-					class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
-				>
-					User Management
-				</h2>
-				<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
-			</div>
-		</div>
-		<Label class="my-auto align-middle text-sm font-extralight">Manage users</Label>
-	</div>
-	<div class="my-auto flex gap-3 sm:ml-auto sm:p-4">
+<ListingPageLayout title="User Management" subtitle="Manage users">
+	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
 			<a href="/users/add/new"><Button class="font-bold"><Plus />Add User</Button></a>
 		{/if}
-	</div>
-</div>
+	{/snippet}
 
-<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
-	<div class="flex items-center py-4">
+	{#snippet filters()}
 		<Input
 			placeholder="Search users..."
 			value={search}
@@ -85,6 +69,9 @@
 			}}
 			class="max-w-sm"
 		/>
-	</div>
-	<DataTable data={tableData} {columns} {totalItems} {totalPages} {currentPage} {pageSize} />
-</div>
+	{/snippet}
+
+	{#snippet content()}
+		<DataTable data={tableData} {columns} {totalItems} {totalPages} {currentPage} {pageSize} />
+	{/snippet}
+</ListingPageLayout>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import Label from '$lib/components/ui/label/label.svelte';
 
@@ -8,11 +9,11 @@
 		showFilters?: boolean;
 		showEmptyState?: boolean;
 		showInfoIcon?: boolean;
-		headerActions?: () => any;
-		toolbar?: () => any;
-		filters?: () => any;
-		content?: () => any;
-		emptyState?: () => any;
+		headerActions?: () => Snippet;
+		toolbar?: () => Snippet;
+		filters?: () => Snippet;
+		content?: () => Snippet;
+		emptyState?: () => Snippet;
 	};
 
 	let {

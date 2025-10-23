@@ -9,6 +9,7 @@
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 
 	let { formData } = $props();
+	let selectedStates = $derived(formData?.state_ids || []);
 </script>
 
 <div class=" mx-auto flex w-full items-center justify-center">
@@ -60,7 +61,7 @@
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					<StateSelection bind:states={$formData.state_ids} />
+					<StateSelection bind:states={$formData.state_ids} filteration={true} />
 				</div>
 				<div class="mt-10 w-1/3">
 					<div class="flex align-middle">
@@ -68,10 +69,7 @@
 							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
 						>
 					</div>
-					<DistrictSelection
-						bind:districts={$formData.district_ids}
-						selectedStates={$formData.state_ids}
-					/>
+					<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
 				</div>
 			</div>
 		</div>

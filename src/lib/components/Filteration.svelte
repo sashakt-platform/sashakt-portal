@@ -17,11 +17,14 @@
 		itemName,
 		label = null,
 		filteration = false,
+		multiple = true,
 		...rest
 	} = $props();
 	let open = $state(false);
 	let searchQuery = $state('');
-	const placeholder = 'Select ' + (label ?? itemName) + 's';
+	const placeholder = multiple
+		? 'Select ' + (label ?? itemName) + 's'
+		: 'Select ' + (label ?? itemName);
 
 	// Debounced search
 	let searchTimeout: NodeJS.Timeout | undefined;
@@ -32,6 +35,8 @@
 			if (searchQuery) url.searchParams.set(itemName + '_search', searchQuery.toLowerCase());
 			else url.searchParams.delete(itemName + '_search');
 
+			// reset pagination to first page user searches
+			url.searchParams.set('page', '1');
 			goto(url, { keepFocus: true, invalidateAll: true });
 		}, 300);
 	}
@@ -51,6 +56,10 @@
 				e.stopPropagation();
 				const url = new URL(page.url);
 				url.searchParams.delete(itemName + '_ids', String(children.id));
+
+				// reset pagination to first page when filters removed
+				url.searchParams.set('page', '1');
+
 				goto(url, { keepFocus: true, invalidateAll: true });
 				items = items.filter((s: Filter) => s.id !== children.id);
 			}}>&times;</button
@@ -75,6 +84,9 @@
 				items.map((item: Filter) => {
 					url.searchParams.append(itemName + '_ids', item.id);
 				});
+
+				// reset pagination to first page when filters change
+				url.searchParams.set('page', '1');
 			}
 			goto(url, { keepFocus: true, invalidateAll: true });
 		}
@@ -89,22 +101,28 @@
 				role="combobox"
 				aria-expanded={open}
 			>
-				{#if items?.length === 0}
+				{#if multiple}
+					{#if items?.length === 0}
+						{placeholder}
+					{:else if items?.length < 3}
+						<span class="flex flex-row truncate text-start">
+							{#each items as item (item.id)}
+								{@render myBadge(item)}
+							{/each}
+						</span>
+					{:else if items?.length >= 3}
+						{#if items[0]}
+							{@render myBadge(items[0])}
+						{/if}
+						{#if items[1]}
+							{@render myBadge(items[1])}
+						{/if}
+						+ {items?.length - 2}
+					{/if}
+				{:else if !items || items.length === 0}
 					{placeholder}
-				{:else if items?.length < 3}
-					<span class="flex flex-row truncate text-start">
-						{#each items as item (item.id)}
-							{@render myBadge(item)}
-						{/each}
-					</span>
-				{:else if items?.length >= 3}
-					{#if items[0]}
-						{@render myBadge(items[0])}
-					{/if}
-					{#if items[1]}
-						{@render myBadge(items[1])}
-					{/if}
-					+ {items?.length - 2}
+				{:else if items && items.length > 0 && items[0]}
+					{items[0].name}
 				{/if}
 				<ChevronsUpDownIcon class="ml-auto opacity-50" />
 			</Button>
@@ -124,11 +142,16 @@
 						value={String(item.name)}
 						onSelect={() => {
 							const itemId: string = String(item.id);
-							const next = (items ?? []) as Filter[];
-							if (next.some((s) => String(s.id) === itemId)) {
-								items = next.filter((s) => String(s.id) !== itemId);
+							if (multiple) {
+								const next = (items ?? []) as Filter[];
+								if (next.some((s) => String(s.id) === itemId)) {
+									items = next.filter((s) => String(s.id) !== itemId);
+								} else {
+									items = [...next, { id: String(item.id), name: item.name }];
+								}
 							} else {
-								items = [...next, { id: String(item.id), name: item.name }];
+								items = [{ id: String(item.id), name: item.name }];
+								open = false;
 							}
 						}}
 					>

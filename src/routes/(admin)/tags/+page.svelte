@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { DataTable } from '$lib/components/data-table';
+	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
 	import { createTagsColumns } from './tags-columns';
 	import { createTagTypesColumns } from './tag-types-columns';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import Info from '@lucide/svelte/icons/info';
 	import Plus from '@lucide/svelte/icons/plus';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
@@ -65,6 +64,30 @@
 	// get active tab from URL parameter
 	const activeTab = $derived(page.url.searchParams.get('tab') === 'tagtype' ? 'tagtype' : 'tag');
 
+	function handleTabChange(value: string) {
+		const url = new URL(page.url);
+
+		// set the tab parameter
+		url.searchParams.set('tab', value);
+
+		// reset all URL parameters for both tabs when switching
+		const paramsToReset = [
+			'tagsPage',
+			'tagsSortBy',
+			'tagsSortOrder',
+			'tagTypesPage',
+			'tagTypesSortBy',
+			'tagTypesSortOrder',
+			'search'
+		];
+
+		paramsToReset.forEach((param) => {
+			url.searchParams.delete(param);
+		});
+
+		goto(url.toString(), { replaceState: false });
+	}
+
 	const tagsColumns = $derived(
 		createTagsColumns(tagsSortBy, tagsSortOrder, handleTagsSort, {
 			canEdit: canUpdate(data.user, 'tag'),
@@ -79,37 +102,21 @@
 	);
 </script>
 
-<div>
-	<DeleteDialog
-		bind:action={deleteAction}
-		elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
-	/>
-	<div class="mx-10 flex flex-row py-4">
-		<div class="my-auto flex flex-col">
-			<div class=" flex w-full items-center align-middle">
-				<div class="flex flex-row">
-					<h2
-						class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-					>
-						Tag Management
-					</h2>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
-				</div>
-			</div>
-			<Label class="my-auto align-middle text-sm font-extralight">Manage Tags and Tag Types</Label>
-		</div>
-		<div class={['my-auto ml-auto gap-3 p-4']}>
-			{#if canCreate(data.user, 'tag')}
-				<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>
-				<a href="/tags/tagtype/add/new"
-					><Button class="font-bold "><Plus />Create Tag Type</Button></a
-				>
-			{/if}
-		</div>
-	</div>
+<DeleteDialog
+	bind:action={deleteAction}
+	elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
+/>
 
-	<div class="mx-8 mt-10 flex flex-col gap-8">
-		<Tabs.Root value={activeTab} class="w-full">
+<ListingPageLayout title="Tag Management" subtitle="Manage Tags and Tag Types">
+	{#snippet headerActions()}
+		{#if canCreate(data.user, 'tag')}
+			<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>
+			<a href="/tags/tagtype/add/new"><Button class="font-bold"><Plus />Create Tag Type</Button></a>
+		{/if}
+	{/snippet}
+
+	{#snippet content()}
+		<Tabs.Root value={activeTab} onValueChange={handleTabChange} class="w-full">
 			<Tabs.List>
 				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>
 				<Tabs.Trigger value="tagtype">Tag Types</Tabs.Trigger>
@@ -124,9 +131,9 @@
 							clearTimeout(tagsSearchTimeout);
 							tagsSearchTimeout = setTimeout(() => {
 								if (event.target?.value) {
-									url.searchParams.set('tagsSearch', event.target.value);
+									url.searchParams.set('search', event.target.value);
 								} else {
-									url.searchParams.delete('tagsSearch');
+									url.searchParams.delete('search');
 								}
 								url.searchParams.set('tagsPage', '1');
 								goto(url, { keepFocus: true, invalidateAll: true });
@@ -155,9 +162,9 @@
 							clearTimeout(tagTypesSearchTimeout);
 							tagTypesSearchTimeout = setTimeout(() => {
 								if (event.target?.value) {
-									url.searchParams.set('tagTypesSearch', event.target.value);
+									url.searchParams.set('search', event.target.value);
 								} else {
-									url.searchParams.delete('tagTypesSearch');
+									url.searchParams.delete('search');
 								}
 								url.searchParams.set('tagTypesPage', '1');
 								goto(url, { keepFocus: true, invalidateAll: true });
@@ -177,5 +184,5 @@
 				/>
 			</Tabs.Content>
 		</Tabs.Root>
-	</div>
-</div>
+	{/snippet}
+</ListingPageLayout>

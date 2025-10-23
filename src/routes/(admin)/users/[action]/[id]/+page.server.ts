@@ -113,6 +113,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		action: params.action,
 		id: params.id,
 		user: userData,
+		currentUser: user,
 		roles: formattedRoles,
 		organizations: formattedOrganizations
 	};
@@ -133,6 +134,17 @@ export const actions: Actions = {
 		// Use appropriate schema based on action
 		const schema = params.action === 'edit' ? editUserSchema : createUserSchema;
 		const form = await superValidate(request, zod(schema));
+
+		// For non-Super Admins, automatically set organization_id to current user's organization
+		const isSuperAdmin =
+			user.permissions?.includes(PERMISSIONS.CREATE_ORGANIZATION) ||
+			user.permissions?.includes(PERMISSIONS.UPDATE_ORGANIZATION) ||
+			user.permissions?.includes(PERMISSIONS.DELETE_ORGANIZATION);
+
+		if (!isSuperAdmin && user.organization_id) {
+			form.data.organization_id = user.organization_id;
+		}
+
 		if (!form.valid) {
 			return fail(400, {
 				form
@@ -146,7 +158,7 @@ export const actions: Actions = {
 				full_name: form.data.full_name,
 				email: form.data.email,
 				phone: form.data.phone || '',
-				state_ids: form.data.state_ids.map((s) => s.id),
+				state_ids: form.data.state_ids,
 				organization_id: form.data.organization_id.toString(),
 				role_id: form.data.role_id.toString(),
 				is_active: form.data.is_active ? 'true' : 'false'
@@ -177,7 +189,7 @@ export const actions: Actions = {
 					email: form.data.email,
 					password: form.data.password,
 					phone: form.data.phone || '',
-					state_ids: form.data.state_ids.map((s) => s.id),
+					state_ids: form.data.state_ids,
 					organization_id: form.data.organization_id.toString(),
 					role_id: form.data.role_id.toString(),
 					is_active: form.data.is_active ? 'true' : 'false'
@@ -187,7 +199,7 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const err = await res.json();
-			form.errors = { email: [err.detail] };
+			form.errors = { _errors: [err.detail] };
 			return fail(401, { form });
 		}
 

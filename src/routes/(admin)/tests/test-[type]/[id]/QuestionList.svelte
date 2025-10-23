@@ -7,6 +7,8 @@
 	import TestPaper from '$lib/icons/TestPaper.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import { Input } from '$lib/components/ui/input/index.js';
+	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 
 	let { formData, questions, questionParams } = $props();
 	let dialogOpen = $state(false);
@@ -117,8 +119,14 @@
 						<p class="text-sm text-gray-400">
 							Add the relevant questions to your test {$formData.is_template ? 'template' : ''}
 						</p>
-						<Button class="mt-6 bg-[#0369A1]" onclick={() => (dialogOpen = true)}
-							>Select from question bank</Button
+						<Button
+							class="mt-6 bg-[#0369A1]"
+							onclick={() => {
+								dialogOpen = true;
+								const url = new URL(page.url);
+								url.searchParams.delete('state_ids');
+								goto(url, { keepFocus: true, invalidateAll: true });
+							}}>Select from question bank</Button
 						>
 					</div>
 				{:else}

@@ -111,13 +111,15 @@
 							{/each}
 						</span>
 					{:else if items?.length >= 3}
-						{#if items[0]}
-							{@render myBadge(items[0])}
-						{/if}
-						{#if items[1]}
-							{@render myBadge(items[1])}
-						{/if}
-						+ {items?.length - 2}
+						<span class="flex w-full flex-row truncate text-start">
+							{#if items[0]}
+								{@render myBadge(items[0])}
+							{/if}
+							{#if items[1]}
+								{@render myBadge(items[1])}
+							{/if}
+						</span>
+						<span class="w-fit">+ {items?.length - 2}</span>
 					{/if}
 				{:else if !items || items.length === 0}
 					{placeholder}

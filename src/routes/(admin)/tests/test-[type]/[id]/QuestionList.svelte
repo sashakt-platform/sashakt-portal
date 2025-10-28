@@ -24,12 +24,16 @@
 	// Optional: auto-select mode on load when tags exist
 	if ($formData.random_tag_count.length > 0 && $formData.question_revision_ids.length === 0) {
 		questionSelectionMode = 'tagBased';
-	} else if ($formData.tag_ids) {
-		$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
-			id: tag.id,
-			name: tag.name
-		}));
 	}
+
+	const setDefaultQuestions = () => {
+		if ($formData.random_tag_count.length === 0 && $formData.tag_ids.length > 0) {
+			$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
+				id: tag.id,
+				name: tag.name
+			}));
+		}
+	};
 
 	const handleRemoveQuestion = (questionId: number) => {
 		// remove from both IDs and question data
@@ -71,7 +75,7 @@
 						<RadioGroup.Item
 							id="tagBased"
 							value="tagBased"
-							onclick={() => ($formData.question_revision_ids = [])}
+							onclick={() => (($formData.question_revision_ids = []), setDefaultQuestions())}
 						/>
 						<Label for="tagBased"
 							><p class="font-bold">Random</p>

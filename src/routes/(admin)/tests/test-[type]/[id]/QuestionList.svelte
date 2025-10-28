@@ -9,6 +9,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import type { Filter } from '$lib/types/filters';
 
 	let { formData, questions, questionParams } = $props();
 	let dialogOpen = $state(false);
@@ -23,6 +24,11 @@
 	// Optional: auto-select mode on load when tags exist
 	if ($formData.random_tag_count.length > 0 && $formData.question_revision_ids.length === 0) {
 		questionSelectionMode = 'tagBased';
+	} else if ($formData.tag_ids) {
+		$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
+			id: tag.id,
+			name: tag.name
+		}));
 	}
 
 	const handleRemoveQuestion = (questionId: number) => {

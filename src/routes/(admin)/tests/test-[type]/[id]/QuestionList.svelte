@@ -26,7 +26,7 @@
 		questionSelectionMode = 'tagBased';
 	}
 
-	const setDefaultQuestions = () => {
+	const setDefaultTagsRandom = () => {
 		if ($formData.random_tag_count.length === 0 && $formData.tag_ids.length > 0) {
 			$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
 				id: tag.id,
@@ -75,7 +75,7 @@
 						<RadioGroup.Item
 							id="tagBased"
 							value="tagBased"
-							onclick={() => (($formData.question_revision_ids = []), setDefaultQuestions())}
+							onclick={() => (($formData.question_revision_ids = []), setDefaultTagsRandom())}
 						/>
 						<Label for="tagBased"
 							><p class="font-bold">Random</p>

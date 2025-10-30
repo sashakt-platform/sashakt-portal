@@ -13,6 +13,7 @@
 
 	const form = superForm(userData || data.form, {
 		validators: zodClient(editUserSchema),
+		dataType: 'json',
 		onResult: ({ result }) => {
 			if (result.type === 'redirect') {
 				isEditMode = false;

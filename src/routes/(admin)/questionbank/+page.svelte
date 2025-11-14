@@ -201,6 +201,8 @@
 	subtitle="Manage question bank"
 	showFilters={selectedQuestionIds.length === 0}
 	showEmptyState={noQuestionCreatedYet}
+	infoLabel="Help: Question Bank"
+	infoDescription="Question Bank allows you to create, manage, and categorize questions that can be reused in multiple tests. Use filters to quickly find and organize questions by topic or difficulty."
 >
 	{#snippet headerActions()}
 		{#if !noQuestionCreatedYet}

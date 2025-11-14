@@ -4,6 +4,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
 	import Info from '@lucide/svelte/icons/info';
+	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	// lazy-loaded components
 	let DistrictSelection: Component | null = $state(null);
@@ -231,7 +232,7 @@
 		</h2>
 		<TooltipInfo
 			label="Help: Dashboard"
-			description="Dashboard provides a quick overview of your organization's activity, including total questions, tests, and users. Use it to manage question banks, create and assign tests, and monitor analytics for better insights."
+			description="Dashboard provides a quick overview of your organization's activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
 		/>
 	</span>
 </div>

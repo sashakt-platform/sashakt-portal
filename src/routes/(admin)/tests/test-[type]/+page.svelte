@@ -130,6 +130,10 @@
 	title={data?.is_template ? 'Test templates' : 'Test sessions'}
 	subtitle={data?.is_template ? 'Manage test templates' : 'Manage test sessions'}
 	showEmptyState={noTestCreatedYet}
+	infoLabel={data?.is_template ? 'Help: Test templates' : 'Help: Test sessions'}
+	infoDescription={data?.is_template
+		? 'This panel lists all your test templates. You can create, edit, or delete a template using the available actions.'
+		: 'This panel lists all your test sessions. You can create, edit, or delete a test .clone an existing test setup, or download the test’s QR code for easy sharing.'}
 >
 	{#snippet headerActions()}
 		{#if !noTestCreatedYet}

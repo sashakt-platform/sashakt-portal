@@ -2,10 +2,13 @@
 	import type { Snippet } from 'svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import TooltipInfo from './data-table/TooltipInfo.svelte';
 
 	type ListingPageLayoutProps = {
 		title: string;
 		subtitle: string;
+		infoLabel?: string;
+		infoDescription?: string;
 		showFilters?: boolean;
 		showEmptyState?: boolean;
 		showInfoIcon?: boolean;
@@ -22,6 +25,8 @@
 		showFilters = true,
 		showEmptyState = false,
 		showInfoIcon = true,
+		infoLabel,
+		infoDescription,
 		headerActions,
 		toolbar,
 		filters,
@@ -42,7 +47,7 @@
 						{title}
 					</h2>
 					{#if showInfoIcon}
-						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+						<TooltipInfo label={infoLabel} description={infoDescription} />
 					{/if}
 				</div>
 			</div>

@@ -44,7 +44,12 @@
 	);
 </script>
 
-<ListingPageLayout title="User Management" subtitle="Manage users">
+<ListingPageLayout
+	title="User Management"
+	subtitle="Manage users"
+	infoLabel="Help: User management"
+	infoDescription="This panel displays all users in the system. You can edit or delete a user by clicking the three dots next to their entry."
+>
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
 			<a href="/users/add/new"><Button class="font-bold"><Plus />Add User</Button></a>

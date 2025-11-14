@@ -108,7 +108,12 @@
 	elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
 />
 
-<ListingPageLayout title="Tag Management" subtitle="Manage Tags and Tag Types">
+<ListingPageLayout
+	title="Tag Management"
+	subtitle="Manage Tags and Tag Types"
+	infoLabel="Help: Tag Management"
+	infoDescription="Manage all tags and tag types here. You can create, edit, or delete tags and tag types using the available actions."
+>
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'tag')}
 			<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>

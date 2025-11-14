@@ -13,16 +13,17 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	// extract query parameters for tags
 	const tagsPage = Number(url.searchParams.get('tagsPage')) || 1;
 	const tagsSize = Number(url.searchParams.get('tagsSize')) || DEFAULT_PAGE_SIZE;
-	const tagsSearch = url.searchParams.get('tagsSearch') || '';
 	const tagsSortBy = url.searchParams.get('tagsSortBy') || '';
 	const tagsSortOrder = url.searchParams.get('tagsSortOrder') || 'asc';
 
 	// extract query parameters for tag types
 	const tagTypesPage = Number(url.searchParams.get('tagTypesPage')) || 1;
 	const tagTypesSize = Number(url.searchParams.get('tagTypesSize')) || DEFAULT_PAGE_SIZE;
-	const tagTypesSearch = url.searchParams.get('tagTypesSearch') || '';
 	const tagTypesSortBy = url.searchParams.get('tagTypesSortBy') || '';
 	const tagTypesSortOrder = url.searchParams.get('tagTypesSortOrder') || 'asc';
+
+	// shared search parameter for both tabs
+	const search = url.searchParams.get('search') || '';
 
 	let tags = { items: [], total: 0, pages: 0 };
 	let tagTypes = { items: [], total: 0, pages: 0 };
@@ -31,7 +32,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const tagsQueryParams = new URLSearchParams({
 		page: tagsPage.toString(),
 		size: tagsSize.toString(),
-		...(tagsSearch && { search: tagsSearch }),
+		...(search && { name: search }),
 		...(tagsSortBy && { sort_by: tagsSortBy }),
 		...(tagsSortOrder && { sort_order: tagsSortOrder })
 	});
@@ -52,14 +53,14 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 			tagsParams: {
 				page: tagsPage,
 				size: tagsSize,
-				search: tagsSearch,
+				search: search,
 				sortBy: tagsSortBy,
 				sortOrder: tagsSortOrder
 			},
 			tagTypesParams: {
 				page: tagTypesPage,
 				size: tagTypesSize,
-				search: tagTypesSearch,
+				search: search,
 				sortBy: tagTypesSortBy,
 				sortOrder: tagTypesSortOrder
 			}
@@ -72,7 +73,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const tagTypesQueryParams = new URLSearchParams({
 		page: tagTypesPage.toString(),
 		size: tagTypesSize.toString(),
-		...(tagTypesSearch && { search: tagTypesSearch }),
+		...(search && { name: search }),
 		...(tagTypesSortBy && { sort_by: tagTypesSortBy }),
 		...(tagTypesSortOrder && { sort_order: tagTypesSortOrder })
 	});
@@ -101,14 +102,14 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		tagsParams: {
 			page: tagsPage,
 			size: tagsSize,
-			search: tagsSearch,
+			search: search,
 			sortBy: tagsSortBy,
 			sortOrder: tagsSortOrder
 		},
 		tagTypesParams: {
 			page: tagTypesPage,
 			size: tagTypesSize,
-			search: tagTypesSearch,
+			search: search,
 			sortBy: tagTypesSortBy,
 			sortOrder: tagTypesSortOrder
 		}

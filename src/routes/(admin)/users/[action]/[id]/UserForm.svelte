@@ -25,16 +25,21 @@
 
 	const form = superForm(userData || data.form, {
 		applyAction: 'never',
-		validators: zodClient(schema),
+		validators: zodClient(schema as any),
 		dataType: 'json'
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, errors } = form;
 
-	if (userData) {
-		$formData.state_ids =
-			userData?.states?.map((state: Filter) => ({ id: String(state.id), name: state.name })) || [];
+	let selectedStates = $state<Filter[]>([]);
+
+	if (userData?.states?.length > 0) {
+		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
 	}
+
+	$effect(() => {
+		$formData.state_ids = selectedStates.length > 0 ? [parseInt(selectedStates[0].id, 10)] : [];
+	});
 
 	// for non-Super Admins, automatically set organization_id to current user's organization
 	if (!isSuperAdmin && data.currentUser?.organization_id && !isEditMode) {
@@ -43,6 +48,16 @@
 </script>
 
 <form method="POST" use:enhance action="?/save" class="flex flex-col gap-6">
+	{#if $errors._errors && $errors._errors.length > 0}
+		<div class="border-destructive bg-destructive/10 rounded-md border p-4">
+			<h3 class="text-destructive mb-2 text-sm font-medium">Please fix the following errors:</h3>
+			<ul class="list-inside list-disc space-y-1">
+				{#each $errors._errors as error, index (index)}
+					<li class="text-destructive text-sm">{error}</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 		<Form.Field {form} name="full_name">
 			<Form.Control>
@@ -133,7 +148,7 @@
 							<Select.Trigger {...props}>
 								{#if $formData.organization_id}
 									{data.organizations.find(
-										(organization) => organization.id === $formData.organization_id
+										(organization: any) => organization.id === $formData.organization_id
 									)?.name || 'Select organization'}
 								{:else}
 									Select organization
@@ -157,7 +172,8 @@
 					<Select.Root type="single" bind:value={$formData.role_id} name={props.name}>
 						<Select.Trigger {...props}>
 							{#if $formData.role_id}
-								{data.roles.find((role) => role.id === $formData.role_id)?.label || 'Select role'}
+								{data.roles.find((role: any) => role.id === $formData.role_id)?.label ||
+									'Select role'}
 							{:else}
 								Select role
 							{/if}
@@ -175,14 +191,14 @@
 	</div>
 
 	{#if data.roles
-		.find((role) => role.id === $formData.role_id)
+		.find((role: any) => role.id === $formData.role_id)
 		?.label?.toLowerCase()
 		?.includes('state')}
 		<Form.Field {form} name="state_ids">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>States</Form.Label>
-					<StateSelection {...props} bind:states={$formData.state_ids} />
+					<Form.Label>State</Form.Label>
+					<StateSelection {...props} bind:states={selectedStates} multiple={false} />
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />

@@ -66,22 +66,24 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	}
 
 	try {
-		const questionRevisionsResponse = await fetch(
-			`${BACKEND_URL}/questions/${params.id}/revisions/`,
-			{
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
+		if (params.id && params.id !== 'new') {
+			const questionRevisionsResponse = await fetch(
+				`${BACKEND_URL}/questions/${params.id}/revisions/`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`
+					}
 				}
+			);
+			if (!questionRevisionsResponse.ok) {
+				console.error(`Failed to fetch Question Revision: ${questionRevisionsResponse.statusText}`);
+				throw new Error('Failed to fetch Question Revision');
 			}
-		);
-		if (!questionRevisionsResponse.ok) {
-			console.error(`Failed to fetch Question Revision: ${questionRevisionsResponse.statusText}`);
-			throw new Error('Failed to fetch Question Revision');
-		}
 
-		questionRevisions = await questionRevisionsResponse.json();
+			questionRevisions = await questionRevisionsResponse.json();
+		}
 	} catch (error) {
 		console.error('Error fetching Question Revision:', error);
 	}

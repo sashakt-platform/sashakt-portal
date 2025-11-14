@@ -134,71 +134,73 @@
 </script>
 
 <div>
-	<Table.Root>
-		<Table.Header>
-			{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-				<Table.Row class="bg-primary-foreground">
-					{#each headerGroup.headers as header (header.id)}
-						<Table.Head colspan={header.colSpan}>
-							{#if !header.isPlaceholder}
-								<FlexRender
-									content={header.column.columnDef.header}
-									context={header.getContext()}
-								/>
-							{/if}
-						</Table.Head>
-					{/each}
-				</Table.Row>
-			{/each}
-		</Table.Header>
-		<Table.Body>
-			{#each table.getRowModel().rows as row (row.id)}
-				<Table.Row data-state={row.getIsSelected() && 'selected'}>
-					{#each row.getVisibleCells() as cell (cell.id)}
-						<Table.Cell
-							class={expandable && expandColumnId && cell.column.id === expandColumnId
-								? 'cursor-pointer'
-								: ''}
-							onclick={expandable &&
-							expandColumnId &&
-							cell.column.id === expandColumnId &&
-							row.getCanExpand()
-								? () => row.toggleExpanded()
-								: undefined}
-							title={expandable &&
-							expandColumnId &&
-							cell.column.id === expandColumnId &&
-							row.getCanExpand()
-								? 'View details'
-								: undefined}
-						>
-							<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
-						</Table.Cell>
-					{/each}
-				</Table.Row>
+	<div class="overflow-x-auto rounded-md border">
+		<Table.Root>
+			<Table.Header>
+				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+					<Table.Row class="bg-primary-foreground">
+						{#each headerGroup.headers as header (header.id)}
+							<Table.Head colspan={header.colSpan}>
+								{#if !header.isPlaceholder}
+									<FlexRender
+										content={header.column.columnDef.header}
+										context={header.getContext()}
+									/>
+								{/if}
+							</Table.Head>
+						{/each}
+					</Table.Row>
+				{/each}
+			</Table.Header>
+			<Table.Body>
+				{#each table.getRowModel().rows as row (row.id)}
+					<Table.Row data-state={row.getIsSelected() && 'selected'}>
+						{#each row.getVisibleCells() as cell (cell.id)}
+							<Table.Cell
+								class={expandable && expandColumnId && cell.column.id === expandColumnId
+									? 'cursor-pointer'
+									: ''}
+								onclick={expandable &&
+								expandColumnId &&
+								cell.column.id === expandColumnId &&
+								row.getCanExpand()
+									? () => row.toggleExpanded()
+									: undefined}
+								title={expandable &&
+								expandColumnId &&
+								cell.column.id === expandColumnId &&
+								row.getCanExpand()
+									? 'View details'
+									: undefined}
+							>
+								<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+							</Table.Cell>
+						{/each}
+					</Table.Row>
 
-				{#if expandable && row.getIsExpanded() && renderExpandedRow}
-					<Table.Row class="border-t-0">
-						<Table.Cell colspan={columns.length} class="p-0">
-							<div class="border-t p-4">
-								{@html renderExpandedRow(row.original)}
-							</div>
+					{#if expandable && row.getIsExpanded() && renderExpandedRow}
+						<Table.Row class="border-t-0">
+							<Table.Cell colspan={columns.length} class="p-0">
+								<div class="border-t p-4">
+									{@html renderExpandedRow(row.original)}
+								</div>
+							</Table.Cell>
+						</Table.Row>
+					{/if}
+				{:else}
+					<Table.Row>
+						<Table.Cell colspan={columns.length} class="h-24 text-center">
+							{#if emptyStateContent}
+								{@html emptyStateContent()}
+							{:else}
+								{emptyStateMessage}
+							{/if}
 						</Table.Cell>
 					</Table.Row>
-				{/if}
-			{:else}
-				<Table.Row>
-					<Table.Cell colspan={columns.length} class="h-24 text-center">
-						{#if emptyStateContent}
-							{@html emptyStateContent()}
-						{:else}
-							{emptyStateMessage}
-						{/if}
-					</Table.Cell>
-				</Table.Row>
-			{/each}
-		</Table.Body>
-	</Table.Root>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</div>
 	<div class="flex items-center justify-between space-x-2 py-4">
 		<div class="text-muted-foreground flex-1 text-sm">
 			{#if enableSelection}

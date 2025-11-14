@@ -16,7 +16,6 @@
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
-	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	let {
 		data
@@ -133,7 +132,7 @@
 	infoLabel={data?.is_template ? 'Help: Test templates' : 'Help: Test sessions'}
 	infoDescription={data?.is_template
 		? 'This panel lists all your test templates. You can create, edit, or delete a template using the available actions.'
-		: 'This panel lists all your test sessions. You can create, edit, or delete a test .clone an existing test setup, or download the test’s QR code for easy sharing.'}
+		: 'This panel lists all your test sessions. You can create, edit, or delete a test ,clone an existing test setup, or download the test’s QR code for easy sharing.'}
 >
 	{#snippet headerActions()}
 		{#if !noTestCreatedYet}

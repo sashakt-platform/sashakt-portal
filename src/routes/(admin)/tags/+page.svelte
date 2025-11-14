@@ -12,7 +12,6 @@
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
-	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);

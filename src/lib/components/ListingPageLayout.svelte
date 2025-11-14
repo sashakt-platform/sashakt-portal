@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import Info from '@lucide/svelte/icons/info';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import TooltipInfo from './data-table/TooltipInfo.svelte';
 

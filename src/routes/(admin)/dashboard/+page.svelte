@@ -3,7 +3,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
-	import Info from '@lucide/svelte/icons/info';
 	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	// lazy-loaded components

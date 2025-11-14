@@ -19,7 +19,6 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
-	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);

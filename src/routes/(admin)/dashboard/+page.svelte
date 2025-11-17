@@ -3,7 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
-	import Info from '@lucide/svelte/icons/info';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
 	// lazy-loaded components
 	let DistrictSelection: Component | null = $state(null);
@@ -229,7 +229,10 @@
 		>
 			Dashboard
 		</h2>
-		<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+		<TooltipInfo
+			label="Help: Dashboard"
+			description="Dashboard provides a quick overview of your organization's activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
+		/>
 	</span>
 </div>
 

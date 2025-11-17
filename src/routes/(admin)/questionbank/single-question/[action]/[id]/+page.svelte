@@ -18,6 +18,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
 	const {
 		data
@@ -120,7 +121,10 @@
 						>
 							{questionData ? 'Edit Question' : 'Create a Question'}
 						</h2>
-						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+						<TooltipInfo
+							label="Help: Question Form"
+							description="Here you can add a new question by providing the question text, possible answers, marking scheme, tags, and states. Make sure to mark the correct answer(s) before saving."
+						/>
 					</div>
 				</div>
 				<Label class="my-auto align-middle text-sm font-extralight">

@@ -13,7 +13,6 @@
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
-	import { Description } from 'formsnap';
 
 	let { data } = $props();
 	const { form, enhance, submit, message } = superForm(data.form, {

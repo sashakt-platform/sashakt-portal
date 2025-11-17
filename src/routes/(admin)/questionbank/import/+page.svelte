@@ -12,7 +12,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 	import { Description } from 'formsnap';
 
 	let { data } = $props();

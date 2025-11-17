@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import TooltipInfo from './data-table/TooltipInfo.svelte';
+	import TooltipInfo from './TooltipInfo.svelte';
 
 	type ListingPageLayoutProps = {
 		title: string;

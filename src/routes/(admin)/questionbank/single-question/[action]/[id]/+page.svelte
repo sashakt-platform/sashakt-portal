@@ -18,7 +18,7 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
-	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
 	const {
 		data

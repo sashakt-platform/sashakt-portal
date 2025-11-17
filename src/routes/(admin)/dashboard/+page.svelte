@@ -3,7 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
-	import TooltipInfo from '$lib/components/data-table/TooltipInfo.svelte';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
 	// lazy-loaded components
 	let DistrictSelection: Component | null = $state(null);

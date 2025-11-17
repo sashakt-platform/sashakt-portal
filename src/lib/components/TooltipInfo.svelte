@@ -22,7 +22,7 @@
 
 		<Tooltip.Content
 			id={tooltipId}
-			class="bg-accent text-accent-foreground max-w-xs rounded-md p-2 text-xs shadow-md"
+			class="text-accent-foreground max-w-xs rounded-md border border-gray-200 bg-white p-3 text-xs shadow-lg/20 backdrop-blur-sm"
 			side="bottom"
 			sideOffset={8}
 			align="start"

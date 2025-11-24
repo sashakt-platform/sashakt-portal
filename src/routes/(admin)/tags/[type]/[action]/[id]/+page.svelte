@@ -77,11 +77,15 @@
 		<div class="mx-10 flex flex-col gap-10 bg-white p-9">
 			<div class="flex w-full flex-col gap-2 pr-8">
 				<h2 class="font-semibold">Name</h2>
-				<Input type="text" name="name" bind:value={$formData.name} />
+				<Input type="text" name="name" bind:value={$formData.name} data-testid="tag-name-input" />
 			</div>
 			<div class="flex w-full flex-col gap-2 pr-8">
 				<h2 class="font-semibold">Description</h2>
-				<Textarea name="description" bind:value={$formData.description} />
+				<Textarea
+					name="description"
+					bind:value={$formData.description}
+					data-testid="tag-desc-input"
+				/>
 			</div>
 			{#if data.type == 'tag'}
 				<div class="flex w-full flex-col gap-2 pr-8">

@@ -7,7 +7,7 @@
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import X from '@lucide/svelte/icons/x';
 	import { fileProxy, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
@@ -16,7 +16,7 @@
 
 	let { data } = $props();
 	const { form, enhance, submit, message } = superForm(data.form, {
-		validators: zodClient(schema),
+		validators: zod4Client(schema),
 		dataType: 'json',
 		onSubmit: () => {
 			$form.user_id = data.user.id;

@@ -1,5 +1,5 @@
 import { superValidate, fail, message } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad } from './$types.js';
 import { schema } from './schema.js';
 import { BACKEND_URL } from '$env/static/private';
@@ -11,7 +11,7 @@ export const load: PageServerLoad = async () => {
 	requirePermission(user, PERMISSIONS.CREATE_QUESTION);
 
 	// Create a form with the default values
-	const form = await superValidate(zod(schema));
+	const form = await superValidate(zod4(schema));
 
 	return {
 		form
@@ -23,7 +23,7 @@ export const actions = {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.CREATE_QUESTION);
 		const token = getSessionTokenCookie();
-		const form = await superValidate(request, zod(schema));
+		const form = await superValidate(request, zod4(schema));
 
 		if (!form.valid) {
 			return fail(400, { form });

@@ -9,7 +9,7 @@ const baseUserSchema = z.object({
 	organization_id: z.coerce.number().min(1, { message: 'Organization is required' }),
 	role_id: z.coerce.number().min(1, { message: 'Role is required' }),
 	state_ids: z.array(z.coerce.number()).default([]),
-	is_active: z.boolean().optional().default(true)
+	is_active: z.boolean().default(true)
 });
 
 // Schema for creating new user (passwords required)

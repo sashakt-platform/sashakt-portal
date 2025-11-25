@@ -1,7 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { createQrPngDataUrl } from '@svelte-put/qr';
-import type { HTMLAttributes } from 'svelte/elements';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));

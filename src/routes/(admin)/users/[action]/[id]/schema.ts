@@ -3,11 +3,11 @@ import { PASSWORD_MIN } from '$lib/constants';
 
 // Base schema for common fields
 const baseUserSchema = z.object({
-	full_name: z.string().min(1, { message: 'Full name is required' }),
-	email: z.string().email({ message: 'Invalid email address' }),
+	full_name: z.string().min(1, { error: 'Full name is required' }),
+	email: z.email({ error: 'Invalid email address' }),
 	phone: z.string().optional(),
-	organization_id: z.coerce.number().min(1, { message: 'Organization is required' }),
-	role_id: z.coerce.number().min(1, { message: 'Role is required' }),
+	organization_id: z.coerce.number().min(1, { error: 'Organization is required' }),
+	role_id: z.coerce.number().min(1, { error: 'Role is required' }),
 	state_ids: z.array(z.coerce.number()).default([]),
 	is_active: z.boolean().default(true)
 });
@@ -17,13 +17,13 @@ export const createUserSchema = baseUserSchema
 	.extend({
 		password: z
 			.string()
-			.min(PASSWORD_MIN, { message: `Password must be at least ${PASSWORD_MIN} characters.` }),
+			.min(PASSWORD_MIN, { error: `Password must be at least ${PASSWORD_MIN} characters.` }),
 		confirm_password: z
 			.string()
-			.min(PASSWORD_MIN, { message: `Password must be at least ${PASSWORD_MIN} characters.` })
+			.min(PASSWORD_MIN, { error: `Password must be at least ${PASSWORD_MIN} characters.` })
 	})
 	.refine((data) => data.password === data.confirm_password, {
-		message: 'Passwords must match',
+		error: 'Passwords must match',
 		path: ['confirm_password']
 	});
 
@@ -41,10 +41,7 @@ export const editUserSchema = baseUserSchema
 			}
 			return true;
 		},
-		{
-			message: `Password must be at least ${PASSWORD_MIN} characters.`,
-			path: ['password']
-		}
+		{ error: `Password must be at least ${PASSWORD_MIN} characters.`, path: ['password'] }
 	)
 	.refine(
 		(data) => {
@@ -54,10 +51,7 @@ export const editUserSchema = baseUserSchema
 			}
 			return true;
 		},
-		{
-			message: 'Passwords must match',
-			path: ['confirm_password']
-		}
+		{ error: 'Passwords must match', path: ['confirm_password'] }
 	)
 	.refine(
 		(data) => {
@@ -67,10 +61,7 @@ export const editUserSchema = baseUserSchema
 			}
 			return true;
 		},
-		{
-			message: 'Confirm password is required when password is provided',
-			path: ['confirm_password']
-		}
+		{ error: 'Confirm password is required when password is provided', path: ['confirm_password'] }
 	);
 
 // Default export for backward compatibility (create mode)

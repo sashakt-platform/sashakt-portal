@@ -14,6 +14,7 @@ export enum MarksLevel {
 export const testSchema = z.object({
 	name: z.string(),
 	description: z.string(),
+	is_active: z.boolean().default(true),
 	start_time: z.string().nullable().optional(),
 	end_time: z.string().nullable().optional(),
 	time_limit: z.number().nullable().optional(),

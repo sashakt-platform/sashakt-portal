@@ -72,6 +72,26 @@
 					<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
 				</div>
 			</div>
+
+			<div class="mt-10">
+				<div class="flex items-center gap-4">
+					<Label for="is-active" class="text-2xl">Active Status</Label>
+					<label class="relative inline-flex cursor-pointer items-center">
+						<input
+							type="checkbox"
+							id="is-active"
+							class="peer sr-only"
+							bind:checked={$formData.is_active}
+						/>
+						<div
+							class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-blue-600 peer-focus:ring-4 peer-focus:ring-blue-300 peer-focus:outline-none after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
+						></div>
+					</label>
+					<span class="text-sm text-gray-500"
+						>{$formData.is_active ? 'Test is active' : 'Test is inactive'}</span
+					>
+				</div>
+			</div>
 		</div>
 	</WhiteEmptyBox>
 </div>

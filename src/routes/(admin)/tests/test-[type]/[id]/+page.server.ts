@@ -158,6 +158,8 @@ export const actions: Actions = {
 		}
 		const transformedFormData = {
 			...form.data,
+			start_time: form.data.start_time || null,
+			end_time: form.data.end_time || null,
 			state_ids: form.data.state_ids.map((s) => s.id),
 			tag_ids: form.data.tag_ids.map((t) => t.id),
 			district_ids: form.data.district_ids.map((d) => d.id),

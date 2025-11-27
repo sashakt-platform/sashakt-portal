@@ -2,6 +2,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+	import { Switch } from '$lib/components/ui/switch/index.js';
 	import WhiteEmptyBox from '$lib/components/white-empty-box.svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
@@ -19,7 +20,7 @@
 				<div class="flex align-middle">
 					<Label for="template-name" class="text-2xl"
 						>{$formData.is_template ? 'Test template name' : 'Test name'}</Label
-					><span><Info class=" m-2  w-4 text-xs text-gray-600" /></span>
+					><span><Info class="m-2 w-4 text-xs text-gray-600" /></span>
 				</div>
 				<Input
 					type="text"
@@ -39,7 +40,7 @@
 			<div class="mt-10">
 				<div class="flex align-middle">
 					<Label for="template-name" class="text-2xl">Description</Label><span
-						><Info class=" m-2  w-4 text-xs text-gray-600" /></span
+						><Info class="m-2 w-4 text-xs text-gray-600" /></span
 					>
 				</div>
 				<Textarea placeholder="" name="description" bind:value={$formData.description} />
@@ -49,7 +50,7 @@
 				<div class="mt-10 w-1/3">
 					<div class="flex align-middle">
 						<Label for="template-name" class="text-2xl">Tags</Label><span
-							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
+							><Info class="m-2 w-4 text-xs text-gray-600" /></span
 						>
 					</div>
 					<TagsSelection bind:tags={$formData.tag_ids} />
@@ -58,7 +59,7 @@
 				<div class="mt-10 w-1/3">
 					<div class="flex align-middle">
 						<Label for="template-name" class="text-2xl">States</Label><span
-							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
+							><Info class="m-2 w-4 text-xs text-gray-600" /></span
 						>
 					</div>
 					<StateSelection bind:states={$formData.state_ids} filteration={true} />
@@ -66,7 +67,7 @@
 				<div class="mt-10 w-1/3">
 					<div class="flex align-middle">
 						<Label for="template-name" class="text-2xl">Districts</Label><span
-							><Info class=" m-2  w-4 text-xs text-gray-600" /></span
+							><Info class="m-2 w-4 text-xs text-gray-600" /></span
 						>
 					</div>
 					<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
@@ -75,18 +76,8 @@
 
 			<div class="mt-10">
 				<div class="flex items-center gap-4">
-					<label class="relative inline-flex cursor-pointer items-center">
-						<input
-							type="checkbox"
-							id="is-active"
-							class="peer sr-only"
-							bind:checked={$formData.is_active}
-						/>
-						<div
-							class="peer h-6 w-11 rounded-full bg-gray-200 peer-checked:bg-blue-600 peer-focus:ring-4 peer-focus:ring-blue-300 peer-focus:outline-none after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
-						></div>
-					</label>
-					<span class="text-sm font-medium">Active</span>
+					<Switch id="is-active" bind:checked={$formData.is_active} />
+					<span class="text-sm font-medium">Is Active?</span>
 				</div>
 			</div>
 		</div>

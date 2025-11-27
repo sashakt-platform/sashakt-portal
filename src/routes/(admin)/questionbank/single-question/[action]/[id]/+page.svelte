@@ -19,6 +19,7 @@
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
+	import { dndzone } from 'svelte-dnd-action';
 
 	const {
 		data
@@ -157,49 +158,60 @@
 					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
 						{@render snippetHeading('Answers')}
 
-						{#each totalOptions as { id, key, value }, index (id)}
-							<div class="group flex flex-row gap-4">
-								<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
-									<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
-										{key}
-									</p>
-								</div>
-								<div class="flex w-full flex-col gap-2">
-									<div class="flex flex-row rounded-sm border-1 border-black">
-										<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
-										<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
+						<div
+							use:dndzone={{ items: totalOptions, flipDurationMs: 150 }}
+							onconsider={({ detail }) => (totalOptions = detail.items)}
+							onfinalize={({ detail }) => {
+								totalOptions = detail.items.map((opt, i) => ({
+									...opt,
+									key: String.fromCharCode(65 + i)
+								}));
+							}}
+						>
+							{#each totalOptions as { id, key, value }, index (id)}
+								<div class="group flex flex-row gap-4">
+									<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
+										<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
+											{key}
+										</p>
 									</div>
-									<div class="flex flex-row gap-2">
-										<Checkbox
-											disabled={!totalOptions[index].value.trim()}
-											checked={totalOptions[index].correct_answer}
-											onCheckedChange={(checked: boolean) =>
-												(totalOptions[index].correct_answer = checked)}
-										/><Label class="text-sm ">Set as correct answer</Label>
+									<div class="flex w-full flex-col gap-2">
+										<div class="flex flex-row rounded-sm border-1 border-black">
+											<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
+											<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
+										</div>
+										<div class="flex flex-row gap-2">
+											<Checkbox
+												disabled={!totalOptions[index].value.trim()}
+												checked={totalOptions[index].correct_answer}
+												onCheckedChange={(checked: boolean) =>
+													(totalOptions[index].correct_answer = checked)}
+											/><Label class="text-sm ">Set as correct answer</Label>
+										</div>
+									</div>
+									<div
+										class={[
+											'mt-2 gap-0 opacity-0 transition-opacity',
+											totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
+										]}
+									>
+										<Trash_2
+											class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
+											onclick={() => {
+												if (totalOptions.length > 1) {
+													totalOptions = totalOptions
+														.filter((_, i) => i !== index)
+														.map((option, i) => ({
+															...option,
+															key: String.fromCharCode(65 + i)
+														}));
+												}
+											}}
+										/>
 									</div>
 								</div>
-								<div
-									class={[
-										'mt-2 gap-0 opacity-0 transition-opacity',
-										totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
-									]}
-								>
-									<Trash_2
-										class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
-										onclick={() => {
-											if (totalOptions.length > 1) {
-												totalOptions = totalOptions
-													.filter((_, i) => i !== index)
-													.map((option, i) => ({
-														...option,
-														key: String.fromCharCode(65 + i)
-													}));
-											}
-										}}
-									/>
-								</div>
-							</div>
-						{/each}
+							{/each}
+						</div>
 
 						<div class="flex justify-end">
 							<Button

@@ -6,7 +6,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { createUserSchema, editUserSchema, type FormSchema } from './schema';
 	import { type Infer, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import type { Filter } from '$lib/types/filters';
 	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
@@ -25,7 +25,7 @@
 
 	const form = superForm(userData || data.form, {
 		applyAction: 'never',
-		validators: zodClient(schema as any),
+		validators: zod4Client(schema as any),
 		dataType: 'json'
 	});
 

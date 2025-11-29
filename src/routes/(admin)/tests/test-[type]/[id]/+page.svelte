@@ -6,7 +6,7 @@
 	import Configuration from './Configuration.svelte';
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 
@@ -32,7 +32,7 @@
 		submit
 	} = superForm(testData || data.form, {
 		applyAction: 'never',
-		validators: zodClient(testSchema),
+		validators: zod4Client(testSchema),
 		dataType: 'json',
 		onSubmit() {
 			if ($formData.template_id) {

@@ -3,12 +3,12 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { loginSchema, type FormSchema } from './schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(loginSchema)
+		validators: zod4Client(loginSchema)
 	});
 
 	const { form: formData, enhance } = form;

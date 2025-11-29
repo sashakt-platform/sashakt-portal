@@ -17,8 +17,5 @@ export const passwordSchema = z
 			}
 			return true;
 		},
-		{
-			message: 'Passwords must match',
-			path: ['confirm_password']
-		}
+		{ error: 'Passwords must match', path: ['confirm_password'] }
 	);

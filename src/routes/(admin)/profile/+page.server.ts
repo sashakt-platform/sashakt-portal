@@ -3,7 +3,7 @@ import { getSessionTokenCookie } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { editUserSchema } from './schema.js';
 
@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	}
 
 	return {
-		form: await superValidate(zod(editUserSchema)),
+		form: await superValidate(zod4(editUserSchema)),
 		currentUser: userData
 	};
 };
@@ -42,7 +42,7 @@ export const actions: Actions = {
 	save: async ({ request, fetch, cookies }) => {
 		const token = getSessionTokenCookie();
 
-		const form = await superValidate(request, zod(editUserSchema));
+		const form = await superValidate(request, zod4(editUserSchema));
 		if (!form.valid) {
 			return fail(400, {
 				form

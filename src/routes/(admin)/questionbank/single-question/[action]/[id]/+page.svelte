@@ -14,7 +14,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { questionSchema, type FormSchema, type TagFormSchema, QuestionTypeEnum } from './schema';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
@@ -38,7 +38,7 @@
 		submit
 	} = superForm(questionData || data.form, {
 		applyAction: 'never',
-		validators: zodClient(questionSchema),
+		validators: zod4Client(questionSchema),
 		dataType: 'json',
 		onSubmit: () => {
 			$formData.options = totalOptions.map((option) => {

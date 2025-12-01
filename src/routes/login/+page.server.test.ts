@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { RequestEvent } from '@sveltejs/kit';
+import { load, actions } from './+page.server';
+import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 
 // Mock environment variables
 vi.mock('$env/static/private', () => ({
@@ -11,10 +13,6 @@ vi.mock('$lib/server/auth.js', () => ({
 	setSessionTokenCookie: vi.fn(),
 	setRefreshTokenCookie: vi.fn()
 }));
-
-// Import after mocks are set up
-import { load, actions } from './+page.server';
-import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 
 describe('Login Route', () => {
 	const mockFetch = vi.fn();

@@ -25,14 +25,14 @@ describe('Login Route', () => {
 
 	describe('load()', () => {
 		it('should return supervalidate form', async () => {
-			const result = await load({} as RequestEvent);
+			const result = await load();
 
 			expect(result).toHaveProperty('form');
 			expect(result.form).toBeDefined();
 		});
 
 		it('should initialize form with empty values', async () => {
-			const result = await load({} as RequestEvent);
+			const result = await load();
 
 			expect(result.form.data).toEqual({
 				username: '',

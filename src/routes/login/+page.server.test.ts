@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { RequestEvent } from '@sveltejs/kit';
 import { load, actions } from './+page.server';
 import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 

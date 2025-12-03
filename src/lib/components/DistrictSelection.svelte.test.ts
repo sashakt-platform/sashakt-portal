@@ -3,13 +3,20 @@ import '@testing-library/jest-dom/vitest';
 import { render } from '@testing-library/svelte';
 import DistrictSelection from './DistrictSelection.svelte';
 
-// Mock Filteration component
+const mockFilterationInstances: any[] = [];
+
 vi.mock('./Filteration.svelte', () => ({
-	default: vi.fn().mockImplementation(() => ({
-		render: vi.fn(),
-		$$set: vi.fn(),
-		$destroy: vi.fn()
-	}))
+	default: function MockFilteration(options: any) {
+		const instance = {
+			$$set: vi.fn(),
+			$destroy: vi.fn(),
+			$on: vi.fn(),
+			_props: options?.props || {},
+			_target: options?.target
+		};
+		mockFilterationInstances.push(instance);
+		return instance;
+	}
 }));
 
 // Mock $app/state and $app/navigation

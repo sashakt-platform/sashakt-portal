@@ -7,15 +7,16 @@
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import X from '@lucide/svelte/icons/x';
 	import { fileProxy, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
 	let { data } = $props();
 	const { form, enhance, submit, message } = superForm(data.form, {
-		validators: zodClient(schema),
+		validators: zod4Client(schema),
 		dataType: 'json',
 		onSubmit: () => {
 			$form.user_id = data.user.id;
@@ -106,7 +107,10 @@
 				>
 					Import questions
 				</h2>
-				<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+				<TooltipInfo
+					label="Help: Question Bank"
+					description="Upload a CSV file containing questions. Make sure to follow the template format. After uploading, you will see a summary and can download an error report if there are issues."
+				/>
 			</span>
 			<Label class="my-auto align-middle text-sm font-extralight"
 				>Upload a .csv file to import questions to your question bank</Label

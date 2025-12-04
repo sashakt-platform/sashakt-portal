@@ -14,10 +14,11 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { questionSchema, type FormSchema, type TagFormSchema, QuestionTypeEnum } from './schema';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
 	const {
 		data
@@ -37,7 +38,7 @@
 		submit
 	} = superForm(questionData || data.form, {
 		applyAction: 'never',
-		validators: zodClient(questionSchema),
+		validators: zod4Client(questionSchema),
 		dataType: 'json',
 		onSubmit: () => {
 			$formData.options = totalOptions.map((option) => {
@@ -120,7 +121,10 @@
 						>
 							{questionData ? 'Edit Question' : 'Create a Question'}
 						</h2>
-						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+						<TooltipInfo
+							label="Help: Question Form"
+							description="Here you can add a new question by providing the question text, possible answers, marking scheme, tags, and states. Make sure to mark the correct answer(s) before saving."
+						/>
 					</div>
 				</div>
 				<Label class="my-auto align-middle text-sm font-extralight">

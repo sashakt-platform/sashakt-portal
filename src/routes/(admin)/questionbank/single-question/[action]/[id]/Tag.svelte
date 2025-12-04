@@ -5,7 +5,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { tagSchema, type TagFormSchema } from './schema';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	let {
 		tagTypes,
 		form,
@@ -33,7 +33,7 @@
 		enhance: enhanceTag,
 		submit: submitTag
 	} = superForm(form, {
-		validators: zodClient(tagSchema),
+		validators: zod4Client(tagSchema),
 		dataType: 'json',
 		onSubmit: () => {
 			$formTagData.tag_type_id = $formTagData.tag_type_id;

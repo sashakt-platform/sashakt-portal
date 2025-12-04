@@ -18,7 +18,7 @@ export const marksSchema = z.object({
 });
 
 export const questionSchema = z.object({
-	question_text: z.string().nonempty({ message: 'Question text is required' }),
+	question_text: z.string().min(1, { error: 'Question text is required' }),
 	instructions: z.string().nullable().optional(),
 	question_type: z.nativeEnum(QuestionTypeEnum),
 	options: z.array(optionSchema).min(2).default([]),
@@ -39,7 +39,7 @@ export type FormSchema = typeof questionSchema;
 
 export const tagSchema = z.object({
 	description: z.string().nullable().optional(),
-	name: z.string().nonempty({ message: 'Tag name is required' }),
+	name: z.string().min(1, { error: 'Tag name is required' }),
 	tag_type_id: z.number().nullable().default(null).optional()
 });
 

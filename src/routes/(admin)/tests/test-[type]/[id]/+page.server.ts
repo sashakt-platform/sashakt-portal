@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from './$types.js';
 import { testSchema } from './schema';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
@@ -60,7 +60,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		testData = null;
 	}
 
-	const form = await superValidate(zod(testSchema));
+	const form = await superValidate(zod4(testSchema));
 	form.data.is_template = is_template;
 
 	// extract question dialog pagination and filter parameters
@@ -148,7 +148,7 @@ export const actions: Actions = {
 				requirePermission(user, PERMISSIONS.UPDATE_TEST);
 			}
 		}
-		const form = await superValidate(request, zod(testSchema));
+		const form = await superValidate(request, zod4(testSchema));
 		if (!form.valid) {
 			setFlash(
 				{ type: 'error', message: 'Test not Created. Please check all the details.' },
@@ -158,6 +158,8 @@ export const actions: Actions = {
 		}
 		const transformedFormData = {
 			...form.data,
+			start_time: form.data.start_time || null,
+			end_time: form.data.end_time || null,
 			state_ids: form.data.state_ids.map((s) => s.id),
 			tag_ids: form.data.tag_ids.map((t) => t.id),
 			district_ids: form.data.district_ids.map((d) => d.id),

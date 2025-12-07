@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from './$types.js';
 import { tagSchema, tagTypeSchema } from './schema';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
@@ -68,8 +68,8 @@ export const load: PageServerLoad = async ({ params, cookies }: any) => {
 		console.error('Error fetching tag types:', error);
 	}
 
-	const tagForm = await superValidate(zod(tagSchema));
-	const tagTypeForm = await superValidate(zod(tagTypeSchema));
+	const tagForm = await superValidate(zod4(tagSchema));
+	const tagTypeForm = await superValidate(zod4(tagTypeSchema));
 
 	return {
 		tagForm,
@@ -97,7 +97,7 @@ export const actions: Actions = {
 		}
 		const form = await superValidate(
 			request,
-			zod(params.type == 'tag' ? tagSchema : tagTypeSchema)
+			zod4(params.type == 'tag' ? tagSchema : tagTypeSchema)
 		);
 		if (!form.valid) {
 			setFlash(

@@ -5,7 +5,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { tagSchema, type TagFormSchema, tagTypeSchema, type TagTypeFormSchema } from './schema';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
@@ -29,7 +29,7 @@
 		enhance,
 		submit
 	} = superForm(tagData || (data.type == 'tag' ? data.tagForm : data.tagTypeForm), {
-		validators: zodClient(data.type == 'tag' ? tagSchema : tagTypeSchema),
+		validators: zod4Client(data.type == 'tag' ? tagSchema : tagTypeSchema),
 		dataType: 'json',
 		onSubmit: () => {
 			if (data.type == 'tagtype') {

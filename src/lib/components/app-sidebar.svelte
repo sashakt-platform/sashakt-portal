@@ -182,7 +182,7 @@
 					<DropdownMenu.Content
 						side="top"
 						align="end"
-						class="w-[--bits-dropdown-menu-anchor-width]"
+						class="w-(--bits-dropdown-menu-anchor-width)"
 					>
 						<DropdownMenu.Item>
 							<a

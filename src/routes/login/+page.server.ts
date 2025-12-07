@@ -2,21 +2,22 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { loginSchema, resetSchema } from './schema';
 import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 import { setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async () => {
 	return {
-		loginForm: await superValidate(zod(loginSchema)),
-		resetForm: await superValidate(zod(resetSchema))
+		loginForm: await superValidate(zod4(loginSchema)),
+		resetForm: await superValidate(zod4(resetSchema))
 	};
 };
 
 export const actions: Actions = {
 	login: async ({ request, cookies }) => {
-		const form = await superValidate(request, zod(loginSchema));
+		const form = await superValidate(request, zod4(loginSchema));
+
 		if (!form.valid) {
 			return fail(400, {
 				form

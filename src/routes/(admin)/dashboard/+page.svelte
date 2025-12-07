@@ -3,7 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
-	import Info from '@lucide/svelte/icons/info';
+	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
 	// lazy-loaded components
 	let DistrictSelection: Component | null = $state(null);
@@ -28,10 +28,6 @@
 		overall_score_percent: 0,
 		overall_avg_time_minutes: 0
 	});
-
-	let filteredStates: Filter[] = $state([]);
-	let filteredTagtypes: Filter[] = $state([]);
-	let filteredDistricts: Filter[] = $state([]);
 
 	// loading states
 	let isLoadingStats = $state(true);
@@ -179,23 +175,11 @@
 		}
 	}
 
-	// watch for filter changes and reload analytics
-	$effect(() => {
-		if (areFiltersLoaded) {
-			loadAnalyticsStats({
-				states: filteredStates,
-				districts: filteredDistricts,
-				tagTypes: filteredTagtypes
-			});
-		}
-	});
-
 	// initial load effect
 	$effect(() => {
 		(async () => {
 			await loadDashboardStats();
 			await loadTestAttemptStats();
-			await Promise.all([loadAnalyticsStats(), loadFilterComponents()]);
 		})();
 	});
 </script>
@@ -245,7 +229,10 @@
 		>
 			Dashboard
 		</h2>
-		<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+		<TooltipInfo
+			label="Help: Dashboard"
+			description="Dashboard provides a quick overview of your organization's activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
+		/>
 	</span>
 </div>
 
@@ -287,48 +274,6 @@
 				testAttemptStats.not_submitted_inactive,
 				false,
 				isLoadingTestStats
-			)}
-		</div>
-	</div>
-	<div class="rounded-xl bg-white p-4">
-		<div class="mb-4">
-			<p class="font-semibold">Score & Duration Analysis</p>
-		</div>
-		<div class="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-			{#if areFiltersLoaded && StateSelection && DistrictSelection && TagTypeSelection}
-				<div>
-					<StateSelection bind:states={filteredStates} filteration={true} />
-				</div>
-				<div>
-					<DistrictSelection
-						bind:districts={filteredDistricts}
-						selectedStates={filteredStates}
-						filteration={true}
-					/>
-				</div>
-				<div>
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
-				</div>
-			{:else}
-				<div class="h-10 animate-pulse rounded bg-gray-200"></div>
-				<div class="h-10 animate-pulse rounded bg-gray-200"></div>
-				<div class="h-10 animate-pulse rounded bg-gray-200"></div>
-			{/if}
-		</div>
-		<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-			{@render dataBox(
-				'Percentage Scored',
-				'',
-				overallAnalyticsStats.overall_score_percent,
-				true,
-				isLoadingAnalytics
-			)}
-			{@render dataBox(
-				'Average Time Taken (Minutes)',
-				'',
-				overallAnalyticsStats.overall_avg_time_minutes,
-				false,
-				isLoadingAnalytics
 			)}
 		</div>
 	</div>

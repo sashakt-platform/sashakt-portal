@@ -1,5 +1,8 @@
 # Sashakt Admin Portal
 
+[![codecov](https://codecov.io/gh/sashakt-platform/sashakt-portal/graph/badge.svg?token=QWAAIN9EB7)](https://codecov.io/gh/sashakt-platform/sashakt-portal)
+[![Test status](https://github.com/sashakt-platform/sashakt-portal/actions/workflows/test-run.yml/badge.svg)](https://github.com/sashakt-platform/sashakt-portal/actions/workflows/test-run.yml)
+
 This builds the frontend interface for managing Sashakt platform.
 
 ## Developing
@@ -25,4 +28,4 @@ You can preview the production build with `npm run preview`.
 
 ## Deployment
 
-TBD
+This happens via CI/CD

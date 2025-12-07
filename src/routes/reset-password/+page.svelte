@@ -3,7 +3,7 @@
 	import type { PageData } from './$types.js';
 	import UpdatePassword from './UpdatePassword.svelte';
 
-	let { data }: { data: PageData; event: Event } = $props();
+	let { data }: { data: PageData } = $props();
 </script>
 
 <div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">

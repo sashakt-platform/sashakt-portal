@@ -26,21 +26,21 @@ describe('Login Route', () => {
 		it('should return supervalidate form', async () => {
 			const result = await load();
 
-			expect(result).toHaveProperty('form');
-			expect(result.form).toBeDefined();
+			expect(result).toHaveProperty('loginForm');
+			expect(result.loginForm).toBeDefined();
 		});
 
 		it('should initialize form with empty values', async () => {
 			const result = await load();
 
-			expect(result.form.data).toEqual({
+			expect(result.loginForm.data).toEqual({
 				username: '',
 				password: ''
 			});
 		});
 	});
 
-	describe('actions.default (login)', () => {
+	describe('actions.login', () => {
 		it('should fail with 400 when form validation fails', async () => {
 			const mockRequest = new Request('http://localhost', {
 				method: 'POST',
@@ -58,7 +58,7 @@ describe('Login Route', () => {
 				serialize: vi.fn()
 			};
 
-			const result = await actions.default({
+			const result = await actions.login({
 				request: mockRequest,
 				cookies: mockCookies
 			} as any);
@@ -95,7 +95,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.default({
+				await actions.login({
 					request: mockRequest,
 					cookies: mockCookies
 				} as any);
@@ -141,7 +141,7 @@ describe('Login Route', () => {
 				})
 			});
 
-			const result = await actions.default({
+			const result = await actions.login({
 				request: mockRequest,
 				cookies: mockCookies
 			} as any);
@@ -177,7 +177,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.default({
+				await actions.login({
 					request: mockRequest,
 					cookies: mockCookies
 				} as any);
@@ -226,7 +226,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.default({
+				await actions.login({
 					request: mockRequest,
 					cookies: mockCookies
 				} as any);

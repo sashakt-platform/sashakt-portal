@@ -1,6 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/server';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types';
 import { updatePasswordSchema } from './schema';
 import { BACKEND_URL } from '$env/static/private';
@@ -10,13 +10,13 @@ export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('token') || '';
 
 	return {
-		form: await superValidate({ token }, zod(updatePasswordSchema))
+		form: await superValidate({ token }, zod4(updatePasswordSchema))
 	};
 };
 
 export const actions: Actions = {
 	update: async ({ request, cookies }) => {
-		const form = await superValidate(request, zod(updatePasswordSchema));
+		const form = await superValidate(request, zod4(updatePasswordSchema));
 		if (!form.valid) {
 			return fail(400, { form });
 		}

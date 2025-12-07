@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Info from '@lucide/svelte/icons/info';
-	import History from '@lucide/svelte/icons/history';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -245,8 +244,8 @@
 						{@render snippetHeading('States')}
 						<StateSelection bind:states={$formData.state_ids} />
 						<div class="mt-6 flex items-center space-x-2 lg:mt-12">
-							<Switch id="airplane-mode" bind:checked={$formData.is_active} />
-							<Label for="airplane-mode">Active</Label><Info
+							<Switch id="is-active" bind:checked={$formData.is_active} />
+							<Label for="is-active">Is Active?</Label><Info
 								class="my-auto w-4 align-middle text-xs text-gray-600"
 							/>
 						</div>

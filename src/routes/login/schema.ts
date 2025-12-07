@@ -9,8 +9,3 @@ export const loginSchema = z.object({
 });
 
 export type FormSchema = typeof loginSchema;
-
-export const resetPasswordSchema = z.object({
-	email: z.email({ error: 'Enter a valid email' })
-});
-export type ResetPasswordFormSchema = typeof resetPasswordSchema;

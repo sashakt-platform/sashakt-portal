@@ -20,7 +20,7 @@
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Email</Form.Label>
-				<Input {...props} bind:value={$formData.username} />
+				<Input {...props} bind:value={$formData.username} autocomplete="email" />
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

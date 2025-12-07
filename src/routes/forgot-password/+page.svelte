@@ -28,7 +28,7 @@
 			{#if !emailSent}
 				<Card.Header class="space-y-3 pb-6 text-center">
 					<Card.Title class="text-3xl font-bold text-gray-800">Forgot Password</Card.Title>
-					<Card.Description>Please enter your registed email.</Card.Description>
+					<Card.Description>Please enter your registered email.</Card.Description>
 				</Card.Header>
 			{/if}
 			<Card.Content class="px-8 pb-8">
@@ -63,7 +63,12 @@
 							<Form.Control>
 								{#snippet children({ props })}
 									<Form.Label>Email</Form.Label>
-									<Input {...props} bind:value={$formData.email} type="email" />
+									<Input
+										{...props}
+										bind:value={$formData.email}
+										type="email"
+										autocomplete="email"
+									/>
 								{/snippet}
 							</Form.Control>
 							<Form.FieldErrors />

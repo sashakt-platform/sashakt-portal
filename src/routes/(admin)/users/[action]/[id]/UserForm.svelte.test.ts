@@ -159,13 +159,13 @@ describe('UserForm Component', () => {
 			// Test active user
 			const activeData = createTestData({ is_active: true });
 			const { container: activeContainer } = render(UserForm, { data: activeData });
-			const activeCheckbox = activeContainer.querySelector('button[role="checkbox"]');
+			const activeCheckbox = activeContainer.querySelector('button[role="switch"]');
 			expect(activeCheckbox).toHaveAttribute('data-state', 'checked');
 
 			// Test inactive user
 			const inactiveData = createTestData({ is_active: false });
 			const { container: inactiveContainer } = render(UserForm, { data: inactiveData });
-			const inactiveCheckbox = inactiveContainer.querySelector('button[role="checkbox"]');
+			const inactiveCheckbox = inactiveContainer.querySelector('button[role="switch"]');
 			expect(inactiveCheckbox).toHaveAttribute('data-state', 'unchecked');
 		});
 

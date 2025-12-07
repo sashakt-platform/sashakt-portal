@@ -1,24 +1,24 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { resetSchema, type ResetFormSchema } from './schema';
+	import { resetPasswordSchema, type ResetPasswordFormSchema } from './schema';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 
 	let {
 		data
 	}: {
-		data: { form: SuperValidated<Infer<ResetFormSchema>> };
+		data: { form: SuperValidated<Infer<ResetPasswordFormSchema>> };
 	} = $props();
 
 	const form = superForm(data.form, {
 		id: 'resetPasswordForm',
-		validators: zodClient(resetSchema)
+		validators: zod4Client(resetPasswordSchema)
 	});
-	const { form: formData, enhance, message } = form;
+	const { form: formData, enhance } = form;
 </script>
 
-<form method="POST" action="?/reset" use:enhance class="space-y-4">
+<form method="POST" action="?/resetpassword" use:enhance class="space-y-4">
 	<Form.Field {form} name="email">
 		<Form.Control>
 			{#snippet children({ props })}

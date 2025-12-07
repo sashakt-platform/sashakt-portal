@@ -104,7 +104,7 @@
 						</Button>
 					</div>
 				{:else}
-					<ResetPasswordForm data={{ form: data.resetForm }} />
+					<ResetPasswordForm data={{ form: data.resetPasswordForm }} />
 					<div class="mt-4 text-right">
 						<button
 							type="button"

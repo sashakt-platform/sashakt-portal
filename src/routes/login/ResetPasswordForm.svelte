@@ -29,5 +29,5 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button class=" mt-4 w-full  py-5 ">Send Reset Link</Form.Button>
+	<Form.Button class="mt-4 w-full py-5">Send Reset Link</Form.Button>
 </form>

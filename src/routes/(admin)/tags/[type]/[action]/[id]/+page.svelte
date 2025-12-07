@@ -111,7 +111,7 @@
 			>
 			<div class="flex gap-2">
 				<Button class="bg-primary" onclick={submit} disabled={$formData.name?.trim() === ''}
-					>Save {title}</Button
+					>Save</Button
 				>
 			</div>
 		</div>

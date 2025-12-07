@@ -209,6 +209,6 @@
 		<Button variant="outline" type="button">
 			<a href="/users" class="block">Cancel</a>
 		</Button>
-		<Form.Button>Save User</Form.Button>
+		<Form.Button>Save</Form.Button>
 	</div>
 </form>

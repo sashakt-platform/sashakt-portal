@@ -91,7 +91,7 @@ describe('UserForm Component', () => {
 			expect(screen.getByText('Role')).toBeInTheDocument();
 
 			// Check buttons
-			expect(screen.getByRole('button', { name: /Save User/i })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Save/i })).toBeInTheDocument();
 			const cancelLink = screen.getByRole('link', { name: /Cancel/i });
 			expect(cancelLink).toBeInTheDocument();
 			expect(cancelLink).toHaveAttribute('href', '/users');

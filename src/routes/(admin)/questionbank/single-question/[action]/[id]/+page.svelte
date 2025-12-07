@@ -285,7 +285,7 @@
 					disabled={$formData?.question_text?.trim() === '' ||
 						totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
 						!totalOptions.some((option) => option.correct_answer)}
-					onclick={submit}>Save Question</Button
+					onclick={submit}>Save</Button
 				>
 			</div>
 		</div>

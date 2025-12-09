@@ -8,13 +8,14 @@ import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.j
 
 export const load: PageServerLoad = async () => {
 	return {
-		form: await superValidate(zod4(loginSchema))
+		loginForm: await superValidate(zod4(loginSchema))
 	};
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	login: async ({ request, cookies }) => {
 		const form = await superValidate(request, zod4(loginSchema));
+
 		if (!form.valid) {
 			return fail(400, {
 				form

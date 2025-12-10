@@ -50,6 +50,9 @@ export const PERMISSIONS = {
 	DELETE_QUESTION: 'delete_question',
 	READ_QUESTION: 'read_question',
 
+	//Question Location Permission
+	UPDATE_QUESTION_LOCATION: 'update_question_location',
+
 	// Test permissions
 	CREATE_TEST: 'create_test',
 	UPDATE_TEST: 'update_test',
@@ -119,6 +122,9 @@ export const ENTITY_PERMISSIONS = {
 		read: PERMISSIONS.READ_QUESTION,
 		update: PERMISSIONS.UPDATE_QUESTION,
 		delete: PERMISSIONS.DELETE_QUESTION
+	},
+	question_location: {
+		update: PERMISSIONS.UPDATE_QUESTION_LOCATION
 	},
 	test: {
 		create: PERMISSIONS.CREATE_TEST,

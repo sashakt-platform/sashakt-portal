@@ -137,20 +137,23 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="overflow-clip  p-0 sm:h-[90%] sm:max-w-[95%]" preventScroll={false}>
+	<Dialog.Content
+		class="max-h-[95vh] overflow-clip p-0 sm:h-[90%] sm:max-w-[95%]"
+		preventScroll={false}
+	>
 		<div class="flex h-full flex-col">
-			<Dialog.Header class="  border-b-2 ">
+			<Dialog.Header class="border-b-2">
 				<Dialog.Title class="h-fit"
-					><div class="ml-6 flex py-4 text-xl">
+					><div class="ml-4 flex py-3 text-base sm:ml-6 sm:py-4 sm:text-xl">
 						<p>Select questions from question bank</p>
 						<Info class="my-auto ml-2 w-4" />
 					</div></Dialog.Title
 				>
 			</Dialog.Header>
 
-			<div class="m-4 flex h-full flex-col gap-8">
-				<div class="flex flex-row items-center gap-4">
-					<div class="mr-8 w-1/3">
+			<div class="m-2 flex h-full flex-col gap-4 sm:m-4 sm:gap-8">
+				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+					<div class="w-full lg:mr-8">
 						<Input
 							type="search"
 							placeholder="Search questions..."
@@ -171,10 +174,10 @@
 							}}
 						></Input>
 					</div>
-					<div class="w-1/3">
+					<div class="w-full">
 						<TagsSelection bind:tags filteration={true} />
 					</div>
-					<div class="w-1/3">
+					<div class="w-full sm:col-span-2 lg:col-span-1">
 						<StateSelection bind:states filteration={true} />
 					</div>
 				</div>
@@ -200,10 +203,15 @@
 					</div>
 
 					<!-- fixed bottom bar -->
-					<div class="absolute right-0 bottom-0 left-0 border-t bg-white p-4">
-						<div class="flex items-center justify-between">
-							<Button class="bg-primary hover:bg-primary/90" onclick={handleSelectionConfirm}>
-								Add to Test {$formData.is_template ? ' Template' : ''}
+					<div class="absolute right-0 bottom-0 left-0 border-t bg-white p-3 sm:p-4">
+						<div
+							class="flex flex-col-reverse items-center justify-between gap-2 sm:flex-row sm:gap-0"
+						>
+							<Button
+								class="bg-primary hover:bg-primary/90 w-full sm:w-auto"
+								onclick={handleSelectionConfirm}
+							>
+								Add to Test{$formData.is_template ? ' Template' : ''}
 							</Button>
 
 							<div class="text-muted-foreground text-sm">

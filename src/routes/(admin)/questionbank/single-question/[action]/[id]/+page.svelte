@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Info from '@lucide/svelte/icons/info';
-	import History from '@lucide/svelte/icons/history';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -112,12 +111,12 @@
 				/>
 			</div>
 		{/snippet}
-		<div class="mx-10 flex flex-row">
+		<div class="mx-4 flex flex-col gap-4 sm:mx-6 md:mx-10 md:flex-row">
 			<div class="my-auto flex flex-col">
-				<div class=" flex w-full items-center align-middle">
+				<div class="flex w-full items-center align-middle">
 					<div class="flex flex-row">
 						<h2
-							class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 						>
 							{questionData ? 'Edit Question' : 'Create a Question'}
 						</h2>
@@ -132,16 +131,18 @@
 				</Label>
 			</div>
 			<div
-				class={['text-primary my-auto ml-auto flex cursor-pointer flex-row gap-2 p-4 font-bold']}
+				class={[
+					'text-primary my-auto flex cursor-pointer flex-row gap-2 p-2 font-bold md:ml-auto md:p-4'
+				]}
 			>
 				{#if questionData}
 					<QuestionRevision {data} />
 				{/if}
 			</div>
 		</div>
-		<div class="mx-10 flex flex-col gap-8 bg-white p-9">
-			<div class="flex flex-row">
-				<div class="flex w-3/5 flex-col gap-4 pr-8">
+		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-8 md:p-9">
+			<div class="flex flex-col gap-6 lg:flex-row lg:gap-0">
+				<div class="flex w-full flex-col gap-4 lg:w-3/5 lg:pr-8">
 					<div class="flex flex-col gap-2">
 						{@render snippetHeading('Question')}
 						<Textarea
@@ -219,8 +220,8 @@
 						</div>
 					</div>
 				</div>
-				<div class="flex w-2/5 flex-col pl-8">
-					<div class="flex h-1/2 flex-col gap-2">
+				<div class="flex w-full flex-col gap-6 lg:w-2/5 lg:gap-4 lg:pl-8">
+					<div class="flex flex-col gap-2">
 						{@render snippetHeading('Tags')}
 						<TagsSelection bind:tags={$formData.tag_ids} />
 						<Dialog.Root bind:open={openTagDialog}>
@@ -229,44 +230,48 @@
 								class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
 								><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
 							>
-							<Dialog.Content class="p-4 px-0 sm:h-[70%] sm:max-w-[45%]">
-								<Dialog.Header class="m-0 h-fit  border-b-2 py-4">
-									<Dialog.Title class="px-8 ">Create new tag</Dialog.Title>
+							<Dialog.Content
+								class="max-h-[90vh] p-4 px-0 sm:h-[70%] sm:max-w-[90%] md:max-w-[70%] lg:max-w-[45%]"
+							>
+								<Dialog.Header class="m-0 h-fit border-b-2 py-4">
+									<Dialog.Title class="px-8">Create new tag</Dialog.Title>
 								</Dialog.Header>
 								<Tag tagTypes={data.tagTypes} form={data.tagForm} bind:open={openTagDialog} />
 							</Dialog.Content>
 						</Dialog.Root>
 					</div>
-					<div class="flex h-1/2 flex-col gap-2">
+					<div class="flex flex-col gap-2">
 						{@render snippetHeading('States')}
 						<StateSelection bind:states={$formData.state_ids} />
-						<div class="mt-12 flex items-center space-x-2">
-							<Switch id="airplane-mode" bind:checked={$formData.is_active} />
-							<Label for="airplane-mode">Active</Label><Info
+						<div class="mt-6 flex items-center space-x-2 lg:mt-12">
+							<Switch id="is-active" bind:checked={$formData.is_active} />
+							<Label for="is-active">Is Active?</Label><Info
 								class="my-auto w-4 align-middle text-xs text-gray-600"
 							/>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="flex flex-row gap-8">
-				<div class="flex w-1/2 flex-row gap-4">
+			<div class="flex flex-col gap-6 md:flex-row md:gap-8">
+				<div class="flex w-full flex-row gap-4 md:w-1/2">
 					<div class="flex w-full flex-col gap-2">
 						{@render snippetHeading('Additional Instructions')}
 						<Textarea name="instructions" bind:value={$formData.instructions} placeholder="" />
 					</div>
 				</div>
-				<div class="flex w-1/2 flex-row gap-4">
+				<div class="flex w-full flex-row gap-4 md:w-1/2">
 					<div class="flex w-full flex-col gap-2">
 						{@render snippetHeading('Marking Scheme')}
-						<div class="flex h-full flex-row gap-2 rounded-lg border border-gray-100 p-4">
-							<p class="my-auto w-1/2">Marks for correct answer</p>
+						<div
+							class="flex h-full flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row"
+						>
+							<p class="my-auto sm:w-1/2">Marks for correct answer</p>
 							<input
 								type="number"
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
 								min="1"
-								class=" rounded-sm border-1 border-gray-300 p-2"
+								class="w-full rounded-sm border-1 border-gray-300 p-2 sm:w-auto"
 							/>
 						</div>
 					</div>
@@ -274,18 +279,20 @@
 			</div>
 		</div>
 	</div>
-	<div class="sticky bottom-0 my-4 flex w-full border-t-4 bg-white p-4">
-		<div class="flex w-full justify-between">
-			<a href="/questionbank"
-				><Button variant="outline" class="text-primary border-primary border-1">Cancel</Button></a
-			>
+	<div class="sticky bottom-0 my-2 flex w-full border-t-4 bg-white p-3 sm:my-4 sm:p-4">
+		<div class="flex w-full justify-between gap-2">
+			<a href="/questionbank">
+				<Button variant="outline" class="text-primary border-primary border-1 text-sm sm:text-base"
+					>Cancel</Button
+				>
+			</a>
 			<div class="flex gap-2">
 				<Button
-					class="bg-primary"
+					class="bg-primary text-sm sm:text-base"
 					disabled={$formData?.question_text?.trim() === '' ||
 						totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
 						!totalOptions.some((option) => option.correct_answer)}
-					onclick={submit}>Save Question</Button
+					onclick={submit}>Save</Button
 				>
 			</div>
 		</div>

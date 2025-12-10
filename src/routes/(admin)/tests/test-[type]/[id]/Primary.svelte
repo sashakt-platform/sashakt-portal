@@ -18,7 +18,7 @@
 		<div class="h-full w-full text-left">
 			<div>
 				<div class="flex align-middle">
-					<Label for="template-name" class="text-2xl"
+					<Label for="template-name" class="text-xl md:text-2xl"
 						>{$formData.is_template ? 'Test template name' : 'Test name'}</Label
 					><span><Info class="m-2 w-4 text-xs text-gray-600" /></span>
 				</div>
@@ -37,36 +37,36 @@
 				>
 			</div>
 
-			<div class="mt-10">
+			<div class="mt-6 md:mt-10">
 				<div class="flex align-middle">
-					<Label for="template-name" class="text-2xl">Description</Label><span
+					<Label for="template-name" class="text-xl md:text-2xl">Description</Label><span
 						><Info class="m-2 w-4 text-xs text-gray-600" /></span
 					>
 				</div>
 				<Textarea placeholder="" name="description" bind:value={$formData.description} />
 			</div>
 
-			<div class="flex flex-row gap-8">
-				<div class="mt-10 w-1/3">
+			<div class="flex flex-col gap-6 md:flex-row md:gap-8">
+				<div class="mt-6 w-full md:mt-10 md:w-1/3">
 					<div class="flex align-middle">
-						<Label for="template-name" class="text-2xl">Tags</Label><span
+						<Label for="template-name" class="text-xl md:text-2xl">Tags</Label><span
 							><Info class="m-2 w-4 text-xs text-gray-600" /></span
 						>
 					</div>
 					<TagsSelection bind:tags={$formData.tag_ids} />
 				</div>
 
-				<div class="mt-10 w-1/3">
+				<div class="mt-6 w-full md:mt-10 md:w-1/3">
 					<div class="flex align-middle">
-						<Label for="template-name" class="text-2xl">States</Label><span
+						<Label for="template-name" class="text-xl md:text-2xl">States</Label><span
 							><Info class="m-2 w-4 text-xs text-gray-600" /></span
 						>
 					</div>
 					<StateSelection bind:states={$formData.state_ids} filteration={true} />
 				</div>
-				<div class="mt-10 w-1/3">
+				<div class="mt-6 w-full md:mt-10 md:w-1/3">
 					<div class="flex align-middle">
-						<Label for="template-name" class="text-2xl">Districts</Label><span
+						<Label for="template-name" class="text-xl md:text-2xl">Districts</Label><span
 							><Info class="m-2 w-4 text-xs text-gray-600" /></span
 						>
 					</div>

@@ -124,11 +124,13 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Field {form} name="is_active">
+		<Form.Field {form} name="is_active" class="my-auto">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Switch id="is-active" bind:checked={$formData.is_active} />
-					<Form.Label>Is Active?</Form.Label>
+					<div class="flex items-center gap-2">
+						<Switch id="is-active" bind:checked={$formData.is_active} />
+						<Form.Label>Is Active?</Form.Label>
+					</div>
 				{/snippet}
 			</Form.Control>
 			<Form.FieldErrors />

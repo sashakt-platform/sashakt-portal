@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { fireEvent, render, screen } from '@testing-library/svelte';
+import { render, screen } from '@testing-library/svelte';
 import ImportQuestions from './+page.svelte';
 
 // Mock sveltekit-superforms so fileProxy never touches DataTransfer

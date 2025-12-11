@@ -10,7 +10,7 @@
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 
 	let { formData } = $props();
-	let selectedStates = $derived(formData?.state_ids || []);
+	let selectedStates = $derived($formData.state_ids || []);
 </script>
 
 <div class=" mx-auto flex w-full items-center justify-center">

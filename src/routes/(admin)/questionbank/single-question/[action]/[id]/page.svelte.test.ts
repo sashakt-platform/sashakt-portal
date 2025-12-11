@@ -38,7 +38,7 @@ describe('Single Question +page.svelte', () => {
 		expect(screen.getAllByRole('textbox').length).toBeGreaterThanOrEqual(4);
 		expect(inputs.length).toBeGreaterThan(1);
 	});
-	test('disables Save button intestially when required fields are empty', () => {
+	test('disables Save button initially when required fields are empty', () => {
 		render(SingleQuestionPage, { data: baseData as any });
 		const saveButton = screen.getByRole('button', { name: /Save/i });
 		expect(saveButton).toBeDisabled();
@@ -79,14 +79,12 @@ describe('Single Question +page.svelte', () => {
 	test('removes an answer when Trash icon is clicked', async () => {
 		render(SingleQuestionPage, { data: baseData as any });
 
-		const trashIcons = document.querySelectorAll('svg[data-testid="trash-icon"]');
+		const trashIcons = screen.getAllByTestId('trash-icon');
 		const initialInputs = screen.getAllByRole('textbox');
 
-		if (trashIcons.length > 0) {
-			await fireEvent.click(trashIcons[0]);
-			const updatedInputs = screen.getAllByRole('textbox');
-			expect(updatedInputs.length).toBe(initialInputs.length - 1);
-		}
+		await fireEvent.click(trashIcons[0]);
+		const updatedInputs = screen.getAllByRole('textbox');
+		expect(updatedInputs.length).toBe(initialInputs.length - 1);
 	});
 	test('toggles mandatory checkbox', async () => {
 		render(SingleQuestionPage, { data: baseData as any });

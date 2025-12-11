@@ -186,6 +186,7 @@
 									]}
 								>
 									<Trash_2
+										data-testid="trash-icon"
 										class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
 										onclick={() => {
 											if (totalOptions.length > 1) {

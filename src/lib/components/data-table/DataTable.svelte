@@ -62,17 +62,27 @@
 	// state for expanded rows
 	let expanded = $state({});
 
-	// initialize row selection state with preselected IDs
-	const initialSelection: RowSelectionState = {};
-	if (enableSelection && preSelectedIds.length > 0) {
-		preSelectedIds.forEach((id) => {
-			const rowId = String(id);
-			initialSelection[rowId] = true;
-		});
-	}
+	// compute initial row selection state with preselected IDs
+	const initialSelection = $derived.by(() => {
+		const selection: RowSelectionState = {};
+		if (enableSelection && preSelectedIds.length > 0) {
+			preSelectedIds.forEach((id) => {
+				const rowId = String(id);
+				selection[rowId] = true;
+			});
+		}
+		return selection;
+	});
 
-	// state for row selection
-	let rowSelection = $state<RowSelectionState>(initialSelection);
+	// state for row selection - initialize with computed initial selection
+	let rowSelection = $state<RowSelectionState>({});
+
+	// effect to set initial selection when preSelectedIds change
+	$effect(() => {
+		if (enableSelection && preSelectedIds.length > 0) {
+			rowSelection = { ...initialSelection };
+		}
+	});
 
 	// effect to clear selection when clearSelection is true
 	$effect(() => {

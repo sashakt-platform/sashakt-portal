@@ -22,9 +22,9 @@
 	} = $props();
 	let open = $state(false);
 	let searchQuery = $state('');
-	const placeholder = multiple
-		? 'Select ' + (label ?? itemName) + 's'
-		: 'Select ' + (label ?? itemName);
+	const placeholder = $derived(
+		multiple ? 'Select ' + (label ?? itemName) + 's' : 'Select ' + (label ?? itemName)
+	);
 
 	// Debounced search
 	let searchTimeout: NodeJS.Timeout | undefined;

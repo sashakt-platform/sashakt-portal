@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Label from '$lib/components/ui/label/label.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 
 	const { data } = $props();
 
@@ -15,14 +15,14 @@
 </script>
 
 <Dialog.Root bind:open={openPreviewDialog}>
-	<Label
+	<Button
+		variant="default"
 		onclick={() => (openPreviewDialog = true)}
-		class="ml-2  inline-flex cursor-pointer items-center
- justify-center  rounded-md px-4 py-1 text-sm font-medium text-white  hover:opacity-90  "
+		class="ml-2 rounded-md px-4 py-1 text-sm font-medium"
 		style="background-color: #0264a1;"
 	>
 		Preview question
-	</Label>
+	</Button>
 	<Dialog.Overlay class="fixed  bg-black/30 backdrop-blur-sm" />
 
 	<Dialog.Content

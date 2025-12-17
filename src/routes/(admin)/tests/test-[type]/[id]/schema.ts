@@ -11,6 +11,11 @@ export enum MarksLevel {
 	TEST = 'test'
 }
 
+export enum Locales {
+	HI_IN = 'HI_IN',
+	EN_US = 'EN_US'
+}
+
 export const testSchema = z.object({
 	name: z.string(),
 	description: z.string(),
@@ -45,7 +50,8 @@ export const testSchema = z.object({
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
-	candidate_profile: z.boolean().default(false)
+	candidate_profile: z.boolean().default(false),
+	locale: z.nativeEnum(Locales).default(Locales.EN_US)
 });
 
 export type FormSchema = typeof testSchema;

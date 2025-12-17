@@ -98,12 +98,12 @@
 		{/if}
 	</Dialog.Content>
 </Dialog.Root>
-<div class="mx-10 flex flex-col gap-20">
-	<div class="mt-10 flex flex-row">
+<div class="mx-4 flex flex-col gap-10 sm:mx-6 md:mx-10 md:gap-20">
+	<div class="mt-6 flex flex-col gap-4 sm:mt-10 sm:flex-row sm:gap-0">
 		<div class="align-left flex flex-col">
 			<span class="flex flex-row">
 				<h2
-					class="mr-2 w-fit scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+					class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 				>
 					Import questions
 				</h2>
@@ -116,16 +116,18 @@
 				>Upload a .csv file to import questions to your question bank</Label
 			>
 		</div>
-		<div class="ml-auto">
-			<Button variant="outline" class="text-primary border-primary cursor-pointer bg-transparent"
+		<div class="sm:ml-auto">
+			<Button
+				variant="outline"
+				class="text-primary border-primary w-full cursor-pointer bg-transparent sm:w-auto"
 				><a href={BulkTemplate} download="template.csv">Download Template</a></Button
 			>
 		</div>
 	</div>
 
-	<div class="flex flex-row justify-between">
-		<div class="mr-4 h-fit w-1/4 rounded-xl bg-white p-6 shadow-lg">
-			<p class="mb-4 text-2xl font-semibold" style="color:#0369A1">Instructions</p>
+	<div class="flex flex-col justify-between gap-6 lg:flex-row lg:gap-0">
+		<div class="h-fit w-full rounded-xl bg-white p-4 shadow-lg sm:p-6 lg:mr-4 lg:w-1/4">
+			<p class="mb-4 text-xl font-semibold sm:text-2xl" style="color:#0369A1">Instructions</p>
 			<ol class="list-inside list-decimal text-sm" style="color: #525252;">
 				<li class="mb-4">
 					Download the CSV template or upload your own with appropriate tags & details.
@@ -138,7 +140,7 @@
 				</li>
 			</ol>
 		</div>
-		<div class="w-3/4 bg-white shadow-lg">
+		<div class="w-full bg-white shadow-lg lg:w-3/4">
 			<form method="POST" enctype="multipart/form-data" use:enhance>
 				<input type="file" hidden name="file" bind:files={$file} accept=".csv" />
 

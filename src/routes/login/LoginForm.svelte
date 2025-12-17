@@ -8,18 +8,19 @@
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
 	const form = superForm(data.form, {
+		id: 'loginForm',
 		validators: zod4Client(loginSchema)
 	});
 
 	const { form: formData, enhance } = form;
 </script>
 
-<form method="POST" use:enhance>
+<form method="POST" action="?/login" use:enhance>
 	<Form.Field {form} name="username">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label>Email</Form.Label>
-				<Input {...props} bind:value={$formData.username} />
+				<Input {...props} bind:value={$formData.username} autocomplete="email" />
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
@@ -33,5 +34,5 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Button>Login</Form.Button>
+	<Form.Button class=" mt-4 w-full  py-5 ">Login</Form.Button>
 </form>

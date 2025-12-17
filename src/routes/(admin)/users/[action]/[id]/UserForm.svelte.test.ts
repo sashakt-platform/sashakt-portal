@@ -91,7 +91,7 @@ describe('UserForm Component', () => {
 			expect(screen.getByText('Role')).toBeInTheDocument();
 
 			// Check buttons
-			expect(screen.getByRole('button', { name: /Save User/i })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Save/i })).toBeInTheDocument();
 			const cancelLink = screen.getByRole('link', { name: /Cancel/i });
 			expect(cancelLink).toBeInTheDocument();
 			expect(cancelLink).toHaveAttribute('href', '/users');
@@ -159,13 +159,13 @@ describe('UserForm Component', () => {
 			// Test active user
 			const activeData = createTestData({ is_active: true });
 			const { container: activeContainer } = render(UserForm, { data: activeData });
-			const activeCheckbox = activeContainer.querySelector('button[role="checkbox"]');
+			const activeCheckbox = activeContainer.querySelector('button[role="switch"]');
 			expect(activeCheckbox).toHaveAttribute('data-state', 'checked');
 
 			// Test inactive user
 			const inactiveData = createTestData({ is_active: false });
 			const { container: inactiveContainer } = render(UserForm, { data: inactiveData });
-			const inactiveCheckbox = inactiveContainer.querySelector('button[role="checkbox"]');
+			const inactiveCheckbox = inactiveContainer.querySelector('button[role="switch"]');
 			expect(inactiveCheckbox).toHaveAttribute('data-state', 'unchecked');
 		});
 

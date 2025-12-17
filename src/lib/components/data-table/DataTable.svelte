@@ -62,17 +62,27 @@
 	// state for expanded rows
 	let expanded = $state({});
 
-	// initialize row selection state with preselected IDs
-	const initialSelection: RowSelectionState = {};
-	if (enableSelection && preSelectedIds.length > 0) {
-		preSelectedIds.forEach((id) => {
-			const rowId = String(id);
-			initialSelection[rowId] = true;
-		});
-	}
+	// compute initial row selection state with preselected IDs
+	const initialSelection = $derived.by(() => {
+		const selection: RowSelectionState = {};
+		if (enableSelection && preSelectedIds.length > 0) {
+			preSelectedIds.forEach((id) => {
+				const rowId = String(id);
+				selection[rowId] = true;
+			});
+		}
+		return selection;
+	});
 
-	// state for row selection
-	let rowSelection = $state<RowSelectionState>(initialSelection);
+	// state for row selection - initialize with computed initial selection
+	let rowSelection = $state<RowSelectionState>({});
+
+	// effect to set initial selection when preSelectedIds change
+	$effect(() => {
+		if (enableSelection && preSelectedIds.length > 0) {
+			rowSelection = { ...initialSelection };
+		}
+	});
 
 	// effect to clear selection when clearSelection is true
 	$effect(() => {
@@ -201,15 +211,20 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
-	<div class="flex items-center justify-between space-x-2 py-4">
-		<div class="text-muted-foreground flex-1 text-sm">
+	<div class="flex flex-col items-center gap-3 py-4 sm:flex-row sm:justify-between sm:gap-2">
+		<div class="text-muted-foreground text-center text-sm sm:flex-1 sm:text-left">
 			{#if enableSelection}
 				{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows
 					.length} selected
 				<span class="mx-2">•</span>
 			{/if}
-			Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalItems)} of
-			{totalItems} entries
+			<span class="hidden sm:inline"
+				>Showing {(currentPage - 1) * pageSize + 1} to {Math.min(
+					currentPage * pageSize,
+					totalItems
+				)} of {totalItems} entries</span
+			>
+			<span class="sm:hidden">{totalItems} entries</span>
 		</div>
 		<div class="flex items-center space-x-2">
 			<Button
@@ -222,7 +237,7 @@
 			</Button>
 			<div class="flex items-center space-x-1">
 				<span class="text-sm font-medium">
-					Page {currentPage} of {totalPages}
+					{currentPage} / {totalPages}
 				</span>
 			</div>
 			<Button

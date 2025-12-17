@@ -153,7 +153,7 @@ describe('DataTable', () => {
 				}
 			});
 
-			expect(screen.getByText('Page 2 of 5')).toBeInTheDocument();
+			expect(screen.getByText('2 / 5')).toBeInTheDocument();
 		});
 	});
 
@@ -318,7 +318,7 @@ describe('DataTable', () => {
 		it('should update when props change', () => {
 			const { rerender } = render(DataTable, { props: defaultProps });
 
-			expect(screen.getByText('Page 1 of 1')).toBeInTheDocument();
+			expect(screen.getByText('1 / 1')).toBeInTheDocument();
 
 			rerender({
 				...defaultProps,
@@ -326,7 +326,7 @@ describe('DataTable', () => {
 				totalPages: 5
 			});
 
-			expect(screen.getByText('Page 2 of 5')).toBeInTheDocument();
+			expect(screen.getByText('2 / 5')).toBeInTheDocument();
 		});
 	});
 

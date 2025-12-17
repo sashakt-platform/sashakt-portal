@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { createUserSchema, editUserSchema, type FormSchema } from './schema';
@@ -10,6 +9,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import type { Filter } from '$lib/types/filters';
 	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
+	import { Switch } from '$lib/components/ui/switch/index.js';
 
 	let { data }: { data: any } = $props();
 
@@ -124,13 +124,12 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<Form.Field {form} name="is_active">
+		<Form.Field {form} name="is_active" class="my-auto">
 			<Form.Control>
 				{#snippet children({ props })}
-					<Form.Label>Is Active?</Form.Label>
-					<div class="flex items-center space-x-2 pt-2">
-						<Checkbox {...props} bind:checked={$formData.is_active} />
-						<span class="text-sm">Active</span>
+					<div class="flex items-center gap-2">
+						<Switch id="is-active" bind:checked={$formData.is_active} />
+						<Form.Label>Is Active?</Form.Label>
 					</div>
 				{/snippet}
 			</Form.Control>
@@ -209,6 +208,6 @@
 		<Button variant="outline" type="button">
 			<a href="/users" class="block">Cancel</a>
 		</Button>
-		<Form.Button>Save User</Form.Button>
+		<Form.Button>Save</Form.Button>
 	</div>
 </form>

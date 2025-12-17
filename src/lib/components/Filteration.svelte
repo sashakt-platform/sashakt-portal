@@ -138,7 +138,7 @@
 				bind:value={searchQuery}
 			/>
 			<Command.List>
-				<Command.Empty>No {itemName} found.</Command.Empty>
+				<Command.Empty>No {label || itemName} found.</Command.Empty>
 				{#each itemList as item (item.id)}
 					<Command.Item
 						value={String(item.name)}

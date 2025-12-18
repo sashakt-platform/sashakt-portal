@@ -18,6 +18,7 @@
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
+	import QuestionPreview from './Question_preview.svelte';
 
 	const {
 		data
@@ -287,6 +288,18 @@
 				>
 			</a>
 			<div class="flex gap-2">
+				<QuestionPreview
+					data={{
+						question_text: $formData.question_text,
+						options: totalOptions,
+						instructions: $formData.instructions,
+						marking_scheme: $formData.marking_scheme,
+						tag_ids: $formData.tag_ids,
+						state_ids: $formData.state_ids,
+						is_mandatory: $formData.is_mandatory
+					}}
+				/>
+
 				<Button
 					class="bg-primary text-sm sm:text-base"
 					disabled={$formData?.question_text?.trim() === '' ||

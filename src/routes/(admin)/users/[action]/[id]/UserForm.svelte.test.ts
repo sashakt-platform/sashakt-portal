@@ -26,7 +26,16 @@ vi.mock('$lib/utils/permissions.js', () => ({
 		CREATE_ORGANIZATION: 'create_organization',
 		UPDATE_ORGANIZATION: 'update_organization',
 		DELETE_ORGANIZATION: 'delete_organization'
-	}
+	},
+	isStateAdmin: vi.fn((user) => {
+		return user?.states?.length === 1;
+	}),
+	getUserState: vi.fn((user) => {
+		if (!user || !user.states || user.states.length === 0) {
+			return null;
+		}
+		return user.states[0];
+	})
 }));
 
 describe('UserForm Component', () => {

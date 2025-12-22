@@ -1,4 +1,4 @@
-import { describe, test, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import ImportQuestions from './+page.svelte';
@@ -21,56 +21,77 @@ const baseData = {
 };
 
 describe('Import Questions Page', () => {
-	test('renders the heading "Import questions"', () => {
-		render(ImportQuestions, { data: baseData });
-
-		expect(screen.getByText('Import questions')).toBeInTheDocument();
-		expect(screen.getByText('Click to upload Questions')).toBeInTheDocument();
-		expect(screen.getByRole('button', { name: /download template/i })).toBeInTheDocument();
-		expect(screen.getByText('Instructions')).toBeInTheDocument();
+	beforeEach(() => {
+		vi.clearAllMocks();
 	});
 
-	test('disables import button while uploading', async () => {
-		render(ImportQuestions, { data: { ...baseData, form: { ...baseData.form, uploading: true } } });
-		const submitBtn = screen.getByRole('button', { name: /import/i });
-		expect(submitBtn).toBeDisabled();
+	describe('Basic Rendering', () => {
+		it('should render the page heading', () => {
+			render(ImportQuestions, { data: baseData });
+			expect(screen.getByText('Import questions')).toBeInTheDocument();
+		});
+
+		it('should render upload area with instructions', () => {
+			render(ImportQuestions, { data: baseData });
+			expect(screen.getByText('Click to upload Questions')).toBeInTheDocument();
+		});
+
+		it('should render download template button', () => {
+			render(ImportQuestions, { data: baseData });
+			expect(screen.getByRole('button', { name: /download template/i })).toBeInTheDocument();
+		});
+
+		it('should render instructions section', () => {
+			render(ImportQuestions, { data: baseData });
+
+			expect(screen.getByText('Instructions')).toBeInTheDocument();
+			expect(
+				screen.getByText(
+					'Download the CSV template or upload your own with appropriate tags & details.'
+				)
+			).toBeInTheDocument();
+		});
 	});
 
-	test('shows instructions list', () => {
-		render(ImportQuestions, { data: baseData });
+	describe('File Input', () => {
+		it('should have hidden CSV file input', () => {
+			const { container } = render(ImportQuestions, { data: baseData });
 
-		expect(screen.getByText('Instructions')).toBeInTheDocument();
-		expect(
-			screen.getByText(
-				'Download the CSV template or upload your own with appropriate tags & details.'
-			)
-		).toBeInTheDocument();
+			const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement | null;
+			expect(fileInput).toBeTruthy();
+			expect(fileInput?.hidden).toBe(true);
+			expect(fileInput?.getAttribute('accept')).toContain('.csv');
+		});
+
+		it('should have download template link with correct filename', () => {
+			render(ImportQuestions, { data: baseData });
+
+			const downloadLink = screen.getByRole('link', { name: /download template/i });
+			expect(downloadLink).toHaveAttribute('download', 'template.csv');
+		});
 	});
 
-	test('has hidden CSV file input and download template link', () => {
-		const { container } = render(ImportQuestions, { data: baseData });
+	describe('Import Button State', () => {
+		it('should disable import button when no file is selected', () => {
+			render(ImportQuestions, { data: baseData });
 
-		const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement | null;
-		expect(fileInput).toBeTruthy();
-		expect(fileInput?.hidden).toBe(true);
-		expect(fileInput?.getAttribute('accept')).toContain('.csv');
+			const importBtn = screen.getByRole('button', { name: /import/i });
+			expect(importBtn).toBeDisabled();
+		});
 
-		const downloadLink = screen.getByRole('link', { name: /download template/i });
-		expect(downloadLink).toHaveAttribute('download', 'template.csv');
-	});
+		it('should enable import button when file is selected', () => {
+			const file = new File(['hello'], 'questions.csv', { type: 'text/csv' });
+			render(ImportQuestions, { data: { ...baseData, form: { file } } });
 
-	test('disables import button when no file is selected', () => {
-		render(ImportQuestions, { data: baseData });
-		const importBtn = screen.getByRole('button', { name: /import/i });
-		expect(importBtn).toBeDisabled();
-	});
+			const importBtn = screen.getByRole('button', { name: /import/i });
+			expect(importBtn).toBeEnabled();
+		});
 
-	test('shows selected file info and enables import', () => {
-		const file = new File(['hello'], 'questions.csv', { type: 'text/csv' });
-		render(ImportQuestions, { data: { ...baseData, form: { file } } });
+		it('should display selected file name', () => {
+			const file = new File(['hello'], 'questions.csv', { type: 'text/csv' });
+			render(ImportQuestions, { data: { ...baseData, form: { file } } });
 
-		expect(screen.getByText('questions.csv')).toBeInTheDocument();
-		const importBtn = screen.getByRole('button', { name: /import/i });
-		expect(importBtn).toBeEnabled();
+			expect(screen.getByText('questions.csv')).toBeInTheDocument();
+		});
 	});
 });

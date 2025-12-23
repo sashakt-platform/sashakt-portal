@@ -62,7 +62,7 @@ describe('TagFormPage', () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole('button', {
-				name: /save tag/i
+				name: /save/i
 			})
 		).toBeInTheDocument();
 		const cancelBtn = screen.getByRole('button', { name: /cancel/i });
@@ -72,7 +72,7 @@ describe('TagFormPage', () => {
 	test('enables Save Tag button after entering name and submits form', async () => {
 		render(TagFormPage, { data: baseData });
 
-		const saveBtn = screen.getByRole('button', { name: /save tag/i });
+		const saveBtn = screen.getByRole('button', { name: /save/i });
 		const nameInput = screen.getByTestId('tag-name-input') as HTMLInputElement;
 		const descInput = screen.getByTestId('tag-desc-input') as HTMLInputElement;
 
@@ -99,7 +99,7 @@ describe('TagFormPage', () => {
 		expect(screen.getByDisplayValue('Existing Tag')).toBeInTheDocument();
 		expect(screen.getByDisplayValue('desc')).toBeInTheDocument();
 		expect(screen.getByRole('button', { name: /Type A/i })).toBeInTheDocument();
-		const saveBtn = screen.getByRole('button', { name: /save tag/i });
+		const saveBtn = screen.getByRole('button', { name: /save/i });
 		expect(saveBtn).toBeEnabled();
 	});
 
@@ -120,7 +120,7 @@ describe('TagFormPage', () => {
 	test('enables Save TagType button after entering name and description', async () => {
 		render(TagFormPage, { data: baseTagTypeData });
 
-		const saveBtn = screen.getByRole('button', { name: /save tag type/i });
+		const saveBtn = screen.getByRole('button', { name: /save/i });
 		const nameInput = screen.getByTestId('tag-name-input') as HTMLInputElement;
 		const descInput = screen.getByTestId('tag-desc-input') as HTMLInputElement;
 		await fireEvent.input(nameInput, { target: { value: 'New TagType' } });
@@ -145,7 +145,7 @@ describe('TagFormPage', () => {
 
 		expect(screen.queryByRole('button', { name: /select tag type/i })).not.toBeInTheDocument();
 
-		const saveBtn = screen.getByRole('button', { name: /save tag type/i });
+		const saveBtn = screen.getByRole('button', { name: /save/i });
 		expect(saveBtn).toBeEnabled();
 	});
 });

@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import TagFormPage from './+page.svelte';
@@ -36,7 +36,7 @@ const baseTagTypeData = {
 };
 
 describe('TagFormPage', () => {
-	test('renders create tag form', () => {
+	it('renders create tag form', () => {
 		render(TagFormPage, { data: baseData });
 		expect(screen.getByRole('heading', { name: /create a tag/i })).toBeInTheDocument();
 
@@ -69,7 +69,7 @@ describe('TagFormPage', () => {
 		expect(cancelBtn).toBeInTheDocument();
 		expect(cancelBtn).toBeEnabled();
 	});
-	test('enables Save Tag button after entering name and submits form', async () => {
+	it('enables Save Tag button after entering name and submits form', async () => {
 		render(TagFormPage, { data: baseData });
 
 		const saveBtn = screen.getByRole('button', { name: /save/i });
@@ -83,7 +83,7 @@ describe('TagFormPage', () => {
 		expect(saveBtn).toBeEnabled();
 	});
 
-	test('renders edit tag form', async () => {
+	it('renders edit tag form', async () => {
 		const data = {
 			...baseData,
 			tagData: { name: 'Existing Tag', description: 'desc', tag_type: { id: 1, name: 'Type A' } },
@@ -103,7 +103,7 @@ describe('TagFormPage', () => {
 		expect(saveBtn).toBeEnabled();
 	});
 
-	test('renders create tag type form', () => {
+	it('renders create tag type form', () => {
 		render(TagFormPage, { data: baseTagTypeData });
 
 		expect(screen.getByRole('heading', { name: /create a tag type/i })).toBeInTheDocument();
@@ -117,7 +117,7 @@ describe('TagFormPage', () => {
 		expect(cancelBtn).toBeInTheDocument();
 		expect(cancelBtn).toBeEnabled();
 	});
-	test('enables Save TagType button after entering name and description', async () => {
+	it('enables Save TagType button after entering name and description', async () => {
 		render(TagFormPage, { data: baseTagTypeData });
 
 		const saveBtn = screen.getByRole('button', { name: /save/i });
@@ -131,7 +131,7 @@ describe('TagFormPage', () => {
 
 		expect(saveBtn).toBeEnabled();
 	});
-	test('renders edit tag type form', () => {
+	it('renders edit tag type form', () => {
 		const editData = {
 			...baseTagTypeData,
 			tagData: { name: 'Existing TagType', description: 'Tag type description' }

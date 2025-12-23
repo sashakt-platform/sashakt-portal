@@ -9,6 +9,7 @@ vi.mock('sveltekit-superforms', async () => {
 	return {
 		...actual,
 		fileProxy: () => ({
+			set: () => {},
 			update: () => {},
 			subscribe: () => () => {}
 		})

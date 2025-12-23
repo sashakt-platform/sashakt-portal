@@ -3,7 +3,7 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { type Infer, superForm } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
 	import { editUserSchema, type EditUserSchema } from './schema';
 
@@ -12,7 +12,7 @@
 	let userData: Partial<Infer<EditUserSchema>> | null = data?.currentUser || null;
 
 	const form = superForm(userData || data.form, {
-		validators: zodClient(editUserSchema),
+		validators: zod4Client(editUserSchema),
 		dataType: 'json',
 		onResult: ({ result }) => {
 			if (result.type === 'redirect') {

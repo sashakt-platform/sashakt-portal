@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from './$types.js';
 import { questionSchema, tagSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
@@ -88,8 +88,8 @@ export const load: PageServerLoad = async ({ params }: any) => {
 		console.error('Error fetching Question Revision:', error);
 	}
 
-	const form = await superValidate(zod(questionSchema));
-	const tagForm = await superValidate(zod(tagSchema));
+	const form = await superValidate(zod4(questionSchema));
+	const tagForm = await superValidate(zod4(tagSchema));
 
 	return {
 		form,
@@ -111,7 +111,7 @@ export const actions: Actions = {
 		} else if (params.action === 'add') {
 			requirePermission(user, PERMISSIONS.CREATE_QUESTION);
 		}
-		const form = await superValidate(request, zod(questionSchema));
+		const form = await superValidate(request, zod4(questionSchema));
 		if (!form.valid) {
 			setFlash(
 				{ type: 'error', message: 'Question not Created. Please check all the details.' },
@@ -226,7 +226,7 @@ export const actions: Actions = {
 
 	tagSave: async ({ request, cookies }) => {
 		const token = getSessionTokenCookie();
-		const tagForm = await superValidate(request, zod(tagSchema));
+		const tagForm = await superValidate(request, zod4(tagSchema));
 		if (!tagForm.valid) {
 			setFlash({ type: 'error', message: `Tag Details not Valid` }, cookies);
 			return fail(400, { tagForm });

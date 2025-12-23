@@ -6,7 +6,7 @@
 	import Configuration from './Configuration.svelte';
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 
@@ -32,7 +32,7 @@
 		submit
 	} = superForm(testData || data.form, {
 		applyAction: 'never',
-		validators: zodClient(testSchema),
+		validators: zod4Client(testSchema),
 		dataType: 'json',
 		onSubmit() {
 			if ($formData.template_id) {
@@ -80,10 +80,11 @@
 
 <form method="POST" action="?/save" use:enhance class="pb-48 md:pb-28">
 	<div class="flex border-b-2 py-2">
-		<div class="mx-auto flex">
+		<div class="mx-auto flex items-center">
 			{#snippet headerNumbers(
 				number: number,
 				text: string,
+				shortText: string,
 				mode: number,
 				isCompleted: boolean = false
 			)}
@@ -91,13 +92,13 @@
 				<Button
 					variant="ghost"
 					class={[
-						'justify-left',
+						'justify-left px-2 sm:px-4',
 						isActive
 							? 'border-primary text-primary border-1 font-bold'
 							: isCompleted
 								? 'text-primary'
 								: '',
-						'mx-4'
+						'mx-1 sm:mx-4'
 					]}
 					onclick={() => {
 						if (isCompleted) {
@@ -111,21 +112,29 @@
 								: isCompleted
 									? 'text-primary border-primary border-1'
 									: 'border-1 border-gray-600 text-gray-500',
-							'mr-2 flex h-6 w-6 items-center justify-center rounded-full '
+							'mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full sm:mr-2'
 						]}>{number}</span
-					>{text}</Button
+					><span class="hidden sm:inline">{text}</span><span class="sm:hidden">{shortText}</span
+					></Button
 				>
 			{/snippet}
 			{@render headerNumbers(
 				1,
 				'Primary Details',
+				'Details',
 				typeOfScreen.primary,
 				$formData.name.trim() != '' && $formData.description.trim() != ''
 			)}
-			<ChevronRight class="my-auto w-4" />
-			{@render headerNumbers(2, 'Select Questions', typeOfScreen.questions, false)}
-			<ChevronRight class="my-auto w-4" />
-			{@render headerNumbers(3, 'Configuration Settings', typeOfScreen.configuration, false)}
+			<ChevronRight class="my-auto w-3 shrink-0 sm:w-4" />
+			{@render headerNumbers(2, 'Select Questions', 'Questions', typeOfScreen.questions, false)}
+			<ChevronRight class="my-auto w-3 shrink-0 sm:w-4" />
+			{@render headerNumbers(
+				3,
+				'Configuration Settings',
+				'Config',
+				typeOfScreen.configuration,
+				false
+			)}
 		</div>
 	</div>
 

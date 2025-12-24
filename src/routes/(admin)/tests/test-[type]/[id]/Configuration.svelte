@@ -9,7 +9,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
-	import { MarksLevel } from './schema';
+	import { MarksLevel, Locales } from './schema';
 
 	let { formData } = $props();
 
@@ -209,6 +209,26 @@
 					</div>
 				</div>
 			{/if}
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox
+						checked={$formData.locale === Locales.HI_IN}
+						onCheckedChange={(checked: boolean) => {
+							if (checked) {
+								$formData.locale = Locales.HI_IN;
+							} else {
+								$formData.locale = Locales.EN_US;
+							}
+						}}
+					/>
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Conduct Assessment in Hindi',
+						'Select to display all instructions and interface text in Hindi. English is the default language.'
+					)}
+				</div>
+			</div>
 		</ConfigureBox>
 
 		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>

@@ -18,7 +18,7 @@
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
-	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import { canCreate, canUpdate, canDelete, isStateAdmin } from '$lib/utils/permissions.js';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -306,9 +306,11 @@
 				/>
 			</div>
 
-			<div>
-				<StateSelection bind:states={filteredStates} filteration={true} />
-			</div>
+			{#if !isStateAdmin(data.user)}
+				<div>
+					<StateSelection bind:states={filteredStates} filteration={true} />
+				</div>
+			{/if}
 
 			<div>
 				<TagsSelection bind:tags={filteredTags} filteration={true} />

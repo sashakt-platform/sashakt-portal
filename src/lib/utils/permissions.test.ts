@@ -9,6 +9,8 @@ import {
 	canDelete,
 	requirePermission,
 	requireAnyPermission,
+	isStateAdmin,
+	getUserState,
 	PERMISSIONS,
 	type User
 } from './permissions';
@@ -184,6 +186,77 @@ describe('permissions', () => {
 			} catch (error: any) {
 				expect(error.status).toBe(403);
 			}
+		});
+	});
+
+	describe('isStateAdmin()', () => {
+		const stateAdminUser: User = {
+			id: 3,
+			username: 'stateadmin',
+			email: 'stateadmin@example.com',
+			permissions: [PERMISSIONS.READ_USER],
+			states: [{ id: 1, name: 'Maharashtra' }]
+		} as User;
+
+		const userWithNoStates: User = {
+			id: 5,
+			username: 'nostate',
+			email: 'nostate@example.com',
+			permissions: [],
+			states: []
+		} as User;
+
+		it('should return true when user has exactly one state assigned', () => {
+			expect(isStateAdmin(stateAdminUser)).toBe(true);
+		});
+
+		it('should return false when user has no states assigned', () => {
+			expect(isStateAdmin(userWithNoStates)).toBe(false);
+		});
+
+		it('should return false when user is null', () => {
+			expect(isStateAdmin(null)).toBe(false);
+		});
+
+		it('should return false when user.states is undefined', () => {
+			const userWithoutStates = { ...mockUser, states: undefined } as User;
+			expect(isStateAdmin(userWithoutStates)).toBe(false);
+		});
+	});
+
+	describe('getUserState()', () => {
+		const stateAdminUser: User = {
+			id: 3,
+			username: 'stateadmin',
+			email: 'stateadmin@example.com',
+			permissions: [],
+			states: [{ id: 1, name: 'Maharashtra' }]
+		} as User;
+
+		const userWithNoStates: User = {
+			id: 5,
+			username: 'nostate',
+			email: 'nostate@example.com',
+			permissions: [],
+			states: []
+		} as User;
+
+		it('should return the state when user has a state assigned', () => {
+			const state = getUserState(stateAdminUser);
+			expect(state).toEqual({ id: 1, name: 'Maharashtra' });
+		});
+
+		it('should return null when user has no states assigned', () => {
+			expect(getUserState(userWithNoStates)).toBeNull();
+		});
+
+		it('should return null when user is null', () => {
+			expect(getUserState(null)).toBeNull();
+		});
+
+		it('should return null when user.states is undefined', () => {
+			const userWithoutStates = { ...mockUser, states: undefined } as User;
+			expect(getUserState(userWithoutStates)).toBeNull();
 		});
 	});
 });

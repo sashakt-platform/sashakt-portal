@@ -1,34 +1,34 @@
-import { describe, test, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import Dashboard from './+page.svelte';
 
 describe('Dashboard.svelte', () => {
-	test('renders "No of Tests" text on the page', () => {
+	it('renders "No of Tests" text on the page', () => {
 		render(Dashboard);
 		expect(screen.getByText('No of Tests')).toBeInTheDocument();
 	});
-	test('does not render "No of Me" text on the page', () => {
+	it('does not render "No of Me" text on the page', () => {
 		render(Dashboard);
 
 		expect(screen.queryByText('No of Me')).not.toBeInTheDocument();
 	});
-	test('renders Dashboard heading', () => {
+	it('renders Dashboard heading', () => {
 		render(Dashboard);
 		expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument();
 	});
 
-	test('renders "Summary of Test Attempts" section', () => {
+	it('renders "Summary of Test Attempts" section', () => {
 		render(Dashboard);
 		expect(screen.getByText('Summary of Test Attempts')).toBeInTheDocument();
 	});
 
-	test('renders info icon near Dashboard title', () => {
+	it('renders info icon near Dashboard title', () => {
 		const { container } = render(Dashboard);
 		const infoIcon = container.querySelector('svg');
 		expect(infoIcon).toBeInTheDocument();
 	});
-	test('loads dashboard stats and displays them in correct places', async () => {
+	it('loads dashboard stats and displays them in correct places', async () => {
 		global.fetch = vi.fn((url) => {
 			if (url === '/api/dashboard/stats') {
 				return Promise.resolve({

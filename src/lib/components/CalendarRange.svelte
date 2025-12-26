@@ -81,9 +81,9 @@
 	}
 </script>
 
-<div class="flex flex-col gap-6">
-	<div class="flex gap-4">
-		<div class="flex flex-1 flex-col gap-3">
+<div class="flex flex-col gap-4 sm:flex-row sm:gap-6">
+	<div class="flex flex-1 gap-2">
+		<div class="flex flex-1 flex-col gap-2">
 			<Label for="{id}-date-from" class="px-1">{rangeFromLabel}</Label>
 			<Popover.Root bind:open={rangeFromOpen}>
 				<Popover.Trigger id="{id}-date-from">
@@ -113,8 +113,8 @@
 				</Popover.Content>
 			</Popover.Root>
 		</div>
-		<div class="flex flex-col gap-3">
-			<Label for="{id}-time-from" class="invisible px-1">From</Label>
+		<div class="flex flex-col gap-2">
+			<Label for="{id}-time-from" class="invisible px-1">Time</Label>
 			<Input
 				type="time"
 				id="{id}-time-from"
@@ -124,8 +124,8 @@
 			/>
 		</div>
 	</div>
-	<div class="flex gap-4">
-		<div class="flex flex-1 flex-col gap-3">
+	<div class="flex flex-1 gap-2">
+		<div class="flex flex-1 flex-col gap-2">
 			<Label for="{id}-date-to" class="px-1">{rangeToLabel}</Label>
 			<Popover.Root bind:open={rangeToOpen}>
 				<Popover.Trigger id="{id}-date-to">
@@ -158,8 +158,8 @@
 				</Popover.Content>
 			</Popover.Root>
 		</div>
-		<div class="flex flex-col gap-3">
-			<Label for="{id}-time-to" class="invisible px-1">To</Label>
+		<div class="flex flex-col gap-2">
+			<Label for="{id}-time-to" class="invisible px-1">Time</Label>
 			<Input
 				type="time"
 				id="{id}-time-to"

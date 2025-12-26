@@ -84,25 +84,6 @@
 						rangeToLabel="End Time"
 						bind:rangeToValue={$formData.end_time}
 					/>
-
-					<!-- <div class="flex w-full flex-col gap-2 sm:w-1/2"> -->
-					<!-- 	<Label for="dateStart" class="my-auto font-extralight">Start Time</Label> -->
-					<!-- 	<Input -->
-					<!-- 		type="datetime-local" -->
-					<!-- 		id="dateStart" -->
-					<!-- 		name="start_time" -->
-					<!-- 		bind:value={$formData.start_time} -->
-					<!-- 	/> -->
-					<!-- </div> -->
-					<!-- <div class="flex w-full flex-col gap-2 sm:w-1/2"> -->
-					<!-- 	<Label for="dateEnd" class="my-auto font-extralight">End Time</Label> -->
-					<!-- 	<Input -->
-					<!-- 		type="datetime-local" -->
-					<!-- 		id="dateEnd" -->
-					<!-- 		name="end_time" -->
-					<!-- 		bind:value={$formData.end_time} -->
-					<!-- 	/> -->
-					<!-- </div> -->
 				</div>
 			</div>
 

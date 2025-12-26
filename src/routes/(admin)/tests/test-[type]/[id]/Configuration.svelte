@@ -8,6 +8,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
 
@@ -77,24 +78,31 @@
 					)}
 				</div>
 				<div class="flex w-full flex-col gap-4 sm:flex-row md:w-3/5">
-					<div class="flex w-full flex-col gap-2 sm:w-1/2">
-						<Label for="dateStart" class="my-auto font-extralight">Start Time</Label>
-						<Input
-							type="datetime-local"
-							id="dateStart"
-							name="start_time"
-							bind:value={$formData.start_time}
-						/>
-					</div>
-					<div class="flex w-full flex-col gap-2 sm:w-1/2">
-						<Label for="dateEnd" class="my-auto font-extralight">End Time</Label>
-						<Input
-							type="datetime-local"
-							id="dateEnd"
-							name="end_time"
-							bind:value={$formData.end_time}
-						/>
-					</div>
+					<CalendarRange
+						rangeFromLabel="Start Time"
+						bind:rangeFromValue={$formData.start_time}
+						rangeToLabel="End Time"
+						bind:rangeToValue={$formData.end_time}
+					/>
+
+					<!-- <div class="flex w-full flex-col gap-2 sm:w-1/2"> -->
+					<!-- 	<Label for="dateStart" class="my-auto font-extralight">Start Time</Label> -->
+					<!-- 	<Input -->
+					<!-- 		type="datetime-local" -->
+					<!-- 		id="dateStart" -->
+					<!-- 		name="start_time" -->
+					<!-- 		bind:value={$formData.start_time} -->
+					<!-- 	/> -->
+					<!-- </div> -->
+					<!-- <div class="flex w-full flex-col gap-2 sm:w-1/2"> -->
+					<!-- 	<Label for="dateEnd" class="my-auto font-extralight">End Time</Label> -->
+					<!-- 	<Input -->
+					<!-- 		type="datetime-local" -->
+					<!-- 		id="dateEnd" -->
+					<!-- 		name="end_time" -->
+					<!-- 		bind:value={$formData.end_time} -->
+					<!-- 	/> -->
+					<!-- </div> -->
 				</div>
 			</div>
 

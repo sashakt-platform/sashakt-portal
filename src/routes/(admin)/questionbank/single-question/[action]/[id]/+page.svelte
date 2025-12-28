@@ -198,7 +198,11 @@
 									>
 										<Trash_2
 											data-testid="trash-icon"
-											class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
+											size={18}
+											class={[
+												'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
+												totalOptions.length > 1 ? 'cursor-pointer' : ''
+											]}
 											onclick={() => {
 												if (totalOptions.length > 1) {
 													totalOptions = totalOptions

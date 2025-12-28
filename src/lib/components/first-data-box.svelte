@@ -45,16 +45,16 @@
 		</g>
 	</svg>
 
-	<h1 class="mt-4 text-3xl font-bold text-gray-800">{title}</h1>
-	<p class="mt-4 text-gray-400">
+	<h1 class="mt-4 text-2xl font-bold text-gray-800 sm:text-3xl">{title}</h1>
+	<p class="mt-4 px-4 text-gray-400 sm:px-0">
 		{subtitle}
 	</p>
-	<div class="mt-4">
+	<div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-4">
 		{#if leftButton}
 			<a href={leftButton.link}>
 				<Button
 					variant="outline"
-					class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+					class="h-12 w-full cursor-pointer hover:bg-[#0369A1] hover:text-white sm:w-auto"
 					onclick={leftButton.click}><Plus /> {leftButton.title}</Button
 				>
 			</a>
@@ -63,12 +63,12 @@
 			<a href={rightButton.link}>
 				<Button
 					variant="outline"
-					class="bg-primary mr-4 h-12 cursor-pointer text-white"
+					class="bg-primary h-12 w-full cursor-pointer text-white sm:w-auto"
 					onclick={rightButton.click}
 				>
 					<FileUp />{rightButton.title}
-				</Button></a
-			>
+				</Button>
+			</a>
 		{/if}
 	</div>
 </WhiteEmptyBox>

@@ -27,7 +27,7 @@
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
-	<div class="mx-10 mt-10 flex w-full flex-col">
+	<div class="mx-4 mt-6 flex w-full flex-col sm:mx-6 md:mx-10 md:mt-10">
 		{#snippet headingSubheading(heading: string, subheading: string)}
 			<p class="font-bold">{heading}</p>
 			<p class="text-sm font-extralight">
@@ -36,14 +36,14 @@
 		{/snippet}
 
 		<ConfigureBox title="Instructions" Icon={Info}>
-			<div class={['flex flex-row py-8', 'border-b-1']}>
-				<div class="w-2/5">
+			<div class={['flex flex-col gap-4 py-6 md:flex-row md:gap-0 md:py-8', 'border-b-1']}>
+				<div class="w-full md:w-2/5">
 					{@render headingSubheading(
 						'Pre-test guidelines',
 						'Instructions displayed before attempting the test.'
 					)}
 				</div>
-				<div class="w-3/5">
+				<div class="w-full md:w-3/5">
 					<Textarea
 						name="start_instructions"
 						placeholder=""
@@ -51,14 +51,14 @@
 					/>
 				</div>
 			</div>
-			<div class={['flex flex-row py-8']}>
-				<div class="w-2/5">
+			<div class={['flex flex-col gap-4 py-6 md:flex-row md:gap-0 md:py-8']}>
+				<div class="w-full md:w-2/5">
 					{@render headingSubheading(
 						'Completion message',
 						'Message displayed after test completion.'
 					)}
 				</div>
-				<div class="w-3/5">
+				<div class="w-full md:w-3/5">
 					<Textarea
 						name="completion_message"
 						placeholder=""
@@ -69,15 +69,15 @@
 		</ConfigureBox>
 
 		<ConfigureBox title="Timer Settings" Icon={Timer}>
-			<div class="flex flex-row" hidden={$formData.is_template}>
-				<div class="my-auto w-2/5 align-middle">
+			<div class="flex flex-col gap-4 md:flex-row md:gap-0" hidden={$formData.is_template}>
+				<div class="my-auto w-full align-middle md:w-2/5">
 					{@render headingSubheading(
 						'Test Schedule',
 						'Set the date and time when the test will be available.'
 					)}
 				</div>
-				<div class=" flex w-3/5 flex-row gap-4">
-					<div class="flex w-1/2 flex-col gap-2">
+				<div class="flex w-full flex-col gap-4 sm:flex-row md:w-3/5">
+					<div class="flex w-full flex-col gap-2 sm:w-1/2">
 						<Label for="dateStart" class="my-auto font-extralight">Start Time</Label>
 						<Input
 							type="datetime-local"
@@ -86,7 +86,7 @@
 							bind:value={$formData.start_time}
 						/>
 					</div>
-					<div class="flex w-1/2 flex-col gap-2">
+					<div class="flex w-full flex-col gap-2 sm:w-1/2">
 						<Label for="dateEnd" class="my-auto font-extralight">End Time</Label>
 						<Input
 							type="datetime-local"
@@ -98,17 +98,17 @@
 				</div>
 			</div>
 
-			<div class="flex flex-row">
-				<div class="w-2/5">
+			<div class="flex flex-col gap-4 md:flex-row md:gap-0">
+				<div class="w-full md:w-2/5">
 					{@render headingSubheading(
 						'Time limit',
 						'Set the maximum duration allowed to complete the test.'
 					)}
 				</div>
-				<div class=" flex w-3/5 flex-row gap-4">
+				<div class="flex w-full flex-row gap-4 md:w-3/5">
 					<Input
 						placeholder="Enter in Minutes..."
-						class="w-1/2"
+						class="w-full sm:w-1/2"
 						type="number"
 						name="time_limit"
 						bind:value={$formData.time_limit}
@@ -118,19 +118,20 @@
 		</ConfigureBox>
 		<ConfigureBox title="Question settings" Icon={CircleHelp}>
 			<div class="flex flex-col gap-6">
-				<div class="flex flex-row gap-4 pt-10">
-					<div class="w-1/2">
+				<div class="flex flex-col gap-4 pt-6 md:flex-row md:pt-10">
+					<div class="w-full md:w-1/2">
 						{@render headingSubheading(
 							'Questions Per Page',
 							"Enter the number of questions to display on each page. Enter '0' to show all questions on a single page."
 						)}
 					</div>
-					<div class=" flex w-1/2 flex-row gap-4">
+					<div class="flex w-full flex-row gap-4 md:w-1/2">
 						<Input
 							placeholder=""
 							type="number"
 							name="question_pagination"
 							bind:value={$formData.question_pagination}
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -168,26 +169,28 @@
 					</div>
 				</div>
 
-				<div class="flex flex-row gap-3 align-top">
-					<div class="my-auto w-fit gap-4">
-						<Checkbox
-							bind:checked={$formData.random_questions}
-							onCheckedChange={(checked: boolean) => {
-								if (checked) {
-									$formData.shuffle = false;
-								} else {
-									$formData.no_of_random_questions = 0;
-								}
-							}}
-						/>
+				<div class="flex flex-col gap-3 align-top md:flex-row">
+					<div class="flex flex-row gap-3">
+						<div class="my-auto w-fit gap-4">
+							<Checkbox
+								bind:checked={$formData.random_questions}
+								onCheckedChange={(checked: boolean) => {
+									if (checked) {
+										$formData.shuffle = false;
+									} else {
+										$formData.no_of_random_questions = 0;
+									}
+								}}
+							/>
+						</div>
+						<div class="w-full md:w-auto">
+							{@render headingSubheading(
+								'Randomize Questions',
+								'Specify the number of random questions to assign from the previously selected questions.'
+							)}
+						</div>
 					</div>
-					<div class="w-1/2">
-						{@render headingSubheading(
-							'Randomize Questions',
-							'Specify the number of random questions to assign from the previously selected questions.'
-						)}
-					</div>
-					<div class="gap- my-auto flex w-1/2 flex-col">
+					<div class="my-auto flex w-full flex-col md:w-1/2">
 						<Input
 							type="number"
 							id="random_count"
@@ -209,9 +212,12 @@
 		</ConfigureBox>
 
 		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>
-			<div class="flex flex-row gap-8 pt-10">
-				<RadioGroup.Root bind:value={$formData.marks_level} class="flex w-full flex-col  gap-8">
-					<div class="b flex w-full items-center space-x-2">
+			<div class="flex flex-col gap-6 pt-6 md:flex-row md:gap-8 md:pt-10">
+				<RadioGroup.Root
+					bind:value={$formData.marks_level}
+					class="flex w-full flex-col gap-6 md:gap-8"
+				>
+					<div class="flex w-full items-center space-x-2">
 						<RadioGroup.Item value={MarksLevel.QUESTION} id="question_level" />
 						<Label for="question_level"
 							>{@render headingSubheading(
@@ -220,8 +226,8 @@
 							)}</Label
 						>
 					</div>
-					<div class="flex w-full flex-row items-center gap-4">
-						<div class="flex w-1/2 flex-row items-center space-x-2">
+					<div class="flex w-full flex-col gap-4 md:flex-row md:items-center">
+						<div class="flex w-full flex-row items-center space-x-2 md:w-1/2">
 							<RadioGroup.Item value={MarksLevel.TEST} id="test_level" />
 							<Label for="test_level"
 								>{@render headingSubheading(
@@ -230,7 +236,10 @@
 								)}</Label
 							>
 						</div>
-						<div class="flex w-1/2 flex-col gap-1" hidden={$formData.marks_level !== 'test'}>
+						<div
+							class="flex w-full flex-col gap-1 md:w-1/2"
+							hidden={$formData.marks_level !== 'test'}
+						>
 							<small class="text-gray-500">Marks for Correct Answer (Test Level)</small>
 							<Input
 								class="flex w-full"

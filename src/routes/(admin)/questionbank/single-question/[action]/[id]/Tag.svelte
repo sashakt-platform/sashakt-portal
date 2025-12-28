@@ -5,7 +5,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { tagSchema, type TagFormSchema } from './schema';
-	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
 	let {
 		tagTypes,
 		form,
@@ -33,7 +33,7 @@
 		enhance: enhanceTag,
 		submit: submitTag
 	} = superForm(form, {
-		validators: zodClient(tagSchema),
+		validators: zod4Client(tagSchema),
 		dataType: 'json',
 		onSubmit: () => {
 			$formTagData.tag_type_id = $formTagData.tag_type_id;
@@ -44,26 +44,15 @@
 <form action="?/tagSave" method="POST" use:enhanceTag>
 	<div class="flex w-full flex-col gap-6 px-8">
 		<div class="flex flex-col gap-4">
-			<h2 class="font-semibold">
-				Tag Name <span class="text-sm">(associated with the tag types) </span>
-			</h2>
-			<Input
-				type="text"
-				placeholder="Enter a tag name"
-				name="name"
-				bind:value={$formTagData.name}
-			/>
+			<h2 class="font-semibold">Name</h2>
+			<Input type="text" name="name" bind:value={$formTagData.name} />
 		</div>
 		<div class="flex flex-col gap-2">
-			<h2 class="font-semibold">Tag Description</h2>
-			<Textarea
-				placeholder="Enter the description here..."
-				name="description"
-				bind:value={$formTagData.description}
-			/>
+			<h2 class="font-semibold">Description</h2>
+			<Textarea name="description" bind:value={$formTagData.description} />
 		</div>
 		<div class="flex w-full flex-col gap-2">
-			<h2 class="font-semibold">Select Tag Type</h2>
+			<h2 class="font-semibold">Tag Type</h2>
 			<Select.Root type="single" name="tag_type_id" bind:value={$formTagData.tag_type_id}>
 				<Select.Trigger>
 					{triggerContent}

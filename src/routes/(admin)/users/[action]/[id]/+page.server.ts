@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { createUserSchema, editUserSchema } from './schema';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { redirect } from 'sveltekit-flash-message/server';
@@ -109,7 +109,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const schema = params.action === 'edit' ? editUserSchema : createUserSchema;
 
 	return {
-		form: await superValidate(zod(schema)),
+		form: await superValidate(zod4(schema)),
 		action: params.action,
 		id: params.id,
 		user: userData,
@@ -133,7 +133,7 @@ export const actions: Actions = {
 
 		// Use appropriate schema based on action
 		const schema = params.action === 'edit' ? editUserSchema : createUserSchema;
-		const form = await superValidate(request, zod(schema));
+		const form = await superValidate(request, zod4(schema));
 
 		// For non-Super Admins, automatically set organization_id to current user's organization
 		const isSuperAdmin =

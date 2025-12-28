@@ -254,27 +254,30 @@
 					</g>
 				</svg>
 
-				<h1 class="mt-4 text-3xl font-bold text-gray-800">Create your first question</h1>
-				<p class="mt-4 text-gray-400">
+				<h1 class="mt-4 text-2xl font-bold text-gray-800 sm:text-3xl">
+					Create your first question
+				</h1>
+				<p class="mt-4 px-4 text-gray-400 sm:px-0">
 					Click on the button to create questions to be uploaded in the test template and tests
 				</p>
 				{#if canCreate(data.user, 'question')}
-					<div class="mt-4">
-						<a href="/questionbank/single-question/add/new"
-							><Button
+					<div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-4">
+						<a href="/questionbank/single-question/add/new">
+							<Button
 								variant="outline"
-								class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
-								><Plus /> Create a Question</Button
-							></a
-						>
-						<a href="/questionbank/import"
-							><Button
+								class="h-12 w-full cursor-pointer hover:bg-[#0369A1] hover:text-white sm:w-auto"
+							>
+								<Plus /> Create a Question
+							</Button>
+						</a>
+						<a href="/questionbank/import">
+							<Button
 								variant="outline"
-								class="mr-4 h-12 cursor-pointer hover:bg-[#0369A1] hover:text-white"
+								class="h-12 w-full cursor-pointer hover:bg-[#0369A1] hover:text-white sm:w-auto"
 							>
 								<FileUp />Bulk Upload
-							</Button></a
-						>
+							</Button>
+						</a>
 					</div>
 				{/if}
 			</WhiteEmptyBox>

@@ -49,17 +49,21 @@
 <QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} />
 
 <div class="mx-auto flex h-dvh">
-	<div class=" mx-auto w-full p-20">
-		<div class=" mb-8 flex h-fit items-center gap-4 rounded-lg bg-white p-4 shadow-lg">
-			<div class="flex h-full w-fit">
-				<TestPaper />
+	<div class="mx-auto w-full p-4 sm:p-8 md:p-12 lg:p-20">
+		<div
+			class="mb-6 flex h-fit flex-col gap-4 rounded-lg bg-white p-4 shadow-lg sm:mb-8 sm:flex-row sm:items-center"
+		>
+			<div class="flex items-center gap-3">
+				<div class="flex h-full w-fit shrink-0">
+					<TestPaper />
+				</div>
+				<p class="text-base font-semibold sm:text-lg">Selection</p>
 			</div>
-			<p class="text-lg font-semibold">Selection</p>
 			<RadioGroup.Root
 				bind:value={questionSelectionMode}
-				class="mx-auto flex w-full  flex-row justify-center gap-8 "
+				class="flex w-full flex-col gap-4 sm:mx-auto sm:flex-row sm:justify-center sm:gap-8"
 			>
-				<div class="b flex w-fit items-center space-x-2">
+				<div class="flex w-fit items-center space-x-2">
 					<RadioGroup.Item
 						id="manual"
 						value="manual"
@@ -86,18 +90,19 @@
 			</RadioGroup.Root>
 		</div>
 		<div
-			class=" mb-2 flex min-h-1/6 items-center gap-4 rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg"
+			class="mb-2 flex min-h-1/6 flex-col gap-4 rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg sm:flex-row sm:items-center"
 		>
-			<div class="flex h-full items-center">
+			<div class="hidden h-full items-center sm:flex">
 				<TestPaper />
 			</div>
-			<div class="flex h-full w-full flex-row gap-8">
-				<div class="flex w-1/2 flex-col">
+			<div class="flex h-full w-full flex-col gap-4 md:flex-row md:gap-8">
+				<div class="flex w-full flex-col md:w-1/2">
 					<div class="flex">
 						<p class="font-bold">{$formData.name}</p>
 					</div>
-					<div class="flex flex-row items-center text-sm">
-						<span class=" my-4 mr-4 rounded-sm bg-[#E8F1F7] p-1 px-2 font-bold"
+					<div class="flex flex-wrap items-center gap-2 text-sm sm:flex-row">
+						<span
+							class="my-2 rounded-sm bg-[#E8F1F7] p-1 px-2 text-xs font-bold sm:my-4 sm:mr-4 sm:text-sm"
 							>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
 						>
 						<span class="text-gray-500"
@@ -107,13 +112,15 @@
 					</div>
 				</div>
 				{#if questionSelectionMode == 'tagBased'}
-					<div class="my-auto flex w-1/2 flex-col justify-center align-middle">
+					<div class="my-auto flex w-full flex-col justify-center align-middle md:w-1/2">
 						<TagsSelection bind:tags={$formData.random_tag_count} />
 					</div>
 				{/if}
 				{#if $formData.question_revision_ids.length != 0}
-					<div class="my-auto ml-auto flex">
-						<Button onclick={() => (dialogOpen = true)}>Select More Questions</Button>
+					<div class="my-auto flex md:ml-auto">
+						<Button class="w-full sm:w-auto" onclick={() => (dialogOpen = true)}
+							>Select More Questions</Button
+						>
 					</div>
 				{/if}
 			</div>
@@ -156,21 +163,23 @@
 				{:else}
 					<div class="flex h-full w-full flex-col gap-4 overflow-auto">
 						<div class="flex flex-col">
-							<p class="text-lg font-bold">Random Configuration</p>
+							<p class="text-base font-bold sm:text-lg">Random Configuration</p>
 							<p class="text-sm text-gray-400">Enter number of questions for the selected Tags</p>
 						</div>
 						<div class="flex flex-col">
 							{#each $formData.random_tag_count as tag (tag.id)}
-								<div class="m-4 flex items-center rounded p-2 text-sm">
-									<span class="w-1/4">{tag.name}</span>
-									<div class="w-3/4">
+								<div
+									class="m-2 flex flex-col gap-2 rounded p-2 text-sm sm:m-4 sm:flex-row sm:items-center sm:gap-0"
+								>
+									<span class="w-full font-medium sm:w-1/4 sm:font-normal">{tag.name}</span>
+									<div class="w-full sm:w-3/4">
 										<Input
 											type="number"
 											placeholder="No of questions"
-											class="ml-2 rounded border p-2"
+											class="rounded border p-2 sm:ml-2"
 											bind:value={tag.count}
 										/>
-										<small class="ml-2 text-red-400"
+										<small class="mt-1 block text-red-400 sm:ml-2"
 											>{tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)
 												? 'Enter a positive integer'
 												: ''}</small

@@ -2,19 +2,20 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { fail, redirect } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { loginSchema } from './schema';
 import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async () => {
 	return {
-		form: await superValidate(zod(loginSchema))
+		loginForm: await superValidate(zod4(loginSchema))
 	};
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
-		const form = await superValidate(request, zod(loginSchema));
+	login: async ({ request, cookies }) => {
+		const form = await superValidate(request, zod4(loginSchema));
+
 		if (!form.valid) {
 			return fail(400, {
 				form

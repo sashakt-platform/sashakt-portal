@@ -18,7 +18,7 @@
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
-	import { dndzone } from 'svelte-dnd-action';
+	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 
 	const {
 		data
@@ -160,7 +160,7 @@
 						{@render snippetHeading('Answers')}
 
 						<div
-							use:dndzone={{ items: totalOptions, flipDurationMs: 150 }}
+							use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
 							onconsider={({ detail }) => (totalOptions = detail.items)}
 							onfinalize={({ detail }) => {
 								totalOptions = detail.items.map((opt, i) => ({
@@ -178,7 +178,9 @@
 									</div>
 									<div class="flex w-full flex-col gap-2">
 										<div class="flex flex-row rounded-sm border-1 border-black">
-											<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
+											<span use:dragHandle aria-label="drag handle">
+												<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+											</span>
 											<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
 										</div>
 										<div class="flex flex-row gap-2">

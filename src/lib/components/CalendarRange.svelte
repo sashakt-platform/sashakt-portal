@@ -3,7 +3,7 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Label } from '$lib/components/ui/label/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+	import TimePicker from '$lib/components/TimePicker.svelte';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { CalendarDate, getLocalTimeZone } from '@internationalized/date';
 
@@ -79,94 +79,78 @@
 	function updateToValue() {
 		rangeToValue = formatDatetime(rangeToDateValue, rangeToTimeValue);
 	}
+
+	// Format time for display in 12-hour format
+	function formatTimeDisplay(time: string): string {
+		const [h, m] = time.split(':').map(Number);
+		const period = h >= 12 ? 'PM' : 'AM';
+		let hour12 = h % 12;
+		if (hour12 === 0) hour12 = 12;
+		return `${hour12}:${String(m).padStart(2, '0')} ${period}`;
+	}
+
+	// Format full datetime for button display
+	function formatButtonDisplay(date: CalendarDate | undefined, time: string): string {
+		if (!date) return 'Select date & time';
+		const dateStr = date.toDate(getLocalTimeZone()).toLocaleDateString('en-US', {
+			day: '2-digit',
+			month: 'short',
+			year: 'numeric'
+		});
+		return `${dateStr}, ${formatTimeDisplay(time)}`;
+	}
 </script>
 
 <div class="flex flex-col gap-4 sm:flex-row sm:gap-6">
-	<div class="flex flex-1 gap-2">
-		<div class="flex flex-1 flex-col gap-2">
-			<Label for="{id}-date-from" class="px-1">{rangeFromLabel}</Label>
-			<Popover.Root bind:open={rangeFromOpen}>
-				<Popover.Trigger id="{id}-date-from">
-					{#snippet child({ props })}
-						<Button {...props} variant="outline" class="w-full justify-between font-normal">
-							{rangeFromDateValue
-								? rangeFromDateValue.toDate(getLocalTimeZone()).toLocaleDateString('en-US', {
-										day: '2-digit',
-										month: 'short',
-										year: 'numeric'
-									})
-								: 'Select date'}
-							<ChevronDownIcon />
-						</Button>
-					{/snippet}
-				</Popover.Trigger>
-				<Popover.Content class="w-auto overflow-hidden p-0" align="start">
-					<Calendar
-						type="single"
-						bind:value={rangeFromDateValue}
-						captionLayout="dropdown"
-						onValueChange={() => {
-							rangeFromOpen = false;
-							updateFromValue();
-						}}
-					/>
-				</Popover.Content>
-			</Popover.Root>
-		</div>
-		<div class="flex flex-col gap-2">
-			<Label for="{id}-time-from" class="invisible px-1">Time</Label>
-			<Input
-				type="time"
-				id="{id}-time-from"
-				bind:value={rangeFromTimeValue}
-				onchange={updateFromValue}
-				class="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-			/>
-		</div>
+	<div class="flex flex-1 flex-col gap-2">
+		<Label for="{id}-from" class="px-1">{rangeFromLabel}</Label>
+		<Popover.Root bind:open={rangeFromOpen}>
+			<Popover.Trigger id="{id}-from">
+				{#snippet child({ props })}
+					<Button {...props} variant="outline" class="w-full justify-between font-normal">
+						{formatButtonDisplay(rangeFromDateValue, rangeFromTimeValue)}
+						<ChevronDownIcon />
+					</Button>
+				{/snippet}
+			</Popover.Trigger>
+			<Popover.Content class="w-auto p-0" align="start">
+				<Calendar
+					type="single"
+					bind:value={rangeFromDateValue}
+					captionLayout="dropdown"
+					onValueChange={updateFromValue}
+				/>
+				<div class="border-t p-3">
+					<TimePicker bind:value={rangeFromTimeValue} onchange={updateFromValue} />
+				</div>
+			</Popover.Content>
+		</Popover.Root>
 	</div>
-	<div class="flex flex-1 gap-2">
-		<div class="flex flex-1 flex-col gap-2">
-			<Label for="{id}-date-to" class="px-1">{rangeToLabel}</Label>
-			<Popover.Root bind:open={rangeToOpen}>
-				<Popover.Trigger id="{id}-date-to">
-					{#snippet child({ props })}
-						<Button {...props} variant="outline" class="w-full justify-between font-normal">
-							{rangeToDateValue
-								? rangeToDateValue.toDate(getLocalTimeZone()).toLocaleDateString('en-US', {
-										day: '2-digit',
-										month: 'short',
-										year: 'numeric'
-									})
-								: 'Select date'}
-							<ChevronDownIcon />
-						</Button>
-					{/snippet}
-				</Popover.Trigger>
-				<Popover.Content class="w-auto overflow-hidden p-0" align="start">
-					<Calendar
-						type="single"
-						bind:value={rangeToDateValue}
-						captionLayout="dropdown"
-						onValueChange={() => {
-							rangeToOpen = false;
-							updateToValue();
-						}}
-						isDateDisabled={(date: CalendarDate) => {
-							return (rangeFromDateValue && date.compare(rangeFromDateValue) < 0) ?? false;
-						}}
-					/>
-				</Popover.Content>
-			</Popover.Root>
-		</div>
-		<div class="flex flex-col gap-2">
-			<Label for="{id}-time-to" class="invisible px-1">Time</Label>
-			<Input
-				type="time"
-				id="{id}-time-to"
-				bind:value={rangeToTimeValue}
-				onchange={updateToValue}
-				class="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-			/>
-		</div>
+	<div class="flex flex-1 flex-col gap-2">
+		<Label for="{id}-to" class="px-1">{rangeToLabel}</Label>
+		<Popover.Root bind:open={rangeToOpen}>
+			<Popover.Trigger id="{id}-to">
+				{#snippet child({ props })}
+					<Button {...props} variant="outline" class="w-full justify-between font-normal">
+						{formatButtonDisplay(rangeToDateValue, rangeToTimeValue)}
+						<ChevronDownIcon />
+					</Button>
+				{/snippet}
+			</Popover.Trigger>
+			<Popover.Content class="w-auto p-0" align="start">
+				<Calendar
+					type="single"
+					bind:value={rangeToDateValue}
+					captionLayout="dropdown"
+					onValueChange={updateToValue}
+					isDateDisabled={(date: CalendarDate) => {
+						return (rangeFromDateValue && date.compare(rangeFromDateValue) < 0) ?? false;
+					}}
+				/>
+				<div class="border-t p-3">
+					<TimePicker bind:value={rangeToTimeValue} onchange={updateToValue} />
+				</div>
+			</Popover.Content>
+		</Popover.Root>
 	</div>
 </div>

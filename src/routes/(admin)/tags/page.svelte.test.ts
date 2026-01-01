@@ -106,7 +106,6 @@ describe('TagManagementPage', () => {
 		await fireEvent.click(sortBtn!);
 		expect(goto).toHaveBeenCalled();
 		const call = vi.mocked(goto).mock.calls[0][0].toString();
-		console.log(call);
 
 		expect(call).toContain('tagsSortBy');
 		expect(call).toContain('tagsSortOrder');
@@ -121,7 +120,6 @@ describe('TagManagementPage', () => {
 		expect(sortBtn).toBeTruthy();
 		await fireEvent.click(sortBtn!);
 		const call = vi.mocked(goto).mock.calls.at(0)![0].toString();
-		console.log('call2', call);
 
 		expect(call).toContain('tagTypesSortBy');
 		expect(call).toContain('tagTypesSortOrder');

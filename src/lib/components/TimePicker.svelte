@@ -52,7 +52,7 @@
 	}
 
 	const hours = ['12', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11'];
-	const minutes = ['00', '15', '30', '45'];
+	const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
 	const periods: ('AM' | 'PM')[] = ['AM', 'PM'];
 </script>
 

@@ -22,9 +22,9 @@
 	} = $props();
 	let open = $state(false);
 	let searchQuery = $state('');
-	const placeholder = multiple
-		? 'Select ' + (label ?? itemName) + 's'
-		: 'Select ' + (label ?? itemName);
+	const placeholder = $derived(
+		multiple ? 'Select ' + (label ?? itemName) + 's' : 'Select ' + (label ?? itemName)
+	);
 
 	// Debounced search
 	let searchTimeout: NodeJS.Timeout | undefined;
@@ -138,7 +138,7 @@
 				bind:value={searchQuery}
 			/>
 			<Command.List>
-				<Command.Empty>No {itemName} found.</Command.Empty>
+				<Command.Empty>No {label || itemName} found.</Command.Empty>
 				{#each itemList as item (item.id)}
 					<Command.Item
 						value={String(item.name)}

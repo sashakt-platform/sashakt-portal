@@ -22,7 +22,7 @@ export const GET: RequestHandler = async () => {
 
 		return json([DEFAULT_LANGUAGE]);
 	} catch (error) {
-		console.error('Failed to fetch test attempt stats:', error);
+		console.error('Failed to fetch supported language list', error);
 		return json([DEFAULT_LANGUAGE]);
 	}
 };

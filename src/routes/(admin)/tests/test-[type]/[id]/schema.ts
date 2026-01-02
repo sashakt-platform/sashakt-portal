@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from '$lib/constants';
 import { z } from 'zod';
 
 export const marksSchema = z.object({
@@ -9,11 +10,6 @@ export const marksSchema = z.object({
 export enum MarksLevel {
 	QUESTION = 'question',
 	TEST = 'test'
-}
-
-export enum Locales {
-	HI_IN = 'HI_IN',
-	EN_US = 'EN_US'
 }
 
 export const testSchema = z.object({
@@ -51,7 +47,7 @@ export const testSchema = z.object({
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
 	candidate_profile: z.boolean().default(false),
-	locale: z.enum(Object.values(Locales)).default(Locales.EN_US)
+	locale: z.string().default(DEFAULT_LANGUAGE.code)
 });
 
 export type FormSchema = typeof testSchema;

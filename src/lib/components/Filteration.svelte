@@ -82,6 +82,12 @@
 	onOpenChange={(e: boolean) => {
 		if (!e) {
 			searchQuery = '';
+
+			// let's reset the filter list when popover closes
+			if (onSearch) {
+				onSearch('');
+			}
+
 			const url = new URL(page.url);
 			try {
 				url.searchParams.delete(itemName + '_search');

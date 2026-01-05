@@ -8,7 +8,6 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
-	import MessageSquareQuote from '@lucide/svelte/icons/message-square-quote';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
 
@@ -210,6 +209,32 @@
 					</div>
 				</div>
 			{/if}
+			<div class="w-full md:w-2/5">
+				{@render headingSubheading('Feedback Setting', '')}
+			</div>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_feedback_on_completion} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Feedback on Completion',
+						'Enable to show candidate their answers and correct answers after the test is completed.'
+					)}
+				</div>
+			</div>
+
+			<div class="mt-4 flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_feedback_immediately} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Immediate Feedback',
+						'Enable to show candidate correct answers immediately after each question is attempted.'
+					)}
+				</div>
+			</div>
 		</ConfigureBox>
 
 		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>
@@ -263,31 +288,6 @@
 					{@render headingSubheading(
 						'Candidate profile',
 						'Enable this option to collect candidate information during the test.'
-					)}
-				</div>
-			</div>
-		</ConfigureBox>
-		<ConfigureBox title="Feedback Settings" Icon={MessageSquareQuote}>
-			<div class="flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.show_feedback_on_completion} />
-				</div>
-				<div class="w-full">
-					{@render headingSubheading(
-						'Feedback on Completion',
-						'Enable to show candidate their answers and correct answers after the test is completed.'
-					)}
-				</div>
-			</div>
-
-			<div class="mt-4 flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.show_feedback_immediately} />
-				</div>
-				<div class="w-full">
-					{@render headingSubheading(
-						'Immediate Feedback',
-						'Enable to show candidate correct answers immediately after each question is attempted.'
 					)}
 				</div>
 			</div>

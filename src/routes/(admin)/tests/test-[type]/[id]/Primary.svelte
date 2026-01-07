@@ -11,7 +11,7 @@
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 
 	let { formData, user = null }: { formData: any; user?: User | null } = $props();
-	let selectedStates = $derived(formData?.state_ids || []);
+	let selectedStates = $derived($formData.state_ids || []);
 
 	// for State admins, auto-assign their state
 	$effect(() => {

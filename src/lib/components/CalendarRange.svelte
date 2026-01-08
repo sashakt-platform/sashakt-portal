@@ -5,7 +5,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import TimePicker from '$lib/components/TimePicker.svelte';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
-	import { CalendarDate, getLocalTimeZone } from '@internationalized/date';
+	import { CalendarDate } from '@internationalized/date';
 
 	const id = $props.id();
 
@@ -23,20 +23,29 @@
 	let rangeFromTimeValue = $state('00:00');
 	let rangeToTimeValue = $state('00:00');
 
-	// Parse datetime string from backedn into CalendarDate and time string
+	// Parse datetime string from backend into CalendarDate and time string
+	// Backend format: "2025-12-31 17:30:00"
 	function parseDatetime(value: string | null | undefined): {
 		date: CalendarDate | undefined;
 		time: string;
 	} {
 		if (!value) return { date: undefined, time: '00:00' };
 		try {
-			const dt = new Date(value);
-			if (isNaN(dt.getTime())) {
+			const normalized = value.replace('T', ' ');
+			const [datePart, timePart] = normalized.split(' ');
+			const [year, month, day] = datePart.split('-').map(Number);
+
+			if (!year || !month || !day) {
 				return { date: undefined, time: '00:00' };
 			}
 
-			const date = new CalendarDate(dt.getFullYear(), dt.getMonth() + 1, dt.getDate());
-			const time = `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`;
+			const date = new CalendarDate(year, month, day);
+
+			let time = '00:00';
+			if (timePart) {
+				const [hours, minutes] = timePart.split(':').map(Number);
+				time = `${String(hours || 0).padStart(2, '0')}:${String(minutes || 0).padStart(2, '0')}`;
+			}
 
 			return { date, time };
 		} catch {
@@ -44,13 +53,16 @@
 		}
 	}
 
-	// Combine CalendarDate and time string into ISO datetime string for api endpoint
+	// Combine CalendarDate and time string into datetime string for api endpoint
 	function formatDatetime(date: CalendarDate | undefined, time: string): string | undefined {
 		if (!date) return undefined;
 		const [hours, minutes] = time.split(':').map(Number);
-		const dt = date.toDate(getLocalTimeZone());
-		dt.setHours(hours || 0, minutes || 0, 0, 0);
-		return dt.toISOString();
+		const year = date.year;
+		const month = String(date.month).padStart(2, '0');
+		const day = String(date.day).padStart(2, '0');
+		const h = String(hours || 0).padStart(2, '0');
+		const m = String(minutes || 0).padStart(2, '0');
+		return `${year}-${month}-${day} ${h}:${m}:00`;
 	}
 
 	// Set defaults for dates based on props
@@ -92,11 +104,21 @@
 	// Format full datetime for button display
 	function formatButtonDisplay(date: CalendarDate | undefined, time: string): string {
 		if (!date) return 'Select date & time';
-		const dateStr = date.toDate(getLocalTimeZone()).toLocaleDateString('en-US', {
-			day: '2-digit',
-			month: 'short',
-			year: 'numeric'
-		});
+		const months = [
+			'Jan',
+			'Feb',
+			'Mar',
+			'Apr',
+			'May',
+			'Jun',
+			'Jul',
+			'Aug',
+			'Sep',
+			'Oct',
+			'Nov',
+			'Dec'
+		];
+		const dateStr = `${months[date.month - 1]} ${String(date.day).padStart(2, '0')}, ${date.year}`;
 		return `${dateStr}, ${formatTimeDisplay(time)}`;
 	}
 </script>

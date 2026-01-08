@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/sveltekit';
 
 Sentry.init({
 	dsn: 'https://91335032a1fef2b37caec0d0271a23a8@o412613.ingest.us.sentry.io/4510127619768320',
+	enabled: !dev,
 
 	tracesSampleRate: 1.0,
 

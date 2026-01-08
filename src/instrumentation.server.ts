@@ -1,4 +1,5 @@
 import { dev } from '$app/environment';
+import { PUBLIC_APP_ENV } from '$env/static/public';
 import * as Sentry from '@sentry/sveltekit';
 
 Sentry.init({
@@ -8,7 +9,9 @@ Sentry.init({
 	tracesSampleRate: 1.0,
 
 	// Enable logs to be sent to Sentry
-	enableLogs: true
+	enableLogs: true,
+
+	environment: PUBLIC_APP_ENV || 'development'
 
 	// uncomment the line below to enable Spotlight (https://spotlightjs.com)
 	// spotlight: import.meta.env.DEV,

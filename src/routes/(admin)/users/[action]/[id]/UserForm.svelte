@@ -8,7 +8,12 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import type { Filter } from '$lib/types/filters';
-	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
+	import {
+		hasPermission,
+		PERMISSIONS,
+		isStateAdmin,
+		getUserState
+	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 
 	let { data }: { data: any } = $props();
@@ -33,9 +38,26 @@
 
 	let selectedStates = $state<Filter[]>([]);
 
+	// check if the current user is a state admin
+	const currentUserIsStateAdmin = isStateAdmin(data.currentUser);
+
 	if (userData?.states?.length > 0) {
 		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
 	}
+
+	// if state admin is creating a user with state admin role,
+	// then we should auto-assign current state admin's state
+	$effect(() => {
+		const selectedRole = data.roles.find((role: any) => role.id === $formData.role_id);
+		const isStateRole = selectedRole?.label?.toLowerCase()?.includes('state');
+
+		if (currentUserIsStateAdmin && isStateRole && selectedStates.length === 0) {
+			const userState = getUserState(data.currentUser);
+			if (userState) {
+				selectedStates = [{ id: String(userState.id), name: userState.name }];
+			}
+		}
+	});
 
 	$effect(() => {
 		$formData.state_ids = selectedStates.length > 0 ? [parseInt(selectedStates[0].id, 10)] : [];
@@ -193,15 +215,17 @@
 		.find((role: any) => role.id === $formData.role_id)
 		?.label?.toLowerCase()
 		?.includes('state')}
-		<Form.Field {form} name="state_ids">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>State</Form.Label>
-					<StateSelection {...props} bind:states={selectedStates} multiple={false} />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
+		{#if !currentUserIsStateAdmin}
+			<Form.Field {form} name="state_ids">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>State</Form.Label>
+						<StateSelection {...props} bind:states={selectedStates} multiple={false} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		{/if}
 	{/if}
 
 	<div class="flex justify-end gap-4 pt-6">

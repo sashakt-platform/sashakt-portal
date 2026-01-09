@@ -18,6 +18,7 @@
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
+	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 
 	const {
@@ -27,6 +28,7 @@
 			form: SuperValidated<Infer<FormSchema>>;
 			tagForm: SuperValidated<Infer<TagFormSchema>>;
 			tagTypes: [];
+			user: User;
 		};
 	} = $props();
 
@@ -101,6 +103,17 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
+
+	// for State admins, auto-assign their state when creating a new question
+	// backend should handle this as well
+	$effect(() => {
+		if (isStateAdmin(data.user) && (!$formData.state_ids || $formData.state_ids.length === 0)) {
+			const userState = getUserState(data.user);
+			if (userState) {
+				$formData.state_ids = [{ id: String(userState.id), name: userState.name }];
+			}
+		}
+	});
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -260,8 +273,10 @@
 						</Dialog.Root>
 					</div>
 					<div class="flex flex-col gap-2">
-						{@render snippetHeading('States')}
-						<StateSelection bind:states={$formData.state_ids} />
+						{#if !isStateAdmin(data.user)}
+							{@render snippetHeading('States')}
+							<StateSelection bind:states={$formData.state_ids} />
+						{/if}
 						<div class="mt-6 flex items-center space-x-2 lg:mt-12">
 							<Switch id="is-active" bind:checked={$formData.is_active} />
 							<Label for="is-active">Is Active?</Label><Info

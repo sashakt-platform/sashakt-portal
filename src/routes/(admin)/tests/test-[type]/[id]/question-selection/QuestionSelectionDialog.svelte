@@ -12,8 +12,21 @@
 	import type { ColumnDef } from '@tanstack/table-core';
 	import { Button } from '$lib/components/ui/button';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import { isStateAdmin, type User } from '$lib/utils/permissions.js';
 
-	let { open = $bindable(), questions, questionParams, formData } = $props();
+	let {
+		open = $bindable(),
+		questions,
+		questionParams,
+		formData,
+		user = null
+	}: {
+		open: boolean;
+		questions: any;
+		questionParams: any;
+		formData: any;
+		user?: User | null;
+	} = $props();
 	let tags = $state<string[]>([]);
 	let states = $state<string[]>([]);
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -177,9 +190,11 @@
 					<div class="w-full">
 						<TagsSelection bind:tags filteration={true} />
 					</div>
-					<div class="w-full sm:col-span-2 lg:col-span-1">
-						<StateSelection bind:states filteration={true} />
-					</div>
+					{#if !isStateAdmin(user)}
+						<div class="w-full sm:col-span-2 lg:col-span-1">
+							<StateSelection bind:states filteration={true} />
+						</div>
+					{/if}
 				</div>
 				<div class="relative flex flex-1 flex-col">
 					<div class="overflow-auto pb-20" style="max-height: 65vh;">

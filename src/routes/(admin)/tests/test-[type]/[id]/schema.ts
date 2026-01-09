@@ -1,3 +1,4 @@
+import { DEFAULT_LANGUAGE } from '$lib/constants';
 import { z } from 'zod';
 
 export const marksSchema = z.object({
@@ -18,7 +19,7 @@ export const testSchema = z.object({
 	start_time: z.string().nullable().optional(),
 	end_time: z.string().nullable().optional(),
 	time_limit: z.number().nullable().optional(),
-	marks_level: z.nativeEnum(MarksLevel).nullable().default(MarksLevel.QUESTION),
+	marks_level: z.enum(Object.values(MarksLevel)).nullable().default(MarksLevel.QUESTION),
 	marks: z.number().nullable().optional(),
 	marking_scheme: marksSchema,
 	completion_message: z.string().nullable().optional(),
@@ -45,7 +46,8 @@ export const testSchema = z.object({
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
-	candidate_profile: z.boolean().default(false)
+	candidate_profile: z.boolean().default(false),
+	locale: z.string().default(DEFAULT_LANGUAGE.code)
 });
 
 export type FormSchema = typeof testSchema;

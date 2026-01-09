@@ -11,6 +11,9 @@
 	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
+	import * as Select from '$lib/components/ui/select';
+	import type { languageOption } from '$lib/types/test';
+	import { DEFAULT_LANGUAGE } from '$lib/constants';
 
 	let { formData } = $props();
 
@@ -25,6 +28,31 @@
 	if (!$formData.marks_level) {
 		$formData.marks_level = MarksLevel.QUESTION;
 	}
+
+	let languageOptions = $state<Array<languageOption>>([DEFAULT_LANGUAGE]);
+
+	// load test languages
+	async function loadLanguages() {
+		try {
+			const response = await fetch('/api/test/languages');
+			if (response.ok) {
+				const data = await response.json();
+				languageOptions = data;
+			} else {
+				languageOptions = [DEFAULT_LANGUAGE];
+			}
+		} catch (error) {
+			console.error('Failed to load test languages:', error);
+			languageOptions = [DEFAULT_LANGUAGE];
+		}
+	}
+
+	// initial load effect
+	$effect(() => {
+		(async () => {
+			await loadLanguages();
+		})();
+	});
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
@@ -198,6 +226,30 @@
 					</div>
 				</div>
 			{/if}
+			<div class="flex flex-row gap-3 align-top">
+				<div class="w-full">
+					{@render headingSubheading(
+						'Language of Assessment',
+						'Select Language of Assessment. English is the default language.'
+					)}
+				</div>
+				<div class="w-full">
+					<Select.Root type="single" name="locale" bind:value={$formData.locale}>
+						<Select.Trigger
+							>{languageOptions.find((lang) => lang.code === $formData.locale)?.language}
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								{#each languageOptions as lang (lang.code)}
+									<Select.Item value={lang.code} label={lang.language}>
+										{lang.language}
+									</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				</div>
+			</div>
 		</ConfigureBox>
 
 		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>

@@ -137,6 +137,18 @@
 					)}
 				</div>
 			</div>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_question_palette} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Show Question Palette',
+						'Choose whether to display the Question Palette during test.'
+					)}
+				</div>
+			</div>
+
 			{#if $formData.random_tag_count.length == 0}
 				<div class="flex flex-row gap-3 align-top">
 					<div class="my-auto w-fit gap-4">

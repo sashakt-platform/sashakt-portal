@@ -10,8 +10,14 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import type { Filter } from '$lib/types/filters';
+	import type { User } from '$lib/utils/permissions.js';
 
-	let { formData, questions, questionParams } = $props();
+	let {
+		formData,
+		questions,
+		questionParams,
+		user = null
+	}: { formData: any; questions: any; questionParams: any; user?: User | null } = $props();
 	let dialogOpen = $state(false);
 	let questionSelectionMode: 'manual' | 'tagBased' = $state('manual');
 
@@ -46,7 +52,7 @@
 	};
 </script>
 
-<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} />
+<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
 
 <div class="mx-auto flex h-dvh">
 	<div class="mx-auto w-full p-4 sm:p-8 md:p-12 lg:p-20">

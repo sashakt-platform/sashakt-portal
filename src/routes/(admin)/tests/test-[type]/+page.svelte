@@ -15,7 +15,7 @@
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
-	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import { canCreate, canUpdate, canDelete, isStateAdmin } from '$lib/utils/permissions.js';
 
 	let {
 		data
@@ -200,9 +200,11 @@
 				/>
 			</div>
 
-			<div>
-				<StateSelection bind:states={filteredStates} filteration={true} />
-			</div>
+			{#if !isStateAdmin(data.user)}
+				<div>
+					<StateSelection bind:states={filteredStates} filteration={true} />
+				</div>
+			{/if}
 
 			<div>
 				<DistrictSelection

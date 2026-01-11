@@ -144,7 +144,7 @@
 				<div class="w-full">
 					{@render headingSubheading(
 						'Show Question Palette',
-						'Choose whether to display the Question Palette during test.'
+						'Choose whether to display the Question Palette during the test.'
 					)}
 				</div>
 			</div>

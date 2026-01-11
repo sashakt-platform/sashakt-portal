@@ -11,8 +11,6 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
 	import * as Select from '$lib/components/ui/select';
-	import type { languageOption } from '$lib/types/test';
-	import { DEFAULT_LANGUAGE } from '$lib/constants';
 
 	let { formData } = $props();
 
@@ -28,21 +26,18 @@
 		$formData.marks_level = MarksLevel.QUESTION;
 	}
 
-	let languageOptions = $state<Array<languageOption>>([DEFAULT_LANGUAGE]);
+	let languageOptions = $state<{ [key: string]: string }>({});
 
 	// load test languages
 	async function loadLanguages() {
 		try {
-			const response = await fetch('/api/test/languages');
+			const response = await fetch('/api/languages');
 			if (response.ok) {
 				const data = await response.json();
 				languageOptions = data;
-			} else {
-				languageOptions = [DEFAULT_LANGUAGE];
 			}
 		} catch (error) {
 			console.error('Failed to load test languages:', error);
-			languageOptions = [DEFAULT_LANGUAGE];
 		}
 	}
 
@@ -247,13 +242,15 @@
 				<div class="w-full">
 					<Select.Root type="single" name="locale" bind:value={$formData.locale}>
 						<Select.Trigger
-							>{languageOptions.find((lang) => lang.code === $formData.locale)?.language}
+							>{Object.entries(languageOptions).find(
+								([key, value]) => key === $formData.locale
+							)?.[1] || 'Select Language'}
 						</Select.Trigger>
 						<Select.Content>
 							<Select.Group>
-								{#each languageOptions as lang (lang.code)}
-									<Select.Item value={lang.code} label={lang.language}>
-										{lang.language}
+								{#each Object.entries(languageOptions) as lang (lang[0])}
+									<Select.Item value={lang[0]} label={lang[1]}>
+										{lang[1]}
 									</Select.Item>
 								{/each}
 							</Select.Group>

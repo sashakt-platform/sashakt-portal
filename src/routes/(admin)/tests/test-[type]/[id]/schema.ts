@@ -1,4 +1,3 @@
-import { DEFAULT_LANGUAGE } from '$lib/constants';
 import { z } from 'zod';
 
 export const marksSchema = z.object({
@@ -47,7 +46,7 @@ export const testSchema = z.object({
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
 	candidate_profile: z.boolean().default(false),
-	locale: z.string().default(DEFAULT_LANGUAGE.code)
+	locale: z.string().nullable().optional()
 });
 
 export type FormSchema = typeof testSchema;

@@ -165,7 +165,7 @@ export const actions: Actions = {
 			district_ids: form.data.district_ids.map((d) => d.id),
 			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
 		};
-		if (!transformedFormData.locale || transformedFormData.locale === '') {
+		if (!transformedFormData.locale) {
 			delete transformedFormData.locale;
 		}
 		const response = await fetch(

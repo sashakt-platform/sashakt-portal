@@ -11,6 +11,7 @@
 	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
+	import * as Select from '$lib/components/ui/select';
 
 	let { formData } = $props();
 
@@ -25,6 +26,30 @@
 	if (!$formData.marks_level) {
 		$formData.marks_level = MarksLevel.QUESTION;
 	}
+
+	if (!$formData.locale) {
+		$formData.locale = 'en-US';
+	}
+
+	let languageOptions = $state<{ [key: string]: string }>({});
+
+	// load test languages
+	async function loadLanguages() {
+		try {
+			const response = await fetch('/api/languages');
+			if (response.ok) {
+				const data = await response.json();
+				languageOptions = data;
+			}
+		} catch (error) {
+			console.error('Failed to load test languages:', error);
+		}
+	}
+
+	// initial load effect
+	$effect(() => {
+		loadLanguages();
+	});
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
@@ -198,6 +223,23 @@
 					</div>
 				</div>
 			{/if}
+			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
+				<div>
+					{@render headingSubheading('Language', 'Select test language.')}
+				</div>
+				<div>
+					<Select.Root type="single" name="locale" bind:value={$formData.locale}>
+						<Select.Trigger class="w-48">{languageOptions[$formData.locale]}</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								{#each Object.entries(languageOptions) as [key, label] (key)}
+									<Select.Item value={key} {label}>{label}</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				</div>
+			</div>
 		</ConfigureBox>
 
 		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>

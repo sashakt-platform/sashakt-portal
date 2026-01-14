@@ -46,11 +46,7 @@ export const testSchema = z.object({
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
 	candidate_profile: z.boolean().default(false),
-	locale: z
-		.string()
-		.nullable()
-		.transform((v) => (v === '' ? undefined : v))
-		.optional()
+	locale: z.string().default('en-US')
 });
 
 export type FormSchema = typeof testSchema;

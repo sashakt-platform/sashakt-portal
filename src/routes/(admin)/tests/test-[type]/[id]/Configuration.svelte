@@ -47,9 +47,7 @@
 
 	// initial load effect
 	$effect(() => {
-		(async () => {
-			await loadLanguages();
-		})();
+		loadLanguages();
 	});
 </script>
 

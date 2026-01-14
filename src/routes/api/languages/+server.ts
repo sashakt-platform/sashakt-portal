@@ -18,7 +18,10 @@ export const GET: RequestHandler = async () => {
 			const data = await response.json();
 			return json(data);
 		}
+
+		return json({ error: 'Failed to fetch languages' }, { status: response.status });
 	} catch (error) {
 		console.error('Failed to fetch supported language list', error);
+		return json({ error: 'Failed to fetch languages' }, { status: 500 });
 	}
 };

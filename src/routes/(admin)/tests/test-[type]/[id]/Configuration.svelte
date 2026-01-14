@@ -232,16 +232,13 @@
 					</div>
 				</div>
 			{/if}
-			<div class="flex flex-row gap-3 align-top">
-				<div class="w-full">
-					{@render headingSubheading(
-						'Language of Assessment',
-						'Select Language of Assessment. English is the default language.'
-					)}
+			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
+				<div>
+					{@render headingSubheading('Language', 'Select test language.')}
 				</div>
-				<div class="w-full">
+				<div>
 					<Select.Root type="single" name="locale" bind:value={$formData.locale}>
-						<Select.Trigger
+						<Select.Trigger class="w-48"
 							>{Object.entries(languageOptions).find(
 								([key, value]) => key === $formData.locale
 							)?.[1] || 'Select Language'}

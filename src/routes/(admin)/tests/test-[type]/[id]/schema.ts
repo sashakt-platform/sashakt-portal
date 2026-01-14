@@ -18,7 +18,7 @@ export const testSchema = z.object({
 	start_time: z.string().nullable().optional(),
 	end_time: z.string().nullable().optional(),
 	time_limit: z.number().nullable().optional(),
-	marks_level: z.nativeEnum(MarksLevel).nullable().default(MarksLevel.QUESTION),
+	marks_level: z.enum(Object.values(MarksLevel)).nullable().default(MarksLevel.QUESTION),
 	marks: z.number().nullable().optional(),
 	marking_scheme: marksSchema,
 	completion_message: z.string().nullable().optional(),
@@ -46,7 +46,8 @@ export const testSchema = z.object({
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
 	show_question_palette: z.boolean().default(true),
-	candidate_profile: z.boolean().default(false)
+	candidate_profile: z.boolean().default(false),
+	locale: z.string().default('en-US')
 });
 
 export type FormSchema = typeof testSchema;

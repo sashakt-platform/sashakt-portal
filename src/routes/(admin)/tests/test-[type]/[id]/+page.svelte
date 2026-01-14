@@ -139,9 +139,14 @@
 	</div>
 
 	{#if currentScreen === typeOfScreen.primary}
-		<Primary {formData} />
+		<Primary {formData} user={data.user} />
 	{:else if currentScreen === typeOfScreen.questions}
-		<QuestionList {formData} questions={data.questions} questionParams={data.questionParams} />
+		<QuestionList
+			{formData}
+			questions={data.questions}
+			questionParams={data.questionParams}
+			user={data.user}
+		/>
 	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}

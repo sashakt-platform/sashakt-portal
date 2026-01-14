@@ -5,8 +5,14 @@ import UserForm from './UserForm.svelte';
 
 // Mock StateSelection component
 vi.mock('$lib/components/StateSelection.svelte', () => ({
-	default: class StateSelectionMock {
-		constructor() {}
+	default: function MockStateSelection(options: any) {
+		return {
+			$$set: vi.fn(),
+			$destroy: vi.fn(),
+			$on: vi.fn(),
+			_props: options?.props || {},
+			_target: options?.target
+		};
 	}
 }));
 
@@ -26,7 +32,16 @@ vi.mock('$lib/utils/permissions.js', () => ({
 		CREATE_ORGANIZATION: 'create_organization',
 		UPDATE_ORGANIZATION: 'update_organization',
 		DELETE_ORGANIZATION: 'delete_organization'
-	}
+	},
+	isStateAdmin: vi.fn((user) => {
+		return user?.states?.length === 1;
+	}),
+	getUserState: vi.fn((user) => {
+		if (!user || !user.states || user.states.length === 0) {
+			return null;
+		}
+		return user.states[0];
+	})
 }));
 
 describe('UserForm Component', () => {
@@ -216,6 +231,38 @@ describe('UserForm Component', () => {
 			render(UserForm, { data });
 
 			expect(screen.queryByText('Organization')).not.toBeInTheDocument();
+		});
+	});
+
+	describe('System Admin - State Field Visibility', () => {
+		it('should show state field when System Admin selects a state role', () => {
+			const data = createTestData(
+				{ role_id: '2' }, // System admin User role
+				{
+					permissions: ['create_user'],
+					states: [] // System Admin has no single state
+				}
+			);
+
+			render(UserForm, { data });
+
+			// State field should be visible for System Admin creating State User
+			expect(screen.getByText('State')).toBeInTheDocument();
+		});
+
+		it('should hide state field when State Admin selects a state role', () => {
+			const data = createTestData(
+				{ role_id: '3' }, // State User role
+				{
+					permissions: ['create_user'],
+					states: [{ id: 1, name: 'Maharashtra' }] // State Admin has exactly one state
+				}
+			);
+
+			render(UserForm, { data });
+
+			// State field should be hidden for State Admin creating State User
+			expect(screen.queryByText('State')).not.toBeInTheDocument();
 		});
 	});
 });

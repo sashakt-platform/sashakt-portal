@@ -26,6 +26,10 @@
 		$formData.marks_level = MarksLevel.QUESTION;
 	}
 
+	if (!$formData.locale) {
+		$formData.locale = 'en-US';
+	}
+
 	let languageOptions = $state<{ [key: string]: string }>({});
 
 	// load test languages
@@ -238,17 +242,11 @@
 				</div>
 				<div>
 					<Select.Root type="single" name="locale" bind:value={$formData.locale}>
-						<Select.Trigger class="w-48"
-							>{Object.entries(languageOptions).find(
-								([key, value]) => key === $formData.locale
-							)?.[1] || 'Select Language'}
-						</Select.Trigger>
+						<Select.Trigger class="w-48">{languageOptions[$formData.locale]}</Select.Trigger>
 						<Select.Content>
 							<Select.Group>
-								{#each Object.entries(languageOptions) as lang (lang[0])}
-									<Select.Item value={lang[0]} label={lang[1]}>
-										{lang[1]}
-									</Select.Item>
+								{#each Object.entries(languageOptions) as [key, label] (key)}
+									<Select.Item value={key} {label}>{label}</Select.Item>
 								{/each}
 							</Select.Group>
 						</Select.Content>

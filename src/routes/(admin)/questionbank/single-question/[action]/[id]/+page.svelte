@@ -207,7 +207,7 @@
 									</div>
 									<div
 										class={[
-											'mt-2 gap-0 opacity-0 transition-opacity',
+											'mt-2 gap-0 opacity-0',
 											totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
 										]}
 									>

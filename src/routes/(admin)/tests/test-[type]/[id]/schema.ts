@@ -45,6 +45,7 @@ export const testSchema = z.object({
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
+	show_question_palette: z.boolean().default(true),
 	candidate_profile: z.boolean().default(false),
 	locale: z.string().default('en-US')
 });

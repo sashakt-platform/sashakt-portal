@@ -60,6 +60,7 @@
 		{children.name}
 		<button
 			class="ml-2 text-white hover:text-gray-400 focus:outline-none"
+			type="button"
 			style="margin-left:auto;"
 			onclick={(e) => {
 				e.stopPropagation();

@@ -8,6 +8,7 @@
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import User from '@lucide/svelte/icons/user';
 	import Tags from '@lucide/svelte/icons/tags';
+	import Building from '@lucide/svelte/icons/building-2';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
@@ -43,6 +44,11 @@
 			title: 'Tag Management',
 			url: '/tags',
 			icon: Tags
+		},
+		organization: {
+			title: 'Organization',
+			url: '/organization',
+			icon: Building
 		},
 		user: {
 			title: 'User Management',
@@ -155,6 +161,9 @@
 
 					{#if canRead(data.user, 'tag')}
 						{@render sidebaritems(menu_items.tags)}
+					{/if}
+					{#if canRead(data.user, 'organization')}
+						{@render sidebaritems(menu_items.organization)}
 					{/if}
 
 					{#if canRead(data.user, 'user')}

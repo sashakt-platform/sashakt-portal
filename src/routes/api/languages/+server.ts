@@ -7,7 +7,7 @@ export const GET: RequestHandler = async () => {
 	const token = getSessionTokenCookie();
 
 	try {
-		const response = await fetch(`${BACKEND_URL}/languages`, {
+		const response = await fetch(`${BACKEND_URL}/languages/`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`

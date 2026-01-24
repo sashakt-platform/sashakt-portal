@@ -10,6 +10,7 @@
 	import type { PageData } from './$types';
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 	import { editOrganizationSchema, type EditOrganizationSchema } from './schema';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import { toast } from 'svelte-sonner';
@@ -51,7 +52,9 @@
 	const selectedFileSize = $derived(
 		$logoFile?.[0] ? `${($logoFile[0].size / 1024).toFixed(1)} KB` : null
 	);
-	const previewUrl = $derived($logoFile?.[0] ? URL.createObjectURL($logoFile[0]) : null);
+	const previewUrl = $derived(
+		browser && $logoFile?.[0] ? URL.createObjectURL($logoFile[0]) : null
+	);
 
 	function clearFileSelection(e: MouseEvent) {
 		e.stopPropagation();

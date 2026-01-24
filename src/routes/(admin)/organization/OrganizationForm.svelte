@@ -2,7 +2,6 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
@@ -36,16 +35,6 @@
 					{#snippet children({ props })}
 						<Form.Label class="font-semibold">Name</Form.Label>
 						<Input {...props} bind:value={$formData.name} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-
-			<Form.Field {form} name="description" class="flex w-full flex-col gap-2 md:pr-8">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label class="font-semibold">Description</Form.Label>
-						<Textarea {...props} bind:value={$formData.description} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />

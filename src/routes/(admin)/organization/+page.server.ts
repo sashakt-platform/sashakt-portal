@@ -48,7 +48,6 @@ export const actions: Actions = {
 
 		const updateData: any = {
 			name: form.data.name,
-			description: form.data.description || '',
 			shortcode: form.data.shortcode,
 			logo: form.data.logo || ''
 		};

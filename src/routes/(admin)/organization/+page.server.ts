@@ -72,7 +72,7 @@ export const actions: Actions = {
 		throw redirect(
 			303,
 			`/organization`,
-			{ type: 'success', message: 'Organization Updated Successfully' },
+			{ type: 'success', message: 'Organization updated successfully.' },
 			cookies
 		);
 	}

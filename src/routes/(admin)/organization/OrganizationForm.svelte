@@ -23,11 +23,23 @@
 	} = $props();
 
 	let orgData: Partial<Infer<EditOrganizationSchema>> | null = data?.currentOrganization || null;
-	let currentLogoUrl: string | null = data?.currentOrganization?.logo || null;
+	let currentLogoUrl = $state<string | null>(data?.currentOrganization?.logo || null);
+
+	// sync currentLogoUrl when data changes
+	$effect(() => {
+		currentLogoUrl = data?.currentOrganization?.logo || null;
+	});
 
 	const form = superForm(orgData || data.form, {
 		validators: zod4Client(editOrganizationSchema),
-		dataType: 'form'
+		dataType: 'form',
+		onResult: () => {
+			// clear file input after successful save
+			if (fileInput) {
+				fileInput.value = '';
+				fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+			}
+		}
 	});
 
 	const { form: formData, enhance } = form;
@@ -134,7 +146,6 @@
 										alt="Current logo"
 										class="h-16 w-16 rounded border object-contain"
 									/>
-									<span class="text-sm text-gray-500">Current logo</span>
 									<Trash_2
 										size={18}
 										class="text-muted-foreground hover:text-destructive cursor-pointer"

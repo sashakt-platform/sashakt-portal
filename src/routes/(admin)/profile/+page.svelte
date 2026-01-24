@@ -20,9 +20,7 @@
 						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 					</div>
 				</div>
-				<Label class="my-auto align-middle text-sm font-extralight">
-					Update your profile information
-				</Label>
+				<Label class="my-auto align-middle text-sm font-extralight">Update your information</Label>
 			</div>
 		</div>
 	{/snippet}

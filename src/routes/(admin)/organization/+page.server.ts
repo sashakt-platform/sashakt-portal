@@ -46,19 +46,21 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const updateData: any = {
-			name: form.data.name,
-			shortcode: form.data.shortcode,
-			logo: form.data.logo || ''
-		};
+		const formData = new FormData();
+		formData.append('name', form.data.name);
+		formData.append('shortcode', form.data.shortcode);
+
+		// append logo file if provided
+		if (form.data.logo && form.data.logo.size > 0) {
+			formData.append('logo', form.data.logo);
+		}
 
 		const res = await fetch(`${BACKEND_URL}/organization/current`, {
 			method: 'PATCH',
 			headers: {
-				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`
 			},
-			body: JSON.stringify(updateData)
+			body: formData
 		});
 
 		if (!res.ok) {

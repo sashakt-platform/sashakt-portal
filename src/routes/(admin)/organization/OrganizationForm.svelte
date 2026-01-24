@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Check from '@lucide/svelte/icons/check';
+	import ClipboardCopy from '@lucide/svelte/icons/clipboard-copy';
 	import Upload from '@lucide/svelte/icons/upload';
 	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.js';
@@ -7,6 +9,7 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
 	import type { Snippet } from 'svelte';
+	import { page } from '$app/stores';
 	import { editOrganizationSchema, type EditOrganizationSchema } from './schema';
 
 	let {
@@ -43,6 +46,17 @@
 			fileInput.dispatchEvent(new Event('change', { bubbles: true }));
 		}
 	}
+
+	let copied = $state(false);
+
+	function copyToClipboard() {
+		const fullUrl = `${$page.url.origin}/${$formData.shortcode}`;
+		navigator.clipboard.writeText(fullUrl);
+		copied = true;
+		setTimeout(() => {
+			copied = false;
+		}, 2000);
+	}
 </script>
 
 <form method="POST" use:enhance action="?/save" enctype="multipart/form-data">
@@ -64,6 +78,22 @@
 					{#snippet children({ props })}
 						<Form.Label class="font-semibold">Shortcode</Form.Label>
 						<Input {...props} bind:value={$formData.shortcode} />
+						<div class="flex items-center gap-2">
+							<p class="text-sm text-gray-500">
+								Your portal URL: {$page.url.origin}/{$formData.shortcode}
+							</p>
+							<button
+								type="button"
+								onclick={copyToClipboard}
+								class="text-gray-500 hover:text-gray-700"
+							>
+								{#if copied}
+									<Check class="h-4 w-4" />
+								{:else}
+									<ClipboardCopy class="h-4 w-4" />
+								{/if}
+							</button>
+						</div>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />

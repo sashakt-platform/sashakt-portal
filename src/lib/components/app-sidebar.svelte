@@ -46,11 +46,6 @@
 			url: '/tags',
 			icon: Tags
 		},
-		organization: {
-			title: 'My Organization',
-			url: '/organization',
-			icon: Building
-		},
 		user: {
 			title: 'User Management',
 			url: '/users',

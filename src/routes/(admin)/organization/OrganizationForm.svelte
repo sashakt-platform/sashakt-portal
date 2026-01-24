@@ -34,6 +34,15 @@
 	const selectedFileSize = $derived(
 		$logoFile?.[0] ? `${($logoFile[0].size / 1024).toFixed(1)} KB` : null
 	);
+	const previewUrl = $derived($logoFile?.[0] ? URL.createObjectURL($logoFile[0]) : null);
+
+	function clearFileSelection(e: MouseEvent) {
+		e.stopPropagation();
+		if (fileInput) {
+			fileInput.value = '';
+			fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+		}
+	}
 </script>
 
 <form method="POST" use:enhance action="?/save" enctype="multipart/form-data">
@@ -90,20 +99,17 @@
 								role="button"
 								tabindex="0"
 							>
-								{#if selectedFileName}
+								{#if selectedFileName && previewUrl}
 									<div class="flex flex-col items-center gap-2">
+										<img
+											src={previewUrl}
+											alt="Logo preview"
+											class="h-24 w-24 rounded border object-contain"
+										/>
 										<p class="text-sm font-medium">{selectedFileName}</p>
 										<p class="text-xs text-gray-500">{selectedFileSize}</p>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onclick={(e) => {
-												e.stopPropagation();
-												$logoFile = null;
-											}}
-										>
-											Remove
+										<Button type="button" variant="outline" size="sm" onclick={clearFileSelection}>
+											Cancel
 										</Button>
 									</div>
 								{:else}

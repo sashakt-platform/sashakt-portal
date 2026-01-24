@@ -11,6 +11,8 @@
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/stores';
 	import { editOrganizationSchema, type EditOrganizationSchema } from './schema';
+	import Trash_2 from '@lucide/svelte/icons/trash-2';
+	import { toast } from 'svelte-sonner';
 
 	let {
 		data,
@@ -57,10 +59,23 @@
 			copied = false;
 		}, 2000);
 	}
+
+	async function deleteLogo() {
+		const res = await fetch('/api/organization/logo', {
+			method: 'DELETE'
+		});
+
+		if (res.ok) {
+			currentLogoUrl = null;
+			toast.success('Logo deleted successfully');
+		} else {
+			toast.error('Failed to delete logo');
+		}
+	}
 </script>
 
 <form method="POST" use:enhance action="?/save" enctype="multipart/form-data">
-	<div class="mx-auto flex h-lvh flex-col gap-6 py-6 md:gap-10 md:py-8">
+	<div class="mx-auto flex min-h-screen flex-col gap-6 py-6 md:gap-10 md:py-8">
 		{@render header()}
 		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-10 md:p-9">
 			<Form.Field {form} name="name" class="flex w-full flex-col gap-2 md:pr-8">
@@ -120,6 +135,11 @@
 										class="h-16 w-16 rounded border object-contain"
 									/>
 									<span class="text-sm text-gray-500">Current logo</span>
+									<Trash_2
+										size={18}
+										class="text-muted-foreground hover:text-destructive cursor-pointer"
+										onclick={deleteLogo}
+									/>
 								</div>
 							{/if}
 							<div

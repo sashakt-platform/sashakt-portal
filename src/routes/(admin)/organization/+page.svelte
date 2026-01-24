@@ -1,10 +1,7 @@
 <script>
 	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
-	import { Button } from '$lib/components/ui/button';
 	import OrganizationForm from './OrganizationForm.svelte';
 	const { data } = $props();
-
-	let isEditMode = $state(false);
 </script>
 
 <div class="mx-4 flex flex-col py-4 sm:mx-6 md:mx-10">
@@ -14,12 +11,11 @@
 		<ListingPageLayout
 			title="My Organization"
 			subtitle="Manage your organization"
-			infoLabel="Help: User management"
-			infoDescription="This panel displays all users in the system. You can edit or delete a user by clicking the three dots next to their entry."
+			infoLabel="Help: Organization settings"
+			infoDescription="Update your organization details including name, description, shortcode, and logo."
 		></ListingPageLayout>
-		<Button onclick={() => (isEditMode = true)}>Edit</Button>
 	</div>
 	<div class="bg-white p-4 sm:p-6 md:p-10">
-		<OrganizationForm {data} bind:isEditMode />
+		<OrganizationForm {data} />
 	</div>
 </div>

@@ -10,7 +10,7 @@
 	import Tags from '@lucide/svelte/icons/tags';
 	import Building from '@lucide/svelte/icons/building-2';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { canRead } from '$lib/utils/permissions.js';
+	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 
 	// Menu items.
@@ -46,7 +46,7 @@
 			icon: Tags
 		},
 		organization: {
-			title: 'Organization',
+			title: 'My Organization',
 			url: '/organization',
 			icon: Building
 		},
@@ -162,9 +162,6 @@
 					{#if canRead(data.user, 'tag')}
 						{@render sidebaritems(menu_items.tags)}
 					{/if}
-					{#if canRead(data.user, 'organization')}
-						{@render sidebaritems(menu_items.organization)}
-					{/if}
 
 					{#if canRead(data.user, 'user')}
 						{@render sidebaritems(menu_items.user)}
@@ -193,9 +190,27 @@
 						align="end"
 						class="w-(--bits-dropdown-menu-anchor-width)"
 					>
-						<DropdownMenu.Item>
+						{#if hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)}
+							<DropdownMenu.Item class="p-0">
+								<a
+									href="/organization"
+									class="flex w-full items-center px-2 py-1.5"
+									onclick={() => {
+										if (sidebar.isMobile) {
+											sidebar.setOpenMobile(false);
+										}
+									}}
+								>
+									<Building class="mr-2 size-4" />
+									<span>My Organization</span>
+								</a>
+							</DropdownMenu.Item>
+							<DropdownMenu.Separator />
+						{/if}
+						<DropdownMenu.Item class="p-0">
 							<a
 								href="/profile"
+								class="flex w-full px-2 py-1.5"
 								onclick={() => {
 									if (sidebar.isMobile) {
 										sidebar.setOpenMobile(false);
@@ -203,9 +218,10 @@
 								}}><span>My Profile</span></a
 							>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item>
+						<DropdownMenu.Item class="p-0">
 							<a
 								href="/profile/password"
+								class="flex w-full px-2 py-1.5"
 								onclick={() => {
 									if (sidebar.isMobile) {
 										sidebar.setOpenMobile(false);
@@ -213,9 +229,10 @@
 								}}><span>Change Password</span></a
 							>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item>
+						<DropdownMenu.Item class="p-0">
 							<a
 								href="/logout"
+								class="flex w-full px-2 py-1.5"
 								onclick={() => {
 									if (sidebar.isMobile) {
 										sidebar.setOpenMobile(false);

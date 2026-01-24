@@ -12,8 +12,8 @@
 		class="my-4 mr-2 flex scroll-m-20 justify-between pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 	>
 		<ListingPageLayout
-			title="Organization Management"
-			subtitle="Manage Organization"
+			title="My Organization"
+			subtitle="Manage your organization"
 			infoLabel="Help: User management"
 			infoDescription="This panel displays all users in the system. You can edit or delete a user by clicking the three dots next to their entry."
 		></ListingPageLayout>

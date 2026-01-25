@@ -11,6 +11,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 
 	// Menu items.
 	const menu_items = {
@@ -43,6 +44,11 @@
 			title: 'Tag Management',
 			url: '/tags',
 			icon: Tags
+		},
+		certificate: {
+			title: 'Certificate Management',
+			url: '/certificate',
+			icon: ShieldCheck
 		},
 		user: {
 			title: 'User Management',
@@ -155,6 +161,9 @@
 
 					{#if canRead(data.user, 'tag')}
 						{@render sidebaritems(menu_items.tags)}
+					{/if}
+					{#if canRead(data.user, 'certificate')}
+						{@render sidebaritems(menu_items.certificate)}
 					{/if}
 
 					{#if canRead(data.user, 'user')}

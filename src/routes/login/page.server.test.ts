@@ -24,14 +24,20 @@ describe('Login Route', () => {
 
 	describe('load()', () => {
 		it('should return supervalidate form', async () => {
-			const result = await load();
+			const result = await load({
+				url: new URL('http://localhost/login'),
+				fetch: mockFetch
+			} as any);
 
 			expect(result).toHaveProperty('loginForm');
 			expect(result.loginForm).toBeDefined();
 		});
 
 		it('should initialize form with empty values', async () => {
-			const result = await load();
+			const result = await load({
+				url: new URL('http://localhost/login'),
+				fetch: mockFetch
+			} as any);
 
 			expect(result.loginForm.data).toEqual({
 				username: '',

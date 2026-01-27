@@ -32,6 +32,7 @@
 	}
 
 	let languageOptions = $state<{ [key: string]: string }>({});
+	let certificatesOptions = $state<Array<{ id: number; name: string | null }>>([]);
 
 	// load test languages
 	async function loadLanguages() {
@@ -46,9 +47,24 @@
 		}
 	}
 
+	async function loadCertificates() {
+		try {
+			const response = await fetch('/api/certificates');
+
+			if (response.ok) {
+				const data = await response.json();
+				certificatesOptions = data.items ?? [];
+			}
+		} catch (error) {
+			console.error('Failed to load certificates:', error);
+			certificatesOptions = [];
+		}
+	}
+
 	// initial load effect
 	$effect(() => {
 		loadLanguages();
+		loadCertificates();
 	});
 </script>
 
@@ -307,6 +323,37 @@
 						'Enable this option to collect candidate information during the test.'
 					)}
 				</div>
+			</div>
+		</ConfigureBox>
+		<ConfigureBox title="Certificate Settings" Icon={ClipboardPenLine}>
+			<div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center">
+				<div class="w-full md:w-2/5">
+					{@render headingSubheading(
+						'Attach Certificate',
+						'Select a certificate to issue after test completion.'
+					)}
+				</div>
+
+				<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
+					<Select.Trigger class="w-48">
+						{#if $formData.certificate_id}
+							{certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name}
+						{:else}
+							Select certificate
+						{/if}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Group>
+							<Select.Item value={null} label="No certificate">No certificate</Select.Item>
+
+							{#each certificatesOptions as cert (cert.id)}
+								<Select.Item value={cert.id}>
+									{cert.name}
+								</Select.Item>
+							{/each}
+						</Select.Group>
+					</Select.Content>
+				</Select.Root>
 			</div>
 		</ConfigureBox>
 	</div>

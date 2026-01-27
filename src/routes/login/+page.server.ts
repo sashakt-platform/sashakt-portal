@@ -26,6 +26,8 @@ export const load: PageServerLoad = async ({ url, fetch, cookies }) => {
 		if (res.ok) {
 			organizationData = await res.json();
 			setOrganizationCookie(cookies, org);
+		} else {
+			deleteOrganizationCookie(cookies);
 		}
 	} else {
 		deleteOrganizationCookie(cookies);

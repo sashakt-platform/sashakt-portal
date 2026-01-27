@@ -10,7 +10,8 @@ vi.mock('$env/static/private', () => ({
 // Mock auth functions
 vi.mock('$lib/server/auth.js', () => ({
 	setSessionTokenCookie: vi.fn(),
-	setRefreshTokenCookie: vi.fn()
+	setRefreshTokenCookie: vi.fn(),
+	deleteOrganizationCookie: vi.fn()
 }));
 
 describe('Login Route', () => {

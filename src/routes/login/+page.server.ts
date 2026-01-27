@@ -18,15 +18,14 @@ type OrgDataType = {
 };
 
 export const load: PageServerLoad = async ({ url, fetch, cookies }) => {
-	const organization = url.searchParams.get('organization');
+	const orgParam = url.searchParams.get('organization');
+	const org = orgParam?.trim() || null;
 	let organizationData: OrgDataType | null = null;
-	if (organization && organization.trim()) {
-		const res = await fetch(
-			`${BACKEND_URL}/organization/public/${encodeURIComponent(organization.trim())}`
-		);
+	if (org) {
+		const res = await fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(org)}`);
 		if (res.ok) {
 			organizationData = await res.json();
-			setOrganizationCookie(cookies, organization);
+			setOrganizationCookie(cookies, org);
 		}
 	} else {
 		deleteOrganizationCookie(cookies);

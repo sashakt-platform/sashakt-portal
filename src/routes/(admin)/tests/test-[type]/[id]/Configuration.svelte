@@ -12,6 +12,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
 	import * as Select from '$lib/components/ui/select';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 
 	let { formData } = $props();
 
@@ -325,7 +326,7 @@
 				</div>
 			</div>
 		</ConfigureBox>
-		<ConfigureBox title="Certificate Settings" Icon={ClipboardPenLine}>
+		<ConfigureBox title="Certificate Settings" Icon={ShieldCheck}>
 			<div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center">
 				<div class="w-full md:w-2/5">
 					{@render headingSubheading(

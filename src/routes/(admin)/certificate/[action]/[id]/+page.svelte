@@ -124,7 +124,6 @@
 		</div>
 	</div>
 
-	<!-- STICKY FOOTER -->
 	<div class="sticky bottom-0 my-2 flex w-full border-t-4 bg-white p-3 sm:my-4 sm:p-4">
 		<div class="flex w-full justify-between gap-2">
 			<a href="/certificate/">

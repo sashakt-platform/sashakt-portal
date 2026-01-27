@@ -4,7 +4,12 @@ import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { loginSchema } from './schema';
-import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
+import {
+	setSessionTokenCookie,
+	setRefreshTokenCookie,
+	setOrganizationCookie,
+	deleteOrganizationCookie
+} from '$lib/server/auth.js';
 
 type OrgDataType = {
 	logo: string;
@@ -12,7 +17,7 @@ type OrgDataType = {
 	shortcode: string;
 };
 
-export const load: PageServerLoad = async ({ url, fetch }) => {
+export const load: PageServerLoad = async ({ url, fetch, cookies }) => {
 	const organization = url.searchParams.get('organization');
 	let organizationData: OrgDataType | null = null;
 	if (organization && organization.trim()) {
@@ -21,7 +26,10 @@ export const load: PageServerLoad = async ({ url, fetch }) => {
 		);
 		if (res.ok) {
 			organizationData = await res.json();
+			setOrganizationCookie(cookies, organization);
 		}
+	} else {
+		deleteOrganizationCookie(cookies);
 	}
 	return {
 		loginForm: await superValidate(zod4(loginSchema)),

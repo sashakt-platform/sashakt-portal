@@ -6,9 +6,26 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { loginSchema } from './schema';
 import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 
-export const load: PageServerLoad = async () => {
+type OrgDataType = {
+	logo: string;
+	name: string;
+	shortcode: string;
+};
+
+export const load: PageServerLoad = async ({ url, fetch }) => {
+	const organization = url.searchParams.get('organization');
+	let organizationData: OrgDataType | null = null;
+	if (organization && organization.trim()) {
+		const res = await fetch(
+			`${BACKEND_URL}/organization/public/${encodeURIComponent(organization.trim())}`
+		);
+		if (res.ok) {
+			organizationData = await res.json();
+		}
+	}
 	return {
-		loginForm: await superValidate(zod4(loginSchema))
+		loginForm: await superValidate(zod4(loginSchema)),
+		organizationData
 	};
 };
 

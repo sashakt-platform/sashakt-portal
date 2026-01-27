@@ -136,7 +136,7 @@
 						<input
 							{...props}
 							type="file"
-							accept="image/*"
+							accept="image/png,image/jpeg,image/webp"
 							bind:files={$logoFile}
 							bind:this={fileInput}
 							hidden

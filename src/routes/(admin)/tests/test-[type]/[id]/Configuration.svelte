@@ -336,12 +336,14 @@
 				</div>
 
 				<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
-					<Select.Trigger class="w-48">
-						{#if $formData.certificate_id}
-							{certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name}
-						{:else}
-							Select certificate
-						{/if}
+					<Select.Trigger class="w-72">
+						<span class="truncate">
+							{#if $formData.certificate_id}
+								{certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name}
+							{:else}
+								Select certificate
+							{/if}
+						</span>
 					</Select.Trigger>
 					<Select.Content>
 						<Select.Group>

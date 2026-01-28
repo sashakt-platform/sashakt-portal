@@ -5,76 +5,74 @@
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
+	import type { Snippet } from 'svelte';
 	import { editUserSchema, type EditUserSchema } from './schema';
 
-	let { data, isEditMode = $bindable() }: { data: PageData; isEditMode: boolean } = $props();
+	let {
+		data,
+		header
+	}: {
+		data: PageData;
+		header: Snippet;
+	} = $props();
 
 	let userData: Partial<Infer<EditUserSchema>> | null = data?.currentUser || null;
 
 	const form = superForm(userData || data.form, {
 		validators: zod4Client(editUserSchema),
-		dataType: 'json',
-		onResult: ({ result }) => {
-			if (result.type === 'redirect') {
-				isEditMode = false;
-			}
-		}
+		dataType: 'json'
 	});
 
 	const { form: formData, enhance } = form;
 </script>
 
 <form method="POST" use:enhance action="?/save">
-	<Form.Field {form} name="full_name">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Name</Form.Label>
-				{#if isEditMode}
-					<Input {...props} bind:value={$formData.full_name} />
-				{:else}
-					<div class="mb-2 px-3.5 py-2.5 text-sm">
-						{$formData.full_name}
-					</div>
-				{/if}
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-	<Form.Field {form} name="email">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Email</Form.Label>
-				{#if isEditMode}
-					<Input {...props} bind:value={$formData.email} />
-				{:else}
-					<div class="mb-2 px-3.5 py-2.5 text-sm">
-						{$formData.email}
-					</div>
-				{/if}
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
+	<div class="mx-auto flex h-lvh flex-col gap-6 py-6 md:gap-10 md:py-8">
+		{@render header()}
+		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-10 md:p-9">
+			<Form.Field {form} name="full_name" class="flex w-full flex-col gap-2 md:pr-8">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">Name</Form.Label>
+						<Input {...props} bind:value={$formData.full_name} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
-	<Form.Field {form} name="phone">
-		<Form.Control>
-			{#snippet children({ props })}
-				<Form.Label>Phone</Form.Label>
-				{#if isEditMode}
-					<Input {...props} bind:value={$formData.phone} />
-				{:else}
-					<div class="mb-2 px-3.5 py-2.5 text-sm">
-						{$formData.phone}
-					</div>
-				{/if}
-			{/snippet}
-		</Form.Control>
-		<Form.FieldErrors />
-	</Form.Field>
-	{#if isEditMode}
-		<div class="float-end mt-2 flex gap-x-3">
-			<Button variant="outline" onclick={() => (isEditMode = false)}>Cancel</Button>
-			<Form.Button>Save</Form.Button>
+			<Form.Field {form} name="email" class="flex w-full flex-col gap-2 md:pr-8">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">Email</Form.Label>
+						<Input {...props} type="email" bind:value={$formData.email} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="phone" class="flex w-full flex-col gap-2 md:pr-8">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">Phone</Form.Label>
+						<Input {...props} type="tel" bind:value={$formData.phone} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 		</div>
-	{/if}
+	</div>
+	<div
+		class="sticky right-0 bottom-0 left-0 mt-2 flex w-full border-t-4 bg-white p-3 shadow-md sm:mt-4 sm:p-4"
+	>
+		<div class="flex w-full justify-between gap-2">
+			<a href="/dashboard">
+				<Button variant="outline" class="border-primary text-primary border-1 text-sm sm:text-base"
+					>Cancel</Button
+				>
+			</a>
+			<div class="flex gap-2">
+				<Form.Button class="bg-primary text-sm sm:text-base">Save</Form.Button>
+			</div>
+		</div>
+	</div>
 </form>

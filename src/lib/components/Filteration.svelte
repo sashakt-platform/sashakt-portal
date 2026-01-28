@@ -7,6 +7,7 @@
 	import { cn } from '$lib/utils.js';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
+	import LoaderIcon from '@lucide/svelte/icons/loader';
 	import { goto } from '$app/navigation';
 
 	type Filter = { id: string; name: string };
@@ -18,6 +19,8 @@
 		label = null,
 		filteration = false,
 		multiple = true,
+		onSearch = null as ((search: string) => void) | null,
+		isLoading = false,
 		...rest
 	} = $props();
 	let open = $state(false);
@@ -28,16 +31,22 @@
 
 	// Debounced search
 	let searchTimeout: NodeJS.Timeout | undefined;
-	function handleSearch(e: Event) {
+	function handleSearch() {
 		clearTimeout(searchTimeout);
 		searchTimeout = setTimeout(() => {
-			const url = new URL(page.url);
-			if (searchQuery) url.searchParams.set(itemName + '_search', searchQuery.toLowerCase());
-			else url.searchParams.delete(itemName + '_search');
+			if (onSearch) {
+				// Lazy loading mode - call the search callback
+				onSearch(searchQuery);
+			} else {
+				// Original URL-based mode for backward compatibility
+				const url = new URL(page.url);
+				if (searchQuery) url.searchParams.set(itemName + '_search', searchQuery.toLowerCase());
+				else url.searchParams.delete(itemName + '_search');
 
-			// reset pagination to first page user searches
-			url.searchParams.set('page', '1');
-			goto(url, { keepFocus: true, invalidateAll: true });
+				// reset pagination to first page user searches
+				url.searchParams.set('page', '1');
+				goto(url, { keepFocus: true, invalidateAll: true });
+			}
 		}, 300);
 	}
 </script>
@@ -51,6 +60,7 @@
 		{children.name}
 		<button
 			class="ml-2 text-white hover:text-gray-400 focus:outline-none"
+			type="button"
 			style="margin-left:auto;"
 			onclick={(e) => {
 				e.stopPropagation();
@@ -73,6 +83,12 @@
 	onOpenChange={(e: boolean) => {
 		if (!e) {
 			searchQuery = '';
+
+			// let's reset the filter list when popover closes
+			if (onSearch) {
+				onSearch('');
+			}
+
 			const url = new URL(page.url);
 			try {
 				url.searchParams.delete(itemName + '_search');
@@ -138,7 +154,16 @@
 				bind:value={searchQuery}
 			/>
 			<Command.List>
-				<Command.Empty>No {label || itemName} found.</Command.Empty>
+				<Command.Empty>
+					{#if isLoading}
+						<div class="flex items-center justify-center gap-2">
+							<LoaderIcon class="h-4 w-4 animate-spin" />
+							Loading...
+						</div>
+					{:else}
+						No {label || itemName} found.
+					{/if}
+				</Command.Empty>
 				{#each itemList as item (item.id)}
 					<Command.Item
 						value={String(item.name)}

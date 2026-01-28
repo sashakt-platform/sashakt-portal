@@ -1,9 +1,11 @@
 import { dev } from '$app/environment';
+import { PUBLIC_APP_ENV } from '$env/static/public';
 import { handleErrorWithSentry, replayIntegration } from '@sentry/sveltekit';
 import * as Sentry from '@sentry/sveltekit';
 
 Sentry.init({
 	dsn: 'https://91335032a1fef2b37caec0d0271a23a8@o412613.ingest.us.sentry.io/4510127619768320',
+	enabled: !dev,
 
 	tracesSampleRate: 1.0,
 
@@ -21,7 +23,7 @@ Sentry.init({
 	// If you don't want to use Session Replay, just remove the line below:
 	integrations: [replayIntegration()],
 
-	environment: dev ? 'development' : 'production'
+	environment: PUBLIC_APP_ENV || 'development'
 });
 
 // If you have a custom error handler, pass it to `handleErrorWithSentry`

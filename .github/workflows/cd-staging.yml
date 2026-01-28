@@ -56,6 +56,7 @@ jobs:
             echo "BACKEND_URL=${{ vars.BACKEND_URL }}" > .env
             echo "TEST_TAKER_URL=${{ vars.TEST_TAKER_URL }}" >> .env
             echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN}}" >> .env
+            echo "PUBLIC_APP_ENV=staging" >> .env
 
             corepack enable
             sudo corepack prepare pnpm@latest --activate

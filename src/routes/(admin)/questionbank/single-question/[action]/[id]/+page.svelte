@@ -18,6 +18,8 @@
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './Question_revision.svelte';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
+	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
+	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 
 	const {
 		data
@@ -26,6 +28,7 @@
 			form: SuperValidated<Infer<FormSchema>>;
 			tagForm: SuperValidated<Infer<TagFormSchema>>;
 			tagTypes: [];
+			user: User;
 		};
 	} = $props();
 
@@ -100,6 +103,17 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
+
+	// for State admins, auto-assign their state when creating a new question
+	// backend should handle this as well
+	$effect(() => {
+		if (isStateAdmin(data.user) && (!$formData.state_ids || $formData.state_ids.length === 0)) {
+			const userState = getUserState(data.user);
+			if (userState) {
+				$formData.state_ids = [{ id: String(userState.id), name: userState.name }];
+			}
+		}
+	});
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -158,49 +172,67 @@
 					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
 						{@render snippetHeading('Answers')}
 
-						{#each totalOptions as { id, key, value }, index (id)}
-							<div class="group flex flex-row gap-4">
-								<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
-									<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
-										{key}
-									</p>
-								</div>
-								<div class="flex w-full flex-col gap-2">
-									<div class="flex flex-row rounded-sm border-1 border-black">
-										<GripVertical class="my-auto h-full  rounded-sm bg-gray-100" />
-										<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
+						<div
+							use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
+							onconsider={({ detail }) => (totalOptions = detail.items)}
+							onfinalize={({ detail }) => {
+								totalOptions = detail.items.map((opt, i) => ({
+									...opt,
+									key: String.fromCharCode(65 + i)
+								}));
+							}}
+						>
+							{#each totalOptions as { id, key, value }, index (id)}
+								<div class="group flex flex-row gap-4">
+									<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
+										<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
+											{key}
+										</p>
 									</div>
-									<div class="flex flex-row gap-2">
-										<Checkbox
-											disabled={!totalOptions[index].value.trim()}
-											checked={totalOptions[index].correct_answer}
-											onCheckedChange={(checked: boolean) =>
-												(totalOptions[index].correct_answer = checked)}
-										/><Label class="text-sm ">Set as correct answer</Label>
+									<div class="flex w-full flex-col gap-2">
+										<div class="flex flex-row rounded-sm border-1 border-black">
+											<span use:dragHandle aria-label="drag handle">
+												<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+											</span>
+											<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
+										</div>
+										<div class="flex flex-row gap-2">
+											<Checkbox
+												disabled={!totalOptions[index].value.trim()}
+												checked={totalOptions[index].correct_answer}
+												onCheckedChange={(checked: boolean) =>
+													(totalOptions[index].correct_answer = checked)}
+											/><Label class="text-sm ">Set as correct answer</Label>
+										</div>
+									</div>
+									<div
+										class={[
+											'mt-2 gap-0 opacity-0',
+											totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
+										]}
+									>
+										<Trash_2
+											data-testid="trash-icon"
+											size={18}
+											class={[
+												'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
+												totalOptions.length > 1 ? 'cursor-pointer' : ''
+											]}
+											onclick={() => {
+												if (totalOptions.length > 1) {
+													totalOptions = totalOptions
+														.filter((_, i) => i !== index)
+														.map((option, i) => ({
+															...option,
+															key: String.fromCharCode(65 + i)
+														}));
+												}
+											}}
+										/>
 									</div>
 								</div>
-								<div
-									class={[
-										'mt-2 gap-0 opacity-0 transition-opacity',
-										totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
-									]}
-								>
-									<Trash_2
-										class={['m-0 my-auto p-0', totalOptions.length > 1 ? 'cursor-pointer' : '']}
-										onclick={() => {
-											if (totalOptions.length > 1) {
-												totalOptions = totalOptions
-													.filter((_, i) => i !== index)
-													.map((option, i) => ({
-														...option,
-														key: String.fromCharCode(65 + i)
-													}));
-											}
-										}}
-									/>
-								</div>
-							</div>
-						{/each}
+							{/each}
+						</div>
 
 						<div class="flex justify-end">
 							<Button
@@ -241,8 +273,10 @@
 						</Dialog.Root>
 					</div>
 					<div class="flex flex-col gap-2">
-						{@render snippetHeading('States')}
-						<StateSelection bind:states={$formData.state_ids} />
+						{#if !isStateAdmin(data.user)}
+							{@render snippetHeading('States')}
+							<StateSelection bind:states={$formData.state_ids} />
+						{/if}
 						<div class="mt-6 flex items-center space-x-2 lg:mt-12">
 							<Switch id="is-active" bind:checked={$formData.is_active} />
 							<Label for="is-active">Is Active?</Label><Info

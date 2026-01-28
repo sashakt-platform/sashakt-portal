@@ -4,6 +4,29 @@ export type User = NonNullable<App.Locals['user']>;
 export type Permission = string;
 
 /**
+ * Check if user is a State Admin (has only one state assigned)
+ * State admins can only access data from their assigned state,
+ * so state selection dropdowns should be hidden for them.
+ */
+export function isStateAdmin(user: User | null): boolean {
+	if (!user || !user.states) {
+		return false;
+	}
+	return user.states.length === 1;
+}
+
+/**
+ * Get the user's assigned state (for State admins)
+ * Returns the first state if user has states assigned, null otherwise
+ */
+export function getUserState(user: User | null): { id: number | string; name: string } | null {
+	if (!user || !user.states || user.states.length === 0) {
+		return null;
+	}
+	return user.states[0];
+}
+
+/**
  * Check if user has a specific permission
  */
 export function hasPermission(user: User | null, permission: Permission): boolean {
@@ -67,6 +90,7 @@ export const PERMISSIONS = {
 	UPDATE_ORGANIZATION: 'update_organization',
 	DELETE_ORGANIZATION: 'delete_organization',
 	READ_ORGANIZATION: 'read_organization',
+	UPDATE_MY_ORGANIZATION: 'update_my_organization',
 
 	// Role permissions
 	CREATE_ROLE: 'create_role',

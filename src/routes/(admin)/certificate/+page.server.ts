@@ -19,8 +19,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		page: page.toString(),
 		size: size.toString(),
 		...(search && { name: search }),
-		...(sortBy && { sort_by: sortBy }),
-		...(sortOrder && { sort_order: sortOrder })
+		...(sortBy && { sort_by: sortBy, sort_order: sortOrder })
 	});
 
 	const res = await fetch(`${BACKEND_URL}/certificate/?${queryParams}`, {

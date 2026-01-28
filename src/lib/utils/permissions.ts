@@ -90,6 +90,7 @@ export const PERMISSIONS = {
 	UPDATE_ORGANIZATION: 'update_organization',
 	DELETE_ORGANIZATION: 'delete_organization',
 	READ_ORGANIZATION: 'read_organization',
+	UPDATE_MY_ORGANIZATION: 'update_my_organization',
 
 	// Certificate permissions
 	CREATE_CERTIFICATE: 'create_certificate',

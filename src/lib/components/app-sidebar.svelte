@@ -8,10 +8,12 @@
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import User from '@lucide/svelte/icons/user';
 	import Tags from '@lucide/svelte/icons/tags';
+	import Building from '@lucide/svelte/icons/building-2';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { canRead } from '$lib/utils/permissions.js';
+	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import { goto } from '$app/navigation';
 
 	// Menu items.
 	const menu_items = {
@@ -68,6 +70,14 @@
 		if (sidebar.isMobile) {
 			sidebar.setOpenMobile(false);
 		}
+	}
+
+	// Helper function to handle dropdown menu item navigation
+	function handleDropdownNavigate(url: string) {
+		if (sidebar.isMobile) {
+			sidebar.setOpenMobile(false);
+		}
+		goto(url);
 	}
 </script>
 
@@ -193,37 +203,21 @@
 						align="end"
 						class="w-(--bits-dropdown-menu-anchor-width)"
 					>
-						<DropdownMenu.Item>
-							<a
-								href="/profile"
-								onclick={() => {
-									if (sidebar.isMobile) {
-										sidebar.setOpenMobile(false);
-									}
-								}}><span>My Profile</span></a
-							>
+						{#if hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)}
+							<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/organization')}>
+								<Building class="mr-2 size-4" />
+								<span>My Organization</span>
+							</DropdownMenu.Item>
+							<DropdownMenu.Separator />
+						{/if}
+						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/profile')}>
+							<span>My Profile</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item>
-							<a
-								href="/profile/password"
-								onclick={() => {
-									if (sidebar.isMobile) {
-										sidebar.setOpenMobile(false);
-									}
-								}}><span>Change Password</span></a
-							>
+						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/profile/password')}>
+							<span>Change Password</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item>
-							<a
-								href="/logout"
-								onclick={() => {
-									if (sidebar.isMobile) {
-										sidebar.setOpenMobile(false);
-									}
-								}}
-							>
-								<span>Sign out</span>
-							</a>
+						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/logout')}>
+							<span>Sign out</span>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>

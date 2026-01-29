@@ -5,6 +5,7 @@ import { dev } from '$app/environment';
 
 export const sessionCookieName = 'sashakt-session';
 export const refreshCookieName = 'sashakt-refresh';
+export const organizationCookieName = 'organization';
 
 export async function refreshAccessToken(refreshToken: string) {
 	try {
@@ -52,6 +53,16 @@ export async function validateSessionToken(token: string) {
 	}
 }
 
+export function setOrganizationCookie(cookies: Cookies, shortCode: string | null) {
+	if (shortCode) {
+		cookies.set(organizationCookieName, shortCode, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: !dev
+		});
+	}
+}
 export function setSessionTokenCookie(cookies: Cookies, token: string, expiresAt: Date) {
 	cookies.set(sessionCookieName, token, {
 		expires: expiresAt,
@@ -73,6 +84,11 @@ export function setRefreshTokenCookie(cookies: Cookies, token: string) {
 
 export function deleteSessionTokenCookie(cookies: Cookies) {
 	cookies.delete(sessionCookieName, {
+		path: '/'
+	});
+}
+export function deleteOrganizationCookie(cookies: Cookies) {
+	cookies.delete(organizationCookieName, {
 		path: '/'
 	});
 }

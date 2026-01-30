@@ -25,26 +25,21 @@
 <div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
-			<h1 class="text-primary w-full pb-4 text-3xl font-extrabold tracking-tighter">SASHAKT</h1>
+			{#if data.organizationData?.logo}
+				<img
+					src={data.organizationData.logo}
+					alt={data.organizationData?.name}
+					class="mx-auto mb-3 h-14 w-auto object-contain"
+					loading="eager"
+				/>
+			{:else}
+				<h1 class="text-primary w-full pb-4 text-3xl font-extrabold tracking-tighter">SASHAKT</h1>
+			{/if}
 		</div>
 
 		<Card.Root class="w-full shadow-xl">
 			<Card.Header class="space-y-3 pb-6 text-center">
-				<Card.Title class="text-3xl font-bold">
-					{#if data.organizationData?.logo}
-						<img
-							src={data.organizationData.logo}
-							alt={data.organizationData?.name
-								? `${data.organizationData.name} logo`
-								: 'Organization logo'}
-							class="mx-auto mb-3 h-14 w-auto object-contain"
-							loading="eager"
-						/>
-					{/if}
-					{data.organizationData?.name
-						? `Login to ${data.organizationData.name}`
-						: 'Login to Sashakt'}
-				</Card.Title>
+				<Card.Title class="text-3xl font-bold">Login to Sashakt</Card.Title>
 				<Card.Description>Please enter your email and password to login</Card.Description>
 			</Card.Header>
 			<Card.Content class="px-8 pb-8">

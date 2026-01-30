@@ -9,7 +9,10 @@ import {
 	deleteAllTokenCookies,
 	logoutFromBackend,
 	sessionCookieName,
-	refreshCookieName
+	refreshCookieName,
+	setOrganizationCookie,
+	organizationCookieName,
+	deleteOrganizationCookie
 } from './auth';
 
 // Mock environment variables
@@ -269,5 +272,90 @@ describe('auth', () => {
 
 			expect(result.success).toBe(false);
 		});
+	});
+});
+
+describe('setOrganizationCookie()', () => {
+	it('should set organization cookie with correct options when shortcode is provided', () => {
+		const mockCookies = {
+			set: vi.fn(),
+			get: vi.fn(),
+			delete: vi.fn(),
+			getAll: vi.fn(),
+			serialize: vi.fn()
+		};
+
+		setOrganizationCookie(mockCookies as any, 'acme');
+
+		expect(mockCookies.set).toHaveBeenCalledWith(organizationCookieName, 'acme', {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'strict',
+			secure: false // dev=true mocked above
+		});
+	});
+
+	it('should not set organization cookie when shortcode is null', () => {
+		const mockCookies = {
+			set: vi.fn(),
+			get: vi.fn(),
+			delete: vi.fn(),
+			getAll: vi.fn(),
+			serialize: vi.fn()
+		};
+
+		setOrganizationCookie(mockCookies as any, null);
+
+		expect(mockCookies.set).not.toHaveBeenCalled();
+	});
+
+	it('should not set organization cookie when shortcode is empty (if you want to enforce this)', () => {
+		const mockCookies = {
+			set: vi.fn(),
+			get: vi.fn(),
+			delete: vi.fn(),
+			getAll: vi.fn(),
+			serialize: vi.fn()
+		};
+
+		// Current implementation WILL set the cookie for empty string.
+		// If you keep current behavior, change this expectation accordingly.
+		setOrganizationCookie(mockCookies as any, '');
+
+		expect(mockCookies.set).not.toHaveBeenCalled();
+	});
+});
+
+describe('deleteOrganizationCookie()', () => {
+	it('should delete organization cookie', () => {
+		const mockCookies = {
+			set: vi.fn(),
+			get: vi.fn(),
+			delete: vi.fn(),
+			getAll: vi.fn(),
+			serialize: vi.fn()
+		};
+
+		deleteOrganizationCookie(mockCookies as any);
+
+		expect(mockCookies.delete).toHaveBeenCalledWith(organizationCookieName, { path: '/' });
+	});
+});
+
+describe('deleteAllTokenCookies()', () => {
+	it('should not delete organization cookie (current behavior)', () => {
+		const mockCookies = {
+			set: vi.fn(),
+			get: vi.fn(),
+			delete: vi.fn(),
+			getAll: vi.fn(),
+			serialize: vi.fn()
+		};
+
+		deleteAllTokenCookies(mockCookies as any);
+
+		// current: deletes only session + refresh
+		expect(mockCookies.delete).toHaveBeenCalledTimes(2);
+		expect(mockCookies.delete).not.toHaveBeenCalledWith(organizationCookieName, expect.anything());
 	});
 });

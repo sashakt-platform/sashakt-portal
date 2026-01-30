@@ -4,11 +4,37 @@ import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { loginSchema } from './schema';
-import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
+import {
+	setSessionTokenCookie,
+	setRefreshTokenCookie,
+	setOrganizationCookie,
+	deleteOrganizationCookie
+} from '$lib/server/auth.js';
 
-export const load: PageServerLoad = async () => {
+type OrgDataType = {
+	logo: string;
+	name: string;
+	shortcode: string;
+};
+
+export const load: PageServerLoad = async ({ url, fetch, cookies }) => {
+	const orgParam = url.searchParams.get('organization');
+	const org = orgParam?.trim() || null;
+	let organizationData: OrgDataType | null = null;
+	if (org) {
+		const res = await fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(org)}`);
+		if (res.ok) {
+			organizationData = await res.json();
+			setOrganizationCookie(cookies, org);
+		} else {
+			deleteOrganizationCookie(cookies);
+		}
+	} else {
+		deleteOrganizationCookie(cookies);
+	}
 	return {
-		loginForm: await superValidate(zod4(loginSchema))
+		loginForm: await superValidate(zod4(loginSchema)),
+		organizationData
 	};
 };
 

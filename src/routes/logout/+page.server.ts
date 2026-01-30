@@ -3,11 +3,16 @@ import { deleteAllTokenCookies, logoutFromBackend } from '$lib/server/auth';
 
 export const load = async ({ cookies, locals }) => {
 	// If user is logged in, call backend logout endpoint
+
+	const currentOrganization = cookies.get('organization');
 	if (locals.session) {
 		await logoutFromBackend(locals.session);
 	}
 
 	// Clear cookies regardless of backend response
 	deleteAllTokenCookies(cookies);
-	throw redirect(303, '/login');
+
+	const next = currentOrganization ? `/${encodeURIComponent(currentOrganization)}` : '/login';
+
+	throw redirect(303, next);
 };

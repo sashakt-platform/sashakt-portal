@@ -26,8 +26,9 @@ export const createColumns = (
 	}
 ): ColumnDef<Certificate>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
-	createSortableColumn('url', 'URL', currentSortBy, currentSortOrder, handleSort),
-	createSortableColumn('is_active', 'Active', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('is_active', 'Active', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => (row.original.is_active ? 'Yes' : 'No')
+	}),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)
 	}),

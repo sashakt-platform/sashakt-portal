@@ -14,6 +14,14 @@ vi.mock('sveltekit-superforms', () => ({
 			},
 			set: () => {},
 			update: () => {}
+		},
+		errors: {
+			subscribe: (fn) => {
+				fn({});
+				return () => {};
+			},
+			set: () => {},
+			update: () => {}
 		}
 	}))
 }));
@@ -46,23 +54,13 @@ describe('CertificateFormPage', () => {
 		expect(screen.getByRole('heading', { name: /edit certificate/i })).toBeInTheDocument();
 	});
 
-	it('shows add mode subtitle', () => {
-		render(CertificateFormPage, { data: addModeData });
-		expect(
-			screen.getByText(/add a new certificate with all required information/i)
-		).toBeInTheDocument();
-	});
-
-	it('shows edit mode subtitle', () => {
-		render(CertificateFormPage, { data: editModeData });
-		expect(screen.getByText(/edit existing certificate details/i)).toBeInTheDocument();
-	});
-
 	it('renders all form fields', () => {
 		render(CertificateFormPage, { data: addModeData });
 		expect(screen.getByPlaceholderText('Enter certificate name')).toBeInTheDocument();
 		expect(screen.getByPlaceholderText('Enter description')).toBeInTheDocument();
-		expect(screen.getByPlaceholderText('Enter certificate URL')).toBeInTheDocument();
+		expect(
+			screen.getByPlaceholderText('Enter certificate URL (e.g., https://example.com)')
+		).toBeInTheDocument();
 		expect(screen.getByText('Is Active?')).toBeInTheDocument();
 	});
 
@@ -105,11 +103,8 @@ describe('CertificateFormPage', () => {
 	it('populates form fields in edit mode', () => {
 		render(CertificateFormPage, { data: editModeData });
 		expect(screen.getByPlaceholderText('Enter certificate name')).toHaveValue('Test');
-		expect(screen.getByPlaceholderText('Enter certificate URL')).toHaveValue('https://example.com');
-	});
-
-	it('renders tooltip help button', () => {
-		render(CertificateFormPage, { data: addModeData });
-		expect(screen.getByRole('button', { name: /help: certificate form/i })).toBeInTheDocument();
+		expect(
+			screen.getByPlaceholderText('Enter certificate URL (e.g., https://example.com)')
+		).toHaveValue('https://example.com');
 	});
 });

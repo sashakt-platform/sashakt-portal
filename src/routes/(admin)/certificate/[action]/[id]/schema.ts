@@ -3,7 +3,7 @@ import { z } from 'zod';
 const baseCertificateSchema = z.object({
 	name: z.string().min(1, { error: 'Certificate name is required' }),
 	description: z.string().optional().nullable(),
-	url: z.string().min(1, { error: 'Certificate URL is required' }),
+	url: z.url({ error: 'Please enter a valid URL' }),
 	is_active: z.boolean().default(true),
 	organization_id: z.number().optional()
 });

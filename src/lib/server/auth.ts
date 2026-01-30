@@ -5,7 +5,7 @@ import { dev } from '$app/environment';
 
 export const sessionCookieName = 'sashakt-session';
 export const refreshCookieName = 'sashakt-refresh';
-export const organizationCookieName = 'organization';
+export const organizationCookieName = 'sashakt-organization';
 
 export async function refreshAccessToken(refreshToken: string) {
 	try {

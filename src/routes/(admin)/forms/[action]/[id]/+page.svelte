@@ -32,12 +32,19 @@
 		};
 	} = $props();
 
-	const existingForm = data?.formData || null;
-	const isEditMode = data.action === 'edit' && existingForm !== null;
+	const existingForm = $derived(data?.formData || null);
+	const isEditMode = $derived(data.action === 'edit' && existingForm !== null);
 
-	let fields = $state<FormField[]>(existingForm?.fields || []);
+	let fields = $state<FormField[]>(data?.formData?.fields || []);
 	let showFieldEditor = $state(false);
 	let editingField = $state<FormField | null>(null);
+
+	// Sync fields with server data when it changes
+	$effect(() => {
+		if (data?.formData?.fields) {
+			fields = data.formData.fields;
+		}
+	});
 
 	const {
 		form: formData,
@@ -61,18 +68,6 @@
 	function handleEditField(field: FormField) {
 		editingField = field;
 		showFieldEditor = true;
-	}
-
-	function handleFieldSaved(savedField: FormField) {
-		if (editingField) {
-			// Update existing field
-			fields = fields.map((f) => (f.id === savedField.id ? savedField : f));
-		} else {
-			// Add new field
-			fields = [...fields, savedField];
-		}
-		showFieldEditor = false;
-		editingField = null;
 	}
 
 	function handleFieldDeleted(fieldId: number) {
@@ -211,7 +206,6 @@
 		field={editingField}
 		formId={existingForm?.id || 0}
 		entityTypes={data.entityTypes}
-		onSave={handleFieldSaved}
 		onClose={handleCloseEditor}
 	/>
 {/if}

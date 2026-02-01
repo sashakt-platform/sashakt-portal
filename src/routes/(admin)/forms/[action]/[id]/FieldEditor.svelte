@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { Input } from '$lib/components/ui/input';
@@ -21,11 +22,10 @@
 		field: FormField | null;
 		formId: number;
 		entityTypes: Array<{ id: number; name: string }>;
-		onSave: (field: FormField) => void;
 		onClose: () => void;
 	}
 
-	let { field, formId, entityTypes: initialEntityTypes, onSave, onClose }: Props = $props();
+	let { field, formId, entityTypes: initialEntityTypes, onClose }: Props = $props();
 
 	const isEditing = field !== null;
 
@@ -178,12 +178,9 @@
 			use:enhance={() => {
 				return async ({ result }) => {
 					if (result.type === 'success') {
-						const savedField = buildFieldData();
-						// For new fields, the server will return the ID
-						if (result.data && typeof result.data === 'object' && 'id' in result.data) {
-							savedField.id = result.data.id as number;
-						}
-						onSave(savedField);
+						// Invalidate page data to reload fields from server
+						await invalidateAll();
+						onClose();
 					}
 				};
 			}}

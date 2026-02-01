@@ -182,6 +182,19 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const fieldData = JSON.parse(data.get('field') as string);
 
+		// Validate field data
+		const validationResult = formFieldSchema.safeParse(fieldData);
+		if (!validationResult.success) {
+			setFlash(
+				{
+					type: 'error',
+					message: 'Invalid field data. Please check all required fields.'
+				},
+				cookies
+			);
+			return fail(400, { errors: validationResult.error.flatten() });
+		}
+
 		const response = await fetch(`${BACKEND_URL}/form/${params.id}/field/`, {
 			method: 'POST',
 			headers: {
@@ -203,8 +216,11 @@ export const actions: Actions = {
 			return fail(500, {});
 		}
 
+		// Get the created field with its ID from the response
+		const createdField = await response.json();
+
 		setFlash({ type: 'success', message: 'Field added successfully' }, cookies);
-		return { success: true };
+		return { success: true, id: createdField.id };
 	},
 
 	updateField: async ({ request, params, cookies }) => {
@@ -215,6 +231,19 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const fieldId = data.get('fieldId') as string;
 		const fieldData = JSON.parse(data.get('field') as string);
+
+		// Validate field data
+		const validationResult = formFieldSchema.safeParse(fieldData);
+		if (!validationResult.success) {
+			setFlash(
+				{
+					type: 'error',
+					message: 'Invalid field data. Please check all required fields.'
+				},
+				cookies
+			);
+			return fail(400, { errors: validationResult.error.flatten() });
+		}
 
 		const response = await fetch(`${BACKEND_URL}/form/${params.id}/field/${fieldId}`, {
 			method: 'PUT',

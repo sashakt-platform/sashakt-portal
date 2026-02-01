@@ -92,10 +92,12 @@ describe('CertificateFormPage', () => {
 	});
 
 	it('populates form fields in edit mode', () => {
-		render(CertificateFormPage, { data: editModeData });
-		expect(screen.getByPlaceholderText('Enter certificate name')).toHaveValue('Test');
-		expect(
-			screen.getByPlaceholderText('Enter certificate URL (e.g., https://example.com)')
-		).toHaveValue('https://example.com');
+		const { container } = render(CertificateFormPage, { data: editModeData });
+		const nameInput = container.querySelector('input[name="name"]') as HTMLInputElement;
+		const urlInput = container.querySelector('input[name="url"]') as HTMLInputElement;
+		expect(nameInput).toBeInTheDocument();
+		expect(nameInput).toHaveValue('Test');
+		expect(urlInput).toBeInTheDocument();
+		expect(urlInput).toHaveValue('https://example.com');
 	});
 });

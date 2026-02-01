@@ -12,6 +12,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
+	import FileText from '@lucide/svelte/icons/file-text';
 	import { goto } from '$app/navigation';
 
 	// Menu items.
@@ -165,6 +166,10 @@
 
 					{#if canRead(data.user, 'tag')}
 						{@render sidebaritems(menu_items.tags)}
+					{/if}
+
+					{#if canRead(data.user, 'form')}
+						{@render sidebaritems(menu_items.forms)}
 					{/if}
 
 					{#if canRead(data.user, 'user')}

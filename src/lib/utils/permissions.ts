@@ -102,7 +102,14 @@ export const PERMISSIONS = {
 	CREATE_TEST_TEMPLATE: 'create_test_template',
 	UPDATE_TEST_TEMPLATE: 'update_test_template',
 	DELETE_TEST_TEMPLATE: 'delete_test_template',
-	READ_TEST_TEMPLATE: 'read_test_template'
+	READ_TEST_TEMPLATE: 'read_test_template',
+
+	// Form permissions
+	CREATE_FORM: 'create_form',
+	UPDATE_FORM: 'update_form',
+	DELETE_FORM: 'delete_form',
+	READ_FORM: 'read_form',
+	READ_FORM_RESPONSE: 'read_form_response'
 } as const;
 
 /**
@@ -173,6 +180,12 @@ export const ENTITY_PERMISSIONS = {
 		read: PERMISSIONS.READ_TEST_TEMPLATE,
 		update: PERMISSIONS.UPDATE_TEST_TEMPLATE,
 		delete: PERMISSIONS.DELETE_TEST_TEMPLATE
+	},
+	form: {
+		create: PERMISSIONS.CREATE_FORM,
+		read: PERMISSIONS.READ_FORM,
+		update: PERMISSIONS.UPDATE_FORM,
+		delete: PERMISSIONS.DELETE_FORM
 	}
 } as const;
 

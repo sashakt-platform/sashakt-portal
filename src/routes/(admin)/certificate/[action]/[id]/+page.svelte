@@ -58,30 +58,20 @@
 						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 					</div>
 				</div>
-				<Label class="my-auto align-middle text-sm font-extralight">
-				</Label>
+				<Label class="my-auto align-middle text-sm font-extralight"></Label>
 			</div>
 		</div>
 		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-10 md:p-9">
 			<div class="flex w-full flex-col gap-2 md:pr-8">
 				<h2 class="font-semibold">Name</h2>
-				<Input
-					type="text"
-					name="name"
-					bind:value={$formData.name}
-					placeholder="Enter certificate name"
-				/>
+				<Input type="text" name="name" bind:value={$formData.name} />
 				{#if $errors.name}
 					<span class="text-destructive text-sm">{$errors.name}</span>
 				{/if}
 			</div>
 			<div class="flex w-full flex-col gap-2 md:pr-8">
 				<h2 class="font-semibold">Description</h2>
-				<Textarea
-					name="description"
-					bind:value={$formData.description}
-					placeholder="Enter description"
-				/>
+				<Textarea name="description" bind:value={$formData.description} />
 			</div>
 			<div class="flex w-full flex-col gap-2 md:pr-8">
 				<h2 class="font-semibold">URL</h2>

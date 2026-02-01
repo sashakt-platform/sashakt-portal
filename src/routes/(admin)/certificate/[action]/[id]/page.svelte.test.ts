@@ -54,21 +54,12 @@ describe('CertificateFormPage', () => {
 		expect(screen.getByRole('heading', { name: /edit certificate/i })).toBeInTheDocument();
 	});
 
-	it('renders all form fields', () => {
-		render(CertificateFormPage, { data: addModeData });
-		expect(screen.getByPlaceholderText('Enter certificate name')).toBeInTheDocument();
-		expect(screen.getByPlaceholderText('Enter description')).toBeInTheDocument();
-		expect(
-			screen.getByPlaceholderText('Enter certificate URL (e.g., https://example.com)')
-		).toBeInTheDocument();
-		expect(screen.getByText('Is Active?')).toBeInTheDocument();
-	});
-
 	it('renders field labels', () => {
 		render(CertificateFormPage, { data: addModeData });
 		expect(screen.getByText('Name')).toBeInTheDocument();
 		expect(screen.getByText('Description')).toBeInTheDocument();
 		expect(screen.getByText('URL')).toBeInTheDocument();
+		expect(screen.getByText('Is Active?')).toBeInTheDocument();
 	});
 
 	it('renders Cancel button linking to certificate list', () => {

@@ -47,6 +47,11 @@
 			url: '/tags',
 			icon: Tags
 		},
+		forms: {
+			title: 'Form Builder',
+			url: '/forms',
+			icon: FileText
+		},
 		user: {
 			title: 'User Management',
 			url: '/users',

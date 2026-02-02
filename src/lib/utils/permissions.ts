@@ -92,6 +92,12 @@ export const PERMISSIONS = {
 	READ_ORGANIZATION: 'read_organization',
 	UPDATE_MY_ORGANIZATION: 'update_my_organization',
 
+	// Certificate permissions
+	CREATE_CERTIFICATE: 'create_certificate',
+	UPDATE_CERTIFICATE: 'update_certificate',
+	DELETE_CERTIFICATE: 'delete_certificate',
+	READ_CERTIFICATE: 'read_certificate',
+
 	// Role permissions
 	CREATE_ROLE: 'create_role',
 	UPDATE_ROLE: 'update_role',
@@ -162,6 +168,13 @@ export const ENTITY_PERMISSIONS = {
 		update: PERMISSIONS.UPDATE_ORGANIZATION,
 		delete: PERMISSIONS.DELETE_ORGANIZATION
 	},
+	certificate: {
+		create: PERMISSIONS.CREATE_CERTIFICATE,
+		read: PERMISSIONS.READ_CERTIFICATE,
+		update: PERMISSIONS.UPDATE_CERTIFICATE,
+		delete: PERMISSIONS.DELETE_CERTIFICATE
+	},
+
 	role: {
 		create: PERMISSIONS.CREATE_ROLE,
 		read: PERMISSIONS.READ_ROLE,

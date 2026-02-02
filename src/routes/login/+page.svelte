@@ -25,7 +25,16 @@
 <div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
-			<h1 class="text-primary w-full pb-4 text-3xl font-extrabold tracking-tighter">SASHAKT</h1>
+			{#if data.organizationData?.logo}
+				<img
+					src={data.organizationData.logo}
+					alt={data.organizationData?.name}
+					class="mx-auto mb-3 h-14 w-auto object-contain"
+					loading="eager"
+				/>
+			{:else}
+				<h1 class="text-primary w-full pb-4 text-3xl font-extrabold tracking-tighter">SASHAKT</h1>
+			{/if}
 		</div>
 
 		<Card.Root class="w-full shadow-xl">

@@ -29,8 +29,11 @@
 		}
 		if (isStateAdminForDistrict(user) && $formData.district_ids?.length === 0) {
 			const userDistrict = getUserDistrict(user);
-			if (userDistrict) {
-				$formData.district_ids = [{ id: String(userDistrict.id), name: userDistrict.name }];
+			if (userDistrict && userDistrict?.length > 0) {
+				$formData.district_ids = userDistrict.map((d) => ({
+					id: String(d.id),
+					name: d.name
+				}));
 			}
 		}
 	});

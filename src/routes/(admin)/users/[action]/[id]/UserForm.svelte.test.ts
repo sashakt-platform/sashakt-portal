@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import UserForm from './UserForm.svelte';
+import type { isStateAdminForDistrict } from '$lib/utils/permissions';
 
 // Mock StateSelection component
 vi.mock('$lib/components/StateSelection.svelte', () => ({
@@ -34,6 +35,9 @@ vi.mock('$lib/utils/permissions.js', () => ({
 		DELETE_ORGANIZATION: 'delete_organization'
 	},
 	isStateAdmin: vi.fn((user) => {
+		return user?.states?.length === 1;
+	}),
+	isStateAdminForDistrict: vi.fn((user) => {
 		return user?.states?.length === 1;
 	}),
 	getUserState: vi.fn((user) => {

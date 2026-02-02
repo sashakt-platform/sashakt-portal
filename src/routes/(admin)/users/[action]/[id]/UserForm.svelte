@@ -49,14 +49,16 @@
 	if (userData?.states?.length > 0) {
 		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
 	}
+
 	if (userData?.districts?.length > 0) {
-		selectedDistricts = [
-			{ id: String(userData.districts[0].id), name: userData.districts[0].name }
-		];
+		selectedDistricts = userData.districts.map((d) => ({
+			id: String(d.id),
+			name: d.name
+		}));
 	}
 
 	// if state admin is creating a user with state admin role,
-	// then we should auto-assign current state admin's state
+	// then we should auto-assign current state admin's state and state admin's districts
 	$effect(() => {
 		const selectedRole = data.roles.find((role: any) => role.id === $formData.role_id);
 		const isStateRole = selectedRole?.label?.toLowerCase()?.includes('state');
@@ -68,11 +70,13 @@
 					selectedStates = [{ id: String(userState.id), name: userState.name }];
 				}
 			}
-
 			if (selectedDistricts.length === 0) {
 				const userDistrict = getUserDistrict(data.currentUser);
-				if (userDistrict) {
-					selectedDistricts = [{ id: String(userDistrict.id), name: userDistrict.name }];
+				if (userDistrict?.length) {
+					selectedDistricts = userDistrict.map((d) => ({
+						id: String(d.id),
+						name: d.name
+					}));
 				}
 			}
 		}
@@ -81,7 +85,7 @@
 	$effect(() => {
 		$formData.state_ids = selectedStates.length > 0 ? [parseInt(selectedStates[0].id, 10)] : [];
 		$formData.district_ids =
-			selectedDistricts.length > 0 ? [parseInt(selectedDistricts[0].id, 10)] : [];
+			selectedDistricts.length > 0 ? selectedDistricts.map((d) => Number.parseInt(d.id, 10)) : [];
 	});
 
 	// for non-Super Admins, automatically set organization_id to current user's organization
@@ -251,12 +255,7 @@
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>District</Form.Label>
-							<DistrictSelection
-								{...props}
-								bind:districts={selectedDistricts}
-								{selectedStates}
-								multiple={false}
-							/>
+							<DistrictSelection {...props} bind:districts={selectedDistricts} {selectedStates} />
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors />

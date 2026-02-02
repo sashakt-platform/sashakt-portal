@@ -43,8 +43,9 @@
 	let selectedDistricts = $state<Filter[]>([]);
 
 	// check if the current user is a state admin
-	const currentUserIsStateAdmin =
-		isStateAdmin(data.currentUser) || isStateAdminForDistrict(data.currentUser);
+	const currentUserIsStateAdmin = isStateAdmin(data.currentUser);
+
+	const currentUserIsStateAdminForDistrict = isStateAdminForDistrict(data.currentUser);
 
 	if (userData?.states?.length > 0) {
 		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
@@ -70,6 +71,8 @@
 					selectedStates = [{ id: String(userState.id), name: userState.name }];
 				}
 			}
+		}
+		if (currentUserIsStateAdminForDistrict && isStateRole) {
 			if (selectedDistricts.length === 0) {
 				const userDistrict = getUserDistrict(data.currentUser);
 				if (userDistrict?.length) {
@@ -240,8 +243,8 @@
 		.find((role: any) => role.id === $formData.role_id)
 		?.label?.toLowerCase()
 		?.includes('state')}
-		{#if !currentUserIsStateAdmin}
-			<div class="flex flex-row gap-4">
+		<div class="flex flex-row gap-4">
+			{#if !currentUserIsStateAdmin}
 				<Form.Field {form} name="state_ids" class="w-1/2">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -251,6 +254,8 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
+			{/if}
+			{#if !currentUserIsStateAdminForDistrict}
 				<Form.Field {form} name="district_ids" class="w-1/2">
 					<Form.Control>
 						{#snippet children({ props })}
@@ -260,8 +265,8 @@
 					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-			</div>
-		{/if}
+			{/if}
+		</div>
 	{/if}
 
 	<div class="flex justify-end gap-4 pt-6">

@@ -24,7 +24,8 @@ export function isStateAdminForDistrict(user: User | null): boolean {
 	if (!user || !user.districts) {
 		return false;
 	}
-	return user.districts.length > 0;
+
+	return Array.isArray(user?.districts) && user.districts.length > 0;
 }
 
 /**

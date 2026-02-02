@@ -41,7 +41,7 @@ export function getUserState(user: User | null): { id: number | string; name: st
 
 /**
  * Get the user's assigned district (for State admins)
- * Returns the first district if user has districts assigned, null otherwise
+ * Returns all the districts if user has districts assigned, null otherwise
  */
 export function getUserDistrict(
 	user: User | null

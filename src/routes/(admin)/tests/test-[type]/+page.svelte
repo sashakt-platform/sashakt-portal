@@ -15,7 +15,13 @@
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
-	import { canCreate, canUpdate, canDelete, isStateAdmin } from '$lib/utils/permissions.js';
+	import {
+		canCreate,
+		canUpdate,
+		canDelete,
+		isStateAdmin,
+		isStateAdminForDistrict
+	} from '$lib/utils/permissions.js';
 
 	let {
 		data
@@ -206,13 +212,15 @@
 				</div>
 			{/if}
 
-			<div>
-				<DistrictSelection
-					bind:districts={filteredDistricts}
-					selectedStates={filteredStates}
-					filteration={true}
-				/>
-			</div>
+			{#if !isStateAdminForDistrict(data.user)}
+				<div>
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						selectedStates={filteredStates}
+						filteration={true}
+					/>
+				</div>
+			{/if}
 
 			<div>
 				<TagsSelection bind:tags={filteredTags} filteration={true} />

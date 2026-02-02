@@ -17,6 +17,7 @@ declare global {
 				modified_date: string;
 				is_deleted: boolean;
 				states: any[];
+				districts: any[];
 				permissions: string[];
 			} | null;
 			session: string | null;

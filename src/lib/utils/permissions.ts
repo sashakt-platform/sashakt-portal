@@ -16,6 +16,18 @@ export function isStateAdmin(user: User | null): boolean {
 }
 
 /**
+ * Check if user is a State Admin with district (has only one district assigned)
+ * State admins can only access data from their assigned district,
+ * so district selection dropdowns should be hidden for them.
+ */
+export function isStateAdminForDistrict(user: User | null): boolean {
+	if (!user || !user.districts) {
+		return false;
+	}
+	return user.districts.length === 1;
+}
+
+/**
  * Get the user's assigned state (for State admins)
  * Returns the first state if user has states assigned, null otherwise
  */
@@ -24,6 +36,17 @@ export function getUserState(user: User | null): { id: number | string; name: st
 		return null;
 	}
 	return user.states[0];
+}
+
+/**
+ * Get the user's assigned district (for State admins)
+ * Returns the first district if user has districts assigned, null otherwise
+ */
+export function getUserDistrict(user: User | null): { id: number | string; name: string } | null {
+	if (!user || !user.districts || user.districts.length === 0) {
+		return null;
+	}
+	return user.districts[0];
 }
 
 /**

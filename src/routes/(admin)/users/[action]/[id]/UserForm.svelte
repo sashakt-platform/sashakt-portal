@@ -12,9 +12,12 @@
 		hasPermission,
 		PERMISSIONS,
 		isStateAdmin,
-		getUserState
+		getUserState,
+		getUserDistrict,
+		isStateAdminForDistrict
 	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 
 	let { data }: { data: any } = $props();
 
@@ -37,12 +40,19 @@
 	const { form: formData, enhance, errors } = form;
 
 	let selectedStates = $state<Filter[]>([]);
+	let selectedDistricts = $state<Filter[]>([]);
 
 	// check if the current user is a state admin
-	const currentUserIsStateAdmin = isStateAdmin(data.currentUser);
+	const currentUserIsStateAdmin =
+		isStateAdmin(data.currentUser) || isStateAdminForDistrict(data.currentUser);
 
 	if (userData?.states?.length > 0) {
 		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
+	}
+	if (userData?.districts?.length > 0) {
+		selectedDistricts = [
+			{ id: String(userData.districts[0].id), name: userData.districts[0].name }
+		];
 	}
 
 	// if state admin is creating a user with state admin role,
@@ -51,16 +61,27 @@
 		const selectedRole = data.roles.find((role: any) => role.id === $formData.role_id);
 		const isStateRole = selectedRole?.label?.toLowerCase()?.includes('state');
 
-		if (currentUserIsStateAdmin && isStateRole && selectedStates.length === 0) {
-			const userState = getUserState(data.currentUser);
-			if (userState) {
-				selectedStates = [{ id: String(userState.id), name: userState.name }];
+		if (currentUserIsStateAdmin && isStateRole) {
+			if (selectedStates.length === 0) {
+				const userState = getUserState(data.currentUser);
+				if (userState) {
+					selectedStates = [{ id: String(userState.id), name: userState.name }];
+				}
+			}
+
+			if (selectedDistricts.length === 0) {
+				const userDistrict = getUserDistrict(data.currentUser);
+				if (userDistrict) {
+					selectedDistricts = [{ id: String(userDistrict.id), name: userDistrict.name }];
+				}
 			}
 		}
 	});
 
 	$effect(() => {
 		$formData.state_ids = selectedStates.length > 0 ? [parseInt(selectedStates[0].id, 10)] : [];
+		$formData.district_ids =
+			selectedDistricts.length > 0 ? [parseInt(selectedDistricts[0].id, 10)] : [];
 	});
 
 	// for non-Super Admins, automatically set organization_id to current user's organization
@@ -216,15 +237,31 @@
 		?.label?.toLowerCase()
 		?.includes('state')}
 		{#if !currentUserIsStateAdmin}
-			<Form.Field {form} name="state_ids">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label>State</Form.Label>
-						<StateSelection {...props} bind:states={selectedStates} multiple={false} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+			<div class="flex flex-row gap-4">
+				<Form.Field {form} name="state_ids" class="w-1/2">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>State</Form.Label>
+							<StateSelection {...props} bind:states={selectedStates} multiple={false} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<Form.Field {form} name="district_ids" class="w-1/2">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>District</Form.Label>
+							<DistrictSelection
+								{...props}
+								bind:districts={selectedDistricts}
+								{selectedStates}
+								multiple={false}
+							/>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			</div>
 		{/if}
 	{/if}
 

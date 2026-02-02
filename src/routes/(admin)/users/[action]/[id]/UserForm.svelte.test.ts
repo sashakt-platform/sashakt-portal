@@ -238,7 +238,7 @@ describe('UserForm Component', () => {
 	});
 
 	describe('System Admin - State Field Visibility', () => {
-		it('should show state field when System Admin selects a state role', () => {
+		it('should show state and district field when System Admin selects a state role', () => {
 			const data = createTestData(
 				{ role_id: '2' }, // System admin User role
 				{
@@ -251,14 +251,16 @@ describe('UserForm Component', () => {
 
 			// State field should be visible for System Admin creating State User
 			expect(screen.getByText('State')).toBeInTheDocument();
+			expect(screen.getByText('District')).toBeInTheDocument();
 		});
 
-		it('should hide state field when State Admin selects a state role', () => {
+		it('should hide state and district field when State Admin selects a state role', () => {
 			const data = createTestData(
 				{ role_id: '3' }, // State User role
 				{
 					permissions: ['create_user'],
-					states: [{ id: 1, name: 'Maharashtra' }] // State Admin has exactly one state
+					states: [{ id: 1, name: 'Maharashtra' }], // State Admin has exactly one state
+					districts: [{ id: 1, name: 'Mumbai' }] // State Admin has exactly one district
 				}
 			);
 
@@ -266,6 +268,7 @@ describe('UserForm Component', () => {
 
 			// State field should be hidden for State Admin creating State User
 			expect(screen.queryByText('State')).not.toBeInTheDocument();
+			expect(screen.queryByText('District')).not.toBeInTheDocument();
 		});
 	});
 });

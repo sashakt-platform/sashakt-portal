@@ -24,7 +24,7 @@ export const questionSchema = z.object({
 	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
 	options: z.array(optionSchema).default([]),
 	correct_answer: z.array(z.number().int()).default([]),
-	subjective_answer_limit: z.number().int().positive().nullable().optional(),
+	subjective_answer_limit: z.coerce.number().int().positive().nullable().optional(),
 	is_mandatory: z.boolean().default(false),
 	marking_scheme: marksSchema,
 	solution: z.string().nullable().optional(),

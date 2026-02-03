@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import SingleQuestionPage from './+page.svelte';
+import { QuestionTypeEnum } from './schema';
 
 vi.mock('sveltekit-superforms/adapters', () => ({
 	zod4Client: vi.fn((schema: unknown) => schema)
@@ -295,6 +296,216 @@ describe('Single Question Page - Edit Mode', () => {
 
 			const updatedInputs = screen.getAllByRole('textbox');
 			expect(updatedInputs.length).toBe(initialInputs.length - 1);
+		});
+	});
+});
+
+describe('Single Question Page - Question Type Selection', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Question Type Dropdown', () => {
+		it('should render question type dropdown with label', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+			expect(screen.getByText('Question Type:')).toBeInTheDocument();
+		});
+
+		it('should show Single Choice as default selected type', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+			expect(screen.getByText('Single Choice')).toBeInTheDocument();
+		});
+
+		it('should show answer options for Single Choice type', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+
+			expect(screen.getByText('Answers')).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Add Answer/i })).toBeInTheDocument();
+		});
+	});
+});
+
+describe('Single Question Page - Subjective Question Type', () => {
+	const subjectiveQuestionData = {
+		question_text: 'Explain the concept of recursion',
+		question_type: QuestionTypeEnum.Subjective,
+		options: [],
+		correct_answer: [],
+		is_mandatory: false,
+		is_active: true,
+		subjective_answer_limit: 50,
+		marking_scheme: { correct: 5, wrong: 0, skipped: 0 },
+		instructions: 'Write in detail'
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Subjective Question UI', () => {
+		it('should show Answer Settings section for subjective questions', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
+		});
+
+		it('should hide Answers section for subjective questions', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			expect(screen.queryByText('Answers')).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+		});
+
+		it('should show character limit input for subjective questions', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			expect(screen.getByText('Maximum character limit')).toBeInTheDocument();
+			expect(screen.getByText('characters')).toBeInTheDocument();
+		});
+
+		it('should display prefilled character limit value', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			const limitInput = screen.getByPlaceholderText('e.g., 500');
+			expect(limitInput).toHaveValue(50);
+		});
+
+		it('should show helper text for character limit', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			expect(screen.getByText(/Leave empty for unlimited/i)).toBeInTheDocument();
+		});
+	});
+
+	describe('Subjective Question Save Button', () => {
+		it('should enable Save button for subjective question with only question text', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
+
+		it('should disable Save button when question text is empty for subjective', async () => {
+			const emptySubjectiveData = {
+				...subjectiveQuestionData,
+				question_text: ''
+			};
+
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: emptySubjectiveData } as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeDisabled();
+		});
+	});
+
+	describe('Subjective Question Editing', () => {
+		it('should allow editing question text', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			const questionInput = screen.getByDisplayValue('Explain the concept of recursion');
+			await fireEvent.input(questionInput, { target: { value: 'Updated subjective question' } });
+			expect(questionInput).toHaveValue('Updated subjective question');
+		});
+
+		it('should allow editing character limit', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			const limitInput = screen.getByPlaceholderText('e.g., 500');
+			await fireEvent.input(limitInput, { target: { value: '1000' } });
+			expect(limitInput).toHaveValue(1000);
+		});
+
+		it('should allow clearing character limit for unlimited', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			const limitInput = screen.getByPlaceholderText('e.g., 500');
+			await fireEvent.input(limitInput, { target: { value: '' } });
+			expect(limitInput).toHaveValue(null);
+		});
+
+		it('should display prefilled instructions for subjective question', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			expect(screen.getByDisplayValue('Write in detail')).toBeInTheDocument();
+		});
+
+		it('should display prefilled marking scheme for subjective question', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			expect(screen.getByDisplayValue('5')).toBeInTheDocument();
+		});
+	});
+});
+
+describe('Single Question Page - Multi Choice Question Type', () => {
+	const multiChoiceQuestionData = {
+		question_text: 'Select all correct answers',
+		question_type: QuestionTypeEnum.MultiChoice,
+		options: [
+			{ id: 1, key: 'A', value: 'Option 1' },
+			{ id: 2, key: 'B', value: 'Option 2' },
+			{ id: 3, key: 'C', value: 'Option 3' }
+		],
+		correct_answer: [1, 2],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 2, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Multi Choice Question UI', () => {
+		it('should show Answers section for multi choice questions', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceQuestionData } as any
+			});
+
+			expect(screen.getByText('Answers')).toBeInTheDocument();
+		});
+
+		it('should hide Answer Settings section for multi choice questions', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceQuestionData } as any
+			});
+
+			expect(screen.queryByText('Answer Settings')).not.toBeInTheDocument();
+			expect(screen.queryByText('Maximum character limit')).not.toBeInTheDocument();
+		});
+
+		it('should display all prefilled options', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceQuestionData } as any
+			});
+
+			expect(screen.getByDisplayValue('Option 1')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Option 2')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Option 3')).toBeInTheDocument();
 		});
 	});
 });

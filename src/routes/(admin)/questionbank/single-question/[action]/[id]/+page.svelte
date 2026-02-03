@@ -13,6 +13,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { questionSchema, type FormSchema, type TagFormSchema, QuestionTypeEnum } from './schema';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
@@ -43,17 +44,18 @@
 		validators: zod4Client(questionSchema),
 		dataType: 'json',
 		onSubmit: () => {
-			$formData.options = totalOptions.map((option) => {
-				return { id: option.id, key: option.key, value: option.value };
-			});
-			$formData.correct_answer = totalOptions
-				.filter((option) => option.correct_answer)
-				.map((option) => option.id);
+			if ($formData.question_type === QuestionTypeEnum.Subjective) {
+				$formData.options = [];
+				$formData.correct_answer = [];
+			} else {
+				$formData.options = totalOptions.map((option) => {
+					return { id: option.id, key: option.key, value: option.value };
+				});
+				$formData.correct_answer = totalOptions
+					.filter((option) => option.correct_answer)
+					.map((option) => option.id);
+			}
 			$formData.organization_id = data.user.organization_id;
-			$formData.question_type =
-				$formData.correct_answer.length > 1
-					? QuestionTypeEnum.MultiChoice
-					: QuestionTypeEnum.SingleChoice;
 		}
 	});
 
@@ -164,11 +166,39 @@
 							bind:value={$formData.question_text}
 							placeholder="Enter your Question..."
 						/>
-						<div class="flex flex-row gap-2">
-							<Checkbox bind:checked={$formData.is_mandatory} />
-							<Label class="text-sm ">Set as mandatory</Label>
+						<div class="flex flex-row items-center gap-4">
+							<div class="flex flex-row items-center gap-2">
+								<Checkbox bind:checked={$formData.is_mandatory} />
+								<Label class="text-sm">Set as mandatory</Label>
+							</div>
+							<Select.Root
+								type="single"
+								value={$formData.question_type}
+								onValueChange={(value) => {
+									$formData.question_type = value as QuestionTypeEnum;
+								}}
+							>
+								<Select.Trigger class="w-[180px]">
+									<span>
+										{$formData.question_type === QuestionTypeEnum.MultiChoice
+											? 'Multi Choice'
+											: $formData.question_type === QuestionTypeEnum.Subjective
+												? 'Subjective'
+												: $formData.question_type === QuestionTypeEnum.NumericalInteger
+													? 'Numerical Integer'
+													: 'Single Choice'}
+									</span>
+								</Select.Trigger>
+								<Select.Content>
+									<Select.Item value={QuestionTypeEnum.SingleChoice}>Single Choice</Select.Item>
+									<Select.Item value={QuestionTypeEnum.MultiChoice}>Multi Choice</Select.Item>
+									<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
+									<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical Integer</Select.Item>
+								</Select.Content>
+							</Select.Root>
 						</div>
 					</div>
+					{#if $formData.question_type !== QuestionTypeEnum.Subjective}
 					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
 						{@render snippetHeading('Answers')}
 
@@ -251,6 +281,7 @@
 							>
 						</div>
 					</div>
+				{/if}
 				</div>
 				<div class="flex w-full flex-col gap-6 lg:w-2/5 lg:gap-4 lg:pl-8">
 					<div class="flex flex-col gap-2">
@@ -324,8 +355,9 @@
 				<Button
 					class="bg-primary text-sm sm:text-base"
 					disabled={$formData?.question_text?.trim() === '' ||
-						totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
-						!totalOptions.some((option) => option.correct_answer)}
+						($formData.question_type !== QuestionTypeEnum.Subjective &&
+							(totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
+								!totalOptions.some((option) => option.correct_answer)))}
 					onclick={submit}>Save</Button
 				>
 			</div>

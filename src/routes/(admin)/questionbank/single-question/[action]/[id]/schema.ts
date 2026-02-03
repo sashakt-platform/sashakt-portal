@@ -9,8 +9,7 @@ export const optionSchema = z.object({
 export enum QuestionTypeEnum {
 	SingleChoice = 'single-choice',
 	MultiChoice = 'multi-choice',
-	Subjective = 'subjective',
-	NumericalInteger = 'numerical-integer'
+	Subjective = 'subjective'
 }
 
 export const marksSchema = z.object({

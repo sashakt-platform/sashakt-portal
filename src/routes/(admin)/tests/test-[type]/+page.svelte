@@ -114,7 +114,8 @@
 			{
 				canEdit: canUpdate(data.user, entityType),
 				canDelete: canDelete(data.user, entityType)
-			}
+			},
+			data.user
 		)
 	);
 

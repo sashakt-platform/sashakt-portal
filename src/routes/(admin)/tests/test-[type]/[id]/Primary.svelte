@@ -13,7 +13,7 @@
 		getUserState,
 		type User,
 		getUserDistrict,
-		isStateAdminForDistrict
+		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
 
 	let { formData, user = null }: { formData: any; user?: User | null } = $props();
@@ -27,7 +27,7 @@
 				$formData.state_ids = [{ id: String(userState.id), name: userState.name }];
 			}
 		}
-		if (isStateAdminForDistrict(user) && $formData.district_ids?.length === 0) {
+		if (hasAssignedDistricts(user) && $formData.district_ids?.length === 0) {
 			const userDistrict = getUserDistrict(user);
 			if (userDistrict && userDistrict?.length > 0) {
 				$formData.district_ids = userDistrict.map((d) => ({
@@ -92,7 +92,7 @@
 						<StateSelection bind:states={$formData.state_ids} filteration={true} />
 					</div>
 				{/if}
-				{#if !isStateAdminForDistrict(user)}
+				{#if !hasAssignedDistricts(user)}
 					<div class="mt-6 w-full md:mt-10 md:w-1/3">
 						<div class="flex align-middle">
 							<Label for="template-name" class="text-xl md:text-2xl">Districts</Label><span

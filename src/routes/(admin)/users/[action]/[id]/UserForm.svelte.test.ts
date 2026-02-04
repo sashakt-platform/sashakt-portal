@@ -36,14 +36,20 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	isStateAdmin: vi.fn((user) => {
 		return user?.states?.length === 1;
 	}),
-	isStateAdminForDistrict: vi.fn((user) => {
-		return user?.states?.length === 1;
+	hasAssignedDistricts: vi.fn((user) => {
+		return Array.isArray(user?.districts) && user.districts.length > 0;
 	}),
 	getUserState: vi.fn((user) => {
 		if (!user || !user.states || user.states.length === 0) {
 			return null;
 		}
 		return user.states[0];
+	}),
+	getUserDistrict: vi.fn((user) => {
+		if (!user || !user.districts || user.districts.length === 0) {
+			return null;
+		}
+		return user.districts;
 	})
 }));
 

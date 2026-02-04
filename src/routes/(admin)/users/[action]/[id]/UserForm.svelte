@@ -14,7 +14,7 @@
 		isStateAdmin,
 		getUserState,
 		getUserDistrict,
-		isStateAdminForDistrict
+		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
@@ -45,7 +45,7 @@
 	// check if the current user is a state admin
 	const currentUserIsStateAdmin = isStateAdmin(data.currentUser);
 
-	const currentUserIsStateAdminForDistrict = isStateAdminForDistrict(data.currentUser);
+	const currentUserHasAssignedDistricts = hasAssignedDistricts(data.currentUser);
 
 	if (userData?.states?.length > 0) {
 		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
@@ -72,7 +72,7 @@
 				}
 			}
 		}
-		if (currentUserIsStateAdminForDistrict && isStateRole) {
+		if (currentUserHasAssignedDistricts && isStateRole) {
 			if (selectedDistricts.length === 0) {
 				const userDistrict = getUserDistrict(data.currentUser);
 				if (userDistrict?.length) {
@@ -243,9 +243,9 @@
 		.find((role: any) => role.id === $formData.role_id)
 		?.label?.toLowerCase()
 		?.includes('state')}
-		<div class="flex flex-row gap-4">
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 			{#if !currentUserIsStateAdmin}
-				<Form.Field {form} name="state_ids" class="w-1/2">
+				<Form.Field {form} name="state_ids">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>State</Form.Label>
@@ -255,8 +255,8 @@
 					<Form.FieldErrors />
 				</Form.Field>
 			{/if}
-			{#if !currentUserIsStateAdminForDistrict}
-				<Form.Field {form} name="district_ids" class="w-1/2">
+			{#if !currentUserHasAssignedDistricts}
+				<Form.Field {form} name="district_ids">
 					<Form.Control>
 						{#snippet children({ props })}
 							<Form.Label>District</Form.Label>

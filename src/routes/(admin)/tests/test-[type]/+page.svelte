@@ -20,7 +20,7 @@
 		canUpdate,
 		canDelete,
 		isStateAdmin,
-		isStateAdminForDistrict
+		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
 
 	let {
@@ -212,7 +212,7 @@
 				</div>
 			{/if}
 
-			{#if !isStateAdminForDistrict(data.user)}
+			{#if !hasAssignedDistricts(data.user)}
 				<div>
 					<DistrictSelection
 						bind:districts={filteredDistricts}

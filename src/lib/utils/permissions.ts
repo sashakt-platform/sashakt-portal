@@ -16,16 +16,16 @@ export function isStateAdmin(user: User | null): boolean {
 }
 
 /**
- * Check if user is a State Admin with district
- * State admins can only access data from their assigned district,
+ * Check if user has assigned districts.
+ * Users with assigned districts can only access data from those districts,
  * so district selection dropdowns should be hidden for them.
  */
-export function isStateAdminForDistrict(user: User | null): boolean {
+export function hasAssignedDistricts(user: User | null): boolean {
 	if (!user || !user.districts) {
 		return false;
 	}
 
-	return Array.isArray(user?.districts) && user.districts.length > 0;
+	return Array.isArray(user.districts) && user.districts.length > 0;
 }
 
 /**

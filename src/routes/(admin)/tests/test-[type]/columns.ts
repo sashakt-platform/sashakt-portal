@@ -3,6 +3,13 @@ import { createSortableColumn } from '$lib/components/data-table/column-helpers'
 import { formatDate, downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions } from '$lib/components/data-table/index.js';
+import {
+	isStateAdmin,
+	hasAssignedDistricts,
+	getUserState,
+	getUserDistrict,
+	type User
+} from '$lib/utils/permissions.js';
 
 export interface Test {
 	id: string;
@@ -11,6 +18,44 @@ export interface Test {
 	modified_date: string;
 	is_template: boolean;
 	link?: string;
+	states?: Array<{ id: string | number; name: string }>;
+	districts?: Array<{ id: string | number; name: string }>;
+}
+
+/**
+ * Check if a state admin can edit/delete this test
+ * Test must be assigned ONLY to their state (not shared with other states)
+ */
+function canStateAdminAccessTest(user: User | null, test: Test): boolean {
+	const userState = getUserState(user);
+	if (!userState) return false;
+
+	// Test must have exactly 1 state assigned, and it must be user's state
+	if (!test.states || test.states.length !== 1) return false;
+
+	return String(test.states[0].id) === String(userState.id);
+}
+
+/**
+ * Check if a district admin can edit/delete this test
+ * Test must be assigned ONLY to their state AND ONLY to their district(s)
+ */
+function canDistrictAdminAccessTest(user: User | null, test: Test): boolean {
+	const userState = getUserState(user);
+	const userDistricts = getUserDistrict(user);
+
+	if (!userState || !userDistricts || userDistricts.length === 0) return false;
+
+	// Test must have exactly 1 state assigned, and it must be user's state
+	if (!test.states || test.states.length !== 1) return false;
+	if (String(test.states[0].id) !== String(userState.id)) return false;
+
+	// Test must have districts assigned
+	if (!test.districts || test.districts.length === 0) return false;
+
+	// All test districts must be within user's assigned districts
+	const userDistrictIds = userDistricts.map((d) => String(d.id));
+	return test.districts.every((district) => userDistrictIds.includes(String(district.id)));
 }
 
 export const createTestColumns = (
@@ -25,7 +70,8 @@ export const createTestColumns = (
 	permissions?: {
 		canEdit?: boolean;
 		canDelete?: boolean;
-	}
+	},
+	user?: User | null
 ): ColumnDef<Test>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
 	{
@@ -98,6 +144,19 @@ export const createTestColumns = (
 				}
 			}
 
+			// Restrict edit/delete for state/district admins to their jurisdiction
+			let isRestricted = false;
+
+			// Check district admin FIRST (has both state and districts)
+			// Then fall back to state admin (has state but no districts)
+			if (hasAssignedDistricts(user)) {
+				// District admin can only edit/delete tests assigned to their district
+				isRestricted = !canDistrictAdminAccessTest(user, test);
+			} else if (isStateAdmin(user)) {
+				// State admin can only edit/delete tests assigned to their state
+				isRestricted = !canStateAdminAccessTest(user, test);
+			}
+
 			return renderComponent(DataTableActions, {
 				id: test.id,
 				entityName: isTemplate ? 'Test Template' : 'Test Session',
@@ -105,8 +164,8 @@ export const createTestColumns = (
 				deleteUrl: `${baseUrl}/${test.id}?/delete`,
 				customActions,
 				onDelete: () => onDelete(test.id),
-				canEdit: permissions?.canEdit ?? true,
-				canDelete: permissions?.canDelete ?? true
+				canEdit: (permissions?.canEdit ?? true) && !isRestricted,
+				canDelete: (permissions?.canDelete ?? true) && !isRestricted
 			});
 		}
 	}

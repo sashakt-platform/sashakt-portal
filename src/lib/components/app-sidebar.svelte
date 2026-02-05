@@ -43,17 +43,17 @@
 			}
 		},
 		tags: {
-			title: 'Tag Management',
+			title: 'Tags',
 			url: '/tags',
 			icon: Tags
 		},
 		certificate: {
-			title: 'Certificate Management',
+			title: 'Certificates',
 			url: '/certificate',
 			icon: ShieldCheck
 		},
 		user: {
-			title: 'User Management',
+			title: 'Users',
 			url: '/users',
 			icon: User
 		}

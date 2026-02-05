@@ -108,7 +108,7 @@
 />
 
 <ListingPageLayout
-	title="Tag Management"
+	title="Tags"
 	subtitle="Manage Tags and Tag Types"
 	infoLabel="Help: Tag Management"
 	infoDescription="Manage all tags and tag types here. You can create, edit, or delete tags and tag types using the available actions."

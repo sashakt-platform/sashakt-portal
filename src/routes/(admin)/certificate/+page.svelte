@@ -42,7 +42,7 @@
 </script>
 
 <ListingPageLayout
-	title="Certificate Management"
+	title="Certificates"
 	subtitle="Manage certificates"
 	infoLabel="Help: Certificate management"
 	infoDescription="This panel displays all certificates in the system. You can edit or delete a certificate by clicking the three dots next to it."

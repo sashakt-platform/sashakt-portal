@@ -31,7 +31,7 @@ describe('CertificatePage', () => {
 	it('renders certificate management page', () => {
 		render(CertificatePage, { data: baseData });
 
-		expect(screen.getByRole('heading', { name: /certificate management/i })).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: /Certificates/i })).toBeInTheDocument();
 		expect(screen.getByText(/manage certificates/i)).toBeInTheDocument();
 	});
 

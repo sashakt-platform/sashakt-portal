@@ -8,6 +8,10 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { createEntitySchema, editEntitySchema, type EntityFormSchema } from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import StateSelection from '$lib/components/StateSelection.svelte';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
+	import BlockSelection from '$lib/components/BlockSelection.svelte';
+	import type { Filter } from '$lib/types/filters';
 
 	const {
 		data
@@ -39,6 +43,56 @@
 	if (!isEditMode && data.entityTypeId) {
 		$formData.entity_type_id = Number(data.entityTypeId);
 	}
+
+	// State/District/Block selection state
+	let selectedStates = $state<Filter[]>([]);
+	let selectedDistricts = $state<Filter[]>([]);
+	let selectedBlocks = $state<Filter[]>([]);
+
+	// Initialize selections from entity data in edit mode
+	if (isEditMode && entityData) {
+		if (entityData.state_id && (entityData as any).state?.name) {
+			selectedStates = [{ id: String(entityData.state_id), name: (entityData as any).state.name }];
+		}
+		if (entityData.district_id && (entityData as any).district?.name) {
+			selectedDistricts = [
+				{ id: String(entityData.district_id), name: (entityData as any).district.name }
+			];
+		}
+		if (entityData.block_id && (entityData as any).block?.name) {
+			selectedBlocks = [{ id: String(entityData.block_id), name: (entityData as any).block.name }];
+		}
+	}
+
+	// Sync selections to form data
+	$effect(() => {
+		($formData as any).state_id =
+			selectedStates.length > 0 ? parseInt(selectedStates[0].id, 10) : null;
+	});
+
+	$effect(() => {
+		($formData as any).district_id =
+			selectedDistricts.length > 0 ? parseInt(selectedDistricts[0].id, 10) : null;
+	});
+
+	$effect(() => {
+		($formData as any).block_id =
+			selectedBlocks.length > 0 ? parseInt(selectedBlocks[0].id, 10) : null;
+	});
+
+	// Clear district when state changes
+	$effect(() => {
+		if (selectedStates.length === 0) {
+			selectedDistricts = [];
+		}
+	});
+
+	// Clear block when district changes
+	$effect(() => {
+		if (selectedDistricts.length === 0) {
+			selectedBlocks = [];
+		}
+	});
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -72,11 +126,7 @@
 			</div>
 			<div class="flex w-full flex-col gap-2 md:pr-8">
 				<h2 class="font-semibold">Entity Type</h2>
-				<Select.Root
-					type="single"
-					bind:value={$formData.entity_type_id}
-					name="entity_type_id"
-				>
+				<Select.Root type="single" bind:value={$formData.entity_type_id} name="entity_type_id">
 					<Select.Trigger>
 						{#if $formData.entity_type_id}
 							{data.entityTypes.find((et) => et.id === $formData.entity_type_id)?.name ||
@@ -94,6 +144,29 @@
 				{#if $errors.entity_type_id}
 					<span class="text-destructive text-sm">{$errors.entity_type_id}</span>
 				{/if}
+			</div>
+			<div class="grid w-full grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+				<div class="flex flex-col gap-2">
+					<h2 class="font-semibold">State</h2>
+					<StateSelection bind:states={selectedStates} multiple={false} />
+					{#if $errors.state_id}
+						<span class="text-destructive text-sm">{$errors.state_id}</span>
+					{/if}
+				</div>
+				<div class="flex flex-col gap-2">
+					<h2 class="font-semibold">District</h2>
+					<DistrictSelection bind:districts={selectedDistricts} {selectedStates} multiple={false} />
+					{#if $errors.district_id}
+						<span class="text-destructive text-sm">{$errors.district_id}</span>
+					{/if}
+				</div>
+				<div class="flex flex-col gap-2">
+					<h2 class="font-semibold">Block</h2>
+					<BlockSelection bind:blocks={selectedBlocks} {selectedDistricts} multiple={false} />
+					{#if $errors.block_id}
+						<span class="text-destructive text-sm">{$errors.block_id}</span>
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>

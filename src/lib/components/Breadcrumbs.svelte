@@ -34,7 +34,7 @@
 	}
 
 	// Generate breadcrumb items from the current path
-	const breadcrumbs = $derived(() => {
+	const breadcrumbs = $derived.by(() => {
 		const pathname = page.url.pathname;
 		const segments = pathname.split('/').filter(Boolean);
 
@@ -67,10 +67,10 @@
 	});
 </script>
 
-{#if breadcrumbs().length > 1}
+{#if breadcrumbs.length > 1}
 	<Breadcrumb.Root>
 		<Breadcrumb.List>
-			{#each breadcrumbs() as crumb, index}
+			{#each breadcrumbs as crumb, index}
 				<Breadcrumb.Item>
 					{#if crumb.isLast}
 						<Breadcrumb.Page>{crumb.label}</Breadcrumb.Page>

@@ -8,7 +8,25 @@ import {
 export const entitySchema = z.object({
 	id: z.number(),
 	name: z.string(),
-	description: z.string().optional()
+	description: z.string().optional(),
+	state: z
+		.object({
+			name: z.string().optional()
+		})
+		.optional()
+		.nullable(),
+	district: z
+		.object({
+			name: z.string().optional()
+		})
+		.optional()
+		.nullable(),
+	block: z
+		.object({
+			name: z.string().optional()
+		})
+		.optional()
+		.nullable()
 });
 
 export type Entity = z.infer<typeof entitySchema>;
@@ -24,6 +42,23 @@ export const createEntityColumns = (
 	}
 ): ColumnDef<Entity>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
-	createSortableColumn('description', 'Description', currentSortBy, currentSortOrder, handleSort),
+	{
+		id: 'state',
+		header: 'State',
+		cell: ({ row }) => row.original.state?.name || '',
+		enableSorting: false
+	},
+	{
+		id: 'district',
+		header: 'District',
+		cell: ({ row }) => row.original.district?.name || '',
+		enableSorting: false
+	},
+	{
+		id: 'block',
+		header: 'Block',
+		cell: ({ row }) => row.original.block?.name || '',
+		enableSorting: false
+	},
 	createActionsColumn<Entity>('Entity', `/entity/view/${entityTypeId}`, permissions)
 ];

@@ -12,6 +12,7 @@
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
 	import * as Select from '$lib/components/ui/select';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 
 	let { formData } = $props();
 
@@ -32,6 +33,7 @@
 	}
 
 	let languageOptions = $state<{ [key: string]: string }>({});
+	let certificatesOptions = $state<Array<{ id: number; name: string | null }>>([]);
 	let formsOptions = $state<Array<{ id: number; name: string; description: string | null }>>([]);
 
 	// load test languages
@@ -61,10 +63,25 @@
 		}
 	}
 
+	async function loadCertificates() {
+		try {
+			const response = await fetch('/api/certificates');
+
+			if (response.ok) {
+				const data = await response.json();
+				certificatesOptions = data.items ?? [];
+			}
+		} catch (error) {
+			console.error('Failed to load certificates:', error);
+			certificatesOptions = [];
+		}
+	}
+
 	// initial load effect
 	$effect(() => {
 		loadLanguages();
 		loadForms();
+		loadCertificates();
 	});
 </script>
 
@@ -251,6 +268,32 @@
 					</div>
 				</div>
 			{/if}
+			<div class="w-full md:w-2/5">
+				{@render headingSubheading('Feedback Setting', '')}
+			</div>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_feedback_on_completion} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Feedback on Completion',
+						'Enable to show candidate their answers and correct answers after the test is completed.'
+					)}
+				</div>
+			</div>
+
+			<div class="mt-4 flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_feedback_immediately} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Immediate Feedback',
+						'Enable to show candidate correct answers immediately after each question is attempted.'
+					)}
+				</div>
+			</div>
 			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
 				<div>
 					{@render headingSubheading('Language', 'Select test language.')}
@@ -375,6 +418,39 @@
 					</div>
 				</div>
 			{/if}
+		</ConfigureBox>
+		<ConfigureBox title="Certificate Settings" Icon={ShieldCheck}>
+			<div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center">
+				<div class="w-full md:w-2/5">
+					{@render headingSubheading(
+						'Attach Certificate',
+						'Select a certificate to issue after test completion.'
+					)}
+				</div>
+
+				<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
+					<Select.Trigger class="w-72">
+						<span class="truncate">
+							{#if $formData.certificate_id}
+								{certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name}
+							{:else}
+								Select certificate
+							{/if}
+						</span>
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Group>
+							<Select.Item value={null} label="No certificate">No certificate</Select.Item>
+
+							{#each certificatesOptions as cert (cert.id)}
+								<Select.Item value={cert.id}>
+									{cert.name}
+								</Select.Item>
+							{/each}
+						</Select.Group>
+					</Select.Content>
+				</Select.Root>
+			</div>
 		</ConfigureBox>
 	</div>
 </div>

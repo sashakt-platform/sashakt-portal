@@ -13,6 +13,7 @@
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import FileText from '@lucide/svelte/icons/file-text';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import { goto } from '$app/navigation';
 
 	// Menu items.
@@ -43,17 +44,22 @@
 			}
 		},
 		tags: {
-			title: 'Tag Management',
+			title: 'Tags',
 			url: '/tags',
 			icon: Tags
 		},
 		forms: {
-			title: 'Form Builder',
+			title: 'Forms',
 			url: '/forms',
 			icon: FileText
 		},
+		certificate: {
+			title: 'Certificates',
+			url: '/certificate',
+			icon: ShieldCheck
+		},
 		user: {
-			title: 'User Management',
+			title: 'Users',
 			url: '/users',
 			icon: User
 		}
@@ -171,6 +177,9 @@
 
 					{#if canRead(data.user, 'tag')}
 						{@render sidebaritems(menu_items.tags)}
+					{/if}
+					{#if canRead(data.user, 'certificate')}
+						{@render sidebaritems(menu_items.certificate)}
 					{/if}
 
 					{#if canRead(data.user, 'form')}

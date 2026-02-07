@@ -47,8 +47,11 @@ export const testSchema = z.object({
 	show_result: z.boolean().default(true),
 	show_question_palette: z.boolean().default(true),
 	candidate_profile: z.boolean().default(false),
+	locale: z.string().default('en-US'),
+	certificate_id: z.coerce.number().nullable(),
+	show_feedback_on_completion: z.boolean().default(false),
+	show_feedback_immediately: z.boolean().default(false)
 	form_id: z.coerce.number().nullable().optional(),
-	locale: z.string().default('en-US')
 });
 
 export type FormSchema = typeof testSchema;

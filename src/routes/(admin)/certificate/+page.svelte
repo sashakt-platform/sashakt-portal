@@ -13,8 +13,8 @@
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
 
-	const tableData = $derived(data?.users?.items || []);
-	const totalItems = $derived(data?.users?.total || 0);
+	const tableData = $derived(data?.certificates?.items || []);
+	const totalItems = $derived(data?.certificates?.total || 0);
 	const totalPages = $derived(data?.totalPages || 0);
 	const currentPage = $derived(data?.params?.page || 1);
 	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
@@ -22,42 +22,44 @@
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
-	// handle sorting
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
-		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
 
+		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
 		url.searchParams.set('sortBy', columnId);
 		url.searchParams.set('sortOrder', newSortOrder);
-		url.searchParams.set('page', '1'); // reset to first page when sorting
+		url.searchParams.set('page', '1');
 
 		goto(url.toString(), { replaceState: false });
 	}
 
-	// create columns for the data table
 	const columns = $derived(
 		createColumns(sortBy, sortOrder, handleSort, {
-			canEdit: canUpdate(data.user, 'user'),
-			canDelete: canDelete(data.user, 'user')
+			canEdit: canUpdate(data.user, 'certificate'),
+			canDelete: canDelete(data.user, 'certificate')
 		})
 	);
 </script>
 
 <ListingPageLayout
-	title="Users"
-	subtitle="Manage users"
-	infoLabel="Help: User management"
-	infoDescription="This panel displays all users in the system. You can edit or delete a user by clicking the three dots next to their entry."
+	title="Certificates"
+	subtitle="Manage certificates"
+	infoLabel="Help: Certificate management"
+	infoDescription="This panel displays all certificates in the system. You can edit or delete a certificate by clicking the three dots next to it."
 >
 	{#snippet headerActions()}
-		{#if canCreate(data.user, 'user')}
-			<a href="/users/add/new"><Button class="font-bold"><Plus />Add User</Button></a>
+		{#if canCreate(data.user, 'certificate')}
+			<a href="/certificate/add/new">
+				<Button class="font-bold">
+					<Plus />Add Certificate
+				</Button>
+			</a>
 		{/if}
 	{/snippet}
 
 	{#snippet filters()}
 		<Input
-			placeholder="Search users..."
+			placeholder="Search certificates..."
 			value={search}
 			oninput={(event) => {
 				const url = new URL(page.url);

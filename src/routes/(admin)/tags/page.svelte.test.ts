@@ -48,7 +48,7 @@ describe('TagManagementPage', () => {
 	it('renders Tag Management title', () => {
 		render(TagManagementPage, { data: mockData });
 
-		expect(screen.getByRole('heading', { name: /tag management/i })).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: /Tags/i })).toBeInTheDocument();
 		expect(screen.getByText(/manage tags and tag types/i)).toBeInTheDocument();
 	});
 	it('renders Create buttons when user has permission', () => {

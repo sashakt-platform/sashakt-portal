@@ -232,7 +232,9 @@
 				<div class="space-y-2">
 					<Label>Field Name *</Label>
 					<Input bind:value={name} placeholder="field_name" disabled={isEditing} />
-					<p class="text-xs text-gray-500">Used as the key in form responses</p>
+					<p class="text-xs text-gray-500">
+						Used as token in certificate and key in form response.
+					</p>
 				</div>
 			</div>
 

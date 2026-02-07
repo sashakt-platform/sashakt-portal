@@ -90,7 +90,7 @@
 			{#snippet snippetHeading(title: string)}
 				<div class="bg-primary-foreground flex flex-row gap-3 rounded-sm px-4 py-3 align-middle">
 					<Label class="text-md my-auto font-bold">{title}</Label>
-					<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+					<!-- <Info class="my-auto w-4 align-middle text-xs text-gray-600" /> -->
 				</div>
 			{/snippet}
 
@@ -105,7 +105,7 @@
 							</h2>
 
 							<TooltipInfo
-								label="Help: Form Builder"
+								label="Help: Forms"
 								description="Create dynamic forms to collect candidate information before tests. Add various field types like text, select, date, and more."
 							/>
 						</div>
@@ -126,27 +126,17 @@
 
 						<div class="flex flex-col gap-2">
 							<Label>Name</Label>
-							<Input
-								type="text"
-								name="name"
-								bind:value={$formData.name}
-								placeholder="Enter form name"
-							/>
+							<Input type="text" name="name" bind:value={$formData.name} />
 						</div>
 
 						<div class="flex flex-col gap-2">
 							<Label>Description</Label>
-							<Textarea
-								name="description"
-								bind:value={$formData.description}
-								placeholder="Enter description (optional)"
-							/>
+							<Textarea name="description" bind:value={$formData.description} />
 						</div>
 
 						<div class="mt-4 flex items-center gap-2">
 							<Switch id="is_active" name="is_active" bind:checked={$formData.is_active} />
 							<Label for="is_active">Is Active?</Label>
-							<Info class="w-4 text-xs text-gray-600" />
 						</div>
 					</div>
 				</div>
@@ -195,7 +185,7 @@
 				disabled={$formData.name?.trim() === ''}
 				onclick={submit}
 			>
-				{isEditMode ? 'Save Form' : 'Create Form'}
+				Save
 			</Button>
 		</div>
 	</div>

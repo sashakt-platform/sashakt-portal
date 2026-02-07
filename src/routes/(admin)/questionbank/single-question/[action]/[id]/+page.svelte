@@ -166,7 +166,7 @@
 							bind:value={$formData.question_text}
 							placeholder="Enter your Question..."
 						/>
-						<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+						<div class="flex flex-col gap-4">
 							<div class="flex flex-row items-center gap-2">
 								<Checkbox bind:checked={$formData.is_mandatory} />
 								<Label class="text-sm">Set as mandatory</Label>

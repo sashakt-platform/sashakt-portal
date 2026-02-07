@@ -14,7 +14,7 @@ vi.mock('./TooltipInfo.svelte', () => ({
 
 describe('ListingPageLayout', () => {
 	const defaultProps = {
-		title: 'User Management',
+		title: 'Users',
 		subtitle: 'Manage all users in the system'
 	};
 
@@ -22,7 +22,7 @@ describe('ListingPageLayout', () => {
 		it('should render title', () => {
 			render(ListingPageLayout, { props: defaultProps });
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
 		it('should render subtitle', () => {
@@ -34,7 +34,7 @@ describe('ListingPageLayout', () => {
 		it('should render both title and subtitle', () => {
 			render(ListingPageLayout, { props: defaultProps });
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 			expect(screen.getByText('Manage all users in the system')).toBeInTheDocument();
 		});
 
@@ -56,7 +56,7 @@ describe('ListingPageLayout', () => {
 			render(ListingPageLayout, { props: defaultProps });
 
 			// TooltipInfo component should be rendered
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
 		it('should not show info icon when showInfoIcon is false', () => {
@@ -67,7 +67,7 @@ describe('ListingPageLayout', () => {
 				}
 			});
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
 		it('should pass infoLabel and infoDescription to TooltipInfo', () => {
@@ -79,7 +79,7 @@ describe('ListingPageLayout', () => {
 				}
 			});
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 	});
 
@@ -101,7 +101,7 @@ describe('ListingPageLayout', () => {
 				}
 			});
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 	});
 
@@ -110,7 +110,7 @@ describe('ListingPageLayout', () => {
 			render(ListingPageLayout, { props: defaultProps });
 
 			// Just verify component renders
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
 		it('should hide filters when showFilters is false', () => {
@@ -121,7 +121,7 @@ describe('ListingPageLayout', () => {
 				}
 			});
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
 		it('should show filters when showFilters is true', () => {
@@ -132,7 +132,7 @@ describe('ListingPageLayout', () => {
 				}
 			});
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 	});
 
@@ -159,7 +159,7 @@ describe('ListingPageLayout', () => {
 		it('should apply correct CSS classes to title', () => {
 			const { container } = render(ListingPageLayout, { props: defaultProps });
 
-			const title = screen.getByText('User Management');
+			const title = screen.getByText('Users');
 			expect(title).toHaveClass('text-2xl');
 			expect(title).toHaveClass('font-semibold');
 		});
@@ -243,7 +243,7 @@ describe('ListingPageLayout', () => {
 				}
 			});
 
-			expect(screen.getByText('User Management')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
 		it('should handle undefined optional props', () => {

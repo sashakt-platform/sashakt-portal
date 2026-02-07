@@ -8,8 +8,11 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel } from './schema';
+	import * as Select from '$lib/components/ui/select';
+	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 
 	let { formData } = $props();
 
@@ -24,6 +27,46 @@
 	if (!$formData.marks_level) {
 		$formData.marks_level = MarksLevel.QUESTION;
 	}
+
+	if (!$formData.locale) {
+		$formData.locale = 'en-US';
+	}
+
+	let languageOptions = $state<{ [key: string]: string }>({});
+	let certificatesOptions = $state<Array<{ id: number; name: string | null }>>([]);
+
+	// load test languages
+	async function loadLanguages() {
+		try {
+			const response = await fetch('/api/languages');
+			if (response.ok) {
+				const data = await response.json();
+				languageOptions = data;
+			}
+		} catch (error) {
+			console.error('Failed to load test languages:', error);
+		}
+	}
+
+	async function loadCertificates() {
+		try {
+			const response = await fetch('/api/certificates');
+
+			if (response.ok) {
+				const data = await response.json();
+				certificatesOptions = data.items ?? [];
+			}
+		} catch (error) {
+			console.error('Failed to load certificates:', error);
+			certificatesOptions = [];
+		}
+	}
+
+	// initial load effect
+	$effect(() => {
+		loadLanguages();
+		loadCertificates();
+	});
 </script>
 
 <div class="mx-auto flex h-dvh overflow-auto">
@@ -77,24 +120,12 @@
 					)}
 				</div>
 				<div class="flex w-full flex-col gap-4 sm:flex-row md:w-3/5">
-					<div class="flex w-full flex-col gap-2 sm:w-1/2">
-						<Label for="dateStart" class="my-auto font-extralight">Start Time</Label>
-						<Input
-							type="datetime-local"
-							id="dateStart"
-							name="start_time"
-							bind:value={$formData.start_time}
-						/>
-					</div>
-					<div class="flex w-full flex-col gap-2 sm:w-1/2">
-						<Label for="dateEnd" class="my-auto font-extralight">End Time</Label>
-						<Input
-							type="datetime-local"
-							id="dateEnd"
-							name="end_time"
-							bind:value={$formData.end_time}
-						/>
-					</div>
+					<CalendarRange
+						rangeFromLabel="Start Time"
+						bind:rangeFromValue={$formData.start_time}
+						rangeToLabel="End Time"
+						bind:rangeToValue={$formData.end_time}
+					/>
 				</div>
 			</div>
 
@@ -148,6 +179,18 @@
 					)}
 				</div>
 			</div>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_question_palette} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Show Question Palette',
+						'Choose whether to display the Question Palette during the test.'
+					)}
+				</div>
+			</div>
+
 			{#if $formData.random_tag_count.length == 0}
 				<div class="flex flex-row gap-3 align-top">
 					<div class="my-auto w-fit gap-4">
@@ -209,6 +252,49 @@
 					</div>
 				</div>
 			{/if}
+			<div class="w-full md:w-2/5">
+				{@render headingSubheading('Feedback Setting', '')}
+			</div>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_feedback_on_completion} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Feedback on Completion',
+						'Enable to show candidate their answers and correct answers after the test is completed.'
+					)}
+				</div>
+			</div>
+
+			<div class="mt-4 flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.show_feedback_immediately} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Immediate Feedback',
+						'Enable to show candidate correct answers immediately after each question is attempted.'
+					)}
+				</div>
+			</div>
+			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
+				<div>
+					{@render headingSubheading('Language', 'Select test language.')}
+				</div>
+				<div>
+					<Select.Root type="single" name="locale" bind:value={$formData.locale}>
+						<Select.Trigger class="w-48">{languageOptions[$formData.locale]}</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								{#each Object.entries(languageOptions) as [key, label] (key)}
+									<Select.Item value={key} {label}>{label}</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				</div>
+			</div>
 		</ConfigureBox>
 
 		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>
@@ -264,6 +350,39 @@
 						'Enable this option to collect candidate information during the test.'
 					)}
 				</div>
+			</div>
+		</ConfigureBox>
+		<ConfigureBox title="Certificate Settings" Icon={ShieldCheck}>
+			<div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center">
+				<div class="w-full md:w-2/5">
+					{@render headingSubheading(
+						'Attach Certificate',
+						'Select a certificate to issue after test completion.'
+					)}
+				</div>
+
+				<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
+					<Select.Trigger class="w-72">
+						<span class="truncate">
+							{#if $formData.certificate_id}
+								{certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name}
+							{:else}
+								Select certificate
+							{/if}
+						</span>
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Group>
+							<Select.Item value={null} label="No certificate">No certificate</Select.Item>
+
+							{#each certificatesOptions as cert (cert.id)}
+								<Select.Item value={cert.id}>
+									{cert.name}
+								</Select.Item>
+							{/each}
+						</Select.Group>
+					</Select.Content>
+				</Select.Root>
 			</div>
 		</ConfigureBox>
 	</div>

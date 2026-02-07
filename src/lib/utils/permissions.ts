@@ -4,6 +4,55 @@ export type User = NonNullable<App.Locals['user']>;
 export type Permission = string;
 
 /**
+ * Check if user is a State Admin (has only one state assigned)
+ * State admins can only access data from their assigned state,
+ * so state selection dropdowns should be hidden for them.
+ */
+export function isStateAdmin(user: User | null): boolean {
+	if (!user || !user.states) {
+		return false;
+	}
+	return user.states.length === 1;
+}
+
+/**
+ * Check if user has assigned districts.
+ * Users with assigned districts can only access data from those districts,
+ * so district selection dropdowns should be hidden for them.
+ */
+export function hasAssignedDistricts(user: User | null): boolean {
+	if (!user || !user.districts) {
+		return false;
+	}
+
+	return Array.isArray(user.districts) && user.districts.length > 0;
+}
+
+/**
+ * Get the user's assigned state (for State admins)
+ * Returns the first state if user has states assigned, null otherwise
+ */
+export function getUserState(user: User | null): { id: number | string; name: string } | null {
+	if (!user || !user.states || user.states.length === 0) {
+		return null;
+	}
+	return user.states[0];
+}
+
+/**
+ * Get the user's assigned district (for State admins)
+ * Returns all the districts if user has districts assigned, null otherwise
+ */
+export function getUserDistrict(
+	user: User | null
+): Array<{ id: number | string; name: string }> | null {
+	if (!user || !user.districts || user.districts.length === 0) {
+		return null;
+	}
+	return user.districts;
+}
+
+/**
  * Check if user has a specific permission
  */
 export function hasPermission(user: User | null, permission: Permission): boolean {
@@ -67,6 +116,13 @@ export const PERMISSIONS = {
 	UPDATE_ORGANIZATION: 'update_organization',
 	DELETE_ORGANIZATION: 'delete_organization',
 	READ_ORGANIZATION: 'read_organization',
+	UPDATE_MY_ORGANIZATION: 'update_my_organization',
+
+	// Certificate permissions
+	CREATE_CERTIFICATE: 'create_certificate',
+	UPDATE_CERTIFICATE: 'update_certificate',
+	DELETE_CERTIFICATE: 'delete_certificate',
+	READ_CERTIFICATE: 'read_certificate',
 
 	// Role permissions
 	CREATE_ROLE: 'create_role',
@@ -138,6 +194,13 @@ export const ENTITY_PERMISSIONS = {
 		update: PERMISSIONS.UPDATE_ORGANIZATION,
 		delete: PERMISSIONS.DELETE_ORGANIZATION
 	},
+	certificate: {
+		create: PERMISSIONS.CREATE_CERTIFICATE,
+		read: PERMISSIONS.READ_CERTIFICATE,
+		update: PERMISSIONS.UPDATE_CERTIFICATE,
+		delete: PERMISSIONS.DELETE_CERTIFICATE
+	},
+
 	role: {
 		create: PERMISSIONS.CREATE_ROLE,
 		read: PERMISSIONS.READ_ROLE,

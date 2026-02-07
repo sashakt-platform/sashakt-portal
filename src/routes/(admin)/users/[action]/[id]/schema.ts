@@ -9,6 +9,7 @@ const baseUserSchema = z.object({
 	organization_id: z.coerce.number().min(1, { error: 'Organization is required' }),
 	role_id: z.coerce.number().min(1, { error: 'Role is required' }),
 	state_ids: z.array(z.coerce.number()).default([]),
+	district_ids: z.array(z.coerce.number()).default([]),
 	is_active: z.boolean().default(true)
 });
 

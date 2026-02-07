@@ -8,9 +8,35 @@
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
+	import {
+		isStateAdmin,
+		getUserState,
+		type User,
+		getUserDistrict,
+		hasAssignedDistricts
+	} from '$lib/utils/permissions.js';
 
-	let { formData } = $props();
-	let selectedStates = $derived(formData?.state_ids || []);
+	let { formData, user = null }: { formData: any; user?: User | null } = $props();
+	let selectedStates = $derived($formData.state_ids || []);
+
+	// for State admins, auto-assign their state
+	$effect(() => {
+		if (isStateAdmin(user) && $formData.state_ids?.length === 0) {
+			const userState = getUserState(user);
+			if (userState) {
+				$formData.state_ids = [{ id: String(userState.id), name: userState.name }];
+			}
+		}
+		if (hasAssignedDistricts(user) && $formData.district_ids?.length === 0) {
+			const userDistrict = getUserDistrict(user);
+			if (userDistrict && userDistrict?.length > 0) {
+				$formData.district_ids = userDistrict.map((d) => ({
+					id: String(d.id),
+					name: d.name
+				}));
+			}
+		}
+	});
 </script>
 
 <div class=" mx-auto flex w-full items-center justify-center">
@@ -56,22 +82,26 @@
 					<TagsSelection bind:tags={$formData.tag_ids} />
 				</div>
 
-				<div class="mt-6 w-full md:mt-10 md:w-1/3">
-					<div class="flex align-middle">
-						<Label for="template-name" class="text-xl md:text-2xl">States</Label><span
-							><Info class="m-2 w-4 text-xs text-gray-600" /></span
-						>
+				{#if !isStateAdmin(user)}
+					<div class="mt-6 w-full md:mt-10 md:w-1/3">
+						<div class="flex align-middle">
+							<Label for="template-name" class="text-xl md:text-2xl">States</Label><span
+								><Info class="m-2 w-4 text-xs text-gray-600" /></span
+							>
+						</div>
+						<StateSelection bind:states={$formData.state_ids} filteration={true} />
 					</div>
-					<StateSelection bind:states={$formData.state_ids} filteration={true} />
-				</div>
-				<div class="mt-6 w-full md:mt-10 md:w-1/3">
-					<div class="flex align-middle">
-						<Label for="template-name" class="text-xl md:text-2xl">Districts</Label><span
-							><Info class="m-2 w-4 text-xs text-gray-600" /></span
-						>
+				{/if}
+				{#if !hasAssignedDistricts(user)}
+					<div class="mt-6 w-full md:mt-10 md:w-1/3">
+						<div class="flex align-middle">
+							<Label for="template-name" class="text-xl md:text-2xl">Districts</Label><span
+								><Info class="m-2 w-4 text-xs text-gray-600" /></span
+							>
+						</div>
+						<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
 					</div>
-					<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
-				</div>
+				{/if}
 			</div>
 
 			<div class="mt-10">

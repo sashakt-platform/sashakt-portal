@@ -310,7 +310,8 @@ describe('User CRUD Route', () => {
 					organization_id: '1',
 					role_id: '2',
 					is_active: 'true',
-					state_ids: '["state1","state2"]'
+					state_ids: '["state1","state2"]',
+					district_ids: '["district1","district2"]'
 				})
 			});
 
@@ -459,7 +460,8 @@ describe('User CRUD Route', () => {
 					organization_id: '1',
 					role_id: '2',
 					is_active: 'false',
-					state_ids: '["state1"]'
+					state_ids: '["state1"]',
+					district_ids: '["district1"]'
 				})
 			});
 

@@ -15,7 +15,13 @@
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
-	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import {
+		canCreate,
+		canUpdate,
+		canDelete,
+		isStateAdmin,
+		hasAssignedDistricts
+	} from '$lib/utils/permissions.js';
 
 	let {
 		data
@@ -108,7 +114,8 @@
 			{
 				canEdit: canUpdate(data.user, entityType),
 				canDelete: canDelete(data.user, entityType)
-			}
+			},
+			data.user
 		)
 	);
 
@@ -200,17 +207,21 @@
 				/>
 			</div>
 
-			<div>
-				<StateSelection bind:states={filteredStates} filteration={true} />
-			</div>
+			{#if !isStateAdmin(data.user)}
+				<div>
+					<StateSelection bind:states={filteredStates} filteration={true} />
+				</div>
+			{/if}
 
-			<div>
-				<DistrictSelection
-					bind:districts={filteredDistricts}
-					selectedStates={filteredStates}
-					filteration={true}
-				/>
-			</div>
+			{#if !hasAssignedDistricts(data.user)}
+				<div>
+					<DistrictSelection
+						bind:districts={filteredDistricts}
+						selectedStates={filteredStates}
+						filteration={true}
+					/>
+				</div>
+			{/if}
 
 			<div>
 				<TagsSelection bind:tags={filteredTags} filteration={true} />

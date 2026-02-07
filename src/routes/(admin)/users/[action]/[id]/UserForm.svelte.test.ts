@@ -5,8 +5,14 @@ import UserForm from './UserForm.svelte';
 
 // Mock StateSelection component
 vi.mock('$lib/components/StateSelection.svelte', () => ({
-	default: class StateSelectionMock {
-		constructor() {}
+	default: function MockStateSelection(options: any) {
+		return {
+			$$set: vi.fn(),
+			$destroy: vi.fn(),
+			$on: vi.fn(),
+			_props: options?.props || {},
+			_target: options?.target
+		};
 	}
 }));
 
@@ -26,7 +32,25 @@ vi.mock('$lib/utils/permissions.js', () => ({
 		CREATE_ORGANIZATION: 'create_organization',
 		UPDATE_ORGANIZATION: 'update_organization',
 		DELETE_ORGANIZATION: 'delete_organization'
-	}
+	},
+	isStateAdmin: vi.fn((user) => {
+		return user?.states?.length === 1;
+	}),
+	hasAssignedDistricts: vi.fn((user) => {
+		return Array.isArray(user?.districts) && user.districts.length > 0;
+	}),
+	getUserState: vi.fn((user) => {
+		if (!user || !user.states || user.states.length === 0) {
+			return null;
+		}
+		return user.states[0];
+	}),
+	getUserDistrict: vi.fn((user) => {
+		if (!user || !user.districts || user.districts.length === 0) {
+			return null;
+		}
+		return user.districts;
+	})
 }));
 
 describe('UserForm Component', () => {
@@ -216,6 +240,41 @@ describe('UserForm Component', () => {
 			render(UserForm, { data });
 
 			expect(screen.queryByText('Organization')).not.toBeInTheDocument();
+		});
+	});
+
+	describe('System Admin - State Field Visibility', () => {
+		it('should show state and district field when System Admin selects a state role', () => {
+			const data = createTestData(
+				{ role_id: '2' }, // System admin User role
+				{
+					permissions: ['create_user'],
+					states: [] // System Admin has no single state
+				}
+			);
+
+			render(UserForm, { data });
+
+			// State field should be visible for System Admin creating State User
+			expect(screen.getByText('State')).toBeInTheDocument();
+			expect(screen.getByText('District')).toBeInTheDocument();
+		});
+
+		it('should hide state and district field when State Admin selects a state role', () => {
+			const data = createTestData(
+				{ role_id: '3' }, // State User role
+				{
+					permissions: ['create_user'],
+					states: [{ id: 1, name: 'Maharashtra' }], // State Admin has exactly one state
+					districts: [{ id: 1, name: 'Mumbai' }] // State Admin has exactly one district
+				}
+			);
+
+			render(UserForm, { data });
+
+			// State field should be hidden for State Admin creating State User
+			expect(screen.queryByText('State')).not.toBeInTheDocument();
+			expect(screen.queryByText('District')).not.toBeInTheDocument();
 		});
 	});
 });

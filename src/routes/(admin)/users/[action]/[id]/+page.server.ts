@@ -159,6 +159,7 @@ export const actions: Actions = {
 				email: form.data.email,
 				phone: form.data.phone || '',
 				state_ids: form.data.state_ids,
+				district_ids: form.data.district_ids,
 				organization_id: form.data.organization_id.toString(),
 				role_id: form.data.role_id.toString(),
 				is_active: form.data.is_active ? 'true' : 'false'
@@ -190,6 +191,7 @@ export const actions: Actions = {
 					password: form.data.password,
 					phone: form.data.phone || '',
 					state_ids: form.data.state_ids,
+					district_ids: form.data.district_ids,
 					organization_id: form.data.organization_id.toString(),
 					role_id: form.data.role_id.toString(),
 					is_active: form.data.is_active ? 'true' : 'false'

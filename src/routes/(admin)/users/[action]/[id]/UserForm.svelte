@@ -8,8 +8,16 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import type { Filter } from '$lib/types/filters';
-	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
+	import {
+		hasPermission,
+		PERMISSIONS,
+		isStateAdmin,
+		getUserState,
+		getUserDistrict,
+		hasAssignedDistricts
+	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
+	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 
 	let { data }: { data: any } = $props();
 
@@ -32,13 +40,55 @@
 	const { form: formData, enhance, errors } = form;
 
 	let selectedStates = $state<Filter[]>([]);
+	let selectedDistricts = $state<Filter[]>([]);
+
+	// check if the current user is a state admin
+	const currentUserIsStateAdmin = isStateAdmin(data.currentUser);
+
+	const currentUserHasAssignedDistricts = hasAssignedDistricts(data.currentUser);
 
 	if (userData?.states?.length > 0) {
 		selectedStates = [{ id: String(userData.states[0].id), name: userData.states[0].name }];
 	}
 
+	if (userData?.districts?.length > 0) {
+		selectedDistricts = userData.districts.map((d) => ({
+			id: String(d.id),
+			name: d.name
+		}));
+	}
+
+	// if state admin is creating a user with state admin role,
+	// then we should auto-assign current state admin's state and state admin's districts
+	$effect(() => {
+		const selectedRole = data.roles.find((role: any) => role.id === $formData.role_id);
+		const isStateRole = selectedRole?.label?.toLowerCase()?.includes('state');
+
+		if (currentUserIsStateAdmin && isStateRole) {
+			if (selectedStates.length === 0) {
+				const userState = getUserState(data.currentUser);
+				if (userState) {
+					selectedStates = [{ id: String(userState.id), name: userState.name }];
+				}
+			}
+		}
+		if (currentUserHasAssignedDistricts && isStateRole) {
+			if (selectedDistricts.length === 0) {
+				const userDistrict = getUserDistrict(data.currentUser);
+				if (userDistrict?.length) {
+					selectedDistricts = userDistrict.map((d) => ({
+						id: String(d.id),
+						name: d.name
+					}));
+				}
+			}
+		}
+	});
+
 	$effect(() => {
 		$formData.state_ids = selectedStates.length > 0 ? [parseInt(selectedStates[0].id, 10)] : [];
+		$formData.district_ids =
+			selectedDistricts.length > 0 ? selectedDistricts.map((d) => Number.parseInt(d.id, 10)) : [];
 	});
 
 	// for non-Super Admins, automatically set organization_id to current user's organization
@@ -193,15 +243,30 @@
 		.find((role: any) => role.id === $formData.role_id)
 		?.label?.toLowerCase()
 		?.includes('state')}
-		<Form.Field {form} name="state_ids">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>State</Form.Label>
-					<StateSelection {...props} bind:states={selectedStates} multiple={false} />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
+		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+			{#if !currentUserIsStateAdmin}
+				<Form.Field {form} name="state_ids">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>State</Form.Label>
+							<StateSelection {...props} bind:states={selectedStates} multiple={false} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			{/if}
+			{#if !currentUserHasAssignedDistricts}
+				<Form.Field {form} name="district_ids">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>District</Form.Label>
+							<DistrictSelection {...props} bind:districts={selectedDistricts} {selectedStates} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			{/if}
+		</div>
 	{/if}
 
 	<div class="flex justify-end gap-4 pt-6">

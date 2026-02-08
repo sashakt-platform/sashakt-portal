@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import Eye from '@lucide/svelte/icons/eye';
 
 	const { data } = $props();
 
@@ -16,30 +17,29 @@
 
 <Dialog.Root bind:open={openPreviewDialog}>
 	<Button
-		variant="default"
+		variant="outline"
 		onclick={() => (openPreviewDialog = true)}
-		class="ml-2 rounded-md px-4 py-1 text-sm font-medium"
-		style="background-color: #0264a1;"
+		class="border-primary text-primary gap-2 border text-sm sm:text-base"
 	>
-		Preview question
+		<Eye size={16} />
+		Preview
 	</Button>
-	<Dialog.Overlay class="fixed  bg-black/30 backdrop-blur-sm" />
+	<Dialog.Overlay class="fixed bg-black/30 backdrop-blur-sm" />
 
 	<Dialog.Content
-		class=" flex max-h-[85vh] w-[90vw] max-w-md flex-col  overflow-y-auto rounded-lg bg-white p-0 shadow-xl "
+		class="flex max-h-[90vh] w-[95vw] max-w-4xl flex-col overflow-hidden rounded-xl bg-white p-0 shadow-2xl sm:w-[90vw]"
 	>
-		<div class="border-b border-gray-200 p-8">
-			<div class="flex items-center justify-between">
-				<div class="text-sm font-medium text-gray-600">PREVIEW</div>
-				<div class="text-sm font-medium text-gray-600">
-					{marking.correct}
-					{marking.correct === 1 ? 'MARK' : 'MARKS'}
-				</div>
-			</div>
+		<div class="flex items-center justify-between px-8 py-5 sm:px-10">
+			<span class="text-sm font-semibold tracking-wide text-gray-600">PREVIEW</span>
+			<span class="mr-8 text-sm font-semibold tracking-wide text-gray-600">
+				{marking.correct}
+				{marking.correct === 1 ? 'MARK' : 'MARKS'}
+			</span>
 		</div>
+		<hr class="mx-4 border-gray-200 sm:mx-10" />
 
-		<div class="px-8 pt-4 pb-8">
-			<div class="mb-4">
+		<div class="overflow-y-auto px-8 py-8 sm:px-10 sm:py-10">
+			<div class="mb-6">
 				{#if question.trim()}
 					<p class="text-base leading-relaxed text-gray-900">
 						{question}
@@ -53,17 +53,19 @@
 					</p>
 				{/if}
 				{#if instructions.trim()}
-					<p class="text-gray-500">{instructions}</p>
+					<p class=" text-sm text-gray-500">{instructions}</p>
 				{/if}
 			</div>
 
 			{#if validOptions.length > 0}
-				<div class="flex flex-col gap-3">
+				<div class="flex flex-col gap-5">
 					{#each validOptions as opt}
-						<div class=" gap-3 rounded-lg border border-gray-200 bg-white p-4 hover:bg-gray-50">
+						<div
+							class="flex items-center justify-between rounded-xl border border-gray-200 px-6 py-5"
+						>
 							<div class="flex items-center gap-3">
-								<span class="font-medium text-gray-700">{opt.key}.</span>
-								<span class="text-gray-900">{opt.value}</span>
+								<span class="text-sm font-semibold text-gray-700">{opt.key}.</span>
+								<span class="text-sm font-medium text-gray-800">{opt.value}</span>
 							</div>
 						</div>
 					{/each}

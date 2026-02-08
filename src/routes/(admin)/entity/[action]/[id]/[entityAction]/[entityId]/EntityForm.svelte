@@ -3,10 +3,14 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
-	import * as Select from '$lib/components/ui/select/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { createEntitySchema, editEntitySchema, type EntityFormSchema } from './schema.js';
+	import {
+		createEntitySchema,
+		editEntitySchema,
+		type EntityFormSchema,
+		type EditEntitySchema
+	} from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
@@ -20,13 +24,13 @@
 			form: SuperValidated<Infer<EntityFormSchema>>;
 			entityAction: 'add' | 'edit';
 			entityTypeId: string;
-			entity: Partial<Infer<EntityFormSchema>> | null;
-			entityTypes: { id: number; name: string }[];
+			entity: Partial<Infer<EditEntitySchema>> | null;
+			entityType: { id: number; name: string } | null;
 			currentUser: any;
 		};
 	} = $props();
 
-	const entityData: Partial<Infer<EntityFormSchema>> | null = data?.entity || null;
+	const entityData: Partial<Infer<EditEntitySchema>> | null = data?.entity || null;
 	const isEditMode = data.entityAction === 'edit';
 
 	const {
@@ -34,15 +38,13 @@
 		enhance,
 		submit,
 		errors
-	} = superForm(entityData || data.form, {
+	} = superForm((entityData as any) || data.form, {
 		validators: zod4Client(isEditMode ? editEntitySchema : createEntitySchema),
 		dataType: 'json'
 	});
 
-	// Pre-set entity_type_id from URL when adding
-	if (!isEditMode && data.entityTypeId) {
-		$formData.entity_type_id = Number(data.entityTypeId);
-	}
+	// Set entity_type_id from URL
+	$formData.entity_type_id = Number(data.entityTypeId);
 
 	// State/District/Block selection state
 	let selectedStates = $state<Filter[]>([]);
@@ -51,16 +53,14 @@
 
 	// Initialize selections from entity data in edit mode
 	if (isEditMode && entityData) {
-		if (entityData.state_id && (entityData as any).state?.name) {
-			selectedStates = [{ id: String(entityData.state_id), name: (entityData as any).state.name }];
+		if (entityData.state?.id && entityData.state?.name) {
+			selectedStates = [{ id: String(entityData.state.id), name: entityData.state.name }];
 		}
-		if (entityData.district_id && (entityData as any).district?.name) {
-			selectedDistricts = [
-				{ id: String(entityData.district_id), name: (entityData as any).district.name }
-			];
+		if (entityData.district?.id && entityData.district?.name) {
+			selectedDistricts = [{ id: String(entityData.district.id), name: entityData.district.name }];
 		}
-		if (entityData.block_id && (entityData as any).block?.name) {
-			selectedBlocks = [{ id: String(entityData.block_id), name: (entityData as any).block.name }];
+		if (entityData.block?.id && entityData.block?.name) {
+			selectedBlocks = [{ id: String(entityData.block.id), name: entityData.block.name }];
 		}
 	}
 
@@ -104,7 +104,7 @@
 						<h2
 							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 						>
-							{isEditMode ? 'Edit Entity' : 'Create Entity'}
+							{(isEditMode ? 'Edit ' : 'Create ') + data.entityType?.name}
 						</h2>
 						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 					</div>
@@ -123,27 +123,6 @@
 			<div class="flex w-full flex-col gap-2 md:pr-8">
 				<h2 class="font-semibold">Description</h2>
 				<Textarea name="description" bind:value={$formData.description} />
-			</div>
-			<div class="flex w-full flex-col gap-2 md:pr-8">
-				<h2 class="font-semibold">Entity Type</h2>
-				<Select.Root type="single" bind:value={$formData.entity_type_id} name="entity_type_id">
-					<Select.Trigger>
-						{#if $formData.entity_type_id}
-							{data.entityTypes.find((et) => et.id === $formData.entity_type_id)?.name ||
-								'Select entity type'}
-						{:else}
-							Select entity type
-						{/if}
-					</Select.Trigger>
-					<Select.Content>
-						{#each data.entityTypes as entityType (entityType.id)}
-							<Select.Item value={entityType.id} label={entityType.name} />
-						{/each}
-					</Select.Content>
-				</Select.Root>
-				{#if $errors.entity_type_id}
-					<span class="text-destructive text-sm">{$errors.entity_type_id}</span>
-				{/if}
 			</div>
 			<div class="grid w-full grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
 				<div class="flex flex-col gap-2">
@@ -183,7 +162,7 @@
 				<Button
 					class="bg-primary text-sm sm:text-base"
 					onclick={submit}
-					disabled={$formData.name?.trim() === '' || !$formData.entity_type_id}>Save</Button
+					disabled={$formData.name?.trim() === ''}>Save</Button
 				>
 			</div>
 		</div>

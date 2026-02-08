@@ -55,10 +55,10 @@
 	infoDescription={`This panel displays list of all ${entityTypeName}s. You can edit or delete an existing ${entityTypeName} by clicking the three dots next to their entry.`}
 >
 	{#snippet headerActions()}
-		<a href="/entity"><Button variant="outline"><ArrowLeft />Back to Entity Types</Button></a>
+		<a href="/entity"><Button variant="outline"><ArrowLeft />Back to Entities</Button></a>
 		{#if canCreate(data.user, 'entity')}
 			<a href="/entity/view/{data.entityTypeId}/add/new"
-				><Button class="font-bold"><Plus />Add Entity</Button></a
+				><Button class="font-bold"><Plus />{`Add ${entityTypeName}`}</Button></a
 			>
 		{/if}
 	{/snippet}

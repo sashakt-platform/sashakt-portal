@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			page: page.toString(),
 			size: size.toString(),
 			entity_type_id: entityTypeId,
-			...(search && { search }),
+			...(search && { name: search }),
 			...(sortBy && { sort_by: sortBy }),
 			...(sortBy && { sort_order: sortOrder })
 		});
@@ -146,8 +146,7 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message:
-							errorMessage.detail || 'Entity type not created. Please check all the details.'
+						message: errorMessage.detail || 'Entity type not created. Please check all the details.'
 					},
 					cookies
 				);
@@ -170,8 +169,7 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message:
-							errorMessage.detail || 'Entity type not updated. Please check all the details.'
+						message: errorMessage.detail || 'Entity type not updated. Please check all the details.'
 					},
 					cookies
 				);

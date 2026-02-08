@@ -42,23 +42,35 @@ export const createEntityColumns = (
 	}
 ): ColumnDef<Entity>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
-	{
-		id: 'state',
-		header: 'State',
-		cell: ({ row }) => row.original.state?.name || '',
-		enableSorting: false
-	},
-	{
-		id: 'district',
-		header: 'District',
-		cell: ({ row }) => row.original.district?.name || '',
-		enableSorting: false
-	},
-	{
-		id: 'block',
-		header: 'Block',
-		cell: ({ row }) => row.original.block?.name || '',
-		enableSorting: false
-	},
+	createSortableColumn<Entity>(
+		'state' as keyof Entity,
+		'State',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => row.original.state?.name || ''
+		}
+	),
+	createSortableColumn<Entity>(
+		'district' as keyof Entity,
+		'District',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => row.original.district?.name || ''
+		}
+	),
+	createSortableColumn<Entity>(
+		'block' as keyof Entity,
+		'Block',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => row.original.block?.name || ''
+		}
+	),
 	createActionsColumn<Entity>('Entity', `/entity/view/${entityTypeId}`, permissions)
 ];

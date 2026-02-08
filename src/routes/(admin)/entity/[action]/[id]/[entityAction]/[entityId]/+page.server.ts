@@ -46,25 +46,22 @@ export const load: PageServerLoad = async ({ params }) => {
 		entityData = null;
 	}
 
-	// Fetch entity types for dropdown
-	let entityTypes: { id: number; name: string }[] = [];
+	// Fetch entity type details
+	let entityType: { id: number; name: string } | null = null;
 	try {
-		const entityTypesRes = await fetch(`${BACKEND_URL}/entitytype/?page=1&size=100`, {
+		const entityTypeRes = await fetch(`${BACKEND_URL}/entitytype/${entityTypeId}`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`
 			}
 		});
 
-		if (entityTypesRes.ok) {
-			const data = await entityTypesRes.json();
-			entityTypes = (data.items || []).map((et: { id: number; name: string }) => ({
-				id: et.id,
-				name: et.name
-			}));
+		if (entityTypeRes.ok) {
+			const data = await entityTypeRes.json();
+			entityType = { id: data.id, name: data.name };
 		}
 	} catch (error) {
-		console.error('Error fetching entity types:', error);
+		console.error('Error fetching entity type:', error);
 	}
 
 	const schema = params.entityAction === 'edit' ? editEntitySchema : createEntitySchema;
@@ -75,7 +72,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		entityId: params.entityId,
 		entityTypeId,
 		entity: entityData,
-		entityTypes,
+		entityType,
 		currentUser: user
 	};
 };

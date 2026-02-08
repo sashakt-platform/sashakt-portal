@@ -19,7 +19,7 @@ export const load = async ({ url }) => {
 	const queryParams = new URLSearchParams({
 		page: page.toString(),
 		size: size.toString(),
-		...(search && { search }),
+		...(search && { name: search }),
 		...(sortBy && { sort_by: sortBy }),
 		...(sortBy && { sort_order: sortOrder })
 	});

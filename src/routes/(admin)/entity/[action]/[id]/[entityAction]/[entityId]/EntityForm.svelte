@@ -5,12 +5,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import {
-		createEntitySchema,
-		editEntitySchema,
-		type EntityFormSchema,
-		type EditEntitySchema
-	} from './schema.js';
+	import { entitySchema, type EntityFormSchema } from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
@@ -24,13 +19,18 @@
 			form: SuperValidated<Infer<EntityFormSchema>>;
 			entityAction: 'add' | 'edit';
 			entityTypeId: string;
-			entity: Partial<Infer<EditEntitySchema>> | null;
+			entity: Partial<Infer<EntityFormSchema>> | null;
 			entityType: { id: number; name: string } | null;
 			currentUser: any;
 		};
 	} = $props();
 
-	const entityData: Partial<Infer<EditEntitySchema>> | null = data?.entity || null;
+	// State/District/Block selection state
+	let selectedStates = $state<Filter[]>([]);
+	let selectedDistricts = $state<Filter[]>([]);
+	let selectedBlocks = $state<Filter[]>([]);
+
+	const entityData: Partial<Infer<EntityFormSchema>> | null = data?.entity || null;
 	const isEditMode = data.entityAction === 'edit';
 
 	const {
@@ -39,17 +39,16 @@
 		submit,
 		errors
 	} = superForm((entityData as any) || data.form, {
-		validators: zod4Client(isEditMode ? editEntitySchema : createEntitySchema),
-		dataType: 'json'
+		validators: zod4Client(entitySchema),
+		dataType: 'json',
+		onSubmit: () => {
+			$formData.entity_type_id = Number(data.entityTypeId);
+			$formData.state_id = selectedStates.length > 0 ? parseInt(selectedStates[0].id, 10) : null;
+			$formData.district_id =
+				selectedDistricts.length > 0 ? parseInt(selectedDistricts[0].id, 10) : null;
+			$formData.block_id = selectedBlocks.length > 0 ? parseInt(selectedBlocks[0].id, 10) : null;
+		}
 	});
-
-	// Set entity_type_id from URL
-	$formData.entity_type_id = Number(data.entityTypeId);
-
-	// State/District/Block selection state
-	let selectedStates = $state<Filter[]>([]);
-	let selectedDistricts = $state<Filter[]>([]);
-	let selectedBlocks = $state<Filter[]>([]);
 
 	// Initialize selections from entity data in edit mode
 	if (isEditMode && entityData) {
@@ -63,36 +62,6 @@
 			selectedBlocks = [{ id: String(entityData.block.id), name: entityData.block.name }];
 		}
 	}
-
-	// Sync selections to form data
-	$effect(() => {
-		($formData as any).state_id =
-			selectedStates.length > 0 ? parseInt(selectedStates[0].id, 10) : null;
-	});
-
-	$effect(() => {
-		($formData as any).district_id =
-			selectedDistricts.length > 0 ? parseInt(selectedDistricts[0].id, 10) : null;
-	});
-
-	$effect(() => {
-		($formData as any).block_id =
-			selectedBlocks.length > 0 ? parseInt(selectedBlocks[0].id, 10) : null;
-	});
-
-	// Clear district when state changes
-	$effect(() => {
-		if (selectedStates.length === 0) {
-			selectedDistricts = [];
-		}
-	});
-
-	// Clear block when district changes
-	$effect(() => {
-		if (selectedDistricts.length === 0) {
-			selectedBlocks = [];
-		}
-	});
 </script>
 
 <form method="POST" action="?/save" use:enhance>

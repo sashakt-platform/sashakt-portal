@@ -2,9 +2,9 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { BACKEND_URL } from '$env/static/private';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { createEntitySchema, editEntitySchema } from './schema.js';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { entitySchema } from './schema.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { fail } from '@sveltejs/kit';
 
@@ -64,10 +64,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		console.error('Error fetching entity type:', error);
 	}
 
-	const schema = params.entityAction === 'edit' ? editEntitySchema : createEntitySchema;
-
 	return {
-		form: await superValidate(zod4(schema)),
+		form: await superValidate(zod4(entitySchema)),
 		entityAction: params.entityAction,
 		entityId: params.entityId,
 		entityTypeId,
@@ -88,8 +86,7 @@ export const actions: Actions = {
 			requirePermission(user, PERMISSIONS.CREATE_ENTITY);
 		}
 
-		const schema = params.entityAction === 'edit' ? editEntitySchema : createEntitySchema;
-		const form = await superValidate(request, zod4(schema));
+		const form = await superValidate(request, zod4(entitySchema));
 
 		if (!form.valid) {
 			setFlash(

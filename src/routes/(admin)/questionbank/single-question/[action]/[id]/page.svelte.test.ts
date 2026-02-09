@@ -313,7 +313,7 @@ describe('Single Question Page - Question Type Selection', () => {
 
 		it('should show Single Choice as default selected type', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Single Choice')).toBeInTheDocument();
+			expect(screen.getByText('Single/Multichoice')).toBeInTheDocument();
 		});
 
 		it('should show answer options for Single Choice type', () => {

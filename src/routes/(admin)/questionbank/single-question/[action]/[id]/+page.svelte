@@ -54,6 +54,11 @@
 				$formData.correct_answer = totalOptions
 					.filter((option) => option.correct_answer)
 					.map((option) => option.id);
+
+				$formData.question_type =
+					$formData.correct_answer.length > 1
+						? QuestionTypeEnum.MultiChoice
+						: QuestionTypeEnum.SingleChoice;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -175,23 +180,24 @@
 								<Label class="text-sm text-gray-600">Question Type:</Label>
 								<Select.Root
 									type="single"
-									value={$formData.question_type}
+									value={$formData.question_type === QuestionTypeEnum.MultiChoice
+										? QuestionTypeEnum.SingleChoice
+										: $formData.question_type}
 									onValueChange={(value) => {
 										$formData.question_type = value as QuestionTypeEnum;
 									}}
 								>
-									<Select.Trigger class="w-40 border-gray-300">
+									<Select.Trigger class="w-48 border-gray-300">
 										<span>
-											{$formData.question_type === QuestionTypeEnum.MultiChoice
-												? 'Multi Choice'
-												: $formData.question_type === QuestionTypeEnum.Subjective
-													? 'Subjective'
-													: 'Single Choice'}
+											{$formData.question_type === QuestionTypeEnum.Subjective
+												? 'Subjective'
+												: 'Single/Multichoice'}
 										</span>
 									</Select.Trigger>
 									<Select.Content>
-										<Select.Item value={QuestionTypeEnum.SingleChoice}>Single Choice</Select.Item>
-										<Select.Item value={QuestionTypeEnum.MultiChoice}>Multi Choice</Select.Item>
+										<Select.Item value={QuestionTypeEnum.SingleChoice}
+											>Single/Multichoice</Select.Item
+										>
 										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
 									</Select.Content>
 								</Select.Root>

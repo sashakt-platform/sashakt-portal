@@ -21,13 +21,13 @@
 	<AppSidebar {data} />
 	<main class="flex h-screen w-full flex-col overflow-x-hidden">
 		<div class="shadow-lg">
-			<div class="my-4">
+			<div class="my-4 flex items-center justify-between">
 				<Sidebar.Trigger class="mx-2 w-14 rounded-none border-r-2 sm:mx-4" />
+				<div class="mx-4 flex-1">
+					<Breadcrumbs />
+				</div>
 			</div>
 			<hr class="w-full" />
-		</div>
-		<div class="mx-4 my-4 sm:mx-8">
-			<Breadcrumbs />
 		</div>
 		<div>
 			<Toaster richColors />

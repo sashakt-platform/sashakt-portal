@@ -39,6 +39,7 @@
 		submit,
 		errors
 	} = superForm((entityData as any) || data.form, {
+		applyAction: 'never',
 		validators: zod4Client(entitySchema),
 		dataType: 'json',
 		onSubmit: () => {

@@ -4,11 +4,13 @@ import {
 	createSortableColumn,
 	createActionsColumn
 } from '$lib/components/data-table/column-helpers';
+import { formatDate } from '$lib/utils';
 
 export const entityTypeSchema = z.object({
 	id: z.number(),
 	name: z.string(),
-	description: z.string().optional()
+	description: z.string().optional(),
+	modified_date: z.string()
 });
 
 export type EntityType = z.infer<typeof entityTypeSchema>;
@@ -24,5 +26,8 @@ export const createColumns = (
 ): ColumnDef<EntityType>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
 	createSortableColumn('description', 'Description', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => formatDate(row.original.modified_date)
+	}),
 	createActionsColumn<EntityType>('Entity Type', '/entity', permissions)
 ];

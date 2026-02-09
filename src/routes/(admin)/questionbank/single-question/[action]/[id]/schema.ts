@@ -8,7 +8,8 @@ export const optionSchema = z.object({
 
 export enum QuestionTypeEnum {
 	SingleChoice = 'single-choice',
-	MultiChoice = 'multi-choice'
+	MultiChoice = 'multi-choice',
+	Subjective = 'subjective'
 }
 
 export const marksSchema = z.object({
@@ -20,10 +21,10 @@ export const marksSchema = z.object({
 export const questionSchema = z.object({
 	question_text: z.string().min(1, { error: 'Question text is required' }),
 	instructions: z.string().nullable().optional(),
-	question_type: z.nativeEnum(QuestionTypeEnum),
-	options: z.array(optionSchema).min(2).default([]),
-	correct_answer: z.array(z.number().int()).min(1).default([]),
-	subjective_answer_limit: z.number().int().positive().nullable().optional(),
+	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
+	options: z.array(optionSchema).default([]),
+	correct_answer: z.array(z.number().int()).default([]),
+	subjective_answer_limit: z.coerce.number().int().positive().nullable().optional(),
 	is_mandatory: z.boolean().default(false),
 	marking_scheme: marksSchema,
 	solution: z.string().nullable().optional(),

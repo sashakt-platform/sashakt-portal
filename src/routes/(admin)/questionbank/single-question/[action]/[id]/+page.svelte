@@ -177,7 +177,7 @@
 								<Label class="text-sm">Set as mandatory</Label>
 							</div>
 							<div class="flex flex-row items-center gap-2">
-								<Label class="text-sm text-gray-600">Question Type:</Label>
+								<Label class="text-sm text-gray-600">Question Type</Label>
 								<Select.Root
 									type="single"
 									value={$formData.question_type === QuestionTypeEnum.MultiChoice

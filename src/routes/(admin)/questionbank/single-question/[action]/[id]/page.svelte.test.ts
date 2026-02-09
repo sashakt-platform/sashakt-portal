@@ -308,7 +308,7 @@ describe('Single Question Page - Question Type Selection', () => {
 	describe('Question Type Dropdown', () => {
 		it('should render question type dropdown with label', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Question Type:')).toBeInTheDocument();
+			expect(screen.getByText('Question Type')).toBeInTheDocument();
 		});
 
 		it('should show Single Choice as default selected type', () => {

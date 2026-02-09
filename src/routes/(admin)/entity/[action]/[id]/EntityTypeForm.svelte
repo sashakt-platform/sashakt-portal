@@ -31,9 +31,7 @@
 		submit,
 		errors
 	} = superForm(entityTypeData || data.form, {
-		validators: zod4Client(
-			data.action === 'edit' ? editEntityTypeSchema : createEntityTypeSchema
-		),
+		validators: zod4Client(data.action === 'edit' ? editEntityTypeSchema : createEntityTypeSchema),
 		dataType: 'json'
 	});
 </script>
@@ -52,7 +50,6 @@
 						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 					</div>
 				</div>
-				<Label class="my-auto align-middle text-sm font-extralight"></Label>
 			</div>
 		</div>
 		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-10 md:p-9">

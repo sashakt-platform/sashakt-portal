@@ -17,17 +17,23 @@ type OrgDataType = {
 	shortcode: string;
 };
 
-export const load: PageServerLoad = async ({ url, fetch, cookies }) => {
+export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
 	const orgParam = url.searchParams.get('organization');
 	const org = orgParam?.trim() || null;
 	let organizationData: OrgDataType | null = null;
 	if (org) {
-		const res = await fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(org)}`);
-		if (res.ok) {
-			organizationData = await res.json();
-			setOrganizationCookie(cookies, org);
+		if (locals.organization?.shortcode === org) {
+			// Cookie was already set on a prior visit — hook already fetched it
+			organizationData = locals.organization;
 		} else {
-			deleteOrganizationCookie(cookies);
+			// First visit or different org — fetch directly and set cookie
+			const res = await fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(org)}`);
+			if (res.ok) {
+				organizationData = await res.json();
+				setOrganizationCookie(cookies, org);
+			} else {
+				deleteOrganizationCookie(cookies);
+			}
 		}
 	} else {
 		deleteOrganizationCookie(cookies);

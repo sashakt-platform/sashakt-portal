@@ -5,9 +5,10 @@ import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { forgotPasswordSchema } from './schema';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
 	return {
-		form: await superValidate(zod4(forgotPasswordSchema))
+		form: await superValidate(zod4(forgotPasswordSchema)),
+		organizationData: locals.organization
 	};
 };
 

@@ -21,6 +21,11 @@ declare global {
 				permissions: string[];
 			} | null;
 			session: string | null;
+			organization: {
+				logo: string;
+				name: string;
+				shortcode: string;
+			} | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

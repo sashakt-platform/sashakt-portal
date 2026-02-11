@@ -2,6 +2,26 @@ import * as Sentry from '@sentry/sveltekit';
 import { redirect, type Handle } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth.js';
 import { sequence } from '@sveltejs/kit/hooks';
+import { BACKEND_URL } from '$env/static/private';
+
+const handleOrganization: Handle = async ({ event, resolve }) => {
+	const shortcode = event.cookies.get(auth.organizationCookieName);
+
+	if (shortcode) {
+		try {
+			const res = await fetch(
+				`${BACKEND_URL}/organization/public/${encodeURIComponent(shortcode)}`
+			);
+			event.locals.organization = res.ok ? await res.json() : null;
+		} catch {
+			event.locals.organization = null;
+		}
+	} else {
+		event.locals.organization = null;
+	}
+
+	return resolve(event);
+};
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(auth.sessionCookieName) ?? null;
@@ -73,5 +93,8 @@ export const admin: Handle = async function ({ event, resolve }) {
 	return resolve(event);
 };
 
-export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, admin));
+export const handle: Handle = sequence(
+	Sentry.sentryHandle(),
+	sequence(handleOrganization, handleAuth, admin)
+);
 export const handleError = Sentry.handleErrorWithSentry();

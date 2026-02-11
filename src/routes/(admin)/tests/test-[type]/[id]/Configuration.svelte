@@ -10,7 +10,7 @@
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
-	import { MarksLevel } from './schema';
+	import { MarksLevel, OmrMode } from './schema';
 	import * as Select from '$lib/components/ui/select';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 
@@ -30,6 +30,10 @@
 
 	if (!$formData.locale) {
 		$formData.locale = 'en-US';
+	}
+
+	if (!$formData.omr) {
+		$formData.omr = OmrMode.NEVER;
 	}
 
 	let languageOptions = $state<{ [key: string]: string }>({});
@@ -290,6 +294,29 @@
 								{#each Object.entries(languageOptions) as [key, label] (key)}
 									<Select.Item value={key} {label}>{label}</Select.Item>
 								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				</div>
+			</div>
+			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
+				<div>
+					{@render headingSubheading('OMR', 'Select OMR Mode')}
+				</div>
+				<div>
+					<Select.Root type="single" name="omr" bind:value={$formData.omr}>
+						<Select.Trigger class="w-48">
+							{$formData.omr === OmrMode.NEVER
+								? 'Never'
+								: $formData.omr === OmrMode.ALWAYS
+									? 'Always'
+									: 'Optional'}
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								<Select.Item value={OmrMode.NEVER} label="Never">Never</Select.Item>
+								<Select.Item value={OmrMode.ALWAYS} label="Always">Always</Select.Item>
+								<Select.Item value={OmrMode.OPTIONAL} label="Optional">Optional</Select.Item>
 							</Select.Group>
 						</Select.Content>
 					</Select.Root>

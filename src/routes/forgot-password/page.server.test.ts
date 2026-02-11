@@ -16,18 +16,31 @@ describe('Forgot Password Route', () => {
 
 	describe('load()', () => {
 		it('should return supervalidate form', async () => {
-			const result = await load();
+			const result = await load({ locals: { organization: null } } as any);
 
 			expect(result).toHaveProperty('form');
 			expect(result.form).toBeDefined();
 		});
 
 		it('should initialize form with empty email', async () => {
-			const result = await load();
+			const result = await load({ locals: { organization: null } } as any);
 
 			expect(result.form.data).toEqual({
 				email: ''
 			});
+		});
+
+		it('should return organizationData from locals', async () => {
+			const orgData = { logo: 'https://cdn.example.com/logo.png', name: 'Acme', shortcode: 'acme' };
+			const result = (await load({ locals: { organization: orgData } } as any)) as any;
+
+			expect(result.organizationData).toEqual(orgData);
+		});
+
+		it('should return null organizationData when no org cookie', async () => {
+			const result = (await load({ locals: { organization: null } } as any)) as any;
+
+			expect(result.organizationData).toBeNull();
 		});
 	});
 

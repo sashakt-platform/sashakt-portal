@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
 	const org = orgParam?.trim() || null;
 	let organizationData: OrgDataType | null = null;
 	if (org) {
-		if (locals.organization?.shortcode === org) {
+		if (locals?.organization?.shortcode === org) {
 			// Cookie was already set on a prior visit — hook already fetched it
 			organizationData = locals.organization;
 		} else {

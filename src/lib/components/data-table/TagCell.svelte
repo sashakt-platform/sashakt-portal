@@ -20,7 +20,7 @@
 	<Tooltip.Provider>
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<span class="block max-w-[200px] truncate">{formatted}</span>
+				<span class="block max-w-[25vw] truncate">{formatted}</span>
 			</Tooltip.Trigger>
 			<Tooltip.Content
 				class="border-border bg-popover text-popover-foreground max-w-xs rounded-md border p-3 text-xs shadow-lg/20"

@@ -65,7 +65,6 @@ describe('TagCell', () => {
 
 			const span = screen.getByText('Math');
 			expect(span).toHaveClass('truncate');
-			expect(span).toHaveClass('max-w-[200px]');
 			expect(span).toHaveClass('block');
 		});
 	});

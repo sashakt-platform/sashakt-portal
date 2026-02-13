@@ -147,11 +147,15 @@ export async function resolveOrganization(
 		if (locals?.organization?.shortcode === org) {
 			return locals.organization;
 		}
-		const res = await fetchFn(`${backendUrl}/organization/public/${encodeURIComponent(org)}`);
-		if (res.ok) {
-			const data = await res.json();
-			setOrganizationCookie(cookies, org);
-			return data;
+		try {
+			const res = await fetchFn(`${backendUrl}/organization/public/${encodeURIComponent(org)}`);
+			if (res.ok) {
+				const data = await res.json();
+				setOrganizationCookie(cookies, org);
+				return data;
+			}
+		} catch (err) {
+			console.error('Failed to fetch organization data:', err);
 		}
 		deleteOrganizationCookie(cookies);
 		return null;

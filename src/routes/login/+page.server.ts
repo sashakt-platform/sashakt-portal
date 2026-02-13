@@ -11,16 +11,10 @@ import {
 	deleteOrganizationCookie
 } from '$lib/server/auth.js';
 
-type OrgDataType = {
-	logo: string;
-	name: string;
-	shortcode: string;
-};
-
 export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
 	const orgParam = url.searchParams.get('organization');
 	const org = orgParam?.trim() || null;
-	let organizationData: OrgDataType | null = null;
+	let organizationData: App.Locals['organization'] | null = null;
 	if (org) {
 		if (locals?.organization?.shortcode === org) {
 			// Cookie was already set on a prior visit — hook already fetched it

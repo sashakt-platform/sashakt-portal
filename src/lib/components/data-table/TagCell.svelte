@@ -6,12 +6,14 @@
 	}
 	let { tags = [] }: Props = $props();
 
-	const formatted = $derived(tags
-		.map((tag) => {
-			const tagTypeName = tag.tag_type?.name ?? '';
-			return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
-		})
-		.join(', '));
+	const formatted = $derived(
+		tags
+			.map((tag) => {
+				const tagTypeName = tag.tag_type?.name ?? '';
+				return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
+			})
+			.join(', ')
+	);
 </script>
 
 {#if formatted}
@@ -21,7 +23,7 @@
 				<span class="block max-w-[200px] truncate">{formatted}</span>
 			</Tooltip.Trigger>
 			<Tooltip.Content
-				class="text-accent-foreground max-w-xs rounded-md border border-gray-200 bg-white p-3 text-xs shadow-lg/20 backdrop-blur-sm"
+				class="border-border bg-popover text-popover-foreground max-w-xs rounded-md border p-3 text-xs shadow-lg/20"
 				side="bottom"
 				sideOffset={8}
 				align="start"

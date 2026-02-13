@@ -5,8 +5,9 @@ import { sequence } from '@sveltejs/kit/hooks';
 import { BACKEND_URL } from '$env/static/private';
 
 // simple in-memory cache for organization lookups (per-node)
-const orgCache = new Map<string, { data: any; expiresAt: number }>();
 const ORG_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+const ORG_CACHE_MAX_SIZE = 100;
+const orgCache = new Map<string, { data: App.Locals['organization']; expiresAt: number }>();
 
 const handleOrganization: Handle = async ({ event, resolve }) => {
 	const shortcode = event.cookies.get(auth.organizationCookieName);
@@ -38,7 +39,11 @@ const handleOrganization: Handle = async ({ event, resolve }) => {
 		if (res.ok) {
 			const json = await res.json();
 			event.locals.organization = json;
-			// cache the successful result
+			// remove oldest entry if cache is full
+			if (orgCache.size >= ORG_CACHE_MAX_SIZE) {
+				const oldestKey = orgCache.keys().next().value;
+				if (oldestKey !== undefined) orgCache.delete(oldestKey);
+			}
 			orgCache.set(key, { data: json, expiresAt: now + ORG_CACHE_TTL });
 		} else {
 			event.locals.organization = null;

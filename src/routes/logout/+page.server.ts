@@ -1,10 +1,10 @@
 import { redirect } from '@sveltejs/kit';
-import { deleteAllTokenCookies, logoutFromBackend } from '$lib/server/auth';
+import { deleteAllTokenCookies, logoutFromBackend, organizationCookieName } from '$lib/server/auth';
 
 export const load = async ({ cookies, locals }) => {
 	// If user is logged in, call backend logout endpoint
 
-	const currentOrganization = cookies.get('organization');
+	const currentOrganization = cookies.get(organizationCookieName);
 	if (locals.session) {
 		await logoutFromBackend(locals.session);
 	}

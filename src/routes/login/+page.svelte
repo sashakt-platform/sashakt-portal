@@ -46,7 +46,9 @@
 				<LoginForm data={{ form: data.loginForm }} />
 				<div class="mt-4 text-right">
 					<a
-						href="/forgot-password"
+						href={data.organizationData?.shortcode
+							? `/forgot-password?organization=${data.organizationData?.shortcode}`
+							: '/forgot-password'}
 						class="text-sm text-gray-500 hover:text-blue-600 hover:underline focus:outline-none"
 					>
 						Forgot your password?

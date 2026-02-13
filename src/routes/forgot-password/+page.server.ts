@@ -4,11 +4,34 @@ import { BACKEND_URL } from '$env/static/private';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { forgotPasswordSchema } from './schema';
+import { setOrganizationCookie, deleteOrganizationCookie } from '$lib/server/auth.js';
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
+	const orgParam = url.searchParams.get('organization');
+	const org = orgParam?.trim() || null;
+	let organizationData: App.Locals['organization'] | null = null;
+
+	if (org) {
+		if (locals?.organization?.shortcode === org) {
+			// Cookie still valid — hook already fetched it
+			organizationData = locals.organization;
+		} else {
+			// Cookie expired or different org — fetch directly and refresh cookie
+			const res = await fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(org)}`);
+			if (res.ok) {
+				organizationData = await res.json();
+				setOrganizationCookie(cookies, org);
+			} else {
+				deleteOrganizationCookie(cookies);
+			}
+		}
+	} else {
+		organizationData = locals.organization;
+	}
+
 	return {
 		form: await superValidate(zod4(forgotPasswordSchema)),
-		organizationData: locals.organization
+		organizationData
 	};
 };
 

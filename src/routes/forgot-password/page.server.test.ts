@@ -6,6 +6,11 @@ vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
 }));
 
+vi.mock('$lib/server/auth.js', () => ({
+	setOrganizationCookie: vi.fn(),
+	deleteOrganizationCookie: vi.fn()
+}));
+
 describe('Forgot Password Route', () => {
 	const mockFetch = vi.fn();
 
@@ -14,33 +19,95 @@ describe('Forgot Password Route', () => {
 		vi.clearAllMocks();
 	});
 
+	const mockCookies = {
+		set: vi.fn(),
+		get: vi.fn(),
+		delete: vi.fn(),
+		getAll: vi.fn(),
+		serialize: vi.fn()
+	};
+
+	const makeUrl = (org?: string) =>
+		new URL(org ? `http://localhost/forgot-password?organization=${org}` : 'http://localhost/forgot-password');
+
 	describe('load()', () => {
 		it('should return supervalidate form', async () => {
-			const result = await load({ locals: { organization: null } } as any);
+			const result = await load({
+				url: makeUrl(),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any);
 
 			expect(result).toHaveProperty('form');
 			expect(result.form).toBeDefined();
 		});
 
 		it('should initialize form with empty email', async () => {
-			const result = await load({ locals: { organization: null } } as any);
+			const result = await load({
+				url: makeUrl(),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any);
 
-			expect(result.form.data).toEqual({
-				email: ''
-			});
+			expect(result.form.data).toEqual({ email: '' });
 		});
 
-		it('should return organizationData from locals', async () => {
+		it('should return organizationData from locals when no org param', async () => {
 			const orgData = { logo: 'https://cdn.example.com/logo.png', name: 'Acme', shortcode: 'acme' };
-			const result = (await load({ locals: { organization: orgData } } as any)) as any;
+			const result = (await load({
+				url: makeUrl(),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: orgData }
+			} as any)) as any;
 
 			expect(result.organizationData).toEqual(orgData);
 		});
 
-		it('should return null organizationData when no org cookie', async () => {
-			const result = (await load({ locals: { organization: null } } as any)) as any;
+		it('should return null organizationData when no org param and no locals', async () => {
+			const result = (await load({
+				url: makeUrl(),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any)) as any;
 
 			expect(result.organizationData).toBeNull();
+		});
+
+		it('should use locals when org param matches locals shortcode', async () => {
+			const orgData = { logo: 'https://cdn.example.com/logo.png', name: 'Acme', shortcode: 'acme' };
+			const result = (await load({
+				url: makeUrl('acme'),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: orgData }
+			} as any)) as any;
+
+			expect(result.organizationData).toEqual(orgData);
+			expect(mockFetch).not.toHaveBeenCalled();
+		});
+
+		it('should fetch org when param does not match locals (cookie expired)', async () => {
+			const orgData = { logo: 'https://cdn.example.com/logo.png', name: 'Acme', shortcode: 'acme' };
+			mockFetch.mockResolvedValueOnce({
+				ok: true,
+				json: async () => orgData
+			});
+
+			const result = (await load({
+				url: makeUrl('acme'),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any)) as any;
+
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://localhost:8000/organization/public/acme'
+			);
+			expect(result.organizationData).toEqual(orgData);
 		});
 	});
 

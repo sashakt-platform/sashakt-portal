@@ -10,7 +10,7 @@
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
-	import { MarksLevel, OmrMode } from './schema';
+	import { MarksLevel } from './schema';
 	import * as Select from '$lib/components/ui/select';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 
@@ -32,9 +32,9 @@
 		$formData.locale = 'en-US';
 	}
 
-	if (!$formData.omr) {
-		$formData.omr = OmrMode.NEVER;
-	}
+	// if (!$formData.omr) {
+	// 	$formData.omr = OmrMode.NEVER;
+	// }
 
 	let languageOptions = $state<{ [key: string]: string }>({});
 	let certificatesOptions = $state<Array<{ id: number; name: string | null }>>([]);
@@ -256,7 +256,7 @@
 					</div>
 				</div>
 			{/if}
-			<div class="w-full md:w-2/5">
+			<!-- <div class="w-full md:w-2/5">
 				{@render headingSubheading('Feedback Setting', '')}
 			</div>
 			<div class="flex flex-row gap-3 align-top">
@@ -281,7 +281,7 @@
 						'Enable to show candidate correct answers immediately after each question is attempted.'
 					)}
 				</div>
-			</div>
+			</div> -->
 			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
 				<div>
 					{@render headingSubheading('Language', 'Select test language.')}
@@ -299,7 +299,7 @@
 					</Select.Root>
 				</div>
 			</div>
-			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
+			<!-- <div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
 				<div>
 					{@render headingSubheading('OMR', 'Select OMR Mode')}
 				</div>
@@ -321,7 +321,7 @@
 						</Select.Content>
 					</Select.Root>
 				</div>
-			</div>
+			</div> -->
 		</ConfigureBox>
 
 		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>

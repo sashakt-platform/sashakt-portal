@@ -130,6 +130,36 @@ export function getRefreshTokenCookie() {
 	return cookies.get(refreshCookieName) ?? null;
 }
 
+/**
+ * Resolve organization data from locals or by fetching from the backend.
+ * Shared by login and forgot-password load functions.
+ */
+export async function resolveOrganization(
+	locals: App.Locals,
+	cookies: Cookies,
+	fetchFn: typeof fetch,
+	orgParam: string | null,
+	backendUrl: string
+): Promise<App.Locals['organization']> {
+	const org = orgParam?.trim() || null;
+
+	if (org) {
+		if (locals?.organization?.shortcode === org) {
+			return locals.organization;
+		}
+		const res = await fetchFn(`${backendUrl}/organization/public/${encodeURIComponent(org)}`);
+		if (res.ok) {
+			const data = await res.json();
+			setOrganizationCookie(cookies, org);
+			return data;
+		}
+		deleteOrganizationCookie(cookies);
+		return null;
+	}
+
+	return locals.organization ?? null;
+}
+
 export function requireLogin() {
 	const { locals, url } = getRequestEvent();
 

@@ -7,31 +7,17 @@ import { loginSchema } from './schema';
 import {
 	setSessionTokenCookie,
 	setRefreshTokenCookie,
-	setOrganizationCookie,
-	deleteOrganizationCookie
+	resolveOrganization
 } from '$lib/server/auth.js';
 
 export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
-	const orgParam = url.searchParams.get('organization');
-	const org = orgParam?.trim() || null;
-	let organizationData: App.Locals['organization'] | null = null;
-	if (org) {
-		if (locals?.organization?.shortcode === org) {
-			// Cookie was already set on a prior visit — hook already fetched it
-			organizationData = locals.organization;
-		} else {
-			// First visit or different org — fetch directly and set cookie
-			const res = await fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(org)}`);
-			if (res.ok) {
-				organizationData = await res.json();
-				setOrganizationCookie(cookies, org);
-			} else {
-				deleteOrganizationCookie(cookies);
-			}
-		}
-	} else {
-		deleteOrganizationCookie(cookies);
-	}
+	const organizationData = await resolveOrganization(
+		locals,
+		cookies,
+		fetch,
+		url.searchParams.get('organization'),
+		BACKEND_URL
+	);
 	return {
 		loginForm: await superValidate(zod4(loginSchema)),
 		organizationData

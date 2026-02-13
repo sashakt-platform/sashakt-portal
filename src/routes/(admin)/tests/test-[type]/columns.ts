@@ -3,6 +3,7 @@ import { createSortableColumn } from '$lib/components/data-table/column-helpers'
 import { formatDate, downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions } from '$lib/components/data-table/index.js';
+import TagCell from '$lib/components/data-table/TagCell.svelte';
 import {
 	isStateAdmin,
 	hasAssignedDistricts,
@@ -77,18 +78,7 @@ export const createTestColumns = (
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => {
-			const tags = row.original.tags;
-			if (tags && tags.length > 0) {
-				return tags
-					.map((tag) => {
-						const tagTypeName = tag.tag_type?.name ?? '';
-						return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
-					})
-					.join(', ');
-			}
-			return '';
-		}
+		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)

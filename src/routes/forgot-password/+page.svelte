@@ -65,12 +65,12 @@
 						</div>
 
 						<Button
-						variant="default"
-						class="mt-4 w-full py-5"
-						href={data.organizationData?.shortcode
-							? `/login?organization=${data.organizationData.shortcode}`
-							: '/login'}>Back to Login</Button
-					>
+							variant="default"
+							class="mt-4 w-full py-5"
+							href={data.organizationData?.shortcode
+								? `/login?organization=${data.organizationData.shortcode}`
+								: '/login'}>Back to Login</Button
+						>
 					</div>
 				{:else}
 					<form method="POST" use:enhance class="space-y-4">

@@ -6,10 +6,14 @@ vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
 }));
 
-vi.mock('$lib/server/auth.js', () => ({
-	setOrganizationCookie: vi.fn(),
-	deleteOrganizationCookie: vi.fn()
-}));
+vi.mock('$lib/server/auth.js', async () => {
+	const actual = await vi.importActual('$lib/server/auth.js');
+	return {
+		...actual,
+		setOrganizationCookie: vi.fn(),
+		deleteOrganizationCookie: vi.fn()
+	};
+});
 
 describe('Forgot Password Route', () => {
 	const mockFetch = vi.fn();
@@ -28,7 +32,11 @@ describe('Forgot Password Route', () => {
 	};
 
 	const makeUrl = (org?: string) =>
-		new URL(org ? `http://localhost/forgot-password?organization=${org}` : 'http://localhost/forgot-password');
+		new URL(
+			org
+				? `http://localhost/forgot-password?organization=${org}`
+				: 'http://localhost/forgot-password'
+		);
 
 	describe('load()', () => {
 		it('should return supervalidate form', async () => {
@@ -104,9 +112,7 @@ describe('Forgot Password Route', () => {
 				locals: { organization: null }
 			} as any)) as any;
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/organization/public/acme'
-			);
+			expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/organization/public/acme');
 			expect(result.organizationData).toEqual(orgData);
 		});
 	});

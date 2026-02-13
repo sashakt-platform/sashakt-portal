@@ -4,19 +4,50 @@ import * as auth from '$lib/server/auth.js';
 import { sequence } from '@sveltejs/kit/hooks';
 import { BACKEND_URL } from '$env/static/private';
 
+// simple in-memory cache for organization lookups (per-node)
+const orgCache = new Map<string, { data: any; expiresAt: number }>();
+const ORG_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+
 const handleOrganization: Handle = async ({ event, resolve }) => {
 	const shortcode = event.cookies.get(auth.organizationCookieName);
 
-	if (shortcode) {
-		try {
-			const res = await fetch(
-				`${BACKEND_URL}/organization/public/${encodeURIComponent(shortcode)}`
-			);
-			event.locals.organization = res.ok ? await res.json() : null;
-		} catch {
+	if (!shortcode) {
+		event.locals.organization = null;
+		return resolve(event);
+	}
+
+	// check cache
+	const key = String(shortcode);
+	const now = Date.now();
+	const cached = orgCache.get(key);
+	if (cached && cached.expiresAt > now) {
+		event.locals.organization = cached.data;
+		return resolve(event);
+	}
+
+	// if no BACKEND_URL, skip fetch
+	if (!BACKEND_URL) {
+		event.locals.organization = null;
+		return resolve(event);
+	}
+
+	try {
+		// use event.fetch so SvelteKit fetch hooks / platform fetch are used
+		const res = await event.fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(key)}`);
+
+		if (res.ok) {
+			const json = await res.json();
+			event.locals.organization = json;
+			// cache the successful result
+			orgCache.set(key, { data: json, expiresAt: now + ORG_CACHE_TTL });
+		} else {
 			event.locals.organization = null;
+			// remove any stale cache on non-ok
+			orgCache.delete(key);
 		}
-	} else {
+	} catch (err) {
+		// on error, avoid leaving stale cached data; set null for this request
+		orgCache.delete(key);
 		event.locals.organization = null;
 	}
 

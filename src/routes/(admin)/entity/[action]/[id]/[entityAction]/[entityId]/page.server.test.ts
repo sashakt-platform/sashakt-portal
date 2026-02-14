@@ -199,17 +199,22 @@ describe('page.server save action', () => {
 	it('creates entity via POST for new entity', async () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-		await server.actions.save({
-			request: {},
-			params: { action: 'view', id: '1', entityAction: 'add', entityId: 'new' },
-			cookies: mockCookies
-		} as any);
+		try {
+			await server.actions.save({
+				request: {},
+				params: { action: 'view', id: '1', entityAction: 'add', entityId: 'new' },
+				cookies: mockCookies
+			} as any);
+		} catch {
+			// throw redirect(303, ...) throws
+		}
 
 		expect(global.fetch).toHaveBeenCalledWith(
 			'http://fake-backend/entity/',
 			expect.objectContaining({ method: 'POST' })
 		);
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity/view/1',
 			{ type: 'success', message: 'Record saved successfully' },
 			mockCookies
@@ -257,17 +262,22 @@ describe('page.server save action', () => {
 	it('updates entity via PUT for existing entity', async () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-		await server.actions.save({
-			request: {},
-			params: { action: 'view', id: '1', entityAction: 'edit', entityId: '5' },
-			cookies: mockCookies
-		} as any);
+		try {
+			await server.actions.save({
+				request: {},
+				params: { action: 'view', id: '1', entityAction: 'edit', entityId: '5' },
+				cookies: mockCookies
+			} as any);
+		} catch {
+			// throw redirect(303, ...) throws
+		}
 
 		expect(global.fetch).toHaveBeenCalledWith(
 			'http://fake-backend/entity/5',
 			expect.objectContaining({ method: 'PUT' })
 		);
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity/view/1',
 			{ type: 'success', message: 'Record saved successfully' },
 			mockCookies

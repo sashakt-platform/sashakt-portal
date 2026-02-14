@@ -50,15 +50,18 @@ const editFormData = {
 	entityId: '5',
 	entityTypeId: '1',
 	form: {
+		id: 'edit-form',
 		valid: true,
+		posted: false,
+		errors: {},
 		data: {
-			name: '',
-			description: '',
+			name: 'My Entity',
+			description: 'A test entity',
 			active: true,
 			entity_type_id: 1,
-			state_id: null,
-			district_id: null,
-			block_id: null
+			state_id: 1,
+			district_id: 10,
+			block_id: 100
 		}
 	},
 	entity: {
@@ -79,6 +82,21 @@ const editFormData = {
 
 const editFormDataPartialLocation = {
 	...editFormData,
+	form: {
+		id: 'edit-form-partial',
+		valid: true,
+		posted: false,
+		errors: {},
+		data: {
+			name: 'State Only Entity',
+			description: '',
+			active: true,
+			entity_type_id: 1,
+			state_id: 2,
+			district_id: null,
+			block_id: null
+		}
+	},
 	entity: {
 		name: 'State Only Entity',
 		description: '',

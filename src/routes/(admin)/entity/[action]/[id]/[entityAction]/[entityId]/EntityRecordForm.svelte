@@ -31,7 +31,6 @@
 	let selectedDistricts = $state<Filter[]>([]);
 	let selectedBlocks = $state<Filter[]>([]);
 
-	const entityData: Partial<Infer<EntityFormSchema>> | null = data?.entity || null;
 	const isEditMode = data.entityAction === 'edit';
 
 	const {
@@ -39,8 +38,7 @@
 		enhance,
 		submit,
 		errors
-	} = superForm((entityData as any) || data.form, {
-		applyAction: 'never',
+	} = superForm(data.form, {
 		validators: zod4Client(entitySchema),
 		dataType: 'json',
 		onSubmit: () => {
@@ -53,15 +51,17 @@
 	});
 
 	// Initialize selections from entity data in edit mode
-	if (isEditMode && entityData) {
-		if (entityData.state?.id && entityData.state?.name) {
-			selectedStates = [{ id: String(entityData.state.id), name: entityData.state.name }];
+	if (isEditMode && data.entity) {
+		if (data.entity.state?.id && data.entity.state?.name) {
+			selectedStates = [{ id: String(data.entity.state.id), name: data.entity.state.name }];
 		}
-		if (entityData.district?.id && entityData.district?.name) {
-			selectedDistricts = [{ id: String(entityData.district.id), name: entityData.district.name }];
+		if (data.entity.district?.id && data.entity.district?.name) {
+			selectedDistricts = [
+				{ id: String(data.entity.district.id), name: data.entity.district.name }
+			];
 		}
-		if (entityData.block?.id && entityData.block?.name) {
-			selectedBlocks = [{ id: String(entityData.block.id), name: entityData.block.name }];
+		if (data.entity.block?.id && data.entity.block?.name) {
+			selectedBlocks = [{ id: String(data.entity.block.id), name: data.entity.block.name }];
 		}
 	}
 </script>

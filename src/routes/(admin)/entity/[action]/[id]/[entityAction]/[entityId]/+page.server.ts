@@ -65,7 +65,9 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	return {
-		form: await superValidate(zod4(entitySchema)),
+		form: entityData
+			? await superValidate(entityData, zod4(entitySchema))
+			: await superValidate(zod4(entitySchema)),
 		entityAction: params.entityAction,
 		entityId: params.entityId,
 		entityTypeId,
@@ -145,7 +147,8 @@ export const actions: Actions = {
 			}
 		}
 
-		redirect(
+		throw redirect(
+			303,
 			`/entity/view/${params.id}`,
 			{
 				type: 'success',

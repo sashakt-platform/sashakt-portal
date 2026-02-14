@@ -85,10 +85,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 			if (!response.ok) {
 				console.error(`Failed to fetch entity type data: ${response.statusText}`);
-				throw new Error('Failed to fetch entity type data');
+				entityTypeData = null;
+			} else {
+				entityTypeData = await response.json();
 			}
-
-			entityTypeData = await response.json();
 		}
 	} catch (error) {
 		console.error('Error fetching entity type data:', error);
@@ -98,7 +98,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const schema = params.action === 'edit' ? editEntityTypeSchema : createEntityTypeSchema;
 
 	return {
-		form: await superValidate(zod4(schema)),
+		form: entityTypeData
+			? await superValidate(entityTypeData, zod4(schema))
+			: await superValidate(zod4(schema)),
 		action: params.action,
 		id: params.id,
 		entityType: entityTypeData,
@@ -177,7 +179,8 @@ export const actions: Actions = {
 			}
 		}
 
-		redirect(
+		throw redirect(
+			303,
 			'/entity',
 			{
 				type: 'success',
@@ -203,7 +206,8 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const errorMessage = await res.json();
-			redirect(
+			throw redirect(
+				303,
 				'/entity',
 				{
 					type: 'error',

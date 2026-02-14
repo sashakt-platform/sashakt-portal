@@ -23,15 +23,15 @@
 		};
 	} = $props();
 
-	const entityTypeData: Partial<Infer<EntityTypeFormSchema>> | null = data?.entityType || null;
+	const isEditMode = data.action === 'edit';
 
 	const {
 		form: formData,
 		enhance,
 		submit,
 		errors
-	} = superForm(entityTypeData || data.form, {
-		validators: zod4Client(data.action === 'edit' ? editEntityTypeSchema : createEntityTypeSchema),
+	} = superForm(data.form, {
+		validators: zod4Client(isEditMode ? editEntityTypeSchema : createEntityTypeSchema),
 		dataType: 'json'
 	});
 </script>
@@ -45,7 +45,7 @@
 						<h2
 							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 						>
-							{entityTypeData ? 'Edit Entity' : 'Create Entity'}
+							{isEditMode ? 'Edit Entity' : 'Create Entity'}
 						</h2>
 						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 					</div>
@@ -79,7 +79,7 @@
 				<Button
 					class="bg-primary text-sm sm:text-base"
 					onclick={submit}
-					disabled={$formData.name?.trim() === ''}>Save</Button
+					disabled={!$formData.name?.trim()}>Save</Button
 				>
 			</div>
 		</div>

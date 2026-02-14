@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Info from '@lucide/svelte/icons/info';
-	import Label from '$lib/components/ui/label/label.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -132,7 +131,7 @@
 				<Button
 					class="bg-primary text-sm sm:text-base"
 					onclick={submit}
-					disabled={$formData.name?.trim() === ''}>Save</Button
+					disabled={!$formData.name?.trim()}>Save</Button
 				>
 			</div>
 		</div>

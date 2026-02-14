@@ -6,6 +6,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
@@ -31,7 +32,7 @@
 		url.searchParams.set('sortOrder', newSortOrder);
 		url.searchParams.set('page', '1');
 
-		goto(url.toString(), { replaceState: false });
+		goto(resolve(url.toString()), { replaceState: false });
 	}
 
 	// create columns for the data table
@@ -51,7 +52,7 @@
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'entity')}
-			<a href="/entity/add/new"><Button class="font-bold"><Plus />Add Entity</Button></a>
+			<a href={resolve('/entity/add/new')}><Button class="font-bold"><Plus />Add Entity</Button></a>
 		{/if}
 	{/snippet}
 
@@ -69,7 +70,7 @@
 						url.searchParams.delete('search');
 					}
 					url.searchParams.set('page', '1');
-					goto(url, { keepFocus: true, invalidateAll: true });
+					goto(resolve(url.toString()), { keepFocus: true, invalidateAll: true });
 				}, 300);
 			}}
 			class="max-w-sm"

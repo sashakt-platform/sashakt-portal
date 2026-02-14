@@ -5,6 +5,7 @@ import {
 	createActionsColumn
 } from '$lib/components/data-table/column-helpers';
 import { formatDate } from '$lib/utils';
+import { resolve } from '$app/paths';
 
 export const entityTypeSchema = z.object({
 	id: z.number(),
@@ -32,7 +33,7 @@ export const createColumns = (
 	createActionsColumn<EntityType>('Entity', '/entity', {
 		...permissions,
 		customActions: (row) => [
-			{ label: 'View Records', href: `/entity/view/${row.id}`, icon: 'external-link' }
+			{ label: 'View Records', href: resolve(`/entity/view/${row.id}`), icon: 'external-link' }
 		]
 	})
 ];

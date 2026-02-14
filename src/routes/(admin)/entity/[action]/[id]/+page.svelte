@@ -1,12 +1,12 @@
 <script lang="ts">
-	import EntityTypeForm from './EntityTypeForm.svelte';
-	import EntityListView from './EntityListView.svelte';
+	import EntityForm from './EntityForm.svelte';
+	import EntityRecordList from './EntityRecordList.svelte';
 
 	let { data } = $props();
 </script>
 
 {#if data.action === 'view'}
-	<EntityListView {data} />
+	<EntityRecordList {data} />
 {:else}
-	<EntityTypeForm {data} />
+	<EntityForm {data} />
 {/if}

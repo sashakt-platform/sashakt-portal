@@ -1,7 +1,7 @@
 <script lang="ts">
-	import EntityForm from './EntityForm.svelte';
+	import EntityRecordForm from './EntityRecordForm.svelte';
 
 	let { data } = $props();
 </script>
 
-<EntityForm {data} />
+<EntityRecordForm {data} />

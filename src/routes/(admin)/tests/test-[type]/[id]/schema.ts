@@ -11,11 +11,11 @@ export enum MarksLevel {
 	TEST = 'test'
 }
 
-export enum OmrMode {
-	NEVER = 'NEVER',
-	ALWAYS = 'ALWAYS',
-	OPTIONAL = 'OPTIONAL'
-}
+// export enum OmrMode {
+// 	NEVER = 'NEVER',
+// 	ALWAYS = 'ALWAYS',
+// 	OPTIONAL = 'OPTIONAL'
+// }
 
 export const testSchema = z.object({
 	name: z.string(),
@@ -54,10 +54,10 @@ export const testSchema = z.object({
 	show_question_palette: z.boolean().default(true),
 	candidate_profile: z.boolean().default(false),
 	locale: z.string().default('en-US'),
-	certificate_id: z.coerce.number().nullable(),
-	show_feedback_on_completion: z.boolean().default(false),
-	show_feedback_immediately: z.boolean().default(false),
-	omr: z.enum(Object.values(OmrMode)).default(OmrMode.NEVER)
+	certificate_id: z.coerce.number().nullable()
+	// show_feedback_on_completion: z.boolean().default(false),
+	// show_feedback_immediately: z.boolean().default(false),
+	// omr: z.enum(Object.values(OmrMode)).default(OmrMode.NEVER)
 });
 
 export type FormSchema = typeof testSchema;

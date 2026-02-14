@@ -5,6 +5,9 @@ import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const token = getSessionTokenCookie();
+	if (!token) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
 	const search = url.searchParams.get('search') || '';
 
 	try {

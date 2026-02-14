@@ -13,7 +13,7 @@
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
-	import Landmark from '@lucide/svelte/icons/landmark';
+	import Boxes from '@lucide/svelte/icons/boxes';
 	import { goto } from '$app/navigation';
 
 	// Menu items.
@@ -56,7 +56,7 @@
 		entity: {
 			title: 'Entities',
 			url: '/entity',
-			icon: Landmark
+			icon: Boxes
 		},
 		user: {
 			title: 'User Management',

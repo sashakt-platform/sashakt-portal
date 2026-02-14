@@ -124,7 +124,7 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: 'Entity type not saved. Please check all the details.'
+					message: 'Entity not saved. Please check all the details.'
 				},
 				cookies
 			);
@@ -146,7 +146,7 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message: errorMessage.detail || 'Entity type not created. Please check all the details.'
+						message: errorMessage.detail || 'Entity not created. Please check all the details.'
 					},
 					cookies
 				);
@@ -169,7 +169,7 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message: errorMessage.detail || 'Entity type not updated. Please check all the details.'
+						message: errorMessage.detail || 'Entity not updated. Please check all the details.'
 					},
 					cookies
 				);
@@ -181,7 +181,7 @@ export const actions: Actions = {
 			'/entity',
 			{
 				type: 'success',
-				message: 'Entity type saved successfully'
+				message: 'Entity saved successfully'
 			},
 			cookies
 		);
@@ -216,7 +216,7 @@ export const actions: Actions = {
 		throw redirect(
 			303,
 			`/entity`,
-			{ type: 'success', message: `Entity type deleted successfully` },
+			{ type: 'success', message: `Entity deleted successfully` },
 			cookies
 		);
 	}

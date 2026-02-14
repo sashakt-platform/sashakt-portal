@@ -88,7 +88,7 @@ describe('Entity Page', () => {
 		it('shows Add button when user has create permission', () => {
 			render(Page, { data: viewData } as any);
 
-			expect(screen.getByText('Add CLF')).toBeInTheDocument();
+			expect(screen.getByText('Add CLF Record')).toBeInTheDocument();
 		});
 
 		it('shows Back to Entities button', () => {
@@ -100,7 +100,7 @@ describe('Entity Page', () => {
 		it('renders search input', () => {
 			render(Page, { data: viewData } as any);
 
-			expect(screen.getByPlaceholderText('Search entities...')).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Search records...')).toBeInTheDocument();
 		});
 
 		it('renders with empty entities list', () => {
@@ -115,11 +115,11 @@ describe('Entity Page', () => {
 		});
 	});
 
-	describe('Add mode - Entity Type Form', () => {
-		it('renders the create entity type form when action is add', () => {
+	describe('Add mode - Entity Form', () => {
+		it('renders the create entity form when action is add', () => {
 			render(Page, { data: createFormData } as any);
 
-			expect(screen.getByText('Create Entity Type')).toBeInTheDocument();
+			expect(screen.getByText('Create Entity')).toBeInTheDocument();
 		});
 
 		it('shows Name and Description fields', () => {
@@ -147,11 +147,11 @@ describe('Entity Page', () => {
 		});
 	});
 
-	describe('Edit mode - Entity Type Form', () => {
-		it('renders the edit entity type form when action is edit', () => {
+	describe('Edit mode - Entity Form', () => {
+		it('renders the edit entity form when action is edit', () => {
 			render(Page, { data: editFormData } as any);
 
-			expect(screen.getByText('Edit Entity Type')).toBeInTheDocument();
+			expect(screen.getByText('Edit Entity')).toBeInTheDocument();
 		});
 
 		it('pre-fills name and description from entity type data', () => {

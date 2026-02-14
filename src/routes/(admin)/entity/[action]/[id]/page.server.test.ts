@@ -228,7 +228,7 @@ describe('page.server save action', () => {
 		} as any)) as any;
 
 		expect(setFlash).toHaveBeenCalledWith(
-			{ type: 'error', message: 'Entity type not saved. Please check all the details.' },
+			{ type: 'error', message: 'Entity not saved. Please check all the details.' },
 			mockCookies
 		);
 		expect(result.status).toBe(400);
@@ -249,7 +249,7 @@ describe('page.server save action', () => {
 		);
 		expect(redirect).toHaveBeenCalledWith(
 			'/entity',
-			{ type: 'success', message: 'Entity type saved successfully' },
+			{ type: 'success', message: 'Entity saved successfully' },
 			mockCookies
 		);
 	});
@@ -285,7 +285,7 @@ describe('page.server save action', () => {
 		expect(setFlash).toHaveBeenCalledWith(
 			{
 				type: 'error',
-				message: 'Entity type not created. Please check all the details.'
+				message: 'Entity not created. Please check all the details.'
 			},
 			mockCookies
 		);
@@ -307,7 +307,7 @@ describe('page.server save action', () => {
 		);
 		expect(redirect).toHaveBeenCalledWith(
 			'/entity',
-			{ type: 'success', message: 'Entity type saved successfully' },
+			{ type: 'success', message: 'Entity saved successfully' },
 			mockCookies
 		);
 	});
@@ -343,7 +343,7 @@ describe('page.server save action', () => {
 		expect(setFlash).toHaveBeenCalledWith(
 			{
 				type: 'error',
-				message: 'Entity type not updated. Please check all the details.'
+				message: 'Entity not updated. Please check all the details.'
 			},
 			mockCookies
 		);
@@ -373,7 +373,7 @@ describe('page.server delete action', () => {
 		expect(redirect).toHaveBeenCalledWith(
 			303,
 			'/entity',
-			{ type: 'success', message: 'Entity type deleted successfully' },
+			{ type: 'success', message: 'Entity deleted successfully' },
 			mockCookies
 		);
 	});
@@ -382,7 +382,7 @@ describe('page.server delete action', () => {
 		(global.fetch as any).mockResolvedValueOnce({
 			ok: false,
 			statusText: 'Not Found',
-			json: async () => ({ detail: 'Entity type not found' })
+			json: async () => ({ detail: 'Entity not found' })
 		});
 
 		try {
@@ -396,7 +396,7 @@ describe('page.server delete action', () => {
 
 		expect(redirect).toHaveBeenCalledWith(
 			'/entity',
-			{ type: 'error', message: 'Entity type not found' },
+			{ type: 'error', message: 'Entity not found' },
 			mockCookies
 		);
 	});

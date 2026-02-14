@@ -22,10 +22,8 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
-	const entityTypeName = $derived(data?.entityType?.name || 'Entity Type');
-	const entityTypeDescription = $derived(
-		data?.entityType?.description || 'Entity Type Description'
-	);
+	const entityTypeName = $derived(data?.entityType?.name || 'Entity');
+	const entityTypeDescription = $derived(data?.entityType?.description || 'Entity Description');
 
 	// handle sorting
 	function handleSort(columnId: string) {
@@ -51,21 +49,21 @@
 <ListingPageLayout
 	title={entityTypeName}
 	subtitle={entityTypeDescription}
-	infoLabel="Help: Entity management"
-	infoDescription={`This panel displays list of all ${entityTypeName}s. You can edit or delete an existing ${entityTypeName} by clicking the three dots next to their entry.`}
+	infoLabel="Help: Record management"
+	infoDescription={`This panel displays all ${entityTypeName} records. You can edit or delete an existing record by clicking the three dots next to their entry.`}
 >
 	{#snippet headerActions()}
 		<a href="/entity"><Button variant="outline"><ArrowLeft />Back to Entities</Button></a>
 		{#if canCreate(data.user, 'entity')}
 			<a href="/entity/view/{data.entityTypeId}/add/new"
-				><Button class="font-bold"><Plus />{`Add ${entityTypeName}`}</Button></a
+				><Button class="font-bold"><Plus />{`Add ${entityTypeName} Record`}</Button></a
 			>
 		{/if}
 	{/snippet}
 
 	{#snippet filters()}
 		<Input
-			placeholder="Search entities..."
+			placeholder="Search records..."
 			value={search}
 			oninput={(event) => {
 				const url = new URL(page.url);

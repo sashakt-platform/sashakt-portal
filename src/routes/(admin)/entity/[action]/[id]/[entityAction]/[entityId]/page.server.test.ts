@@ -190,7 +190,7 @@ describe('page.server save action', () => {
 		} as any)) as any;
 
 		expect(setFlash).toHaveBeenCalledWith(
-			{ type: 'error', message: 'Entity not saved. Please check all the details.' },
+			{ type: 'error', message: 'Record not saved. Please check all the details.' },
 			mockCookies
 		);
 		expect(result.status).toBe(400);
@@ -211,7 +211,7 @@ describe('page.server save action', () => {
 		);
 		expect(redirect).toHaveBeenCalledWith(
 			'/entity/view/1',
-			{ type: 'success', message: 'Entity saved successfully' },
+			{ type: 'success', message: 'Record saved successfully' },
 			mockCookies
 		);
 	});
@@ -248,7 +248,7 @@ describe('page.server save action', () => {
 		} as any)) as any;
 
 		expect(setFlash).toHaveBeenCalledWith(
-			{ type: 'error', message: 'Entity not created. Please check all the details.' },
+			{ type: 'error', message: 'Record not created. Please check all the details.' },
 			mockCookies
 		);
 		expect(result.status).toBe(500);
@@ -269,7 +269,7 @@ describe('page.server save action', () => {
 		);
 		expect(redirect).toHaveBeenCalledWith(
 			'/entity/view/1',
-			{ type: 'success', message: 'Entity saved successfully' },
+			{ type: 'success', message: 'Record saved successfully' },
 			mockCookies
 		);
 	});
@@ -303,7 +303,7 @@ describe('page.server save action', () => {
 		} as any)) as any;
 
 		expect(setFlash).toHaveBeenCalledWith(
-			{ type: 'error', message: 'Entity not updated. Please check all the details.' },
+			{ type: 'error', message: 'Record not updated. Please check all the details.' },
 			mockCookies
 		);
 		expect(result.status).toBe(500);
@@ -332,7 +332,7 @@ describe('page.server delete action', () => {
 		expect(redirect).toHaveBeenCalledWith(
 			303,
 			'/entity/view/1',
-			{ type: 'success', message: 'Entity deleted successfully' },
+			{ type: 'success', message: 'Record deleted successfully' },
 			mockCookies
 		);
 	});
@@ -341,7 +341,7 @@ describe('page.server delete action', () => {
 		(global.fetch as any).mockResolvedValueOnce({
 			ok: false,
 			statusText: 'Not Found',
-			json: async () => ({ detail: 'Entity not found' })
+			json: async () => ({ detail: 'Record not found' })
 		});
 
 		try {
@@ -355,7 +355,7 @@ describe('page.server delete action', () => {
 
 		expect(redirect).toHaveBeenCalledWith(
 			'/entity/view/1',
-			{ type: 'error', message: 'Entity not found' },
+			{ type: 'error', message: 'Record not found' },
 			mockCookies
 		);
 	});

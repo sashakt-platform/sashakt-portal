@@ -45,7 +45,7 @@
 						<h2
 							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 						>
-							{entityTypeData ? 'Edit Entity Type' : 'Create Entity Type'}
+							{entityTypeData ? 'Edit Entity' : 'Create Entity'}
 						</h2>
 						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
 					</div>

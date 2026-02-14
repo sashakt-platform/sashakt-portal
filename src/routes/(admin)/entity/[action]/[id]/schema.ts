@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const baseEntityTypeSchema = z.object({
-	name: z.string().min(1, { error: 'Entity type name is required' }),
+	name: z.string().min(1, { error: 'Entity name is required' }),
 	description: z.string().optional().nullable()
 });
 

@@ -94,11 +94,11 @@ const editFormDataPartialLocation = {
 };
 
 describe('Entity Form Page', () => {
-	describe('Add mode - Create Entity', () => {
+	describe('Add mode - Create Record', () => {
 		it('renders the create form with entity type name', () => {
 			render(Page, { data: createFormData } as any);
 
-			expect(screen.getByText('Create CLF')).toBeInTheDocument();
+			expect(screen.getByText('Create CLF Record')).toBeInTheDocument();
 		});
 
 		it('shows Name, Description, State, District and Block fields', () => {
@@ -152,11 +152,11 @@ describe('Entity Form Page', () => {
 		});
 	});
 
-	describe('Edit mode - Edit Entity', () => {
+	describe('Edit mode - Edit Record', () => {
 		it('renders the edit form with entity type name', () => {
 			render(Page, { data: editFormData } as any);
 
-			expect(screen.getByText('Edit CLF')).toBeInTheDocument();
+			expect(screen.getByText('Edit CLF Record')).toBeInTheDocument();
 		});
 
 		it('pre-fills name from entity data', () => {

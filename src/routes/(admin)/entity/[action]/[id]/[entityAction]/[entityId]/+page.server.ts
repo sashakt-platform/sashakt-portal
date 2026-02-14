@@ -171,7 +171,8 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const errorMessage = await res.json();
-			redirect(
+			throw redirect(
+				303,
 				`/entity/view/${params.id}`,
 				{
 					type: 'error',

@@ -29,5 +29,10 @@ export const createColumns = (
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)
 	}),
-	createActionsColumn<EntityType>('Entity', '/entity', permissions)
+	createActionsColumn<EntityType>('Entity', '/entity', {
+		...permissions,
+		customActions: (row) => [
+			{ label: 'View Records', href: `/entity/view/${row.id}`, icon: 'external-link' }
+		]
+	})
 ];

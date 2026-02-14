@@ -77,14 +77,6 @@
 	{/snippet}
 
 	{#snippet content()}
-		<DataTable
-			data={tableData}
-			{columns}
-			{totalItems}
-			{totalPages}
-			{currentPage}
-			{pageSize}
-			onRowClick={(row) => goto(`/entity/view/${row.id}`)}
-		/>
+		<DataTable data={tableData} {columns} {totalItems} {totalPages} {currentPage} {pageSize} />
 	{/snippet}
 </ListingPageLayout>

@@ -354,6 +354,7 @@ describe('page.server delete action', () => {
 		}
 
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity/view/1',
 			{ type: 'error', message: 'Record not found' },
 			mockCookies
@@ -377,6 +378,7 @@ describe('page.server delete action', () => {
 		}
 
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity/view/1',
 			{ type: 'error', message: 'Internal Server Error' },
 			mockCookies

@@ -46,8 +46,11 @@ const editFormData = {
 	action: 'edit',
 	id: '1',
 	form: {
+		id: 'edit-form',
 		valid: true,
-		data: { name: '', description: '' }
+		posted: false,
+		errors: {},
+		data: { name: 'CLF', description: 'Community Level Federation' }
 	},
 	entityType: { name: 'CLF', description: 'Community Level Federation' },
 	currentUser: { id: 1, name: 'Test User' }

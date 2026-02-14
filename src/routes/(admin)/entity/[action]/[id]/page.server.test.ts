@@ -237,17 +237,22 @@ describe('page.server save action', () => {
 	it('creates entity type via POST for new entity type', async () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-		await server.actions.save({
-			request: {},
-			params: { action: 'add', id: 'new' },
-			cookies: mockCookies
-		} as any);
+		try {
+			await server.actions.save({
+				request: {},
+				params: { action: 'add', id: 'new' },
+				cookies: mockCookies
+			} as any);
+		} catch {
+			// throw redirect(303, ...) throws
+		}
 
 		expect(global.fetch).toHaveBeenCalledWith(
 			'http://fake-backend/entitytype/',
 			expect.objectContaining({ method: 'POST' })
 		);
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity',
 			{ type: 'success', message: 'Entity saved successfully' },
 			mockCookies
@@ -295,17 +300,22 @@ describe('page.server save action', () => {
 	it('updates entity type via PUT for existing entity type', async () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-		await server.actions.save({
-			request: {},
-			params: { action: 'edit', id: '5' },
-			cookies: mockCookies
-		} as any);
+		try {
+			await server.actions.save({
+				request: {},
+				params: { action: 'edit', id: '5' },
+				cookies: mockCookies
+			} as any);
+		} catch {
+			// throw redirect(303, ...) throws
+		}
 
 		expect(global.fetch).toHaveBeenCalledWith(
 			'http://fake-backend/entitytype/5',
 			expect.objectContaining({ method: 'PUT' })
 		);
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity',
 			{ type: 'success', message: 'Entity saved successfully' },
 			mockCookies
@@ -395,6 +405,7 @@ describe('page.server delete action', () => {
 		}
 
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity',
 			{ type: 'error', message: 'Entity not found' },
 			mockCookies
@@ -418,6 +429,7 @@ describe('page.server delete action', () => {
 		}
 
 		expect(redirect).toHaveBeenCalledWith(
+			303,
 			'/entity',
 			{ type: 'error', message: 'Internal Server Error' },
 			mockCookies

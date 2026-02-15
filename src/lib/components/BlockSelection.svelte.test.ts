@@ -25,9 +25,9 @@ vi.mock('$app/state', () => ({
 		data: {
 			blocks: {
 				items: [
-					{ id: 1, name: 'Block A', district_id: 1 },
-					{ id: 2, name: 'Block B', district_id: 1 },
-					{ id: 3, name: 'Block C', district_id: 2 }
+					{ id: '1', name: 'Block A', district_id: '1' },
+					{ id: '2', name: 'Block B', district_id: '1' },
+					{ id: '3', name: 'Block C', district_id: '2' }
 				]
 			}
 		},

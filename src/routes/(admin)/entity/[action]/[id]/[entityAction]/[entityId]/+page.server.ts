@@ -84,8 +84,16 @@ export const actions: Actions = {
 
 		if (params.entityAction === 'edit') {
 			requirePermission(user, PERMISSIONS.UPDATE_ENTITY);
+			if (params.entityId === 'new') {
+				return fail(400, { error: 'Invalid entity ID for edit action' });
+			}
 		} else if (params.entityAction === 'add') {
 			requirePermission(user, PERMISSIONS.CREATE_ENTITY);
+			if (params.entityId !== 'new') {
+				return fail(400, { error: 'Invalid entity ID for add action' });
+			}
+		} else {
+			return fail(400, { error: 'Invalid action' });
 		}
 
 		const form = await superValidate(request, zod4(entityRecordSchema));
@@ -101,7 +109,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		if (params.entityId === 'new') {
+		if (params.entityAction === 'add') {
 			const response = await fetch(`${BACKEND_URL}/entity/`, {
 				method: 'POST',
 				headers: {
@@ -124,7 +132,7 @@ export const actions: Actions = {
 			}
 		}
 
-		if (params.entityId !== 'new') {
+		if (params.entityAction === 'edit') {
 			const response = await fetch(`${BACKEND_URL}/entity/${params.entityId}`, {
 				method: 'PUT',
 				headers: {

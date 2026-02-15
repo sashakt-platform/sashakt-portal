@@ -13,6 +13,7 @@
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import Boxes from '@lucide/svelte/icons/boxes';
 	import { goto } from '$app/navigation';
 
 	// Menu items.
@@ -51,6 +52,11 @@
 			title: 'Certificates',
 			url: '/certificate',
 			icon: ShieldCheck
+		},
+		entity: {
+			title: 'Entities',
+			url: '/entity',
+			icon: Boxes
 		},
 		user: {
 			title: 'Users',
@@ -174,6 +180,10 @@
 					{/if}
 					{#if canRead(data.user, 'certificate')}
 						{@render sidebaritems(menu_items.certificate)}
+					{/if}
+
+					{#if canRead(data.user, 'entity')}
+						{@render sidebaritems(menu_items.entity)}
 					{/if}
 
 					{#if canRead(data.user, 'user')}

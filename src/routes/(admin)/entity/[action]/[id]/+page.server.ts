@@ -70,6 +70,14 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		};
 	}
 
+	// DELETE: no form needed, just return minimal data
+	if (params.action === 'delete') {
+		return {
+			action: params.action,
+			id: params.id
+		};
+	}
+
 	// --- ADD / EDIT: load entity type form ---
 	let entityTypeData = null;
 

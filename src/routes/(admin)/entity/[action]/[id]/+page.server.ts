@@ -3,7 +3,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { createEntityTypeSchema, editEntityTypeSchema } from './schema.js';
+import { createEntitySchema, editEntitySchema } from './schema.js';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
@@ -95,7 +95,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		entityTypeData = null;
 	}
 
-	const schema = params.action === 'edit' ? editEntityTypeSchema : createEntityTypeSchema;
+	const schema = params.action === 'edit' ? editEntitySchema : createEntitySchema;
 
 	return {
 		form: entityTypeData
@@ -119,7 +119,7 @@ export const actions: Actions = {
 			requirePermission(user, PERMISSIONS.CREATE_ENTITY);
 		}
 
-		const schema = params.action === 'edit' ? editEntityTypeSchema : createEntityTypeSchema;
+		const schema = params.action === 'edit' ? editEntitySchema : createEntitySchema;
 		const form = await superValidate(request, zod4(schema));
 
 		if (!form.valid) {

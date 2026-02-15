@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { entitySchema } from './schema';
+import { entityRecordSchema } from './schema';
 
 const validData = {
 	name: 'My Entity',
@@ -14,12 +14,12 @@ const validData = {
 describe('Entity Schema Validation', () => {
 	describe('Valid Data', () => {
 		it('should validate correct entity data with all fields', () => {
-			const result = entitySchema.safeParse(validData);
+			const result = entityRecordSchema.safeParse(validData);
 			expect(result.success).toBe(true);
 		});
 
 		it('should parse all fields correctly', () => {
-			const result = entitySchema.safeParse(validData);
+			const result = entityRecordSchema.safeParse(validData);
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.name).toBe('My Entity');
@@ -35,24 +35,24 @@ describe('Entity Schema Validation', () => {
 
 	describe('Required Fields', () => {
 		it('should fail when name is empty', () => {
-			const result = entitySchema.safeParse({ ...validData, name: '' });
+			const result = entityRecordSchema.safeParse({ ...validData, name: '' });
 			expect(result.success).toBe(false);
 		});
 
 		it('should fail when name is missing', () => {
 			const { name, ...dataWithoutName } = validData;
-			const result = entitySchema.safeParse(dataWithoutName);
+			const result = entityRecordSchema.safeParse(dataWithoutName);
 			expect(result.success).toBe(false);
 		});
 
 		it('should fail when entity_type_id is missing', () => {
 			const { entity_type_id, ...dataWithoutType } = validData;
-			const result = entitySchema.safeParse(dataWithoutType);
+			const result = entityRecordSchema.safeParse(dataWithoutType);
 			expect(result.success).toBe(false);
 		});
 
 		it('should fail when entity_type_id is 0', () => {
-			const result = entitySchema.safeParse({ ...validData, entity_type_id: 0 });
+			const result = entityRecordSchema.safeParse({ ...validData, entity_type_id: 0 });
 			expect(result.success).toBe(false);
 		});
 	});
@@ -60,12 +60,12 @@ describe('Entity Schema Validation', () => {
 	describe('Optional Fields', () => {
 		it('should allow missing description', () => {
 			const { description, ...data } = validData;
-			const result = entitySchema.safeParse(data);
+			const result = entityRecordSchema.safeParse(data);
 			expect(result.success).toBe(true);
 		});
 
 		it('should allow null description', () => {
-			const result = entitySchema.safeParse({ ...validData, description: null });
+			const result = entityRecordSchema.safeParse({ ...validData, description: null });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.description).toBeNull();
@@ -74,7 +74,7 @@ describe('Entity Schema Validation', () => {
 
 		it('should default active to true when missing', () => {
 			const { active, ...data } = validData;
-			const result = entitySchema.safeParse(data);
+			const result = entityRecordSchema.safeParse(data);
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.active).toBe(true);
@@ -82,7 +82,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should allow null state_id', () => {
-			const result = entitySchema.safeParse({ ...validData, state_id: null });
+			const result = entityRecordSchema.safeParse({ ...validData, state_id: null });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.state_id).toBeNull();
@@ -90,7 +90,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should allow null district_id', () => {
-			const result = entitySchema.safeParse({ ...validData, district_id: null });
+			const result = entityRecordSchema.safeParse({ ...validData, district_id: null });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.district_id).toBeNull();
@@ -98,7 +98,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should allow null block_id', () => {
-			const result = entitySchema.safeParse({ ...validData, block_id: null });
+			const result = entityRecordSchema.safeParse({ ...validData, block_id: null });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.block_id).toBeNull();
@@ -106,7 +106,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should allow missing location IDs entirely', () => {
-			const result = entitySchema.safeParse({
+			const result = entityRecordSchema.safeParse({
 				name: 'No Location',
 				entity_type_id: 1
 			});
@@ -116,7 +116,7 @@ describe('Entity Schema Validation', () => {
 
 	describe('Type Coercion', () => {
 		it('should coerce entity_type_id from string to number', () => {
-			const result = entitySchema.safeParse({ ...validData, entity_type_id: '5' });
+			const result = entityRecordSchema.safeParse({ ...validData, entity_type_id: '5' });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.entity_type_id).toBe(5);
@@ -125,7 +125,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should coerce state_id from string to number', () => {
-			const result = entitySchema.safeParse({ ...validData, state_id: '3' });
+			const result = entityRecordSchema.safeParse({ ...validData, state_id: '3' });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.state_id).toBe(3);
@@ -133,7 +133,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should coerce district_id from string to number', () => {
-			const result = entitySchema.safeParse({ ...validData, district_id: '15' });
+			const result = entityRecordSchema.safeParse({ ...validData, district_id: '15' });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.district_id).toBe(15);
@@ -141,7 +141,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should coerce block_id from string to number', () => {
-			const result = entitySchema.safeParse({ ...validData, block_id: '200' });
+			const result = entityRecordSchema.safeParse({ ...validData, block_id: '200' });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.block_id).toBe(200);
@@ -151,22 +151,22 @@ describe('Entity Schema Validation', () => {
 
 	describe('Edge Cases', () => {
 		it('should accept single character name', () => {
-			const result = entitySchema.safeParse({ ...validData, name: 'A' });
+			const result = entityRecordSchema.safeParse({ ...validData, name: 'A' });
 			expect(result.success).toBe(true);
 		});
 
 		it('should reject non-string name', () => {
-			const result = entitySchema.safeParse({ ...validData, name: 123 });
+			const result = entityRecordSchema.safeParse({ ...validData, name: 123 });
 			expect(result.success).toBe(false);
 		});
 
 		it('should reject completely empty object', () => {
-			const result = entitySchema.safeParse({});
+			const result = entityRecordSchema.safeParse({});
 			expect(result.success).toBe(false);
 		});
 
 		it('should strip unknown fields', () => {
-			const result = entitySchema.safeParse({ ...validData, unknownField: 'value' });
+			const result = entityRecordSchema.safeParse({ ...validData, unknownField: 'value' });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect((result.data as any).unknownField).toBeUndefined();
@@ -174,7 +174,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should accept active as false', () => {
-			const result = entitySchema.safeParse({ ...validData, active: false });
+			const result = entityRecordSchema.safeParse({ ...validData, active: false });
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.active).toBe(false);
@@ -182,7 +182,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should validate with all location IDs null', () => {
-			const result = entitySchema.safeParse({
+			const result = entityRecordSchema.safeParse({
 				...validData,
 				state_id: null,
 				district_id: null,
@@ -197,7 +197,7 @@ describe('Entity Schema Validation', () => {
 		});
 
 		it('should reject negative entity_type_id', () => {
-			const result = entitySchema.safeParse({ ...validData, entity_type_id: -1 });
+			const result = entityRecordSchema.safeParse({ ...validData, entity_type_id: -1 });
 			expect(result.success).toBe(false);
 		});
 	});

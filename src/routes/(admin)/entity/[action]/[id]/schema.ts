@@ -1,16 +1,16 @@
 import { z } from 'zod';
 
-const baseEntityTypeSchema = z.object({
+const baseEntitySchema = z.object({
 	name: z.string().min(1, { error: 'Entity name is required' }),
 	description: z.string().optional().nullable()
 });
 
-export const createEntityTypeSchema = baseEntityTypeSchema;
+export const createEntitySchema = baseEntitySchema;
 
-export const editEntityTypeSchema = baseEntityTypeSchema;
+export const editEntitySchema = baseEntitySchema;
 
-export const entityTypeSchema = createEntityTypeSchema;
+export const entitySchema = createEntitySchema;
 
-export type CreateEntityTypeSchema = typeof createEntityTypeSchema;
-export type EditEntityTypeSchema = typeof editEntityTypeSchema;
-export type EntityTypeFormSchema = typeof entityTypeSchema;
+export type CreateEntitySchema = typeof createEntitySchema;
+export type EditEntitySchema = typeof editEntitySchema;
+export type EntityFormSchema = typeof entitySchema;

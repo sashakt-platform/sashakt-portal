@@ -4,7 +4,7 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { entitySchema, type EntityFormSchema } from './schema.js';
+	import { entityRecordSchema, type EntityRecordFormSchema } from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
@@ -16,10 +16,10 @@
 		data
 	}: {
 		data: {
-			form: SuperValidated<Infer<EntityFormSchema>>;
+			form: SuperValidated<Infer<EntityRecordFormSchema>>;
 			entityAction: 'add' | 'edit';
 			entityTypeId: string;
-			entity: Partial<Infer<EntityFormSchema>> | null;
+			entity: Partial<Infer<EntityRecordFormSchema>> | null;
 			entityType: { id: number; name: string } | null;
 			currentUser: any;
 		};
@@ -38,7 +38,7 @@
 		submit,
 		errors
 	} = superForm(data.form, {
-		validators: zod4Client(entitySchema),
+		validators: zod4Client(entityRecordSchema),
 		dataType: 'json',
 		onSubmit: () => {
 			$formData.entity_type_id = Number(data.entityTypeId);

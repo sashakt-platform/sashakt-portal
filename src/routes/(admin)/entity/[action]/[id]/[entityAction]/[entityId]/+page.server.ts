@@ -4,7 +4,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
-import { entitySchema } from './schema.js';
+import { entityRecordSchema } from './schema.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { fail } from '@sveltejs/kit';
 
@@ -66,8 +66,8 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	return {
 		form: entityData
-			? await superValidate(entityData, zod4(entitySchema))
-			: await superValidate(zod4(entitySchema)),
+			? await superValidate(entityData, zod4(entityRecordSchema))
+			: await superValidate(zod4(entityRecordSchema)),
 		entityAction: params.entityAction,
 		entityId: params.entityId,
 		entityTypeId,
@@ -88,7 +88,7 @@ export const actions: Actions = {
 			requirePermission(user, PERMISSIONS.CREATE_ENTITY);
 		}
 
-		const form = await superValidate(request, zod4(entitySchema));
+		const form = await superValidate(request, zod4(entityRecordSchema));
 
 		if (!form.valid) {
 			setFlash(

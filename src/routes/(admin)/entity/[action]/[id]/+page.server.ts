@@ -123,8 +123,16 @@ export const actions: Actions = {
 
 		if (params.action === 'edit') {
 			requirePermission(user, PERMISSIONS.UPDATE_ENTITY);
+			if (params.id === 'new') {
+				return fail(400, { error: 'Invalid entity ID for edit action' });
+			}
 		} else if (params.action === 'add') {
 			requirePermission(user, PERMISSIONS.CREATE_ENTITY);
+			if (params.id !== 'new') {
+				return fail(400, { error: 'Invalid entity ID for add action' });
+			}
+		} else {
+			return fail(400, { error: 'Invalid action' });
 		}
 
 		const schema = params.action === 'edit' ? editEntitySchema : createEntitySchema;
@@ -141,7 +149,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		if (params.id === 'new') {
+		if (params.action === 'add') {
 			const response = await fetch(`${BACKEND_URL}/entitytype/`, {
 				method: 'POST',
 				headers: {
@@ -164,7 +172,7 @@ export const actions: Actions = {
 			}
 		}
 
-		if (params.id !== 'new') {
+		if (params.action === 'edit') {
 			const response = await fetch(`${BACKEND_URL}/entitytype/${params.id}`, {
 				method: 'PUT',
 				headers: {

@@ -35,7 +35,7 @@
 		url.searchParams.set('sortOrder', newSortOrder);
 		url.searchParams.set('page', '1');
 
-		goto(resolve(url.toString()), { replaceState: false });
+		goto(resolve(url.pathname + url.search), { replaceState: false });
 	}
 
 	// create columns for the data table
@@ -77,7 +77,7 @@
 						url.searchParams.delete('search');
 					}
 					url.searchParams.set('page', '1');
-					goto(resolve(url.toString()), { keepFocus: true, invalidateAll: true });
+					goto(resolve(url.pathname + url.search), { keepFocus: true, invalidateAll: true });
 				}, 300);
 			}}
 			class="max-w-sm"

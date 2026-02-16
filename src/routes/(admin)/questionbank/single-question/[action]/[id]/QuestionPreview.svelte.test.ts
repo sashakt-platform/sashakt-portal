@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import { describe, it, expect } from 'vitest';
-import QuestionPreview from './Question_preview.svelte';
+import QuestionPreview from './QuestionPreview.svelte';
 
 function createData(overrides = {}) {
 	return {

@@ -17,9 +17,9 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
-	import QuestionRevision from './Question_revision.svelte';
+	import QuestionRevision from './QuestionRevision.svelte';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
-	import QuestionPreview from './Question_preview.svelte';
+	import QuestionPreview from './QuestionPreview.svelte';
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 

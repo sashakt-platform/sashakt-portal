@@ -29,6 +29,7 @@
 		getRowId?: (row: TData) => string; // function to get unique row ID
 		preSelectedIds?: (string | number)[]; // pre-selected row IDs
 		clearSelection?: boolean; // set to true to clear selection
+		onRowClick?: (row: TData) => void; // callback when a row is clicked
 	};
 
 	let {
@@ -48,7 +49,8 @@
 		onSelectionChange,
 		getRowId = (row: unknown) => String((row as { id: string | number }).id),
 		preSelectedIds = [],
-		clearSelection = false
+		clearSelection = false,
+		onRowClick
 	}: DataTableProps<TData, TValue> = $props();
 
 	// pagination
@@ -164,7 +166,11 @@
 			</Table.Header>
 			<Table.Body>
 				{#each table.getRowModel().rows as row (row.id)}
-					<Table.Row data-state={row.getIsSelected() && 'selected'}>
+					<Table.Row
+						data-state={row.getIsSelected() && 'selected'}
+						class={onRowClick ? 'cursor-pointer' : ''}
+						onclick={onRowClick ? () => onRowClick(row.original) : undefined}
+					>
 						{#each row.getVisibleCells() as cell (cell.id)}
 							<Table.Cell
 								class={expandable && expandColumnId && cell.column.id === expandColumnId

@@ -2,6 +2,62 @@ import * as Sentry from '@sentry/sveltekit';
 import { redirect, type Handle } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth.js';
 import { sequence } from '@sveltejs/kit/hooks';
+import { BACKEND_URL } from '$env/static/private';
+
+// simple in-memory cache for organization lookups (per-node)
+const ORG_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+const ORG_CACHE_MAX_SIZE = 100;
+const orgCache = new Map<string, { data: App.Locals['organization']; expiresAt: number }>();
+
+const handleOrganization: Handle = async ({ event, resolve }) => {
+	const shortcode = event.cookies.get(auth.organizationCookieName);
+
+	if (!shortcode) {
+		event.locals.organization = null;
+		return resolve(event);
+	}
+
+	// check cache
+	const key = String(shortcode);
+	const now = Date.now();
+	const cached = orgCache.get(key);
+	if (cached && cached.expiresAt > now) {
+		event.locals.organization = cached.data;
+		return resolve(event);
+	}
+
+	// if no BACKEND_URL, skip fetch
+	if (!BACKEND_URL) {
+		event.locals.organization = null;
+		return resolve(event);
+	}
+
+	try {
+		// use event.fetch so SvelteKit fetch hooks / platform fetch are used
+		const res = await event.fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(key)}`);
+
+		if (res.ok) {
+			const json = await res.json();
+			event.locals.organization = json;
+			// remove oldest entry if cache is full
+			if (orgCache.size >= ORG_CACHE_MAX_SIZE) {
+				const oldestKey = orgCache.keys().next().value;
+				if (oldestKey !== undefined) orgCache.delete(oldestKey);
+			}
+			orgCache.set(key, { data: json, expiresAt: now + ORG_CACHE_TTL });
+		} else {
+			event.locals.organization = null;
+			// remove any stale cache on non-ok
+			orgCache.delete(key);
+		}
+	} catch (err) {
+		// on error, avoid leaving stale cached data; set null for this request
+		orgCache.delete(key);
+		event.locals.organization = null;
+	}
+
+	return resolve(event);
+};
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	const sessionToken = event.cookies.get(auth.sessionCookieName) ?? null;
@@ -73,5 +129,8 @@ export const admin: Handle = async function ({ event, resolve }) {
 	return resolve(event);
 };
 
-export const handle: Handle = sequence(Sentry.sentryHandle(), sequence(handleAuth, admin));
+export const handle: Handle = sequence(
+	Sentry.sentryHandle(),
+	sequence(handleOrganization, handleAuth, admin)
+);
 export const handleError = Sentry.handleErrorWithSentry();

@@ -7,31 +7,17 @@ import { loginSchema } from './schema';
 import {
 	setSessionTokenCookie,
 	setRefreshTokenCookie,
-	setOrganizationCookie,
-	deleteOrganizationCookie
+	resolveOrganization
 } from '$lib/server/auth.js';
 
-type OrgDataType = {
-	logo: string;
-	name: string;
-	shortcode: string;
-};
-
-export const load: PageServerLoad = async ({ url, fetch, cookies }) => {
-	const orgParam = url.searchParams.get('organization');
-	const org = orgParam?.trim() || null;
-	let organizationData: OrgDataType | null = null;
-	if (org) {
-		const res = await fetch(`${BACKEND_URL}/organization/public/${encodeURIComponent(org)}`);
-		if (res.ok) {
-			organizationData = await res.json();
-			setOrganizationCookie(cookies, org);
-		} else {
-			deleteOrganizationCookie(cookies);
-		}
-	} else {
-		deleteOrganizationCookie(cookies);
-	}
+export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
+	const organizationData = await resolveOrganization(
+		locals,
+		cookies,
+		fetch,
+		url.searchParams.get('organization'),
+		BACKEND_URL
+	);
 	return {
 		loginForm: await superValidate(zod4(loginSchema)),
 		organizationData

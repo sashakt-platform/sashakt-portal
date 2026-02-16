@@ -36,6 +36,9 @@ export const createActionsColumn = <T extends { id: string | number }>(
 	options?: {
 		canEdit?: boolean;
 		canDelete?: boolean;
+		customActions?: (
+			row: T
+		) => { label: string; href?: string; action?: () => void; icon?: string; method?: string }[];
 	}
 ): ColumnDef<T> => ({
 	id: 'actions',
@@ -48,7 +51,8 @@ export const createActionsColumn = <T extends { id: string | number }>(
 			editUrl: `${baseUrl}/edit/${row.original.id}`,
 			deleteUrl: `${baseUrl}/delete/${row.original.id}?/delete`,
 			canEdit: options?.canEdit ?? true,
-			canDelete: options?.canDelete ?? true
+			canDelete: options?.canDelete ?? true,
+			customActions: options?.customActions?.(row.original) ?? []
 		});
 	}
 });

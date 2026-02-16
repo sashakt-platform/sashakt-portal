@@ -5,7 +5,8 @@ import { deleteAllTokenCookies, logoutFromBackend } from '$lib/server/auth';
 // Mock auth functions
 vi.mock('$lib/server/auth', () => ({
 	deleteAllTokenCookies: vi.fn(),
-	logoutFromBackend: vi.fn()
+	logoutFromBackend: vi.fn(),
+	organizationCookieName: 'sashakt-organization'
 }));
 
 describe('Logout Route', () => {

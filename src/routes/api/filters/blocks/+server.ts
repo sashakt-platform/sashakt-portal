@@ -9,27 +9,33 @@ export const GET: RequestHandler = async ({ url }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 	const search = url.searchParams.get('search') || '';
+	const districtIds = url.searchParams.getAll('district_ids');
+
+	const params = new URLSearchParams({
+		name: search
+	});
+
+	for (const id of districtIds) {
+		params.append('district_ids', id);
+	}
 
 	try {
-		const response = await fetch(
-			`${BACKEND_URL}/location/state/?name=${encodeURIComponent(search)}`,
-			{
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${token}`
-				}
+		const response = await fetch(`${BACKEND_URL}/location/block/?${params.toString()}`, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${token}`
 			}
-		);
+		});
 
 		if (response.ok) {
 			const data = await response.json();
 			return json(data);
 		}
 
-		console.error('Failed to fetch states:', response.status, response.statusText);
+		console.error('Failed to fetch blocks:', response.status, response.statusText);
 		return json({ items: [] });
 	} catch (error) {
-		console.error('Failed to fetch states:', error);
+		console.error('Failed to fetch blocks:', error);
 		return json({ items: [] });
 	}
 };

@@ -7,6 +7,7 @@ import {
 import { formatDate } from '$lib/utils';
 import Eye from '@lucide/svelte/icons/eye';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
+import TagCell from '$lib/components/data-table/TagCell.svelte';
 
 export interface Question {
 	id: string;
@@ -40,18 +41,7 @@ export const createQuestionColumns = (
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => {
-			const tags = row.original.tags;
-			if (tags && tags.length > 0) {
-				return tags
-					.map((tag) => {
-						const tagTypeName = tag.tag_type?.name ?? '';
-						return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
-					})
-					.join(', ');
-			}
-			return '';
-		}
+		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)

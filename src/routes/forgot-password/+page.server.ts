@@ -4,10 +4,20 @@ import { BACKEND_URL } from '$env/static/private';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { forgotPasswordSchema } from './schema';
+import { resolveOrganization } from '$lib/server/auth.js';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
+	const organizationData = await resolveOrganization(
+		locals,
+		cookies,
+		fetch,
+		url.searchParams.get('organization'),
+		BACKEND_URL
+	);
+
 	return {
-		form: await superValidate(zod4(forgotPasswordSchema))
+		form: await superValidate(zod4(forgotPasswordSchema)),
+		organizationData
 	};
 };
 

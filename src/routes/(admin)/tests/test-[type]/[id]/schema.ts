@@ -11,6 +11,12 @@ export enum MarksLevel {
 	TEST = 'test'
 }
 
+export enum OmrMode {
+	NEVER = 'NEVER',
+	ALWAYS = 'ALWAYS',
+	OPTIONAL = 'OPTIONAL'
+}
+
 export const testSchema = z.object({
 	name: z.string(),
 	description: z.string(),
@@ -52,6 +58,7 @@ export const testSchema = z.object({
 	show_feedback_on_completion: z.boolean().default(false),
 	show_feedback_immediately: z.boolean().default(false),
 	form_id: z.coerce.number().nullable().optional()
+	omr: z.enum(Object.values(OmrMode)).default(OmrMode.NEVER)
 });
 
 export type FormSchema = typeof testSchema;

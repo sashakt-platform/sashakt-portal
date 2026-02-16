@@ -13,6 +13,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { questionSchema, type FormSchema, type TagFormSchema, QuestionTypeEnum } from './schema';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
@@ -43,17 +44,23 @@
 		validators: zod4Client(questionSchema),
 		dataType: 'json',
 		onSubmit: () => {
-			$formData.options = totalOptions.map((option) => {
-				return { id: option.id, key: option.key, value: option.value };
-			});
-			$formData.correct_answer = totalOptions
-				.filter((option) => option.correct_answer)
-				.map((option) => option.id);
+			if ($formData.question_type === QuestionTypeEnum.Subjective) {
+				$formData.options = [];
+				$formData.correct_answer = [];
+			} else {
+				$formData.options = totalOptions.map((option) => {
+					return { id: option.id, key: option.key, value: option.value };
+				});
+				$formData.correct_answer = totalOptions
+					.filter((option) => option.correct_answer)
+					.map((option) => option.id);
+
+				$formData.question_type =
+					$formData.correct_answer.length > 1
+						? QuestionTypeEnum.MultiChoice
+						: QuestionTypeEnum.SingleChoice;
+			}
 			$formData.organization_id = data.user.organization_id;
-			$formData.question_type =
-				$formData.correct_answer.length > 1
-					? QuestionTypeEnum.MultiChoice
-					: QuestionTypeEnum.SingleChoice;
 		}
 	});
 
@@ -164,93 +171,156 @@
 							bind:value={$formData.question_text}
 							placeholder="Enter your Question..."
 						/>
-						<div class="flex flex-row gap-2">
-							<Checkbox bind:checked={$formData.is_mandatory} />
-							<Label class="text-sm ">Set as mandatory</Label>
+						<div class="flex flex-col gap-4">
+							<div class="flex flex-row items-center gap-2">
+								<Checkbox bind:checked={$formData.is_mandatory} />
+								<Label class="text-sm">Set as mandatory</Label>
+							</div>
+							<div class="flex flex-row items-center gap-2">
+								<Label class="text-sm text-gray-600">Question Type</Label>
+								<Select.Root
+									type="single"
+									value={$formData.question_type === QuestionTypeEnum.MultiChoice
+										? QuestionTypeEnum.SingleChoice
+										: $formData.question_type}
+									onValueChange={(value) => {
+										$formData.question_type = value as QuestionTypeEnum;
+									}}
+								>
+									<Select.Trigger class="w-48 border-gray-300">
+										<span>
+											{$formData.question_type === QuestionTypeEnum.Subjective
+												? 'Subjective'
+												: 'Single/Multichoice'}
+										</span>
+									</Select.Trigger>
+									<Select.Content>
+										<Select.Item value={QuestionTypeEnum.SingleChoice}
+											>Single/Multichoice</Select.Item
+										>
+										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
+									</Select.Content>
+								</Select.Root>
+							</div>
 						</div>
 					</div>
-					<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
-						{@render snippetHeading('Answers')}
-
-						<div
-							use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
-							onconsider={({ detail }) => (totalOptions = detail.items)}
-							onfinalize={({ detail }) => {
-								totalOptions = detail.items.map((opt, i) => ({
-									...opt,
-									key: String.fromCharCode(65 + i)
-								}));
-							}}
-						>
-							{#each totalOptions as { id, key, value }, index (id)}
-								<div class="group flex flex-row gap-4">
-									<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
-										<p class="flex h-full w-full items-center justify-center text-xl font-semibold">
-											{key}
-										</p>
-									</div>
-									<div class="flex w-full flex-col gap-2">
-										<div class="flex flex-row rounded-sm border-1 border-black">
-											<span use:dragHandle aria-label="drag handle">
-												<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
-											</span>
-											<Input class=" border-0" name={key} bind:value={totalOptions[index].value} />
-										</div>
-										<div class="flex flex-row gap-2">
-											<Checkbox
-												disabled={!totalOptions[index].value.trim()}
-												checked={totalOptions[index].correct_answer}
-												onCheckedChange={(checked: boolean) =>
-													(totalOptions[index].correct_answer = checked)}
-											/><Label class="text-sm ">Set as correct answer</Label>
-										</div>
-									</div>
-									<div
-										class={[
-											'mt-2 gap-0 opacity-0',
-											totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
-										]}
-									>
-										<Trash_2
-											data-testid="trash-icon"
-											size={18}
-											class={[
-												'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
-												totalOptions.length > 1 ? 'cursor-pointer' : ''
-											]}
-											onclick={() => {
-												if (totalOptions.length > 1) {
-													totalOptions = totalOptions
-														.filter((_, i) => i !== index)
-														.map((option, i) => ({
-															...option,
-															key: String.fromCharCode(65 + i)
-														}));
-												}
-											}}
+					{#if $formData.question_type === QuestionTypeEnum.Subjective}
+						<div class="flex flex-col gap-2">
+							{@render snippetHeading('Answer Settings')}
+							<div class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
+								<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+									<Label for="subjective-limit" class="text-sm font-medium sm:w-48">
+										Maximum character limit
+									</Label>
+									<div class="flex items-center gap-2">
+										<Input
+											id="subjective-limit"
+											type="number"
+											min="1"
+											max="10000"
+											placeholder="e.g., 500"
+											class="w-32"
+											bind:value={$formData.subjective_answer_limit}
 										/>
+										<span class="text-sm text-gray-500">characters</span>
 									</div>
 								</div>
-							{/each}
+								<p class="text-xs text-gray-500">
+									Leave empty for unlimited. Recommended: 200-1000 characters for short answers,
+									1000-5000 for essays.
+								</p>
+							</div>
 						</div>
+					{:else}
+						<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
+							{@render snippetHeading('Answers')}
 
-						<div class="flex justify-end">
-							<Button
-								variant="outline"
-								class="text-primary border-primary"
-								onclick={() => {
-									totalOptions.push({
-										id: totalOptions[totalOptions.length - 1].id + 1,
-										key: String.fromCharCode(64 + totalOptions.length + 1),
-										value: '',
-										correct_answer: false
-									});
+							<div
+								use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
+								onconsider={({ detail }) => (totalOptions = detail.items)}
+								onfinalize={({ detail }) => {
+									totalOptions = detail.items.map((opt, i) => ({
+										...opt,
+										key: String.fromCharCode(65 + i)
+									}));
 								}}
 							>
-								<Plus />Add Answer</Button
-							>
+								{#each totalOptions as { id, key, value }, index (id)}
+									<div class="group flex flex-row gap-4">
+										<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
+											<p
+												class="flex h-full w-full items-center justify-center text-xl font-semibold"
+											>
+												{key}
+											</p>
+										</div>
+										<div class="flex w-full flex-col gap-2">
+											<div class="flex flex-row rounded-sm border-1 border-black">
+												<span use:dragHandle aria-label="drag handle">
+													<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+												</span>
+												<Input
+													class=" border-0"
+													name={key}
+													bind:value={totalOptions[index].value}
+												/>
+											</div>
+											<div class="flex flex-row gap-2">
+												<Checkbox
+													disabled={!totalOptions[index].value.trim()}
+													checked={totalOptions[index].correct_answer}
+													onCheckedChange={(checked: boolean) =>
+														(totalOptions[index].correct_answer = checked)}
+												/><Label class="text-sm ">Set as correct answer</Label>
+											</div>
+										</div>
+										<div
+											class={[
+												'mt-2 gap-0 opacity-0',
+												totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
+											]}
+										>
+											<Trash_2
+												data-testid="trash-icon"
+												size={18}
+												class={[
+													'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
+													totalOptions.length > 1 ? 'cursor-pointer' : ''
+												]}
+												onclick={() => {
+													if (totalOptions.length > 1) {
+														totalOptions = totalOptions
+															.filter((_, i) => i !== index)
+															.map((option, i) => ({
+																...option,
+																key: String.fromCharCode(65 + i)
+															}));
+													}
+												}}
+											/>
+										</div>
+									</div>
+								{/each}
+							</div>
+
+							<div class="flex justify-end">
+								<Button
+									variant="outline"
+									class="text-primary border-primary"
+									onclick={() => {
+										totalOptions.push({
+											id: totalOptions[totalOptions.length - 1].id + 1,
+											key: String.fromCharCode(64 + totalOptions.length + 1),
+											value: '',
+											correct_answer: false
+										});
+									}}
+								>
+									<Plus />Add Answer</Button
+								>
+							</div>
 						</div>
-					</div>
+					{/if}
 				</div>
 				<div class="flex w-full flex-col gap-6 lg:w-2/5 lg:gap-4 lg:pl-8">
 					<div class="flex flex-col gap-2">
@@ -324,8 +394,9 @@
 				<Button
 					class="bg-primary text-sm sm:text-base"
 					disabled={$formData?.question_text?.trim() === '' ||
-						totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
-						!totalOptions.some((option) => option.correct_answer)}
+						($formData.question_type !== QuestionTypeEnum.Subjective &&
+							(totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
+								!totalOptions.some((option) => option.correct_answer)))}
 					onclick={submit}>Save</Button
 				>
 			</div>

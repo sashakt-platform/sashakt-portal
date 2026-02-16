@@ -21,7 +21,16 @@
 <div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
-			<h1 class="text-primary w-full pb-4 text-3xl font-extrabold tracking-tighter">SASHAKT</h1>
+			{#if data.organizationData?.logo}
+				<img
+					src={data.organizationData.logo}
+					alt={data.organizationData.name}
+					class="mx-auto mb-3 h-14 w-auto object-contain"
+					loading="eager"
+				/>
+			{:else}
+				<h1 class="text-primary w-full pb-4 text-3xl font-extrabold tracking-tighter">SASHAKT</h1>
+			{/if}
 		</div>
 
 		<Card.Root class="w-full shadow-xl">
@@ -55,7 +64,13 @@
 							<p class="pt-2 text-sm text-gray-600">Please check your email inbox.</p>
 						</div>
 
-						<Button variant="default" class="mt-4 w-full py-5" href="/login">Back to Login</Button>
+						<Button
+							variant="default"
+							class="mt-4 w-full py-5"
+							href={data.organizationData?.shortcode
+								? `/login?organization=${data.organizationData.shortcode}`
+								: '/login'}>Back to Login</Button
+						>
 					</div>
 				{:else}
 					<form method="POST" use:enhance class="space-y-4">
@@ -78,7 +93,9 @@
 					</form>
 					<div class="mt-4 text-right">
 						<a
-							href="/login"
+							href={data.organizationData?.shortcode
+								? `/login?organization=${data.organizationData.shortcode}`
+								: '/login'}
 							class="text-sm text-gray-500 hover:text-blue-600 hover:underline focus:outline-none"
 						>
 							Back to Login

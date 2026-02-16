@@ -130,6 +130,12 @@ export const PERMISSIONS = {
 	DELETE_ROLE: 'delete_role',
 	READ_ROLE: 'read_role',
 
+	// Entity permissions
+	CREATE_ENTITY: 'create_entity',
+	UPDATE_ENTITY: 'update_entity',
+	DELETE_ENTITY: 'delete_entity',
+	READ_ENTITY: 'read_entity',
+
 	// Test template permissions
 	CREATE_TEST_TEMPLATE: 'create_test_template',
 	UPDATE_TEST_TEMPLATE: 'update_test_template',
@@ -206,6 +212,12 @@ export const ENTITY_PERMISSIONS = {
 		read: PERMISSIONS.READ_ROLE,
 		update: PERMISSIONS.UPDATE_ROLE,
 		delete: PERMISSIONS.DELETE_ROLE
+	},
+	entity: {
+		create: PERMISSIONS.CREATE_ENTITY,
+		read: PERMISSIONS.READ_ENTITY,
+		update: PERMISSIONS.UPDATE_ENTITY,
+		delete: PERMISSIONS.DELETE_ENTITY
 	},
 	'test-template': {
 		create: PERMISSIONS.CREATE_TEST_TEMPLATE,

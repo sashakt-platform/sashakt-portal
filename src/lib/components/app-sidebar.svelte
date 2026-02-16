@@ -13,6 +13,7 @@
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import Boxes from '@lucide/svelte/icons/boxes';
 	import { goto } from '$app/navigation';
 
 	// Menu items.
@@ -32,13 +33,13 @@
 			url: '/tests',
 			icon: ClipboardList,
 			submenu: {
-				test_template: {
-					title: 'Test Template',
-					url: '/tests/test-template'
-				},
 				test_sessions: {
 					title: 'Test Sessions',
 					url: '/tests/test-session'
+				},
+				test_template: {
+					title: 'Test Template',
+					url: '/tests/test-template'
 				}
 			}
 		},
@@ -51,6 +52,11 @@
 			title: 'Certificates',
 			url: '/certificate',
 			icon: ShieldCheck
+		},
+		entity: {
+			title: 'Entities',
+			url: '/entity',
+			icon: Boxes
 		},
 		user: {
 			title: 'Users',
@@ -121,10 +127,10 @@
 							<Sidebar.MenuItem>
 								<Collapsible.Trigger>
 									<Sidebar.MenuButton
-										onclick={() => (currentitem = menu_items.tests.submenu.test_template.title)}
+										onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
 									>
 										{#snippet child({ props })}
-											<a href={menu_items.tests.submenu.test_template.url} {...props}>
+											<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
 												<ClipboardList />
 												<span>{menu_items.tests.title}</span>
 												<ChevronRight
@@ -136,19 +142,6 @@
 								</Collapsible.Trigger>
 								<Collapsible.Content>
 									<Sidebar.MenuSub>
-										{#if canRead(data.user, 'test-template')}
-											<Sidebar.MenuButton
-												isActive={currentitem == menu_items.tests.submenu.test_template.title}
-												onclick={() =>
-													handleMenuClick(menu_items.tests.submenu.test_template.title)}
-											>
-												{#snippet child({ props })}
-													<a href={menu_items.tests.submenu.test_template.url} {...props}>
-														<span>{menu_items.tests.submenu.test_template.title}</span>
-													</a>
-												{/snippet}
-											</Sidebar.MenuButton>
-										{/if}
 										{#if canRead(data.user, 'test')}
 											<Sidebar.MenuButton
 												isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
@@ -158,6 +151,19 @@
 												{#snippet child({ props })}
 													<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
 														<span>{menu_items.tests.submenu.test_sessions.title}</span>
+													</a>
+												{/snippet}
+											</Sidebar.MenuButton>
+										{/if}
+										{#if canRead(data.user, 'test-template')}
+											<Sidebar.MenuButton
+												isActive={currentitem == menu_items.tests.submenu.test_template.title}
+												onclick={() =>
+													handleMenuClick(menu_items.tests.submenu.test_template.title)}
+											>
+												{#snippet child({ props })}
+													<a href={menu_items.tests.submenu.test_template.url} {...props}>
+														<span>{menu_items.tests.submenu.test_template.title}</span>
 													</a>
 												{/snippet}
 											</Sidebar.MenuButton>
@@ -174,6 +180,10 @@
 					{/if}
 					{#if canRead(data.user, 'certificate')}
 						{@render sidebaritems(menu_items.certificate)}
+					{/if}
+
+					{#if canRead(data.user, 'entity')}
+						{@render sidebaritems(menu_items.entity)}
 					{/if}
 
 					{#if canRead(data.user, 'user')}

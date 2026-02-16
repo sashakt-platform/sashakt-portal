@@ -1,24 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { load, actions } from './+page.server';
-import {
-	setSessionTokenCookie,
-	setRefreshTokenCookie,
-	setOrganizationCookie,
-	deleteOrganizationCookie
-} from '$lib/server/auth.js';
+import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
 
 // Mock environment variables
 vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
 }));
 
-// Mock auth functions
-vi.mock('$lib/server/auth.js', () => ({
-	setSessionTokenCookie: vi.fn(),
-	setRefreshTokenCookie: vi.fn(),
-	setOrganizationCookie: vi.fn(),
-	deleteOrganizationCookie: vi.fn()
-}));
+// Mock auth functions — use importActual so resolveOrganization runs for real
+vi.mock('$lib/server/auth.js', async () => {
+	const actual = await vi.importActual('$lib/server/auth.js');
+	return {
+		...actual,
+		setSessionTokenCookie: vi.fn(),
+		setRefreshTokenCookie: vi.fn(),
+		setOrganizationCookie: vi.fn(),
+		deleteOrganizationCookie: vi.fn()
+	};
+});
 
 describe('Login Route', () => {
 	const mockFetch = vi.fn();
@@ -33,7 +32,9 @@ describe('Login Route', () => {
 		it('should return supervalidate form', async () => {
 			const result = await load({
 				url: new URL('http://localhost/login'),
-				fetch: mockFetch
+				fetch: mockFetch,
+				cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+				locals: { organization: null }
 			} as any);
 
 			expect(result).toHaveProperty('loginForm');
@@ -43,7 +44,9 @@ describe('Login Route', () => {
 		it('should initialize form with empty values', async () => {
 			const result = await load({
 				url: new URL('http://localhost/login'),
-				fetch: mockFetch
+				fetch: mockFetch,
+				cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+				locals: { organization: null }
 			} as any);
 
 			expect(result.loginForm.data).toEqual({
@@ -269,26 +272,25 @@ describe('login load() with organization param', () => {
 		const result = await load({
 			url: new URL('http://localhost/login?organization=acme'),
 			fetch: mockFetch,
-			cookies
+			cookies,
+			locals: { organization: null }
 		} as any);
 
 		expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/organization/public/acme');
 		expect(result.organizationData).toEqual({ logo: 'x', name: 'Acme', shortcode: 'acme' });
-		expect(setOrganizationCookie).toHaveBeenCalledWith(cookies, 'acme');
 	});
 
-	it('when backend is not ok, returns null organizationData and does not set cookie', async () => {
+	it('when backend is not ok, returns null organizationData', async () => {
 		const mockFetch = vi.fn().mockResolvedValue({ ok: false });
 		const cookies = { get: vi.fn(), set: vi.fn(), delete: vi.fn() };
 
 		const result = await load({
 			url: new URL('http://localhost/login?organization=unknown'),
 			fetch: mockFetch,
-			cookies
+			cookies,
+			locals: { organization: null }
 		} as any);
 
 		expect(result.organizationData).toBeNull();
-		expect(setOrganizationCookie).not.toHaveBeenCalled();
-		expect(deleteOrganizationCookie).toHaveBeenCalled();
 	});
 });

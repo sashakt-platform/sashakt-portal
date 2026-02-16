@@ -1,0 +1,81 @@
+import { z } from 'zod';
+import type { ColumnDef } from '@tanstack/table-core';
+import {
+	createSortableColumn,
+	createActionsColumn
+} from '$lib/components/data-table/column-helpers';
+import { formatDate } from '$lib/utils';
+
+export const entitySchema = z.object({
+	id: z.number(),
+	name: z.string(),
+	description: z.string().optional(),
+	state: z
+		.object({
+			name: z.string().optional()
+		})
+		.optional()
+		.nullable(),
+	district: z
+		.object({
+			name: z.string().optional()
+		})
+		.optional()
+		.nullable(),
+	block: z
+		.object({
+			name: z.string().optional()
+		})
+		.optional()
+		.nullable(),
+	modified_date: z.string()
+});
+
+export type Entity = z.infer<typeof entitySchema>;
+
+export const createEntityColumns = (
+	entityTypeId: string,
+	currentSortBy: string,
+	currentSortOrder: string,
+	handleSort: (columnId: string) => void,
+	permissions?: {
+		canEdit?: boolean;
+		canDelete?: boolean;
+	}
+): ColumnDef<Entity>[] => [
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn<Entity>(
+		'state' as keyof Entity,
+		'State',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => row.original.state?.name || ''
+		}
+	),
+	createSortableColumn<Entity>(
+		'district' as keyof Entity,
+		'District',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => row.original.district?.name || ''
+		}
+	),
+	createSortableColumn<Entity>(
+		'block' as keyof Entity,
+		'Block',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => row.original.block?.name || ''
+		}
+	),
+	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => formatDate(row.original.modified_date)
+	}),
+	createActionsColumn<Entity>('Record', `/entity/view/${entityTypeId}`, permissions)
+];

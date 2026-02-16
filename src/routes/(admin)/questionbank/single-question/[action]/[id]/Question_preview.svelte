@@ -55,16 +55,19 @@
 	<Dialog.Content
 		class="flex max-h-[90vh] w-[95vw] max-w-4xl flex-col overflow-hidden rounded-xl bg-white p-0 shadow-2xl sm:w-[90vw]"
 	>
-		<div class="flex items-center justify-between px-8 py-3 sm:px-10 sm:py-4">
-			<span class="text-sm font-semibold tracking-wide text-gray-600">PREVIEW</span>
-			<span class="mr-8 text-sm font-semibold tracking-wide text-gray-600">
-				{marking.correct}
-				{marking.correct === 1 ? 'MARK' : 'MARKS'}
-			</span>
+		<div class="px-8 py-4 sm:px-10 sm:py-5">
+			<h2 class="text-xl font-bold text-gray-900">Preview</h2>
 		</div>
 		<hr class="mx-4 border-gray-200 sm:mx-10" />
 
 		<div class="overflow-y-auto px-8 py-5 sm:px-10 sm:py-6">
+			<div class="mb-6 flex items-center justify-between">
+				<span class="text-sm font-medium text-gray-500">1 of 1</span>
+				<span class="text-sm font-semibold text-gray-600"
+					>{marking.correct}
+					{marking.correct === 1 ? 'MARK' : 'MARKS'}</span
+				>
+			</div>
 			<div class="mb-4">
 				{#if question.trim()}
 					<p class="text-base/normal font-medium text-gray-900">

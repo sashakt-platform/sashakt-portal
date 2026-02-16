@@ -35,7 +35,7 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('PREVIEW')).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: 'Preview' })).toBeInTheDocument();
 	});
 
 	it('displays question text in dialog', async () => {

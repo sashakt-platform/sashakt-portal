@@ -398,8 +398,6 @@
 						options: totalOptions,
 						instructions: $formData.instructions,
 						marking_scheme: $formData.marking_scheme,
-						tag_ids: $formData.tag_ids,
-						state_ids: $formData.state_ids,
 						is_mandatory: $formData.is_mandatory,
 						question_type: $formData.question_type
 					}}

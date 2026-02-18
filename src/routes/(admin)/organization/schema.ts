@@ -18,7 +18,7 @@ export const editOrganizationSchema = z.object({
 				}),
 			z.string()
 		])
-		.nullable()
+		.nullish()
 });
 
 export type EditOrganizationSchema = typeof editOrganizationSchema;

@@ -4,6 +4,19 @@ import { DataTableActions, DataTableSortButton } from './index.js';
 import { Checkbox } from '$lib/components/ui/checkbox/index.js';
 
 /**
+ * Format an array of tags into a comma-separated string with optional tag_type in parentheses
+ */
+export const formatTags = (
+	tags: Array<{ name: string; tag_type?: { name: string } }>
+): string =>
+	tags
+		.map((tag) => {
+			const tagTypeName = tag.tag_type?.name ?? '';
+			return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
+		})
+		.join(', ');
+
+/**
  *  Function to create a sortable column with the given configuration
  */
 export const createSortableColumn = <T>(

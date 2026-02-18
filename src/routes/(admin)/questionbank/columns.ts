@@ -2,12 +2,13 @@ import type { ColumnDef } from '@tanstack/table-core';
 import {
 	createSortableColumn,
 	createActionsColumn,
-	createSelectionColumn
+	createSelectionColumn,
+	formatTags
 } from '$lib/components/data-table/column-helpers';
 import { formatDate } from '$lib/utils';
 import Eye from '@lucide/svelte/icons/eye';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
-import TagCell from '$lib/components/data-table/TagCell.svelte';
+import { TruncatedCell } from '$lib/components/data-table/index.js';
 
 export interface Question {
 	id: string;
@@ -29,7 +30,9 @@ export const createQuestionColumns = (
 	}
 ): ColumnDef<Question>[] => [
 	...(enableSelection ? [createSelectionColumn<Question>()] : []),
-	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => renderComponent(TruncatedCell, { text: row.original.question_text })
+	}),
 	{
 		id: 'answers',
 		header: 'Answers',
@@ -41,7 +44,7 @@ export const createQuestionColumns = (
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
+		cell: ({ row }) => renderComponent(TruncatedCell, { text: formatTags(row.original.tags ?? []) })
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)

@@ -1,9 +1,8 @@
 import type { ColumnDef } from '@tanstack/table-core';
-import { createSortableColumn } from '$lib/components/data-table/column-helpers';
+import { createSortableColumn, formatTags } from '$lib/components/data-table/column-helpers';
 import { formatDate, downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
-import { DataTableActions } from '$lib/components/data-table/index.js';
-import TagCell from '$lib/components/data-table/TagCell.svelte';
+import { DataTableActions, TruncatedCell } from '$lib/components/data-table/index.js';
 import {
 	isStateAdmin,
 	hasAssignedDistricts,
@@ -74,11 +73,13 @@ export const createTestColumns = (
 	},
 	user?: User | null
 ): ColumnDef<Test>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => renderComponent(TruncatedCell, { text: row.original.name })
+	}),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
+		cell: ({ row }) => renderComponent(TruncatedCell, { text: formatTags(row.original.tags ?? []) })
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)

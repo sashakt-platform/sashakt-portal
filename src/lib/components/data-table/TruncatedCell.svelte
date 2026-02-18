@@ -2,25 +2,17 @@
 	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	interface Props {
-		tags: Array<{ name: string; tag_type?: { name: string } }>;
+		text: string;
+		maxWidth?: string;
 	}
-	let { tags = [] }: Props = $props();
-
-	const formatted = $derived(
-		tags
-			.map((tag) => {
-				const tagTypeName = tag.tag_type?.name ?? '';
-				return tagTypeName ? `${tag.name} (${tagTypeName})` : tag.name;
-			})
-			.join(', ')
-	);
+	let { text, maxWidth = 'max-w-[25vw]' }: Props = $props();
 </script>
 
-{#if formatted}
+{#if text}
 	<Tooltip.Provider>
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<span class="block max-w-[25vw] truncate">{formatted}</span>
+				<span class="block truncate {maxWidth}">{text}</span>
 			</Tooltip.Trigger>
 			<Tooltip.Content
 				class="border-border bg-popover text-popover-foreground max-w-xs rounded-md border p-3 text-xs shadow-lg/20"
@@ -28,7 +20,7 @@
 				sideOffset={8}
 				align="start"
 			>
-				<p>{formatted}</p>
+				<p>{text}</p>
 			</Tooltip.Content>
 		</Tooltip.Root>
 	</Tooltip.Provider>

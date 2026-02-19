@@ -8,6 +8,7 @@ import { formatDate } from '$lib/utils';
 import Eye from '@lucide/svelte/icons/eye';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
+import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 
 export interface Question {
 	id: string;
@@ -29,7 +30,9 @@ export const createQuestionColumns = (
 	}
 ): ColumnDef<Question>[] => [
 	...(enableSelection ? [createSelectionColumn<Question>()] : []),
-	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.question_text })
+	}),
 	{
 		id: 'answers',
 		header: 'Answers',

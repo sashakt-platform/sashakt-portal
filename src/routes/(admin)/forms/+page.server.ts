@@ -50,6 +50,14 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 
 	const forms = await res.json();
 
+	// Compute fields_count from the fields array
+	if (forms.items) {
+		forms.items = forms.items.map((form: Record<string, unknown>) => ({
+			...form,
+			fields_count: form.fields_count ?? (Array.isArray(form.fields) ? form.fields.length : 0)
+		}));
+	}
+
 	return {
 		forms,
 		totalPages: forms.pages || 0,

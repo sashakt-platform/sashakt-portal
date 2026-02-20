@@ -8,8 +8,10 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import type { FormField, FieldOption } from './schema.js';
 	import {
 		FormFieldType,
@@ -320,47 +322,67 @@
 
 			<!-- Validation Settings -->
 			{#if needsTextValidation || needsNumberValidation}
-				<div class="space-y-4 border-t pt-4">
-					<Label class="text-base font-semibold">Validation (Optional)</Label>
+				<div class="border-t pt-4">
+					<Collapsible.Root>
+						<Collapsible.Trigger class="flex w-full items-center justify-between text-left">
+							<Label class="pointer-events-none text-base font-semibold"
+								>Validation (Optional)</Label
+							>
+							<ChevronDown class="h-4 w-4 transition-transform [[data-state=open]>&]:rotate-180" />
+						</Collapsible.Trigger>
+						<Collapsible.Content>
+							<div class="space-y-4 pt-4">
+								{#if needsTextValidation}
+									<div class="grid grid-cols-2 gap-4">
+										<div class="space-y-2">
+											<Label>Min Length</Label>
+											<Input
+												type="number"
+												bind:value={minLength}
+												placeholder="No minimum"
+												min="0"
+											/>
+										</div>
+										<div class="space-y-2">
+											<Label>Max Length</Label>
+											<Input
+												type="number"
+												bind:value={maxLength}
+												placeholder="No maximum"
+												min="0"
+											/>
+										</div>
+									</div>
+								{/if}
 
-					{#if needsTextValidation}
-						<div class="grid grid-cols-2 gap-4">
-							<div class="space-y-2">
-								<Label>Min Length</Label>
-								<Input type="number" bind:value={minLength} placeholder="No minimum" min="0" />
-							</div>
-							<div class="space-y-2">
-								<Label>Max Length</Label>
-								<Input type="number" bind:value={maxLength} placeholder="No maximum" min="0" />
-							</div>
-						</div>
-					{/if}
+								{#if needsNumberValidation}
+									<div class="grid grid-cols-2 gap-4">
+										<div class="space-y-2">
+											<Label>Min Value</Label>
+											<Input type="number" bind:value={minValue} placeholder="No minimum" />
+										</div>
+										<div class="space-y-2">
+											<Label>Max Value</Label>
+											<Input type="number" bind:value={maxValue} placeholder="No maximum" />
+										</div>
+									</div>
+								{/if}
 
-					{#if needsNumberValidation}
-						<div class="grid grid-cols-2 gap-4">
-							<div class="space-y-2">
-								<Label>Min Value</Label>
-								<Input type="number" bind:value={minValue} placeholder="No minimum" />
-							</div>
-							<div class="space-y-2">
-								<Label>Max Value</Label>
-								<Input type="number" bind:value={maxValue} placeholder="No maximum" />
-							</div>
-						</div>
-					{/if}
+								<div class="space-y-2">
+									<Label>Pattern (Regex)</Label>
+									<Input bind:value={pattern} placeholder="e.g., ^[a-zA-Z]+$" />
+								</div>
 
-					<div class="space-y-2">
-						<Label>Pattern (Regex)</Label>
-						<Input bind:value={pattern} placeholder="e.g., ^[a-zA-Z]+$" />
-					</div>
-
-					<div class="space-y-2">
-						<Label>Custom Error Message</Label>
-						<Input
-							bind:value={customErrorMessage}
-							placeholder="Error message when validation fails"
-						/>
-					</div>
+								<div class="space-y-2">
+									<Label>Custom Error Message</Label>
+									<Input
+										bind:value={customErrorMessage}
+										placeholder="Error message when validation fails"
+									/>
+								</div>
+							</div>
+						</Collapsible.Content>
+					</Collapsible.Root>
 				</div>
 			{/if}
 

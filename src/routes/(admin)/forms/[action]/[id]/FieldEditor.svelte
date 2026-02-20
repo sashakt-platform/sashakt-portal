@@ -178,11 +178,14 @@
 			method="POST"
 			action={isEditing ? '?/updateField' : '?/addField'}
 			use:enhance={() => {
-				return async ({ result }) => {
+				return async ({ result, update }) => {
 					if (result.type === 'success') {
 						// Invalidate page data to reload fields from server
 						await invalidateAll();
 						onClose();
+					} else {
+						// Process the result to display flash messages on error
+						await update();
 					}
 				};
 			}}

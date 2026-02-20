@@ -190,9 +190,15 @@
 								>
 									<Select.Trigger class="w-48 border-gray-300">
 										<span>
-											{$formData.question_type === QuestionTypeEnum.Subjective
-												? 'Subjective'
-												: 'Single/Multichoice'}
+											{#if $formData.question_type === QuestionTypeEnum.Subjective}
+												Subjective
+											{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger}
+												Numerical (Integer)
+											{:else if $formData.question_type === QuestionTypeEnum.NumericalDecimal}
+												Numerical (Decimal)
+											{:else}
+												Single/Multichoice
+											{/if}
 										</span>
 									</Select.Trigger>
 									<Select.Content>
@@ -200,6 +206,12 @@
 											>Single/Multichoice</Select.Item
 										>
 										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
+										<Select.Item value={QuestionTypeEnum.NumericalInteger}
+											>Numerical (Integer)</Select.Item
+										>
+										<Select.Item value={QuestionTypeEnum.NumericalDecimal}
+											>Numerical (Decimal)</Select.Item
+										>
 									</Select.Content>
 								</Select.Root>
 							</div>
@@ -232,9 +244,9 @@
 								</p>
 							</div>
 						</div>
-					{:else}
+					{:else if $formData.question_type === QuestionTypeEnum.SingleChoice || $formData.question_type === QuestionTypeEnum.MultiChoice}
 						<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
-							{@render snippetHeading('Answers')}
+							{@render snippetHeading('Answer')}
 
 							<div
 								use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
@@ -320,6 +332,15 @@
 									<Plus />Add Answer</Button
 								>
 							</div>
+						</div>
+					{:else}
+						<div class="flex flex-col gap-2">
+							{@render snippetHeading('Correct Answer')}
+							<Input
+								type="number"
+								step={$formData.question_type === QuestionTypeEnum.NumericalDecimal ? 'any' : '1'}
+								class="w-full"
+							/>
 						</div>
 					{/if}
 				</div>

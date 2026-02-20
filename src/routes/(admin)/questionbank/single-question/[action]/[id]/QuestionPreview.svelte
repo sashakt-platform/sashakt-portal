@@ -53,15 +53,14 @@
 	<Dialog.Overlay class="fixed bg-black/30 backdrop-blur-sm" />
 
 	<Dialog.Content
-		class="flex max-h-[90vh] w-[95vw] max-w-4xl flex-col overflow-hidden rounded-xl bg-white p-0 shadow-2xl sm:w-[90vw]"
+		class="flex max-h-[90vh] w-[95vw] max-w-4xl flex-col items-start gap-6 rounded-xl bg-blue-50 p-8 shadow-2xl sm:w-[90vw]"
 	>
-		<div class="px-8 py-4 sm:px-10 sm:py-5">
-			<h2 class="text-xl font-bold text-gray-900">Preview</h2>
-		</div>
-		<hr class="mx-4 border-gray-200 sm:mx-10" />
+		<h2 class="text-xl font-bold text-gray-800">Preview</h2>
 
-		<div class="overflow-y-auto px-8 py-5 sm:px-10 sm:py-6">
-			<div class="mb-6 flex items-center justify-between">
+		<div
+			class="w-full overflow-y-auto rounded-xl border border-blue-100 bg-white p-6 shadow-md sm:p-8"
+		>
+			<div class="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
 				<span class="text-sm font-medium text-gray-500">1 of 1</span>
 				<span class="text-sm font-semibold text-gray-600"
 					>{marking.correct}

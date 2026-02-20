@@ -57,7 +57,7 @@ export const testSchema = z.object({
 	certificate_id: z.coerce.number().nullable(),
 	show_feedback_on_completion: z.boolean().default(false),
 	show_feedback_immediately: z.boolean().default(false),
-	form_id: z.coerce.number().nullable().optional()
+	form_id: z.coerce.number().nullable().optional(),
 	omr: z.enum(Object.values(OmrMode)).default(OmrMode.NEVER)
 });
 

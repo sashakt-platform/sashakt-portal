@@ -4,6 +4,7 @@ import { formatDate, downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
+import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import {
 	isStateAdmin,
 	hasAssignedDistricts,
@@ -74,7 +75,9 @@ export const createTestColumns = (
 	},
 	user?: User | null
 ): ColumnDef<Test>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name })
+	}),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',

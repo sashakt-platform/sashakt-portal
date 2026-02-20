@@ -50,7 +50,7 @@
 		form: formData,
 		enhance,
 		submit
-	} = superForm(existingForm || data.form, {
+	} = superForm(data.form, {
 		validators: zod4Client(data.action === 'edit' ? editFormSchema : createFormSchema),
 		dataType: 'json',
 		onSubmit: () => {

@@ -69,7 +69,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	const schema = params.action === 'edit' ? editFormSchema : createFormSchema;
 
 	return {
-		form: await superValidate(zod4(schema)),
+		form: await superValidate(formData ?? undefined, zod4(schema)),
 		action: params.action,
 		id: params.id,
 		formData,

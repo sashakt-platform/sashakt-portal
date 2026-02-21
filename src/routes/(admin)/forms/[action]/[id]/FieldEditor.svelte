@@ -84,8 +84,8 @@
 	// Field types that need entity type selection
 	const needsEntityType = $derived(fieldType === 'entity');
 
-	// Field types that support text validation
-	const textFieldTypes = ['text', 'textarea', 'full_name', 'email', 'phone'];
+	// Field types that support text validation (email/phone validated on frontend already)
+	const textFieldTypes = ['text', 'textarea', 'full_name'];
 	const needsTextValidation = $derived(textFieldTypes.includes(fieldType));
 
 	// Field types that support number validation

@@ -42,13 +42,11 @@
 		// Capture previous order for rollback
 		const previousFields = [...fields];
 
-		const newFields = [...fields];
-		[newFields[index], newFields[newIndex]] = [newFields[newIndex], newFields[index]];
+		const swapped = [...fields];
+		[swapped[index], swapped[newIndex]] = [swapped[newIndex], swapped[index]];
 
-		// Update order values
-		newFields.forEach((field, i) => {
-			field.order = i;
-		});
+		// Update order values without mutating prop objects
+		const newFields = swapped.map((field, i) => ({ ...field, order: i }));
 
 		// Optimistic update
 		onReorder(newFields);

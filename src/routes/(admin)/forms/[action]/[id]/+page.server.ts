@@ -6,7 +6,7 @@ import { createFormSchema, editFormSchema, formFieldSchema } from './schema.js';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const user = requireLogin();
@@ -23,8 +23,8 @@ export const load: PageServerLoad = async ({ params }) => {
 	let formData = null;
 	let entityTypes: Array<{ id: number; name: string }> = [];
 
+	// Fetch entity types for entity field selection (non-fatal)
 	try {
-		// Fetch entity types for entity field selection
 		const entityTypesRes = await fetch(`${BACKEND_URL}/entitytype/?size=100`, {
 			method: 'GET',
 			headers: {
@@ -43,27 +43,25 @@ export const load: PageServerLoad = async ({ params }) => {
 				entityTypesRes.statusText
 			);
 		}
+	} catch (err) {
+		console.error('Error fetching entity types:', err);
+	}
 
-		// Fetch form data in edit mode
-		if (params.id && params.action === 'edit') {
-			const response = await fetch(`${BACKEND_URL}/form/${params.id}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
-				}
-			});
-
-			if (!response.ok) {
-				console.error(`Failed to fetch form data: ${response.statusText}`);
-				throw new Error('Failed to fetch form data');
+	// Fetch form data in edit mode
+	if (params.id && params.action === 'edit') {
+		const response = await fetch(`${BACKEND_URL}/form/${params.id}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
 			}
+		});
 
-			formData = await response.json();
+		if (!response.ok) {
+			throw error(response.status, `Failed to load form: ${response.statusText}`);
 		}
-	} catch (error) {
-		console.error('Error fetching form data:', error);
-		formData = null;
+
+		formData = await response.json();
 	}
 
 	const schema = params.action === 'edit' ? editFormSchema : createFormSchema;

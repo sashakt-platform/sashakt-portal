@@ -204,10 +204,10 @@
 							{fieldType ? fieldTypeLabels[fieldType as FormFieldTypeValue] : 'Select a field type'}
 						</Select.Trigger>
 						<Select.Content>
-							{#each Object.entries(fieldTypeCategories) as [category, types]}
+							{#each Object.entries(fieldTypeCategories) as [category, types] (category)}
 								<Select.Group>
 									<Select.GroupHeading>{category}</Select.GroupHeading>
-									{#each types as type}
+									{#each types as type (type)}
 										<Select.Item value={type}>{fieldTypeLabels[type]}</Select.Item>
 									{/each}
 								</Select.Group>
@@ -309,7 +309,7 @@
 								: 'Select entity type'}
 						</Select.Trigger>
 						<Select.Content>
-							{#each entityTypes as entityType}
+							{#each entityTypes as entityType (entityType.id)}
 								<Select.Item value={entityType.id.toString()}>{entityType.name}</Select.Item>
 							{/each}
 						</Select.Content>

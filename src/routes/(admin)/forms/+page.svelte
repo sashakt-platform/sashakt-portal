@@ -62,11 +62,12 @@
 			placeholder="Search forms..."
 			value={search}
 			oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
+				const value = event.currentTarget.value;
 				const url = new URL(page.url);
 				clearTimeout(searchTimeout);
 				searchTimeout = setTimeout(() => {
-					if (event.currentTarget?.value) {
-						url.searchParams.set('search', event.currentTarget.value);
+					if (value) {
+						url.searchParams.set('search', value);
 					} else {
 						url.searchParams.delete('search');
 					}

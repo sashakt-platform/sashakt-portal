@@ -12,6 +12,7 @@
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
+	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
 	import { goto } from '$app/navigation';
@@ -47,6 +48,11 @@
 			title: 'Tags',
 			url: '/tags',
 			icon: Tags
+		},
+		forms: {
+			title: 'Forms',
+			url: '/forms',
+			icon: FileText
 		},
 		certificate: {
 			title: 'Certificates',
@@ -180,6 +186,10 @@
 					{/if}
 					{#if canRead(data.user, 'certificate')}
 						{@render sidebaritems(menu_items.certificate)}
+					{/if}
+
+					{#if canRead(data.user, 'form')}
+						{@render sidebaritems(menu_items.forms)}
 					{/if}
 
 					{#if canRead(data.user, 'entity')}

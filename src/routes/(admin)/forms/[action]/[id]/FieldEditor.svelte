@@ -13,21 +13,15 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import type { FormField, FieldOption } from './schema.js';
-	import {
-		FormFieldType,
-		fieldTypeLabels,
-		fieldTypeCategories,
-		type FormFieldTypeValue
-	} from './schema.js';
+	import { fieldTypeLabels, fieldTypeCategories, type FormFieldTypeValue } from './schema.js';
 
 	interface Props {
 		field: FormField | null;
-		formId: number;
 		entityTypes: Array<{ id: number; name: string }>;
 		onClose: () => void;
 	}
 
-	let { field, formId, entityTypes: initialEntityTypes, onClose }: Props = $props();
+	let { field, entityTypes: initialEntityTypes, onClose }: Props = $props();
 
 	const isEditing = field !== null;
 
@@ -66,10 +60,10 @@
 	let options = $state<FieldOption[]>(field?.options || []);
 
 	// Validation fields
-	let minLength = $state<number | null>(field?.validation?.min_length || null);
-	let maxLength = $state<number | null>(field?.validation?.max_length || null);
-	let minValue = $state<number | null>(field?.validation?.min_value || null);
-	let maxValue = $state<number | null>(field?.validation?.max_value || null);
+	let minLength = $state<number | null>(field?.validation?.min_length ?? null);
+	let maxLength = $state<number | null>(field?.validation?.max_length ?? null);
+	let minValue = $state<number | null>(field?.validation?.min_value ?? null);
+	let maxValue = $state<number | null>(field?.validation?.max_value ?? null);
 	let pattern = $state(field?.validation?.pattern || '');
 	let customErrorMessage = $state(field?.validation?.custom_error_message || '');
 

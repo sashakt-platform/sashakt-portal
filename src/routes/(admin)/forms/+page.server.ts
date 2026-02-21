@@ -31,12 +31,18 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	});
 
 	if (!res.ok) {
-		const errorMessage = await res.json();
+		let detail = res.statusText;
+		try {
+			const errorMessage = await res.json();
+			detail = errorMessage.detail || detail;
+		} catch {
+			// Response was not JSON, fall back to statusText
+		}
 
 		setFlash(
 			{
 				type: 'error',
-				message: `Failed to fetch forms: ${errorMessage.detail || res.statusText}`
+				message: `Failed to fetch forms: ${detail}`
 			},
 			cookies
 		);

@@ -8,6 +8,7 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import { toast } from 'svelte-sonner';
 	import type { FormField } from './schema.js';
 	import { fieldTypeLabels } from './schema.js';
 
@@ -38,6 +39,9 @@
 		const newIndex = direction === 'up' ? index - 1 : index + 1;
 		if (newIndex < 0 || newIndex >= fields.length) return;
 
+		// Capture previous order for rollback
+		const previousFields = [...fields];
+
 		const newFields = [...fields];
 		[newFields[index], newFields[newIndex]] = [newFields[newIndex], newFields[index]];
 
@@ -46,6 +50,7 @@
 			field.order = i;
 		});
 
+		// Optimistic update
 		onReorder(newFields);
 
 		// Submit reorder to server
@@ -53,10 +58,20 @@
 		const formData = new FormData();
 		formData.set('fieldIds', JSON.stringify(fieldIds));
 
-		await fetch(`?/reorderFields`, {
-			method: 'POST',
-			body: formData
-		});
+		try {
+			const response = await fetch(`?/reorderFields`, {
+				method: 'POST',
+				body: formData
+			});
+
+			if (!response.ok) {
+				onReorder(previousFields);
+				toast.error('Failed to reorder fields');
+			}
+		} catch {
+			onReorder(previousFields);
+			toast.error('Failed to reorder fields. Please check your connection.');
+		}
 	}
 </script>
 

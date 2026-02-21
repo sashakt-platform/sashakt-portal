@@ -1,9 +1,12 @@
 import { json } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
-import { getSessionTokenCookie } from '$lib/server/auth';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.READ_FORM);
 	const token = getSessionTokenCookie();
 
 	try {

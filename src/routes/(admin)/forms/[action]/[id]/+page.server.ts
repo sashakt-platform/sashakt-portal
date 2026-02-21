@@ -180,7 +180,13 @@ export const actions: Actions = {
 		const token = getSessionTokenCookie();
 
 		const data = await request.formData();
-		const fieldData = JSON.parse(data.get('field') as string);
+		let fieldData;
+		try {
+			fieldData = JSON.parse(data.get('field') as string);
+		} catch {
+			setFlash({ type: 'error', message: 'Invalid JSON for field' }, cookies);
+			return fail(400, {});
+		}
 
 		// Validate field data
 		const validationResult = formFieldSchema.safeParse(fieldData);
@@ -230,7 +236,13 @@ export const actions: Actions = {
 
 		const data = await request.formData();
 		const fieldId = data.get('fieldId') as string;
-		const fieldData = JSON.parse(data.get('field') as string);
+		let fieldData;
+		try {
+			fieldData = JSON.parse(data.get('field') as string);
+		} catch {
+			setFlash({ type: 'error', message: 'Invalid JSON for field' }, cookies);
+			return fail(400, {});
+		}
 
 		// Validate field data
 		const validationResult = formFieldSchema.safeParse(fieldData);
@@ -287,14 +299,14 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash(
-				{
-					type: 'error',
-					message: errorMessage.detail || 'Failed to delete field'
-				},
-				cookies
-			);
+			let detail = 'Failed to delete field';
+			try {
+				const errorMessage = await response.json();
+				detail = errorMessage.detail || detail;
+			} catch {
+				// Response was not JSON, use default message
+			}
+			setFlash({ type: 'error', message: detail }, cookies);
 			return fail(500, {});
 		}
 
@@ -308,7 +320,13 @@ export const actions: Actions = {
 		const token = getSessionTokenCookie();
 
 		const data = await request.formData();
-		const fieldIds = JSON.parse(data.get('fieldIds') as string);
+		let fieldIds;
+		try {
+			fieldIds = JSON.parse(data.get('fieldIds') as string);
+		} catch {
+			setFlash({ type: 'error', message: 'Invalid JSON for field order' }, cookies);
+			return fail(400, {});
+		}
 
 		const response = await fetch(`${BACKEND_URL}/form/${params.id}/field/reorder`, {
 			method: 'PUT',
@@ -349,7 +367,8 @@ export const actions: Actions = {
 
 		if (!res.ok) {
 			const errorMessage = await res.json();
-			redirect(
+			throw redirect(
+				303,
 				'/forms',
 				{
 					type: 'error',

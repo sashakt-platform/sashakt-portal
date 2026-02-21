@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Info from '@lucide/svelte/icons/info';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
@@ -90,7 +89,6 @@
 			{#snippet snippetHeading(title: string)}
 				<div class="bg-primary-foreground flex flex-row gap-3 rounded-sm px-4 py-3 align-middle">
 					<Label class="text-md my-auto font-bold">{title}</Label>
-					<!-- <Info class="my-auto w-4 align-middle text-xs text-gray-600" /> -->
 				</div>
 			{/snippet}
 
@@ -192,10 +190,5 @@
 </form>
 
 {#if showFieldEditor}
-	<FieldEditor
-		field={editingField}
-		formId={existingForm?.id || 0}
-		entityTypes={data.entityTypes}
-		onClose={handleCloseEditor}
-	/>
+	<FieldEditor field={editingField} entityTypes={data.entityTypes} onClose={handleCloseEditor} />
 {/if}

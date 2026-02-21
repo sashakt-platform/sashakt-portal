@@ -383,68 +383,47 @@
 			</div>
 		</ConfigureBox>
 		<ConfigureBox title="Candidate Profile" Icon={ClipboardPenLine}>
-			<div class="flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox
-						bind:checked={$formData.candidate_profile}
-						onCheckedChange={(checked: boolean) => {
-							if (!checked) {
-								$formData.form_id = null;
-							}
-						}}
-					/>
-				</div>
-				<div class="w-full">
+			<div class="flex flex-col gap-4 md:flex-row md:items-center">
+				<div class="w-full md:w-2/5">
 					{@render headingSubheading(
-						'Candidate profile',
-						'Enable this option to collect candidate information during the test.'
+						'Form',
+						'Choose a form to collect candidate information before the test.'
 					)}
 				</div>
-			</div>
 
-			{#if $formData.candidate_profile}
-				<div class="mt-4 flex flex-col gap-4 border-t pt-4 md:flex-row md:items-center">
-					<div class="w-full md:w-2/5">
-						{@render headingSubheading(
-							'Select Form',
-							'Choose a form to collect candidate information before the test.'
-						)}
-					</div>
+				<div class="flex items-center gap-2">
+					<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
+						<Select.Trigger class="w-72">
+							<span class="truncate">
+								{#if $formData.form_id}
+									{formsOptions.find((f) => f.id === $formData.form_id)?.name}
+								{:else}
+									Select form
+								{/if}
+							</span>
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								<Select.Item value={null} label="No form">No form</Select.Item>
 
-					<div class="flex items-center gap-2">
-						<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
-							<Select.Trigger class="w-72">
-								<span class="truncate">
-									{#if $formData.form_id}
-										{formsOptions.find((f) => f.id === $formData.form_id)?.name}
-									{:else}
-										Select form
-									{/if}
-								</span>
-							</Select.Trigger>
-							<Select.Content>
-								<Select.Group>
-									<Select.Item value={null} label="No form">No form</Select.Item>
+								{#each formsOptions as form (form.id)}
+									<Select.Item value={form.id}>
+										{form.name}
+									</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
 
-									{#each formsOptions as form (form.id)}
-										<Select.Item value={form.id}>
-											{form.name}
-										</Select.Item>
-									{/each}
-								</Select.Group>
-							</Select.Content>
-						</Select.Root>
-
-						<a
-							href="/forms/add/new"
-							target="_blank"
-							class="text-primary text-sm whitespace-nowrap hover:underline"
-						>
-							Create new form
-						</a>
-					</div>
+					<a
+						href="/forms/add/new"
+						target="_blank"
+						class="text-primary text-sm whitespace-nowrap hover:underline"
+					>
+						Create new form
+					</a>
 				</div>
-			{/if}
+			</div>
 		</ConfigureBox>
 		<ConfigureBox title="Certificate Settings" Icon={ShieldCheck}>
 			<div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center">

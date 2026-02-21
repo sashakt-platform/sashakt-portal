@@ -52,7 +52,6 @@ export const testSchema = z.object({
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),
 	show_question_palette: z.boolean().default(true),
-	candidate_profile: z.boolean().default(false),
 	locale: z.string().default('en-US'),
 	certificate_id: z.coerce.number().nullable(),
 	show_feedback_on_completion: z.boolean().default(false),

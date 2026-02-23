@@ -64,7 +64,9 @@
 			$formData.organization_id = data.user.organization_id;
 		}
 	});
-	$formData.marking_type = 'full';
+	let markingType = $state<'full' | 'partial'>(
+		questionData?.marking_scheme?.partial ? 'partial' : 'full'
+	);
 	if (questionData?.locations?.length) {
 		$formData.state_ids = questionData.locations.map((location) => ({
 			id: String((location as { state_id: string | number }).state_id),
@@ -111,6 +113,7 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
+	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
 	// for State admins, auto-assign their state when creating a new question
 	// backend should handle this as well
@@ -122,6 +125,22 @@
 			}
 		}
 	});
+
+	$effect(() => {
+		if (!isMultiChoice && markingType === 'partial') {
+			markingType = 'full';
+		}
+	});
+
+	function setMarkingType(type: 'full' | 'partial') {
+		if (type === 'partial' && !$formData.marking_scheme?.partial) {
+			$formData.marking_scheme = {
+				...$formData.marking_scheme!,
+				partial: { correct_answers: [{ num_correct_selected: 1, marks: 0 }] }
+			};
+		}
+		markingType = type;
+	}
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -374,19 +393,27 @@
 									type="radio"
 									name="marking_type"
 									value="full"
-									bind:group={$formData.marking_type}
+									checked={markingType === 'full'}
+									onchange={() => setMarkingType('full')}
 									class="h-5 w-5"
 									style="accent-color: #0264a1"
 								/>
 								<span>Full marks</span>
 							</label>
 
-							<label class="flex cursor-pointer items-center gap-2">
+							<label
+								class={[
+									'flex cursor-pointer items-center gap-2',
+									!isMultiChoice ? 'cursor-not-allowed opacity-50' : ''
+								]}
+							>
 								<input
 									type="radio"
 									name="marking_type"
 									value="partial"
-									bind:group={$formData.marking_type}
+									checked={markingType === 'partial'}
+									disabled={!isMultiChoice}
+									onchange={() => setMarkingType('partial')}
 									class="h-5 w-5"
 									style="accent-color: #0264a1"
 								/>
@@ -424,6 +451,60 @@
 								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
 							/>
 						</div>
+						{#if markingType === 'partial' && $formData.marking_scheme?.partial}
+							{#each $formData.marking_scheme.partial.correct_answers as _, i}
+								<div
+									class="flex flex-wrap items-center gap-4 rounded-lg border border-gray-100 p-3"
+								>
+									<div class="flex items-center gap-2">
+										<p class="text-sm whitespace-nowrap">Number of correct selected</p>
+										<input
+											type="number"
+											name="marking_scheme.partial.correct_answers.{i}.num_correct_selected"
+											bind:value={
+												$formData.marking_scheme!.partial!.correct_answers[i].num_correct_selected
+											}
+											min="1"
+											class="w-24 rounded-sm border border-gray-300 p-2"
+										/>
+									</div>
+									<div class="flex items-center gap-2">
+										<p class="text-sm whitespace-nowrap">Marks</p>
+										<input
+											type="number"
+											name="marking_scheme.partial.correct_answers.{i}.marks"
+											bind:value={$formData.marking_scheme!.partial!.correct_answers[i].marks}
+											min="0"
+											class="w-20 rounded-sm border border-gray-300 p-2"
+										/>
+									</div>
+									<button
+										type="button"
+										class="hover:text-destructive ml-auto text-gray-400 disabled:cursor-not-allowed disabled:opacity-30"
+										disabled={$formData.marking_scheme!.partial!.correct_answers.length <= 1}
+										onclick={() => {
+											$formData.marking_scheme!.partial!.correct_answers =
+												$formData.marking_scheme!.partial!.correct_answers.filter(
+													(_, idx) => idx !== i
+												);
+										}}><Trash_2 size={16} /></button
+									>
+								</div>
+							{/each}
+							<div class="flex justify-end">
+								<Button
+									type="button"
+									variant="outline"
+									class="text-primary border-primary"
+									onclick={() => {
+										$formData.marking_scheme!.partial!.correct_answers = [
+											...$formData.marking_scheme!.partial!.correct_answers,
+											{ num_correct_selected: 1, marks: 0 }
+										];
+									}}><Plus /> Add Row</Button
+								>
+							</div>
+						{/if}
 					</div>
 				</div>
 			</div>

@@ -295,7 +295,7 @@
 			<!-- Entity Type Selection -->
 			{#if needsEntityType}
 				<div class="space-y-2 border-t pt-4">
-					<Label>Entity Type *</Label>
+					<Label>Entity *</Label>
 					<Select.Root
 						type="single"
 						value={entityTypeId?.toString()}
@@ -306,7 +306,7 @@
 						<Select.Trigger class="w-full">
 							{entityTypeId
 								? entityTypes.find((et) => et.id === entityTypeId)?.name || 'Select entity type'
-								: 'Select entity type'}
+								: 'Select entity'}
 						</Select.Trigger>
 						<Select.Content>
 							{#each entityTypes as entityType (entityType.id)}

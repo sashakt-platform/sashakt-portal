@@ -376,7 +376,27 @@
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
 								min="1"
-								class="w-full rounded-sm border-1 border-gray-300 p-2 sm:w-auto"
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
+							/>
+						</div>
+
+						<div class="flex flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row">
+							<p class="my-auto sm:w-1/2">Marks for wrong answer</p>
+							<input
+								type="number"
+								name="marking_scheme.wrong"
+								bind:value={$formData.marking_scheme.wrong}
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
+							/>
+						</div>
+
+						<div class="flex flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row">
+							<p class="my-auto sm:w-1/2">Marks for skipped answer</p>
+							<input
+								type="number"
+								name="marking_scheme.skipped"
+								bind:value={$formData.marking_scheme.skipped}
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
 							/>
 						</div>
 					</div>

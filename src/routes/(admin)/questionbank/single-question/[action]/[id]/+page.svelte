@@ -64,7 +64,7 @@
 			$formData.organization_id = data.user.organization_id;
 		}
 	});
-
+	$formData.marking_type = 'full';
 	if (questionData?.locations?.length) {
 		$formData.state_ids = questionData.locations.map((location) => ({
 			id: String((location as { state_id: string | number }).state_id),
@@ -365,11 +365,36 @@
 					</div>
 				</div>
 				<div class="flex w-full flex-row gap-4 md:w-1/2">
-					<div class="flex w-full flex-col gap-2">
+					<div class="flex w-full flex-col gap-1">
 						{@render snippetHeading('Marking Scheme')}
-						<div
-							class="flex h-full flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row"
-						>
+
+						<div class="mt-4 mb-3 flex gap-4">
+							<label class="flex cursor-pointer items-center gap-2">
+								<input
+									type="radio"
+									name="marking_type"
+									value="full"
+									bind:group={$formData.marking_type}
+									class="h-5 w-5"
+									style="accent-color: #0264a1"
+								/>
+								<span>Full marks</span>
+							</label>
+
+							<label class="flex cursor-pointer items-center gap-2">
+								<input
+									type="radio"
+									name="marking_type"
+									value="partial"
+									bind:group={$formData.marking_type}
+									class="h-5 w-5"
+									style="accent-color: #0264a1"
+								/>
+								<span>Partial marks</span>
+							</label>
+						</div>
+
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
 							<p class="my-auto sm:w-1/2">Marks for correct answer</p>
 							<input
 								type="number"
@@ -380,7 +405,7 @@
 							/>
 						</div>
 
-						<div class="flex flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row">
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
 							<p class="my-auto sm:w-1/2">Marks for wrong answer</p>
 							<input
 								type="number"
@@ -390,7 +415,7 @@
 							/>
 						</div>
 
-						<div class="flex flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row">
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
 							<p class="my-auto sm:w-1/2">Marks for skipped answer</p>
 							<input
 								type="number"

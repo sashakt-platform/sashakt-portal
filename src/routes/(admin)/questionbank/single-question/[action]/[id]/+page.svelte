@@ -127,7 +127,10 @@
 	});
 
 	$effect(() => {
-		if (!isMultiChoice && markingType === 'partial') {
+		if (
+			(!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective) &&
+			markingType === 'partial'
+		) {
 			markingType = 'full';
 		}
 	});
@@ -407,7 +410,9 @@
 							<label
 								class={[
 									'flex items-center gap-2.5',
-									!isMultiChoice ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+									!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective
+										? 'cursor-not-allowed opacity-50'
+										: 'cursor-pointer'
 								]}
 							>
 								<div class="relative flex h-5 w-5 shrink-0 items-center justify-center">
@@ -416,7 +421,7 @@
 										name="marking_type"
 										value="partial"
 										checked={markingType === 'partial'}
-										disabled={!isMultiChoice}
+										disabled={!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective}
 										onchange={() => setMarkingType('partial')}
 										class="peer sr-only"
 									/>

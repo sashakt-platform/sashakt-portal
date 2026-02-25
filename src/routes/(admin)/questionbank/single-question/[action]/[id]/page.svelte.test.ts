@@ -936,3 +936,75 @@ describe('Single Question Page - setMarkingType Behavior', () => {
 		});
 	});
 });
+
+describe('Single Question Page - Partial marking disabled for Subjective type', () => {
+	const subjectiveWithMultiCorrect = {
+		question_text: 'Explain recursion',
+		question_type: QuestionTypeEnum.Subjective,
+		options: [
+			{ id: 1, key: 'A', value: 'Option A' },
+			{ id: 2, key: 'B', value: 'Option B' }
+		],
+		correct_answer: [1, 2],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 2, wrong: 0, skipped: 0 }
+	};
+
+	const subjectiveWithPartialScheme = {
+		...subjectiveWithMultiCorrect,
+		marking_scheme: {
+			correct: 2,
+			wrong: 0,
+			skipped: 0,
+			partial: { correct_answers: [{ num_correct_selected: 1, marks: 1 }] }
+		}
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('should disable the partial radio for Subjective type even when isMultiChoice is true', () => {
+		render(SingleQuestionPage, {
+			data: { ...baseData, questionData: subjectiveWithMultiCorrect } as any
+		});
+
+		const partialRadio = screen
+			.getAllByRole('radio')
+			.find((r) => (r as HTMLInputElement).value === 'partial')!;
+		expect(partialRadio).toBeDisabled();
+	});
+
+	it('should apply cursor-not-allowed and opacity-50 to the Partial marks label for Subjective type', () => {
+		render(SingleQuestionPage, {
+			data: { ...baseData, questionData: subjectiveWithMultiCorrect } as any
+		});
+
+		const partialRadio = screen
+			.getAllByRole('radio')
+			.find((r) => (r as HTMLInputElement).value === 'partial')!;
+		const label = partialRadio.closest('label')!;
+		expect(label.className).toMatch(/opacity-50/);
+		expect(label.className).toMatch(/cursor-not-allowed/);
+	});
+
+	it('should hide Partial Marking Rules section for Subjective type even with a saved partial scheme', () => {
+		render(SingleQuestionPage, {
+			data: { ...baseData, questionData: subjectiveWithPartialScheme } as any
+		});
+
+		expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+	});
+
+	it('should keep the partial radio unchecked for Subjective type even with a saved partial scheme', () => {
+		render(SingleQuestionPage, {
+			data: { ...baseData, questionData: subjectiveWithPartialScheme } as any
+		});
+
+		const partialRadio = screen
+			.getAllByRole('radio')
+			.find((r) => (r as HTMLInputElement).value === 'partial')!;
+		expect(partialRadio).not.toBeChecked();
+	});
+});

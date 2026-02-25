@@ -704,12 +704,9 @@ describe('Single Question Page - Partial Marking Section', () => {
 				}
 			};
 			render(SingleQuestionPage, { data: { ...baseData, questionData: singleRow } as any });
-			const deleteButtons = screen
-				.getAllByRole('button')
-				.filter((b) => b.closest('[class*="border-l"]'));
-			if (deleteButtons.length > 0) {
-				expect(deleteButtons[0]).toBeDisabled();
-			}
+
+			const deleteBtn = screen.getByTestId('delete-partial-row');
+			expect(deleteBtn).toBeDisabled();
 		});
 
 		it('should remove a partial marking row when delete is clicked with multiple rows', async () => {
@@ -717,27 +714,18 @@ describe('Single Question Page - Partial Marking Section', () => {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
 
-			const initialRows = screen.getAllByText('Correct selected').length;
-			expect(initialRows).toBe(2);
+			expect(screen.getAllByText('Correct selected').length).toBe(2);
 
 			await fireEvent.click(screen.getByRole('button', { name: /Add Row/i }));
 			expect(screen.getAllByText('Correct selected').length).toBe(3);
 
-			const allButtons = screen.getAllByRole('button');
-			const deleteBtn = allButtons.find(
-				(b) =>
-					!b.textContent?.includes('Add Row') &&
-					!b.textContent?.includes('Save') &&
-					!b.textContent?.includes('Cancel') &&
-					!b.textContent?.includes('Answer') &&
-					!b.textContent?.includes('Tag') &&
-					!b.hasAttribute('aria-expanded') &&
-					b.closest('[class*="border-gray-200"]')
-			);
-			if (deleteBtn && !deleteBtn.hasAttribute('disabled')) {
-				await fireEvent.click(deleteBtn);
-				expect(screen.getAllByText('Correct selected').length).toBe(2);
-			}
+			const deleteButtons = screen.getAllByTestId('delete-partial-row');
+			expect(deleteButtons.length).toBe(3);
+
+			expect(deleteButtons[0]).toBeEnabled();
+
+			await fireEvent.click(deleteButtons[0]);
+			expect(screen.getAllByText('Correct selected').length).toBe(2);
 		});
 	});
 

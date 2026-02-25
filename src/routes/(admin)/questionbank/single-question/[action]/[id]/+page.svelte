@@ -489,6 +489,7 @@
 											</div>
 											<button
 												type="button"
+												data-testid="delete-partial-row"
 												class="hover:text-destructive border-l border-gray-200 pl-3 text-gray-400 disabled:cursor-not-allowed disabled:opacity-30"
 												disabled={$formData.marking_scheme!.partial!.correct_answers.length <= 1}
 												onclick={() => {

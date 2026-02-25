@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import SingleQuestionPage from './+page.svelte';
@@ -798,6 +798,153 @@ describe('Single Question Page - Multi Choice Question Type', () => {
 			expect(screen.getByDisplayValue('Option 1')).toBeInTheDocument();
 			expect(screen.getByDisplayValue('Option 2')).toBeInTheDocument();
 			expect(screen.getByDisplayValue('Option 3')).toBeInTheDocument();
+		});
+	});
+});
+
+describe('Single Question Page - setMarkingType Behavior', () => {
+	const multiChoiceNoPartial = {
+		question_text: 'Multi choice question',
+		options: [
+			{ id: 1, key: 'A', value: 'Option A' },
+			{ id: 2, key: 'B', value: 'Option B' }
+		],
+		correct_answer: [1, 2],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 2, wrong: 0, skipped: 0 }
+	};
+
+	const multiChoiceWithExistingPartial = {
+		...multiChoiceNoPartial,
+		marking_scheme: {
+			correct: 2,
+			wrong: 0,
+			skipped: 0,
+			partial: { correct_answers: [{ num_correct_selected: 1, marks: 3 }] }
+		}
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe("onchange={() => setMarkingType('full')}", () => {
+		it('should hide Partial Marking Rules section when full radio onchange fires', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithExistingPartial } as any
+			});
+
+			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+
+			const radios = screen.getAllByRole('radio');
+			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full')!;
+			await fireEvent.change(fullRadio);
+
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+		});
+
+		it('should switch markingType to full when full radio onchange fires', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithExistingPartial } as any
+			});
+
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
+			expect(partialRadio).toBeChecked();
+
+			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full')!;
+			await fireEvent.change(fullRadio);
+
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+		});
+	});
+
+	describe("onchange={() => setMarkingType('partial')}", () => {
+		it('should show Partial Marking Rules section when partial radio onchange fires', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceNoPartial } as any
+			});
+
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
+			expect(partialRadio).not.toBeDisabled();
+			await fireEvent.change(partialRadio);
+
+			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+		});
+
+		it('should create default partial scheme with one row when no partial data exists', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceNoPartial } as any
+			});
+
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
+			await fireEvent.change(partialRadio);
+
+			expect(screen.getAllByText('Correct selected').length).toBe(1);
+		});
+
+		it('should initialize default partial scheme with num_correct_selected=1 and marks=0', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceNoPartial } as any
+			});
+
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
+			await fireEvent.change(partialRadio);
+
+			const numCorrectInput = container.querySelector(
+				'input[name="marking_scheme.partial.correct_answers.0.num_correct_selected"]'
+			) as HTMLInputElement;
+			expect(numCorrectInput).toBeTruthy();
+			expect(numCorrectInput.value).toBe('1');
+
+			const marksInput = container.querySelector(
+				'input[name="marking_scheme.partial.correct_answers.0.marks"]'
+			) as HTMLInputElement;
+			expect(marksInput).toBeTruthy();
+			expect(marksInput.value).toBe('0');
+		});
+	});
+
+	describe('setMarkingType function - conditional partial scheme initialization', () => {
+		it('should not overwrite an existing partial scheme when switching back to partial', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithExistingPartial } as any
+			});
+
+			expect(screen.getByDisplayValue('3')).toBeInTheDocument();
+
+			const radios = screen.getAllByRole('radio');
+			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full')!;
+			await fireEvent.change(fullRadio);
+
+			const updatedRadios = screen.getAllByRole('radio');
+			const partialRadio = updatedRadios.find((r) => (r as HTMLInputElement).value === 'partial')!;
+			await fireEvent.change(partialRadio);
+
+			expect(screen.getByDisplayValue('3')).toBeInTheDocument();
+		});
+
+		it('should auto-reset markingType to full when question becomes single-choice', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceNoPartial } as any
+			});
+
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
+			await fireEvent.change(partialRadio);
+			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+
+			const checkboxes = screen.getAllByRole('checkbox');
+
+			await fireEvent.click(checkboxes[1]);
+
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
 		});
 	});
 });

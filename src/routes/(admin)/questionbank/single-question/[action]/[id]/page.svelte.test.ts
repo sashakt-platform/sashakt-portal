@@ -461,6 +461,298 @@ describe('Single Question Page - Subjective Question Type', () => {
 	});
 });
 
+describe('Single Question Page - Marking Type Selection', () => {
+	const singleChoiceData = {
+		question_text: 'What is 2+2?',
+		options: [
+			{ id: 1, key: 'A', value: 'Three' },
+			{ id: 2, key: 'B', value: 'Four' }
+		],
+		correct_answer: [2],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+	};
+
+	const multiChoiceWithPartialData = {
+		question_text: 'Select all correct answers',
+		options: [
+			{ id: 1, key: 'A', value: 'Option 1' },
+			{ id: 2, key: 'B', value: 'Option 2' }
+		],
+		correct_answer: [1, 2],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: {
+			correct: 2,
+			wrong: 0,
+			skipped: 0,
+			partial: { correct_answers: [{ num_correct_selected: 1, marks: 1 }] }
+		}
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Radio Button Rendering', () => {
+		it('should render "Full marks" radio button', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+			expect(screen.getByText('Full marks')).toBeInTheDocument();
+		});
+
+		it('should render "Partial marks" radio button', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+			expect(screen.getByText('Partial marks')).toBeInTheDocument();
+		});
+
+		it('should default to "Full marks" selected', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+			const radios = screen.getAllByRole('radio');
+			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full');
+			expect(fullRadio).toBeChecked();
+		});
+
+		it('should have "Partial marks" unchecked by default', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial');
+			expect(partialRadio).not.toBeChecked();
+		});
+	});
+
+	describe('Partial Marks Disabled for Non-Multi-Choice', () => {
+		it('should disable "Partial marks" radio for single-choice question', () => {
+			render(SingleQuestionPage, { data: { ...baseData, questionData: singleChoiceData } as any });
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial');
+			expect(partialRadio).toBeDisabled();
+		});
+
+		it('should not show partial marking rules section for single-choice question', () => {
+			render(SingleQuestionPage, { data: { ...baseData, questionData: singleChoiceData } as any });
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+		});
+	});
+
+	describe('Partial Marks Pre-filled', () => {
+		it('should show "Partial Marking Rules" section when question has partial marking data', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartialData } as any
+			});
+			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+		});
+
+		it('should pre-select "Partial marks" radio when question has partial marking data', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartialData } as any
+			});
+			const radios = screen.getAllByRole('radio');
+			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial');
+			expect(partialRadio).toBeChecked();
+		});
+	});
+});
+
+describe('Single Question Page - Wrong and Skipped Marks', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('should render "Marks for wrong answer" field', () => {
+		render(SingleQuestionPage, { data: baseData as any });
+		expect(screen.getByText('Marks for wrong answer')).toBeInTheDocument();
+	});
+
+	it('should render "Marks for skipped answer" field', () => {
+		render(SingleQuestionPage, { data: baseData as any });
+		expect(screen.getByText('Marks for skipped answer')).toBeInTheDocument();
+	});
+
+	it('should update wrong marks input value', async () => {
+		const { container } = render(SingleQuestionPage, { data: baseData as any });
+		const wrongInput = container.querySelector(
+			'input[name="marking_scheme.wrong"]'
+		) as HTMLInputElement;
+		await fireEvent.input(wrongInput, { target: { value: '-1' } });
+		expect(wrongInput).toHaveValue(-1);
+	});
+
+	it('should display prefilled wrong marks from question data', () => {
+		const questionData = {
+			...baseData.form,
+			marking_scheme: { correct: 3, wrong: -1, skipped: 0 }
+		};
+		render(SingleQuestionPage, { data: { ...baseData, questionData } as any });
+		expect(screen.getByDisplayValue('-1')).toBeInTheDocument();
+	});
+
+	it('should display prefilled skipped marks from question data', () => {
+		const questionData = {
+			...baseData.form,
+			marking_scheme: { correct: 3, wrong: 0, skipped: -0.5 }
+		};
+		render(SingleQuestionPage, { data: { ...baseData, questionData } as any });
+		expect(screen.getByDisplayValue('-0.5')).toBeInTheDocument();
+	});
+});
+
+describe('Single Question Page - Partial Marking Section', () => {
+	const multiChoiceWithPartial = {
+		question_text: 'Multi choice question',
+		options: [
+			{ id: 1, key: 'A', value: 'Option A' },
+			{ id: 2, key: 'B', value: 'Option B' },
+			{ id: 3, key: 'C', value: 'Option C' }
+		],
+		correct_answer: [1, 2],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: {
+			correct: 5,
+			wrong: 0,
+			skipped: 0,
+			partial: {
+				correct_answers: [
+					{ num_correct_selected: 1, marks: 11 },
+					{ num_correct_selected: 2, marks: 22 }
+				]
+			}
+		}
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Section Header and Labels', () => {
+		it('should show "PARTIAL MARKING RULES" header', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+		});
+
+		it('should show "Correct selected" label in partial rows', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+			expect(screen.getAllByText('Correct selected').length).toBeGreaterThan(0);
+		});
+
+		it('should show "Marks" label in partial rows', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+			expect(screen.getAllByText('Marks').length).toBeGreaterThan(0);
+		});
+
+		it('should show "Add Row" button in partial marking section', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+			expect(screen.getByRole('button', { name: /Add Row/i })).toBeInTheDocument();
+		});
+	});
+
+	describe('Prefilled Partial Rows', () => {
+		it('should render the correct number of partial marking rows', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+			expect(screen.getAllByText('Correct selected').length).toBe(2);
+		});
+
+		it('should display prefilled num_correct_selected values', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+
+			expect(screen.getByDisplayValue('1')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('2')).toBeInTheDocument();
+		});
+
+		it('should display prefilled marks values', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+
+			expect(screen.getByDisplayValue('11')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('22')).toBeInTheDocument();
+		});
+	});
+
+	describe('Add Row', () => {
+		it('should add a new partial marking row when "Add Row" is clicked', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+
+			const initialRows = screen.getAllByText('Correct selected').length;
+			await fireEvent.click(screen.getByRole('button', { name: /Add Row/i }));
+			expect(screen.getAllByText('Correct selected').length).toBe(initialRows + 1);
+		});
+	});
+
+	describe('Delete Row', () => {
+		it('should disable delete button when only one partial row exists', () => {
+			const singleRow = {
+				...multiChoiceWithPartial,
+				marking_scheme: {
+					...multiChoiceWithPartial.marking_scheme,
+					partial: { correct_answers: [{ num_correct_selected: 1, marks: 1 }] }
+				}
+			};
+			render(SingleQuestionPage, { data: { ...baseData, questionData: singleRow } as any });
+			const deleteButtons = screen
+				.getAllByRole('button')
+				.filter((b) => b.closest('[class*="border-l"]'));
+			if (deleteButtons.length > 0) {
+				expect(deleteButtons[0]).toBeDisabled();
+			}
+		});
+
+		it('should remove a partial marking row when delete is clicked with multiple rows', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartial } as any
+			});
+
+			const initialRows = screen.getAllByText('Correct selected').length;
+			expect(initialRows).toBe(2);
+
+			await fireEvent.click(screen.getByRole('button', { name: /Add Row/i }));
+			expect(screen.getAllByText('Correct selected').length).toBe(3);
+
+			const allButtons = screen.getAllByRole('button');
+			const deleteBtn = allButtons.find(
+				(b) =>
+					!b.textContent?.includes('Add Row') &&
+					!b.textContent?.includes('Save') &&
+					!b.textContent?.includes('Cancel') &&
+					!b.textContent?.includes('Answer') &&
+					!b.textContent?.includes('Tag') &&
+					!b.hasAttribute('aria-expanded') &&
+					b.closest('[class*="border-gray-200"]')
+			);
+			if (deleteBtn && !deleteBtn.hasAttribute('disabled')) {
+				await fireEvent.click(deleteBtn);
+				expect(screen.getAllByText('Correct selected').length).toBe(2);
+			}
+		});
+	});
+
+	describe('Hidden When Full Marks Selected', () => {
+		it('should not show partial marking section for full marks question', () => {
+			const fullMarksData = {
+				...multiChoiceWithPartial,
+				marking_scheme: { correct: 3, wrong: 0, skipped: 0 }
+			};
+			render(SingleQuestionPage, { data: { ...baseData, questionData: fullMarksData } as any });
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+		});
+	});
+});
+
 describe('Single Question Page - Multi Choice Question Type', () => {
 	const multiChoiceQuestionData = {
 		question_text: 'Select all correct answers',

@@ -235,13 +235,13 @@
 											{:else if $formData.question_type === QuestionTypeEnum.NumericalDecimal}
 												Numerical (Decimal)
 											{:else}
-												Single/Multichoice
+												Single/Multiple Choice
 											{/if}
 										</span>
 									</Select.Trigger>
 									<Select.Content>
 										<Select.Item value={QuestionTypeEnum.SingleChoice}
-											>Single/Multichoice</Select.Item
+											>Single/Multiple Choice</Select.Item
 										>
 										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
 										<Select.Item value={QuestionTypeEnum.NumericalInteger}

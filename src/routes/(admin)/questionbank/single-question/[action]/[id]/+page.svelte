@@ -49,7 +49,10 @@
 			if ($formData.question_type === QuestionTypeEnum.Subjective) {
 				$formData.options = [];
 				$formData.correct_answer = [];
-			} else {
+			} else if (
+				$formData.question_type === QuestionTypeEnum.SingleChoice ||
+				$formData.question_type === QuestionTypeEnum.MultiChoice
+			) {
 				$formData.options = totalOptions.map((option) => {
 					return { id: option.id, key: option.key, value: option.value };
 				});
@@ -61,6 +64,12 @@
 					$formData.correct_answer.length > 1
 						? QuestionTypeEnum.MultiChoice
 						: QuestionTypeEnum.SingleChoice;
+			} else if (
+				$formData.question_type === QuestionTypeEnum.NumericalDecimal ||
+				$formData.question_type === QuestionTypeEnum.NumericalInteger
+			) {
+				$formData.options = [];
+				$formData.correct_answer = $formData.correct_answer;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -120,6 +129,25 @@
 		) {
 			$formData.marking_scheme!.partial = undefined;
 		}
+	});
+
+	const isDisabled = $derived.by(() => {
+		if (!$formData?.question_text?.trim()) return true;
+
+		const type = $formData.question_type;
+		if (type === QuestionTypeEnum.Subjective) {
+			return false;
+		}
+
+		if (type === QuestionTypeEnum.NumericalInteger || type === QuestionTypeEnum.NumericalDecimal) {
+			return !$formData.correct_answer || String($formData.correct_answer).trim() === '';
+		}
+
+		// Single/Multi choice: need ≥2 filled options and at least one marked correct
+		return (
+			totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
+			!totalOptions.some((option) => option.correct_answer)
+		);
 	});
 
 	// for State admins, auto-assign their state when creating a new question
@@ -350,6 +378,7 @@
 								type="number"
 								step={$formData.question_type === QuestionTypeEnum.NumericalDecimal ? 'any' : '1'}
 								class="w-full"
+								bind:value={$formData.correct_answer}
 							/>
 						</div>
 					{/if}
@@ -459,13 +488,8 @@
 					}}
 				/>
 
-				<Button
-					class="bg-primary text-sm sm:text-base"
-					disabled={$formData?.question_text?.trim() === '' ||
-						($formData.question_type !== QuestionTypeEnum.Subjective &&
-							(totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
-								!totalOptions.some((option) => option.correct_answer)))}
-					onclick={submit}>Save</Button
+				<Button class="bg-primary text-sm sm:text-base" disabled={isDisabled} onclick={submit}
+					>Save</Button
 				>
 			</div>
 		</div>

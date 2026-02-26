@@ -7,6 +7,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Eye from '@lucide/svelte/icons/eye';
 	import { QuestionTypeEnum } from './schema';
+	import { Input } from '$lib/components/ui/input';
 
 	const { data } = $props();
 
@@ -20,19 +21,28 @@
 	const validOptions = $derived(options.filter((opt: any) => opt.value.trim() !== ''));
 
 	const questionType = $derived.by(() => {
-		if (data?.question_type === QuestionTypeEnum.Subjective) return 'subjective';
-		const correctCount = options.filter((opt: any) => opt.correct_answer === true).length;
-		return correctCount > 1 ? 'multi-choice' : 'single-choice';
+		if (data?.question_type === QuestionTypeEnum.SingleChoice) {
+			const opts = options; // Ensure reactivity by referencing options
+			if (opts.length > 0) {
+				const correctCount = opts.filter((opt: any) => opt.correct_answer === true).length;
+				return correctCount > 1 ? QuestionTypeEnum.MultiChoice : QuestionTypeEnum.SingleChoice;
+			}
+		}
+		return data?.question_type;
 	});
 
 	let selectedSingleChoice: string = $state('');
 	let selectedMultiChoices: Record<string, boolean> = $state({});
 	let subjectiveAnswer: string = $state('');
+	let numberAnswer: number | null = $state(null);
+	let decimalAnswer: float | null = $state(null);
 
 	function resetSelections() {
 		selectedSingleChoice = '';
 		selectedMultiChoices = {};
 		subjectiveAnswer = '';
+		numberAnswer = null;
+		decimalAnswer = null;
 	}
 </script>
 
@@ -85,13 +95,13 @@
 				{/if}
 			</div>
 
-			{#if questionType === 'subjective'}
+			{#if questionType === QuestionTypeEnum.Subjective}
 				<Textarea
 					placeholder="Type your answer here..."
 					bind:value={subjectiveAnswer}
 					class="min-h-20"
 				/>
-			{:else if questionType === 'single-choice'}
+			{:else if questionType === QuestionTypeEnum.SingleChoice}
 				{#if validOptions.length > 0}
 					<RadioGroup.Root bind:value={selectedSingleChoice}>
 						{#each validOptions as opt}
@@ -115,7 +125,7 @@
 				{:else}
 					<p class="text-sm text-gray-400 italic">Add options to see them in preview...</p>
 				{/if}
-			{:else if validOptions.length > 0}
+			{:else if questionType === QuestionTypeEnum.MultiChoice && validOptions.length > 0}
 				{#each validOptions as opt}
 					{@const uid = `preview-${opt.key}`}
 					<div class="flex flex-row items-start space-x-3">
@@ -137,6 +147,10 @@
 						</Label>
 					</div>
 				{/each}
+			{:else if questionType === QuestionTypeEnum.NumericalInteger}
+				<Input type="number" class="w-full" bind:value={numberAnswer} />
+			{:else if questionType === QuestionTypeEnum.NumericalDecimal}
+				<Input type="decimal" class="w-full" bind:value={decimalAnswer} />
 			{:else}
 				<p class="text-sm text-gray-400 italic">Add options to see them in preview...</p>
 			{/if}

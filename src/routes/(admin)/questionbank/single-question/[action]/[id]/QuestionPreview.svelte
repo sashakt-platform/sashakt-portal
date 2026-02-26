@@ -35,14 +35,12 @@
 	let selectedMultiChoices: Record<string, boolean> = $state({});
 	let subjectiveAnswer: string = $state('');
 	let numberAnswer: number | null = $state(null);
-	let decimalAnswer: float | null = $state(null);
 
 	function resetSelections() {
 		selectedSingleChoice = '';
 		selectedMultiChoices = {};
 		subjectiveAnswer = '';
 		numberAnswer = null;
-		decimalAnswer = null;
 	}
 </script>
 
@@ -147,10 +145,8 @@
 						</Label>
 					</div>
 				{/each}
-			{:else if questionType === QuestionTypeEnum.NumericalInteger}
-				<Input type="number" class="w-full" bind:value={numberAnswer} />
-			{:else if questionType === QuestionTypeEnum.NumericalDecimal}
-				<Input type="decimal" class="w-full" bind:value={decimalAnswer} />
+			{:else if questionType === QuestionTypeEnum.NumericalInteger || questionType === QuestionTypeEnum.NumericalDecimal}
+				<Input type="number" class="w-full" bind:value={numberAnswer} inputmode="numeric" />
 			{:else}
 				<p class="text-sm text-gray-400 italic">Add options to see them in preview...</p>
 			{/if}

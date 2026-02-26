@@ -3,6 +3,8 @@
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
 	import Timer from '@lucide/svelte/icons/timer';
 	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
+	import Copy from '@lucide/svelte/icons/copy';
+	import Check from '@lucide/svelte/icons/check';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import ConfigureBox from './ConfigureBox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
@@ -13,6 +15,11 @@
 	import { MarksLevel, OmrMode } from './schema';
 	import * as Select from '$lib/components/ui/select';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+
+	interface CertificateToken {
+		token: string;
+		label: string;
+	}
 
 	let { formData } = $props();
 
@@ -39,6 +46,8 @@
 	let languageOptions = $state<{ [key: string]: string }>({});
 	let certificatesOptions = $state<Array<{ id: number; name: string | null }>>([]);
 	let formsOptions = $state<Array<{ id: number; name: string; description: string | null }>>([]);
+	let availableTokens = $state<CertificateToken[]>([]);
+	let copiedToken = $state<string | null>(null);
 
 	// load test languages
 	async function loadLanguages() {
@@ -81,11 +90,51 @@
 		}
 	}
 
+	async function loadCertificateTokens() {
+		if (!$formData.certificate_id) {
+			availableTokens = [];
+			return;
+		}
+
+		try {
+			const queryParams = $formData.form_id ? `?form_id=${$formData.form_id}` : '';
+			const response = await fetch(`/api/certificate-tokens${queryParams}`);
+
+			if (response.ok) {
+				const data = await response.json();
+				availableTokens = data.tokens ?? [];
+			}
+		} catch (error) {
+			console.error('Failed to load certificate tokens:', error);
+			availableTokens = [];
+		}
+	}
+
+	async function copyToClipboard(token: string) {
+		const tokenText = `{{${token}}}`;
+		try {
+			await navigator.clipboard.writeText(tokenText);
+			copiedToken = token;
+			setTimeout(() => {
+				copiedToken = null;
+			}, 2000);
+		} catch (error) {
+			console.error('Failed to copy to clipboard:', error);
+		}
+	}
+
 	// initial load effect
 	$effect(() => {
 		loadLanguages();
 		loadForms();
 		loadCertificates();
+	});
+
+	// load tokens when certificate or form changes
+	$effect(() => {
+		$formData.certificate_id;
+		$formData.form_id;
+		loadCertificateTokens();
 	});
 </script>
 
@@ -457,6 +506,32 @@
 					</Select.Content>
 				</Select.Root>
 			</div>
+
+			{#if $formData.certificate_id && availableTokens.length > 0}
+				<div class="bg-muted/50 mt-4 rounded-md border p-4">
+					<p class="mb-3 text-sm font-medium">Available Tokens</p>
+					<div class="flex flex-wrap gap-2">
+						{#each availableTokens as token (token.token)}
+							<button
+								type="button"
+								class="bg-background hover:bg-accent flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors"
+								onclick={() => copyToClipboard(token.token)}
+								title={token.label}
+							>
+								<code class="text-primary">{`{{${token.token}}}`}</code>
+								{#if copiedToken === token.token}
+									<Check class="h-3 w-3 text-green-500" />
+								{:else}
+									<Copy class="text-muted-foreground h-3 w-3" />
+								{/if}
+							</button>
+						{/each}
+					</div>
+					<p class="text-muted-foreground mt-3 text-xs">
+						Click to copy. Use these tokens in your Google Slides certificate template.
+					</p>
+				</div>
+			{/if}
 		</ConfigureBox>
 	</div>
 </div>

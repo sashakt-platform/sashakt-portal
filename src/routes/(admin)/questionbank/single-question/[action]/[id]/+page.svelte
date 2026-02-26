@@ -120,10 +120,6 @@
 	);
 	let openTagDialog: boolean = $state(false);
 
-	$effect(() => {
-		console.log('$formData', $formData);
-	});
-
 	const isDisabled = $derived.by(() => {
 		if (!$formData?.question_text?.trim()) return true;
 
@@ -217,6 +213,13 @@
 										: $formData.question_type}
 									onValueChange={(value) => {
 										$formData.question_type = value as QuestionTypeEnum;
+										$formData.correct_answer = [];
+										totalOptions = Array.from({ length: 4 }, (_, i) => ({
+											id: i + 1,
+											key: String.fromCharCode(65 + i),
+											value: '',
+											correct_answer: false
+										}));
 									}}
 								>
 									<Select.Trigger class="w-48 border-gray-300">

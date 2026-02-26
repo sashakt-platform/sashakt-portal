@@ -69,7 +69,6 @@
 				$formData.question_type === QuestionTypeEnum.NumericalInteger
 			) {
 				$formData.options = [];
-				$formData.correct_answer = $formData.correct_answer;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -129,6 +128,10 @@
 		) {
 			$formData.marking_scheme!.partial = undefined;
 		}
+	});
+
+	$effect(() => {
+		console.log('$formData', $formData);
 	});
 
 	const isDisabled = $derived.by(() => {

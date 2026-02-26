@@ -68,7 +68,6 @@
 				$formData.question_type === QuestionTypeEnum.NumericalInteger
 			) {
 				$formData.options = [];
-				$formData.correct_answer = $formData.correct_answer;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -120,6 +119,10 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
+
+	$effect(() => {
+		console.log('$formData', $formData);
+	});
 
 	const isDisabled = $derived.by(() => {
 		if (!$formData?.question_text?.trim()) return true;

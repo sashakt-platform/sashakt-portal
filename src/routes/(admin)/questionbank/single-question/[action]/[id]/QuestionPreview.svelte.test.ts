@@ -371,4 +371,154 @@ describe('Question_preview', () => {
 			expect(newTextarea).toHaveValue('');
 		});
 	});
+
+	describe('Numerical Integer interaction', () => {
+		it('renders a number input for numerical integer questions', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+		});
+
+		it('has inputmode="numeric" on the number input', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			expect(screen.getByRole('spinbutton')).toHaveAttribute('inputmode', 'numeric');
+		});
+
+		it('does not render radio buttons', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+		});
+
+		it('does not render checkboxes', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+		});
+
+		it('does not render the subjective textarea', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByPlaceholderText('Type your answer here...')).not.toBeInTheDocument();
+		});
+
+		it('does not show the options placeholder text', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			expect(
+				screen.queryByText('Add options to see them in preview...')
+			).not.toBeInTheDocument();
+		});
+
+		it('allows entering a number value', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			const input = screen.getByRole('spinbutton');
+			await fireEvent.input(input, { target: { value: '42' } });
+			expect(input).toHaveValue(42);
+		});
+
+		it('clears the answer when dialog closes and reopens', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-integer' }) }
+			});
+			await openDialog();
+
+			const input = screen.getByRole('spinbutton');
+			await fireEvent.input(input, { target: { value: '42' } });
+			expect(input).toHaveValue(42);
+
+			await fireEvent.click(screen.getByRole('button', { name: /close/i }));
+			await openDialog();
+
+			expect(screen.getByRole('spinbutton')).toHaveValue(null);
+		});
+	});
+
+	describe('Numerical Decimal interaction', () => {
+		it('renders a number input for numerical decimal questions', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-decimal' }) }
+			});
+			await openDialog();
+
+			expect(screen.getByRole('spinbutton')).toBeInTheDocument();
+		});
+
+		it('does not render radio buttons', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-decimal' }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+		});
+
+		it('does not render checkboxes', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-decimal' }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+		});
+
+		it('does not render the subjective textarea', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-decimal' }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByPlaceholderText('Type your answer here...')).not.toBeInTheDocument();
+		});
+
+		it('allows entering a decimal value', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-decimal' }) }
+			});
+			await openDialog();
+
+			const input = screen.getByRole('spinbutton');
+			await fireEvent.input(input, { target: { value: '3.14' } });
+			expect(input).toHaveValue(3.14);
+		});
+
+		it('clears the answer when dialog closes and reopens', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'numerical-decimal' }) }
+			});
+			await openDialog();
+
+			const input = screen.getByRole('spinbutton');
+			await fireEvent.input(input, { target: { value: '3.14' } });
+			expect(input).toHaveValue(3.14);
+
+			await fireEvent.click(screen.getByRole('button', { name: /close/i }));
+			await openDialog();
+
+			expect(screen.getByRole('spinbutton')).toHaveValue(null);
+		});
+	});
 });

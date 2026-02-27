@@ -64,7 +64,9 @@
 			$formData.organization_id = data.user.organization_id;
 		}
 	});
-
+	let markingType = $state<'full' | 'partial'>(
+		questionData?.marking_scheme?.partial ? 'partial' : 'full'
+	);
 	if (questionData?.locations?.length) {
 		$formData.state_ids = questionData.locations.map((location) => ({
 			id: String((location as { state_id: string | number }).state_id),
@@ -111,6 +113,7 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
+	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
 	// for State admins, auto-assign their state when creating a new question
 	// backend should handle this as well
@@ -122,6 +125,25 @@
 			}
 		}
 	});
+
+	$effect(() => {
+		if (
+			(!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective) &&
+			markingType === 'partial'
+		) {
+			markingType = 'full';
+		}
+	});
+
+	function setMarkingType(type: 'full' | 'partial') {
+		if (type === 'partial' && !$formData.marking_scheme?.partial) {
+			$formData.marking_scheme = {
+				...$formData.marking_scheme!,
+				partial: { correct_answers: [{ num_correct_selected: 1, marks: 0 }] }
+			};
+		}
+		markingType = type;
+	}
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -365,20 +387,141 @@
 					</div>
 				</div>
 				<div class="flex w-full flex-row gap-4 md:w-1/2">
-					<div class="flex w-full flex-col gap-2">
+					<div class="flex w-full flex-col gap-1">
 						{@render snippetHeading('Marking Scheme')}
-						<div
-							class="flex h-full flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row"
-						>
+
+						<div class="mt-4 mb-3 flex gap-6">
+							<label class="flex cursor-pointer items-center gap-2.5">
+								<div class="relative flex h-5 w-5 shrink-0 items-center justify-center">
+									<input
+										type="radio"
+										name="marking_type"
+										value="full"
+										checked={markingType === 'full'}
+										onchange={() => setMarkingType('full')}
+										class="peer sr-only"
+									/>
+									<div class="h-5 w-5 rounded-full border-2 border-gray-300 bg-white transition-colors peer-checked:border-[#0264a1]"></div>
+									<div class="absolute h-2.5 w-2.5 scale-0 rounded-full bg-[#0264a1] transition-transform peer-checked:scale-100"></div>
+								</div>
+								<span class="text-sm font-medium">Full marks</span>
+							</label>
+
+							<label
+								class={[
+									'flex items-center gap-2.5',
+									!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective
+										? 'cursor-not-allowed opacity-50'
+										: 'cursor-pointer'
+								]}
+							>
+								<div class="relative flex h-5 w-5 shrink-0 items-center justify-center">
+									<input
+										type="radio"
+										name="marking_type"
+										value="partial"
+										checked={markingType === 'partial'}
+										disabled={!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective}
+										onchange={() => setMarkingType('partial')}
+										class="peer sr-only"
+									/>
+									<div class="h-5 w-5 rounded-full border-2 border-gray-300 bg-white transition-colors peer-checked:border-[#0264a1]"></div>
+									<div class="absolute h-2.5 w-2.5 scale-0 rounded-full bg-[#0264a1] transition-transform peer-checked:scale-100"></div>
+								</div>
+								<span class="text-sm font-medium">Partial marks</span>
+							</label>
+						</div>
+
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
 							<p class="my-auto sm:w-1/2">Marks for correct answer</p>
 							<input
 								type="number"
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
 								min="1"
-								class="w-full rounded-sm border-1 border-gray-300 p-2 sm:w-auto"
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
 							/>
 						</div>
+
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
+							<p class="my-auto sm:w-1/2">Marks for wrong answer</p>
+							<input
+								type="number"
+								name="marking_scheme.wrong"
+								bind:value={$formData.marking_scheme.wrong}
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
+							/>
+						</div>
+
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
+							<p class="my-auto sm:w-1/2">Marks for skipped answer</p>
+							<input
+								type="number"
+								name="marking_scheme.skipped"
+								bind:value={$formData.marking_scheme.skipped}
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
+							/>
+						</div>
+						{#if markingType === 'partial' && $formData.marking_scheme?.partial}
+							<div class="mt-1 rounded-lg border border-gray-200 p-3">
+								<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Partial Marking Rules</p>
+								<div class="flex flex-col gap-2">
+									{#each $formData.marking_scheme.partial.correct_answers as _, i}
+										<div
+											class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+										>
+											<div class="flex items-center gap-2">
+												<p class="text-sm whitespace-nowrap text-gray-600">Correct selected</p>
+												<input
+													type="number"
+													name="marking_scheme.partial.correct_answers.{i}.num_correct_selected"
+													bind:value={
+														$formData.marking_scheme!.partial!.correct_answers[i].num_correct_selected
+													}
+													min="1"
+													class="w-20 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
+												/>
+											</div>
+											<div class="ml-auto flex items-center gap-2">
+												<p class="text-sm whitespace-nowrap text-gray-600">Marks</p>
+												<input
+													type="number"
+													name="marking_scheme.partial.correct_answers.{i}.marks"
+													bind:value={$formData.marking_scheme!.partial!.correct_answers[i].marks}
+													min="0"
+													class="w-16 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
+												/>
+											</div>
+											<button
+												type="button"
+												data-testid="delete-partial-row"
+												class="hover:text-destructive border-l border-gray-200 pl-3 text-gray-400 disabled:cursor-not-allowed disabled:opacity-30"
+												disabled={$formData.marking_scheme!.partial!.correct_answers.length <= 1}
+												onclick={() => {
+													$formData.marking_scheme!.partial!.correct_answers =
+														$formData.marking_scheme!.partial!.correct_answers.filter(
+															(_, idx) => idx !== i
+														);
+												}}><Trash_2 size={15} /></button
+											>
+										</div>
+									{/each}
+								</div>
+								<div class="mt-3 flex justify-end">
+									<Button
+										type="button"
+										variant="outline"
+										class="text-primary border-primary h-8 gap-1 text-sm"
+										onclick={() => {
+											$formData.marking_scheme!.partial!.correct_answers = [
+												...$formData.marking_scheme!.partial!.correct_answers,
+												{ num_correct_selected: 1, marks: 0 }
+											];
+										}}><Plus size={14} /> Add Row</Button
+									>
+								</div>
+							</div>
+						{/if}
 					</div>
 				</div>
 			</div>

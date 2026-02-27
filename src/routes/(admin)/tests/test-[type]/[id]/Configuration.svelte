@@ -3,11 +3,14 @@
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
 	import Timer from '@lucide/svelte/icons/timer';
 	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Plus from '@lucide/svelte/icons/plus';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import ConfigureBox from './ConfigureBox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel, OmrMode } from './schema';
@@ -22,6 +25,19 @@
 			wrong: 0,
 			skipped: 0
 		};
+	}
+
+	let partialMarking = $state(!!$formData.marking_scheme?.partial);
+
+	function togglePartialMarking(checked: boolean) {
+		partialMarking = checked;
+		if (checked) {
+			$formData.marking_scheme.partial = {
+				correct_answers: [{ num_correct_selected: 1, marks: 0 }]
+			};
+		} else {
+			$formData.marking_scheme.partial = undefined;
+		}
 	}
 
 	if (!$formData.marks_level) {
@@ -350,18 +366,106 @@
 							>
 						</div>
 						<div
-							class="flex w-full flex-col gap-1 md:w-1/2"
+							class="grid w-full grid-cols-3 gap-3 md:w-1/2"
 							hidden={$formData.marks_level !== 'test'}
 						>
-							<small class="text-gray-500">Marks for Correct Answer (Test Level)</small>
-							<Input
-								class="flex w-full"
-								type="number"
-								placeholder=""
-								name="marking_scheme.correct"
-								bind:value={$formData.marking_scheme.correct}
-							/>
+							<div class="flex flex-col gap-1">
+								<small class="text-gray-500">Correct</small>
+								<Input
+									class="w-full"
+									type="number"
+									placeholder=""
+									name="marking_scheme.correct"
+									bind:value={$formData.marking_scheme.correct}
+								/>
+							</div>
+							<div class="flex flex-col gap-1">
+								<small class="text-gray-500">Wrong</small>
+								<Input
+									class="w-full"
+									type="number"
+									placeholder=""
+									name="marking_scheme.wrong"
+									bind:value={$formData.marking_scheme.wrong}
+								/>
+							</div>
+							<div class="flex flex-col gap-1">
+								<small class="text-gray-500">Skipped</small>
+								<Input
+									class="w-full"
+									type="number"
+									placeholder=""
+									name="marking_scheme.skipped"
+									bind:value={$formData.marking_scheme.skipped}
+								/>
+							</div>
 						</div>
+					</div>
+					<div hidden={$formData.marks_level !== 'test'} class="flex flex-col gap-3">
+						<label class="flex cursor-pointer items-center gap-2">
+							<Checkbox checked={partialMarking} onCheckedChange={togglePartialMarking} />
+							<span class="text-sm font-medium">Partial Marking</span>
+						</label>
+						{#if partialMarking && $formData.marking_scheme?.partial}
+							<div class="rounded-lg border border-gray-200 p-3">
+								<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+									Partial Marking Rules
+								</p>
+								<div class="flex flex-col gap-2">
+									{#each $formData.marking_scheme.partial.correct_answers as _, i}
+										<div
+											class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
+										>
+											<div class="flex items-center gap-2">
+												<p class="whitespace-nowrap text-sm text-gray-600">Correct selected</p>
+												<input
+													type="number"
+													name="marking_scheme.partial.correct_answers.{i}.num_correct_selected"
+													bind:value={$formData.marking_scheme!.partial!.correct_answers[i]
+														.num_correct_selected}
+													min="1"
+													class="w-20 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
+												/>
+											</div>
+											<div class="ml-auto flex items-center gap-2">
+												<p class="whitespace-nowrap text-sm text-gray-600">Marks</p>
+												<input
+													type="number"
+													name="marking_scheme.partial.correct_answers.{i}.marks"
+													bind:value={$formData.marking_scheme!.partial!.correct_answers[i].marks}
+													min="0"
+													class="w-16 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
+												/>
+											</div>
+											<button
+												type="button"
+												class="hover:text-destructive border-l border-gray-200 pl-3 text-gray-400 disabled:cursor-not-allowed disabled:opacity-30"
+												disabled={$formData.marking_scheme!.partial!.correct_answers.length <= 1}
+												onclick={() => {
+													$formData.marking_scheme!.partial!.correct_answers =
+														$formData.marking_scheme!.partial!.correct_answers.filter(
+															(_, idx) => idx !== i
+														);
+												}}><Trash2 size={15} /></button
+											>
+										</div>
+									{/each}
+								</div>
+								<div class="mt-3 flex justify-end">
+									<Button
+										type="button"
+										variant="outline"
+										class="text-primary border-primary h-8 gap-1 text-sm"
+										onclick={() => {
+											$formData.marking_scheme!.partial!.correct_answers = [
+												...$formData.marking_scheme!.partial!.correct_answers,
+												{ num_correct_selected: 1, marks: 0 }
+											];
+										}}><Plus size={14} /> Add Row</Button
+									>
+								</div>
+							</div>
+						{/if}
 					</div>
 				</RadioGroup.Root>
 			</div>

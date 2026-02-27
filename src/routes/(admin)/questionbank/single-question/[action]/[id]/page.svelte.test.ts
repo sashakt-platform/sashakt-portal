@@ -14,7 +14,8 @@ const baseForm = {
 	is_active: false,
 	tag_ids: [],
 	state_ids: [],
-	marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+	marking_scheme: { correct: 1, wrong: 0, skipped: 0 },
+	question_type: QuestionTypeEnum.SingleChoice
 };
 
 const baseData = {
@@ -142,6 +143,7 @@ describe('Single Question Page - Create Mode', () => {
 		it('should show edit heading and prefilled data when questionData exists', () => {
 			const questionData = {
 				question_text: 'Existing question',
+				question_type: QuestionTypeEnum.SingleChoice,
 				options: [
 					{ id: 1, key: 'A', value: 'Yes' },
 					{ id: 2, key: 'B', value: 'No' }
@@ -166,6 +168,7 @@ describe('Single Question Page - Create Mode', () => {
 describe('Single Question Page - Edit Mode', () => {
 	const editQuestionData = {
 		question_text: 'Existing question',
+		question_type: QuestionTypeEnum.SingleChoice,
 		options: [
 			{ id: 1, key: 'A', value: 'Yes' },
 			{ id: 2, key: 'B', value: 'No' }
@@ -313,13 +316,13 @@ describe('Single Question Page - Question Type Selection', () => {
 
 		it('should show Single Choice as default selected type', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Single/Multichoice')).toBeInTheDocument();
+			expect(screen.getByText('Single/Multiple Choice')).toBeInTheDocument();
 		});
 
 		it('should show answer options for Single Choice type', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			expect(screen.getByText('Answers')).toBeInTheDocument();
+			expect(screen.getByText('Answer')).toBeInTheDocument();
 			expect(screen.getByRole('button', { name: /Add Answer/i })).toBeInTheDocument();
 		});
 	});
@@ -356,7 +359,7 @@ describe('Single Question Page - Subjective Question Type', () => {
 				data: { ...baseData, questionData: subjectiveQuestionData } as any
 			});
 
-			expect(screen.queryByText('Answers')).not.toBeInTheDocument();
+			expect(screen.queryByText('Answer')).not.toBeInTheDocument();
 			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
 		});
 
@@ -486,7 +489,7 @@ describe('Single Question Page - Multi Choice Question Type', () => {
 				data: { ...baseData, questionData: multiChoiceQuestionData } as any
 			});
 
-			expect(screen.getByText('Answers')).toBeInTheDocument();
+			expect(screen.getByText('Answer')).toBeInTheDocument();
 		});
 
 		it('should hide Answer Settings section for multi choice questions', () => {
@@ -506,6 +509,192 @@ describe('Single Question Page - Multi Choice Question Type', () => {
 			expect(screen.getByDisplayValue('Option 1')).toBeInTheDocument();
 			expect(screen.getByDisplayValue('Option 2')).toBeInTheDocument();
 			expect(screen.getByDisplayValue('Option 3')).toBeInTheDocument();
+		});
+	});
+});
+
+describe('Single Question Page - Numerical Integer Question Type', () => {
+	const numericalIntegerData = {
+		question_text: 'What is 6 × 7?',
+		question_type: QuestionTypeEnum.NumericalInteger,
+		options: [],
+		correct_answer: 42,
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Numerical Integer UI', () => {
+		it('should show Correct Answer section', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalIntegerData } as any
+			});
+
+			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
+		});
+
+		it('should hide Answer section and Add Answer button', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalIntegerData } as any
+			});
+
+			expect(screen.queryByText('Answer')).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+		});
+
+		it('should hide Answer Settings section', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalIntegerData } as any
+			});
+
+			expect(screen.queryByText('Answer Settings')).not.toBeInTheDocument();
+		});
+
+		it('should render number input with step="1"', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalIntegerData } as any
+			});
+
+			const spinbuttons = screen.getAllByRole('spinbutton');
+			const answerInput = spinbuttons.find((el) => el.getAttribute('step') === '1');
+			expect(answerInput).toBeDefined();
+			expect(answerInput).toHaveAttribute('step', '1');
+		});
+
+		it('should display prefilled integer answer', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalIntegerData } as any
+			});
+
+			expect(screen.getByDisplayValue('42')).toBeInTheDocument();
+		});
+	});
+
+	describe('Numerical Integer Save Button', () => {
+		it('should disable Save button when no correct answer is provided', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...numericalIntegerData, correct_answer: [] }
+				} as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeDisabled();
+		});
+
+		it('should enable Save button when integer answer is provided', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalIntegerData } as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
+	});
+
+	describe('Numerical Integer Editing', () => {
+		it('should allow editing the integer answer', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalIntegerData } as any
+			});
+
+			const input = screen.getByDisplayValue('42');
+			await fireEvent.input(input, { target: { value: '100' } });
+			expect(input).toHaveValue(100);
+		});
+	});
+});
+
+describe('Single Question Page - Numerical Decimal Question Type', () => {
+	const numericalDecimalData = {
+		question_text: 'What is π approximately?',
+		question_type: QuestionTypeEnum.NumericalDecimal,
+		options: [],
+		correct_answer: 3.14,
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Numerical Decimal UI', () => {
+		it('should show Correct Answer section', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalDecimalData } as any
+			});
+
+			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
+		});
+
+		it('should hide Answer section and Add Answer button', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalDecimalData } as any
+			});
+
+			expect(screen.queryByText('Answer')).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+		});
+
+		it('should render number input with step="any"', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalDecimalData } as any
+			});
+
+			const spinbuttons = screen.getAllByRole('spinbutton');
+			const answerInput = spinbuttons.find((el) => el.getAttribute('step') === 'any');
+			expect(answerInput).toBeDefined();
+			expect(answerInput).toHaveAttribute('step', 'any');
+		});
+
+		it('should display prefilled decimal answer', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalDecimalData } as any
+			});
+
+			expect(screen.getByDisplayValue('3.14')).toBeInTheDocument();
+		});
+	});
+
+	describe('Numerical Decimal Save Button', () => {
+		it('should disable Save button when no correct answer is provided', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...numericalDecimalData, correct_answer: [] }
+				} as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeDisabled();
+		});
+
+		it('should enable Save button when decimal answer is provided', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalDecimalData } as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
+	});
+
+	describe('Numerical Decimal Editing', () => {
+		it('should allow editing the decimal answer', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: numericalDecimalData } as any
+			});
+
+			const input = screen.getByDisplayValue('3.14');
+			await fireEvent.input(input, { target: { value: '2.718' } });
+			expect(input).toHaveValue(2.718);
 		});
 	});
 });

@@ -48,7 +48,10 @@
 			if ($formData.question_type === QuestionTypeEnum.Subjective) {
 				$formData.options = [];
 				$formData.correct_answer = [];
-			} else {
+			} else if (
+				$formData.question_type === QuestionTypeEnum.SingleChoice ||
+				$formData.question_type === QuestionTypeEnum.MultiChoice
+			) {
 				$formData.options = totalOptions.map((option) => {
 					return { id: option.id, key: option.key, value: option.value };
 				});
@@ -60,6 +63,11 @@
 					$formData.correct_answer.length > 1
 						? QuestionTypeEnum.MultiChoice
 						: QuestionTypeEnum.SingleChoice;
+			} else if (
+				$formData.question_type === QuestionTypeEnum.NumericalDecimal ||
+				$formData.question_type === QuestionTypeEnum.NumericalInteger
+			) {
+				$formData.options = [];
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -111,6 +119,25 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
+
+	const isDisabled = $derived.by(() => {
+		if (!$formData?.question_text?.trim()) return true;
+
+		const type = $formData.question_type;
+		if (type === QuestionTypeEnum.Subjective) {
+			return false;
+		}
+
+		if (type === QuestionTypeEnum.NumericalInteger || type === QuestionTypeEnum.NumericalDecimal) {
+			return !$formData.correct_answer || String($formData.correct_answer).trim() === '';
+		}
+
+		// Single/Multi choice: need ≥2 filled options and at least one marked correct
+		return (
+			totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
+			!totalOptions.some((option) => option.correct_answer)
+		);
+	});
 
 	// for State admins, auto-assign their state when creating a new question
 	// backend should handle this as well
@@ -186,20 +213,39 @@
 										: $formData.question_type}
 									onValueChange={(value) => {
 										$formData.question_type = value as QuestionTypeEnum;
+										$formData.correct_answer = [];
+										totalOptions = Array.from({ length: 4 }, (_, i) => ({
+											id: i + 1,
+											key: String.fromCharCode(65 + i),
+											value: '',
+											correct_answer: false
+										}));
 									}}
 								>
 									<Select.Trigger class="w-48 border-gray-300">
 										<span>
-											{$formData.question_type === QuestionTypeEnum.Subjective
-												? 'Subjective'
-												: 'Single/Multichoice'}
+											{#if $formData.question_type === QuestionTypeEnum.Subjective}
+												Subjective
+											{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger}
+												Numerical (Integer)
+											{:else if $formData.question_type === QuestionTypeEnum.NumericalDecimal}
+												Numerical (Decimal)
+											{:else}
+												Single/Multiple Choice
+											{/if}
 										</span>
 									</Select.Trigger>
 									<Select.Content>
 										<Select.Item value={QuestionTypeEnum.SingleChoice}
-											>Single/Multichoice</Select.Item
+											>Single/Multiple Choice</Select.Item
 										>
 										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
+										<Select.Item value={QuestionTypeEnum.NumericalInteger}
+											>Numerical (Integer)</Select.Item
+										>
+										<Select.Item value={QuestionTypeEnum.NumericalDecimal}
+											>Numerical (Decimal)</Select.Item
+										>
 									</Select.Content>
 								</Select.Root>
 							</div>
@@ -232,9 +278,9 @@
 								</p>
 							</div>
 						</div>
-					{:else}
+					{:else if $formData.question_type === QuestionTypeEnum.SingleChoice || $formData.question_type === QuestionTypeEnum.MultiChoice}
 						<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
-							{@render snippetHeading('Answers')}
+							{@render snippetHeading('Answer')}
 
 							<div
 								use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
@@ -321,6 +367,16 @@
 								>
 							</div>
 						</div>
+					{:else}
+						<div class="flex flex-col gap-2">
+							{@render snippetHeading('Correct Answer')}
+							<Input
+								type="number"
+								step={$formData.question_type === QuestionTypeEnum.NumericalDecimal ? 'any' : '1'}
+								class="w-full"
+								bind:value={$formData.correct_answer}
+							/>
+						</div>
 					{/if}
 				</div>
 				<div class="flex w-full flex-col gap-6 lg:w-2/5 lg:gap-4 lg:pl-8">
@@ -403,13 +459,8 @@
 					}}
 				/>
 
-				<Button
-					class="bg-primary text-sm sm:text-base"
-					disabled={$formData?.question_text?.trim() === '' ||
-						($formData.question_type !== QuestionTypeEnum.Subjective &&
-							(totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
-								!totalOptions.some((option) => option.correct_answer)))}
-					onclick={submit}>Save</Button
+				<Button class="bg-primary text-sm sm:text-base" disabled={isDisabled} onclick={submit}
+					>Save</Button
 				>
 			</div>
 		</div>

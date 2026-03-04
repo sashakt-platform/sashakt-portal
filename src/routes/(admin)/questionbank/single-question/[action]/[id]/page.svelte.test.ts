@@ -595,6 +595,18 @@ describe('Single Question Page - Numerical Integer Question Type', () => {
 			const saveButton = screen.getByRole('button', { name: /Save/i });
 			expect(saveButton).toBeEnabled();
 		});
+
+		it('should enable Save button when correct answer is 0', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...numericalIntegerData, correct_answer: 0 }
+				} as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
 	});
 
 	describe('Numerical Integer Editing', () => {
@@ -679,6 +691,18 @@ describe('Single Question Page - Numerical Decimal Question Type', () => {
 		it('should enable Save button when decimal answer is provided', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: numericalDecimalData } as any
+			});
+
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
+
+		it('should enable Save button when correct answer is 0', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...numericalDecimalData, correct_answer: 0 }
+				} as any
 			});
 
 			const saveButton = screen.getByRole('button', { name: /Save/i });

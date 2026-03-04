@@ -139,7 +139,7 @@
 		}
 
 		if (type === QuestionTypeEnum.NumericalInteger || type === QuestionTypeEnum.NumericalDecimal) {
-			return !$formData.correct_answer || String($formData.correct_answer).trim() === '';
+			return $formData.correct_answer == null || String($formData.correct_answer).trim() === '';
 		}
 
 		// Single/Multi choice: need ≥2 filled options and at least one marked correct

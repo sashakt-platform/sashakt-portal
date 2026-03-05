@@ -22,6 +22,7 @@
 	import QuestionPreview from './QuestionPreview.svelte';
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
+	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
 
 	const {
 		data
@@ -112,25 +113,12 @@
 	let openTagDialog: boolean = $state(false);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
-	let partialMarking = $state(!!$formData.marking_scheme?.partial);
-
-	function togglePartialMarking(checked: boolean) {
-		partialMarking = checked;
-		if (checked) {
-			$formData.marking_scheme!.partial = {
-				correct_answers: [{ num_correct_selected: 1, marks: 0 }]
-			};
-		} else {
-			$formData.marking_scheme!.partial = undefined;
-		}
-	}
-
 	$effect(() => {
 		if (
 			(!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective) &&
-			partialMarking
+			$formData.marking_scheme?.partial
 		) {
-			togglePartialMarking(false);
+			$formData.marking_scheme!.partial = undefined;
 		}
 	});
 
@@ -421,73 +409,10 @@
 							/>
 						</div>
 						{#if isMultiChoice && $formData.question_type !== QuestionTypeEnum.Subjective}
-							<label class="mt-6 mb-4 flex cursor-pointer items-center gap-2">
-								<Checkbox checked={partialMarking} onCheckedChange={togglePartialMarking} />
-								<span class="text-sm font-medium">Partial Marking</span>
-							</label>
-							{#if partialMarking && $formData.marking_scheme?.partial}
-								<div class="rounded-lg border border-gray-200 p-3">
-									<p class="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
-										Partial Marking Rules
-									</p>
-									<div class="flex flex-col gap-2">
-										{#each $formData.marking_scheme.partial.correct_answers as _, i}
-											<div
-												class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
-											>
-												<div class="flex items-center gap-2">
-													<p class="text-sm whitespace-nowrap text-gray-600">Correct selected</p>
-													<input
-														type="number"
-														name="marking_scheme.partial.correct_answers.{i}.num_correct_selected"
-														bind:value={
-															$formData.marking_scheme!.partial!.correct_answers[i]
-																.num_correct_selected
-														}
-														min="1"
-														class="w-20 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
-													/>
-												</div>
-												<div class="ml-auto flex items-center gap-2">
-													<p class="text-sm whitespace-nowrap text-gray-600">Marks</p>
-													<input
-														type="number"
-														name="marking_scheme.partial.correct_answers.{i}.marks"
-														bind:value={$formData.marking_scheme!.partial!.correct_answers[i].marks}
-														min="0"
-														class="w-16 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
-													/>
-												</div>
-												<button
-													type="button"
-													data-testid="delete-partial-row"
-													class="hover:text-destructive border-l border-gray-200 pl-3 text-gray-400 disabled:cursor-not-allowed disabled:opacity-30"
-													disabled={$formData.marking_scheme!.partial!.correct_answers.length <= 1}
-													onclick={() => {
-														$formData.marking_scheme!.partial!.correct_answers =
-															$formData.marking_scheme!.partial!.correct_answers.filter(
-																(_, idx) => idx !== i
-															);
-													}}><Trash_2 size={15} /></button
-												>
-											</div>
-										{/each}
-									</div>
-									<div class="mt-3 flex justify-end">
-										<Button
-											type="button"
-											variant="outline"
-											class="text-primary border-primary h-8 gap-1 text-sm"
-											onclick={() => {
-												$formData.marking_scheme!.partial!.correct_answers = [
-													...$formData.marking_scheme!.partial!.correct_answers,
-													{ num_correct_selected: 1, marks: 0 }
-												];
-											}}><Plus size={14} /> Add Row</Button
-										>
-									</div>
-								</div>
-							{/if}
+							<PartialMarkingSection
+								bind:partial={$formData.marking_scheme!.partial}
+								labelClass="mt-6 mb-4"
+							/>
 						{/if}
 					</div>
 				</div>

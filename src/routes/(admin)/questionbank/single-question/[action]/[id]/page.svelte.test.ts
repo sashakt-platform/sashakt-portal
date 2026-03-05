@@ -495,38 +495,42 @@ describe('Single Question Page - Marking Type Selection', () => {
 		vi.clearAllMocks();
 	});
 
-	describe('Radio Button Rendering', () => {
-		it('should render "Full marks" radio button', () => {
+	describe('Partial Marking Checkbox Rendering', () => {
+		it('should not show "Partial Marking" checkbox for single-choice question by default', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Full marks')).toBeInTheDocument();
+			expect(screen.queryByText('Partial Marking')).not.toBeInTheDocument();
 		});
 
-		it('should render "Partial marks" radio button', () => {
+		it('should not show "Partial Marking Rules" section by default for single-choice', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Partial marks')).toBeInTheDocument();
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
 		});
 
-		it('should default to "Full marks" selected', () => {
-			render(SingleQuestionPage, { data: baseData as any });
-			const radios = screen.getAllByRole('radio');
-			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full');
-			expect(fullRadio).toBeChecked();
+		it('should show "Partial Marking" checkbox for multi-choice question', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: multiChoiceWithPartialData } as any
+			});
+			expect(screen.getByText('Partial Marking')).toBeInTheDocument();
 		});
 
-		it('should have "Partial marks" unchecked by default', () => {
-			render(SingleQuestionPage, { data: baseData as any });
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial');
-			expect(partialRadio).not.toBeChecked();
+		it('should show "Partial Marking" checkbox unchecked for multi-choice without partial data', () => {
+			const multiNoPartial = {
+				...multiChoiceWithPartialData,
+				marking_scheme: { correct: 2, wrong: 0, skipped: 0 }
+			};
+			render(SingleQuestionPage, { data: { ...baseData, questionData: multiNoPartial } as any });
+			const checkbox = screen
+				.getByText('Partial Marking')
+				.closest('label')!
+				.querySelector('[role="checkbox"]') as HTMLElement;
+			expect(checkbox).toHaveAttribute('data-state', 'unchecked');
 		});
 	});
 
-	describe('Partial Marks Disabled for Non-Multi-Choice', () => {
-		it('should disable "Partial marks" radio for single-choice question', () => {
+	describe('Partial Marks Not Shown for Non-Multi-Choice', () => {
+		it('should not show "Partial Marking" checkbox for single-choice question', () => {
 			render(SingleQuestionPage, { data: { ...baseData, questionData: singleChoiceData } as any });
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial');
-			expect(partialRadio).toBeDisabled();
+			expect(screen.queryByText('Partial Marking')).not.toBeInTheDocument();
 		});
 
 		it('should not show partial marking rules section for single-choice question', () => {
@@ -543,13 +547,15 @@ describe('Single Question Page - Marking Type Selection', () => {
 			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
 		});
 
-		it('should pre-select "Partial marks" radio when question has partial marking data', () => {
+		it('should show "Partial Marking" checkbox as checked when question has partial marking data', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartialData } as any
 			});
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial');
-			expect(partialRadio).toBeChecked();
+			const checkbox = screen
+				.getByText('Partial Marking')
+				.closest('label')!
+				.querySelector('[role="checkbox"]') as HTMLElement;
+			expect(checkbox).toHaveAttribute('data-state', 'checked');
 		});
 	});
 });
@@ -790,7 +796,7 @@ describe('Single Question Page - Multi Choice Question Type', () => {
 	});
 });
 
-describe('Single Question Page - setMarkingType Behavior', () => {
+describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 	const multiChoiceNoPartial = {
 		question_text: 'Multi choice question',
 		options: [
@@ -813,53 +819,51 @@ describe('Single Question Page - setMarkingType Behavior', () => {
 		}
 	};
 
+	const getPartialCheckbox = () =>
+		screen
+			.getByText('Partial Marking')
+			.closest('label')!
+			.querySelector('[role="checkbox"]') as HTMLElement;
+
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
-	describe("onchange={() => setMarkingType('full')}", () => {
-		it('should hide Partial Marking Rules section when full radio onchange fires', async () => {
+	describe('Unchecking the Partial Marking checkbox', () => {
+		it('should hide Partial Marking Rules section when checkbox is unchecked', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithExistingPartial } as any
 			});
 
 			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
 
-			const radios = screen.getAllByRole('radio');
-			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full')!;
-			await fireEvent.change(fullRadio);
+			await fireEvent.click(getPartialCheckbox());
 
 			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
 		});
 
-		it('should switch markingType to full when full radio onchange fires', async () => {
+		it('should uncheck the checkbox and hide rules when clicked while checked', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithExistingPartial } as any
 			});
 
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
-			expect(partialRadio).toBeChecked();
+			expect(getPartialCheckbox()).toHaveAttribute('data-state', 'checked');
 
-			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full')!;
-			await fireEvent.change(fullRadio);
+			await fireEvent.click(getPartialCheckbox());
 
 			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
 		});
 	});
 
-	describe("onchange={() => setMarkingType('partial')}", () => {
-		it('should show Partial Marking Rules section when partial radio onchange fires', async () => {
+	describe('Checking the Partial Marking checkbox', () => {
+		it('should show Partial Marking Rules section when checkbox is checked', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceNoPartial } as any
 			});
 
 			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
 
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
-			expect(partialRadio).not.toBeDisabled();
-			await fireEvent.change(partialRadio);
+			await fireEvent.click(getPartialCheckbox());
 
 			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
 		});
@@ -869,9 +873,7 @@ describe('Single Question Page - setMarkingType Behavior', () => {
 				data: { ...baseData, questionData: multiChoiceNoPartial } as any
 			});
 
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
-			await fireEvent.change(partialRadio);
+			await fireEvent.click(getPartialCheckbox());
 
 			expect(screen.getAllByText('Correct selected').length).toBe(1);
 		});
@@ -881,9 +883,7 @@ describe('Single Question Page - setMarkingType Behavior', () => {
 				data: { ...baseData, questionData: multiChoiceNoPartial } as any
 			});
 
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
-			await fireEvent.change(partialRadio);
+			await fireEvent.click(getPartialCheckbox());
 
 			const numCorrectInput = container.querySelector(
 				'input[name="marking_scheme.partial.correct_answers.0.num_correct_selected"]'
@@ -899,45 +899,40 @@ describe('Single Question Page - setMarkingType Behavior', () => {
 		});
 	});
 
-	describe('setMarkingType function - conditional partial scheme initialization', () => {
-		it('should not overwrite an existing partial scheme when switching back to partial', async () => {
+	describe('Partial marking checkbox state persistence', () => {
+		it('should clear partial data when unchecked and reinitialize a default row when rechecked', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithExistingPartial } as any
 			});
 
 			expect(screen.getByDisplayValue('3')).toBeInTheDocument();
 
-			const radios = screen.getAllByRole('radio');
-			const fullRadio = radios.find((r) => (r as HTMLInputElement).value === 'full')!;
-			await fireEvent.change(fullRadio);
+			await fireEvent.click(getPartialCheckbox());
+			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
 
-			const updatedRadios = screen.getAllByRole('radio');
-			const partialRadio = updatedRadios.find((r) => (r as HTMLInputElement).value === 'partial')!;
-			await fireEvent.change(partialRadio);
-
-			expect(screen.getByDisplayValue('3')).toBeInTheDocument();
+			await fireEvent.click(getPartialCheckbox());
+			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+			expect(screen.getAllByText('Correct selected').length).toBe(1);
 		});
 
-		it('should auto-reset markingType to full when question becomes single-choice', async () => {
+		it('should auto-uncheck and hide partial rules when question becomes single-choice', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceNoPartial } as any
 			});
 
-			const radios = screen.getAllByRole('radio');
-			const partialRadio = radios.find((r) => (r as HTMLInputElement).value === 'partial')!;
-			await fireEvent.change(partialRadio);
+			await fireEvent.click(getPartialCheckbox());
 			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
 
 			const checkboxes = screen.getAllByRole('checkbox');
-
 			await fireEvent.click(checkboxes[1]);
 
 			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(screen.queryByText('Partial Marking')).not.toBeInTheDocument();
 		});
 	});
 });
 
-describe('Single Question Page - Partial marking disabled for Subjective type', () => {
+describe('Single Question Page - Partial marking hidden for Subjective type', () => {
 	const subjectiveWithMultiCorrect = {
 		question_text: 'Explain recursion',
 		question_type: QuestionTypeEnum.Subjective,
@@ -965,28 +960,20 @@ describe('Single Question Page - Partial marking disabled for Subjective type', 
 		vi.clearAllMocks();
 	});
 
-	it('should disable the partial radio for Subjective type even when isMultiChoice is true', () => {
+	it('should not show Partial Marking checkbox for Subjective type even when isMultiChoice is true', () => {
 		render(SingleQuestionPage, {
 			data: { ...baseData, questionData: subjectiveWithMultiCorrect } as any
 		});
 
-		const partialRadio = screen
-			.getAllByRole('radio')
-			.find((r) => (r as HTMLInputElement).value === 'partial')!;
-		expect(partialRadio).toBeDisabled();
+		expect(screen.queryByText('Partial Marking')).not.toBeInTheDocument();
 	});
 
-	it('should apply cursor-not-allowed and opacity-50 to the Partial marks label for Subjective type', () => {
+	it('should not show Partial Marking checkbox for Subjective type with a saved partial scheme', () => {
 		render(SingleQuestionPage, {
-			data: { ...baseData, questionData: subjectiveWithMultiCorrect } as any
+			data: { ...baseData, questionData: subjectiveWithPartialScheme } as any
 		});
 
-		const partialRadio = screen
-			.getAllByRole('radio')
-			.find((r) => (r as HTMLInputElement).value === 'partial')!;
-		const label = partialRadio.closest('label')!;
-		expect(label.className).toMatch(/opacity-50/);
-		expect(label.className).toMatch(/cursor-not-allowed/);
+		expect(screen.queryByText('Partial Marking')).not.toBeInTheDocument();
 	});
 
 	it('should hide Partial Marking Rules section for Subjective type even with a saved partial scheme', () => {
@@ -997,14 +984,11 @@ describe('Single Question Page - Partial marking disabled for Subjective type', 
 		expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
 	});
 
-	it('should keep the partial radio unchecked for Subjective type even with a saved partial scheme', () => {
+	it('should not show Partial Marking checkbox for Subjective type even with a saved partial scheme', () => {
 		render(SingleQuestionPage, {
 			data: { ...baseData, questionData: subjectiveWithPartialScheme } as any
 		});
 
-		const partialRadio = screen
-			.getAllByRole('radio')
-			.find((r) => (r as HTMLInputElement).value === 'partial')!;
-		expect(partialRadio).not.toBeChecked();
+		expect(screen.queryByText('Partial Marking')).not.toBeInTheDocument();
 	});
 });

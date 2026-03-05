@@ -3,6 +3,8 @@
 	import CircleHelp from '@lucide/svelte/icons/circle-help';
 	import Timer from '@lucide/svelte/icons/timer';
 	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
+	import Copy from '@lucide/svelte/icons/copy';
+	import Check from '@lucide/svelte/icons/check';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
@@ -16,6 +18,11 @@
 	import { MarksLevel, OmrMode } from './schema';
 	import * as Select from '$lib/components/ui/select';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+
+	interface CertificateToken {
+		token: string;
+		label: string;
+	}
 
 	let { formData } = $props();
 
@@ -54,6 +61,9 @@
 
 	let languageOptions = $state<{ [key: string]: string }>({});
 	let certificatesOptions = $state<Array<{ id: number; name: string | null }>>([]);
+	let formsOptions = $state<Array<{ id: number; name: string; description: string | null }>>([]);
+	let availableTokens = $state<CertificateToken[]>([]);
+	let copiedToken = $state<string | null>(null);
 
 	// load test languages
 	async function loadLanguages() {
@@ -65,6 +75,20 @@
 			}
 		} catch (error) {
 			console.error('Failed to load test languages:', error);
+		}
+	}
+
+	async function loadForms() {
+		try {
+			const response = await fetch('/api/forms');
+
+			if (response.ok) {
+				const data = await response.json();
+				formsOptions = data.items ?? [];
+			}
+		} catch (error) {
+			console.error('Failed to load forms:', error);
+			formsOptions = [];
 		}
 	}
 
@@ -82,10 +106,51 @@
 		}
 	}
 
+	async function loadCertificateTokens() {
+		if (!$formData.certificate_id) {
+			availableTokens = [];
+			return;
+		}
+
+		try {
+			const queryParams = $formData.form_id ? `?form_id=${$formData.form_id}` : '';
+			const response = await fetch(`/api/certificate-tokens${queryParams}`);
+
+			if (response.ok) {
+				const data = await response.json();
+				availableTokens = data.tokens ?? [];
+			}
+		} catch (error) {
+			console.error('Failed to load certificate tokens:', error);
+			availableTokens = [];
+		}
+	}
+
+	async function copyToClipboard(token: string) {
+		const tokenText = `{{${token}}}`;
+		try {
+			await navigator.clipboard.writeText(tokenText);
+			copiedToken = token;
+			setTimeout(() => {
+				copiedToken = null;
+			}, 2000);
+		} catch (error) {
+			console.error('Failed to copy to clipboard:', error);
+		}
+	}
+
 	// initial load effect
 	$effect(() => {
 		loadLanguages();
+		loadForms();
 		loadCertificates();
+	});
+
+	// load tokens when certificate or form changes
+	$effect(() => {
+		$formData.certificate_id;
+		$formData.form_id;
+		loadCertificateTokens();
 	});
 </script>
 
@@ -408,7 +473,7 @@
 						</label>
 						{#if partialMarking && $formData.marking_scheme?.partial}
 							<div class="rounded-lg border border-gray-200 p-3">
-								<p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+								<p class="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
 									Partial Marking Rules
 								</p>
 								<div class="flex flex-col gap-2">
@@ -417,18 +482,20 @@
 											class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3"
 										>
 											<div class="flex items-center gap-2">
-												<p class="whitespace-nowrap text-sm text-gray-600">Correct selected</p>
+												<p class="text-sm whitespace-nowrap text-gray-600">Correct selected</p>
 												<input
 													type="number"
 													name="marking_scheme.partial.correct_answers.{i}.num_correct_selected"
-													bind:value={$formData.marking_scheme!.partial!.correct_answers[i]
-														.num_correct_selected}
+													bind:value={
+														$formData.marking_scheme!.partial!.correct_answers[i]
+															.num_correct_selected
+													}
 													min="1"
 													class="w-20 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
 												/>
 											</div>
 											<div class="ml-auto flex items-center gap-2">
-												<p class="whitespace-nowrap text-sm text-gray-600">Marks</p>
+												<p class="text-sm whitespace-nowrap text-gray-600">Marks</p>
 												<input
 													type="number"
 													name="marking_scheme.partial.correct_answers.{i}.marks"
@@ -471,15 +538,45 @@
 			</div>
 		</ConfigureBox>
 		<ConfigureBox title="Candidate Profile" Icon={ClipboardPenLine}>
-			<div class="flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.candidate_profile} />
-				</div>
-				<div class="w-full">
+			<div class="flex flex-col gap-4 md:flex-row md:items-center">
+				<div class="w-full md:w-2/5">
 					{@render headingSubheading(
-						'Candidate profile',
-						'Enable this option to collect candidate information during the test.'
+						'Form',
+						'Choose a form to collect candidate information before the test.'
 					)}
+				</div>
+
+				<div class="flex items-center gap-2">
+					<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
+						<Select.Trigger class="w-72">
+							<span class="truncate">
+								{#if $formData.form_id}
+									{formsOptions.find((f) => f.id === $formData.form_id)?.name}
+								{:else}
+									Select form
+								{/if}
+							</span>
+						</Select.Trigger>
+						<Select.Content>
+							<Select.Group>
+								<Select.Item value={null} label="No form">No form</Select.Item>
+
+								{#each formsOptions as form (form.id)}
+									<Select.Item value={form.id}>
+										{form.name}
+									</Select.Item>
+								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+
+					<a
+						href="/forms/add/new"
+						target="_blank"
+						class="text-primary text-sm whitespace-nowrap hover:underline"
+					>
+						Create new form
+					</a>
 				</div>
 			</div>
 		</ConfigureBox>
@@ -515,6 +612,32 @@
 					</Select.Content>
 				</Select.Root>
 			</div>
+
+			{#if $formData.certificate_id && availableTokens.length > 0}
+				<div class="bg-muted/50 mt-4 rounded-md border p-4">
+					<p class="mb-3 text-sm font-medium">Available Tokens</p>
+					<div class="flex flex-wrap gap-2">
+						{#each availableTokens as token (token.token)}
+							<button
+								type="button"
+								class="bg-background hover:bg-accent flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors"
+								onclick={() => copyToClipboard(token.token)}
+								title={token.label}
+							>
+								<code class="text-primary">{`{{${token.token}}}`}</code>
+								{#if copiedToken === token.token}
+									<Check class="h-3 w-3 text-green-500" />
+								{:else}
+									<Copy class="text-muted-foreground h-3 w-3" />
+								{/if}
+							</button>
+						{/each}
+					</div>
+					<p class="text-muted-foreground mt-3 text-xs">
+						Click to copy. Use these tokens in your Google Slides certificate template.
+					</p>
+				</div>
+			{/if}
 		</ConfigureBox>
 	</div>
 </div>

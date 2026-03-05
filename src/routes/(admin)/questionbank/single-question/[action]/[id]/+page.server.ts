@@ -173,7 +173,7 @@ export const actions: Actions = {
 
 			// Transform tag_ids array into the required format
 			const tagsDataArray = form.data.tag_ids.map((tagId) => tagId.id);
-			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags/`, {
+			const tagResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/tags`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ export const actions: Actions = {
 			}));
 
 			// Send the transformed array to the API
-			const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations/`, {
+			const stateResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/locations`, {
 				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json',

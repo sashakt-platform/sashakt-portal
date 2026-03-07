@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { marksSchema } from '$lib/schemas/marks';
 
 export const optionSchema = z.object({
 	id: z.number().int(),
@@ -11,12 +12,6 @@ export enum QuestionTypeEnum {
 	MultiChoice = 'multi-choice',
 	Subjective = 'subjective'
 }
-
-export const marksSchema = z.object({
-	correct: z.number().int().default(1),
-	wrong: z.number().int().default(0),
-	skipped: z.number().int().default(0)
-});
 
 export const questionSchema = z.object({
 	question_text: z.string().min(1, { error: 'Question text is required' }),

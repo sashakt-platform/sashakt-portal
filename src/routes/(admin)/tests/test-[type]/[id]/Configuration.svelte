@@ -10,6 +10,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
 	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel, OmrMode } from './schema';
@@ -415,18 +416,43 @@
 							>
 						</div>
 						<div
-							class="flex w-full flex-col gap-1 md:w-1/2"
+							class="grid w-full grid-cols-3 gap-3 md:w-1/2"
 							hidden={$formData.marks_level !== 'test'}
 						>
-							<small class="text-gray-500">Marks for Correct Answer (Test Level)</small>
-							<Input
-								class="flex w-full"
-								type="number"
-								placeholder=""
-								name="marking_scheme.correct"
-								bind:value={$formData.marking_scheme.correct}
-							/>
+							<div class="flex flex-col gap-1">
+								<small class="text-gray-500">Correct</small>
+								<Input
+									class="w-full"
+									type="number"
+									placeholder=""
+									name="marking_scheme.correct"
+									bind:value={$formData.marking_scheme.correct}
+								/>
+							</div>
+							<div class="flex flex-col gap-1">
+								<small class="text-gray-500">Wrong</small>
+								<Input
+									class="w-full"
+									type="number"
+									placeholder=""
+									name="marking_scheme.wrong"
+									bind:value={$formData.marking_scheme.wrong}
+								/>
+							</div>
+							<div class="flex flex-col gap-1">
+								<small class="text-gray-500">Skipped</small>
+								<Input
+									class="w-full"
+									type="number"
+									placeholder=""
+									name="marking_scheme.skipped"
+									bind:value={$formData.marking_scheme.skipped}
+								/>
+							</div>
 						</div>
+					</div>
+					<div hidden={$formData.marks_level !== 'test'} class="flex flex-col gap-3">
+						<PartialMarkingSection bind:partial={$formData.marking_scheme.partial} />
 					</div>
 				</RadioGroup.Root>
 			</div>

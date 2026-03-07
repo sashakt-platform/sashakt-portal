@@ -1,10 +1,5 @@
 import { z } from 'zod';
-
-export const marksSchema = z.object({
-	correct: z.number().int().default(1),
-	wrong: z.number().int().default(0),
-	skipped: z.number().int().default(0)
-});
+import { marksSchema } from '$lib/schemas/marks';
 
 export enum MarksLevel {
 	QUESTION = 'question',

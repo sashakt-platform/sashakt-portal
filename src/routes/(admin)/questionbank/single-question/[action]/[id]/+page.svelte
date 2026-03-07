@@ -22,6 +22,7 @@
 	import QuestionPreview from './QuestionPreview.svelte';
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
+	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
 
 	const {
 		data
@@ -64,7 +65,6 @@
 			$formData.organization_id = data.user.organization_id;
 		}
 	});
-
 	if (questionData?.locations?.length) {
 		$formData.state_ids = questionData.locations.map((location) => ({
 			id: String((location as { state_id: string | number }).state_id),
@@ -111,6 +111,16 @@
 				}))
 	);
 	let openTagDialog: boolean = $state(false);
+	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
+
+	$effect(() => {
+		if (
+			(!isMultiChoice || $formData.question_type === QuestionTypeEnum.Subjective) &&
+			$formData.marking_scheme?.partial
+		) {
+			$formData.marking_scheme!.partial = undefined;
+		}
+	});
 
 	// for State admins, auto-assign their state when creating a new question
 	// backend should handle this as well
@@ -365,20 +375,45 @@
 					</div>
 				</div>
 				<div class="flex w-full flex-row gap-4 md:w-1/2">
-					<div class="flex w-full flex-col gap-2">
+					<div class="flex w-full flex-col gap-1">
 						{@render snippetHeading('Marking Scheme')}
-						<div
-							class="flex h-full flex-col gap-2 rounded-lg border border-gray-100 p-4 sm:flex-row"
-						>
+
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
 							<p class="my-auto sm:w-1/2">Marks for correct answer</p>
 							<input
 								type="number"
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
 								min="1"
-								class="w-full rounded-sm border-1 border-gray-300 p-2 sm:w-auto"
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
 							/>
 						</div>
+
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
+							<p class="my-auto sm:w-1/2">Marks for wrong answer</p>
+							<input
+								type="number"
+								name="marking_scheme.wrong"
+								bind:value={$formData.marking_scheme.wrong}
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
+							/>
+						</div>
+
+						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
+							<p class="my-auto sm:w-1/2">Marks for skipped answer</p>
+							<input
+								type="number"
+								name="marking_scheme.skipped"
+								bind:value={$formData.marking_scheme.skipped}
+								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
+							/>
+						</div>
+						{#if isMultiChoice && $formData.question_type !== QuestionTypeEnum.Subjective}
+							<PartialMarkingSection
+								bind:partial={$formData.marking_scheme!.partial}
+								labelClass="mt-6 mb-4"
+							/>
+						{/if}
 					</div>
 				</div>
 			</div>

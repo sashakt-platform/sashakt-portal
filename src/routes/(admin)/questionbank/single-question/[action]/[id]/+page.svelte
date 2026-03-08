@@ -139,7 +139,12 @@
 		}
 
 		if (type === QuestionTypeEnum.NumericalInteger || type === QuestionTypeEnum.NumericalDecimal) {
-			return $formData.correct_answer == null || String($formData.correct_answer).trim() === '';
+			const answer = $formData.correct_answer;
+			return (
+				answer == null ||
+				(typeof answer === 'number' && isNaN(answer)) ||
+				String(answer).trim() === ''
+			);
 		}
 
 		// Single/Multi choice: need ≥2 filled options and at least one marked correct
@@ -236,10 +241,8 @@
 										<span>
 											{#if $formData.question_type === QuestionTypeEnum.Subjective}
 												Subjective
-											{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger}
-												Numerical (Integer)
-											{:else if $formData.question_type === QuestionTypeEnum.NumericalDecimal}
-												Numerical (Decimal)
+											{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger || $formData.question_type === QuestionTypeEnum.NumericalDecimal}
+												Numerical
 											{:else}
 												Single/Multiple Choice
 											{/if}
@@ -250,12 +253,7 @@
 											>Single/Multiple Choice</Select.Item
 										>
 										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
-										<Select.Item value={QuestionTypeEnum.NumericalInteger}
-											>Numerical (Integer)</Select.Item
-										>
-										<Select.Item value={QuestionTypeEnum.NumericalDecimal}
-											>Numerical (Decimal)</Select.Item
-										>
+										<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
 									</Select.Content>
 								</Select.Root>
 							</div>
@@ -302,7 +300,7 @@
 									}));
 								}}
 							>
-								{#each totalOptions as { id, key, value }, index (id)}
+								{#each totalOptions as { id, key }, index (id)}
 									<div class="group flex flex-row gap-4">
 										<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
 											<p
@@ -382,9 +380,15 @@
 							{@render snippetHeading('Correct Answer')}
 							<Input
 								type="number"
-								step={$formData.question_type === QuestionTypeEnum.NumericalDecimal ? 'any' : '1'}
+								step="any"
 								class="w-full"
 								bind:value={$formData.correct_answer}
+								oninput={(e) => {
+									const val = (e.target as HTMLInputElement).value;
+									$formData.question_type = val.includes('.')
+										? QuestionTypeEnum.NumericalDecimal
+										: QuestionTypeEnum.NumericalInteger;
+								}}
 							/>
 						</div>
 					{/if}

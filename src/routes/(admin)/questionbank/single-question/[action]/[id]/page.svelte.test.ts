@@ -1037,15 +1037,15 @@ describe('Single Question Page - Numerical Integer Question Type', () => {
 			expect(screen.queryByText('Answer Settings')).not.toBeInTheDocument();
 		});
 
-		it('should render number input with step="1"', () => {
+		it('should render number input with step="any"', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
 			const spinbuttons = screen.getAllByRole('spinbutton');
-			const answerInput = spinbuttons.find((el) => el.getAttribute('step') === '1');
+			const answerInput = spinbuttons.find((el) => el.getAttribute('step') === 'any');
 			expect(answerInput).toBeDefined();
-			expect(answerInput).toHaveAttribute('step', '1');
+			expect(answerInput).toHaveAttribute('step', 'any');
 		});
 
 		it('should display prefilled integer answer', () => {
@@ -1203,5 +1203,55 @@ describe('Single Question Page - Numerical Decimal Question Type', () => {
 			await fireEvent.input(input, { target: { value: '2.718' } });
 			expect(input).toHaveValue(2.718);
 		});
+	});
+});
+
+describe('Single Question Page - Numerical Auto-Detection', () => {
+	const numericalBase = {
+		question_text: 'What is the answer?',
+		question_type: QuestionTypeEnum.NumericalInteger,
+		options: [],
+		correct_answer: [],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('should always render the numerical input with step="any"', () => {
+		render(SingleQuestionPage, { data: { ...baseData, questionData: numericalBase } as any });
+		const spinbuttons = screen.getAllByRole('spinbutton');
+		const answerInput = spinbuttons.find((el) => el.getAttribute('step') === 'any');
+		expect(answerInput).toBeDefined();
+		expect(answerInput).toHaveAttribute('step', 'any');
+	});
+
+	it('should disable Save when input is cleared after entering a value', async () => {
+		const filledData = { ...numericalBase, question_text: 'Q?', correct_answer: 42 };
+		render(SingleQuestionPage, { data: { ...baseData, questionData: filledData } as any });
+		const input = screen.getByDisplayValue('42');
+		await fireEvent.input(input, { target: { value: '' } });
+		expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+	});
+
+	it('should enable Save when an integer value is entered', async () => {
+		const withQuestion = { ...numericalBase, question_text: 'Q?' };
+		render(SingleQuestionPage, { data: { ...baseData, questionData: withQuestion } as any });
+		const spinbuttons = screen.getAllByRole('spinbutton');
+		const answerInput = spinbuttons.find((el) => el.getAttribute('step') === 'any')!;
+		await fireEvent.input(answerInput, { target: { value: '42' } });
+		expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
+	});
+
+	it('should enable Save when a decimal value is entered', async () => {
+		const withQuestion = { ...numericalBase, question_text: 'Q?' };
+		render(SingleQuestionPage, { data: { ...baseData, questionData: withQuestion } as any });
+		const spinbuttons = screen.getAllByRole('spinbutton');
+		const answerInput = spinbuttons.find((el) => el.getAttribute('step') === 'any')!;
+		await fireEvent.input(answerInput, { target: { value: '3.14' } });
+		expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
 	});
 });

@@ -802,6 +802,7 @@ describe('Single Question Page - Multi Choice Question Type', () => {
 describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 	const multiChoiceNoPartial = {
 		question_text: 'Multi choice question',
+		question_type: QuestionTypeEnum.MultiChoice,
 		options: [
 			{ id: 1, key: 'A', value: 'Option A' },
 			{ id: 2, key: 'B', value: 'Option B' }

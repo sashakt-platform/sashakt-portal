@@ -58,13 +58,21 @@
 		}));
 	}
 
-	// if state admin is creating a user with state admin role,
+	const showLocationFields = $derived.by(() => {
+		const label =
+			data.roles.find((role: any) => role.id === $formData.role_id)?.label?.toLowerCase() ?? '';
+		return label.includes('state') || label.includes('test');
+	});
+
+	// if state admin is creating a user with state admin or test admin role,
 	// then we should auto-assign current state admin's state and state admin's districts
 	$effect(() => {
 		const selectedRole = data.roles.find((role: any) => role.id === $formData.role_id);
-		const isStateRole = selectedRole?.label?.toLowerCase()?.includes('state');
+		const selectedRoleLabel = selectedRole?.label?.toLowerCase() ?? '';
+		const isStateRole = selectedRoleLabel.includes('state');
+		const isTestRole = selectedRoleLabel.includes('test');
 
-		if (currentUserIsStateAdmin && isStateRole) {
+		if (currentUserIsStateAdmin && (isStateRole || isTestRole)) {
 			if (selectedStates.length === 0) {
 				const userState = getUserState(data.currentUser);
 				if (userState) {
@@ -72,7 +80,7 @@
 				}
 			}
 		}
-		if (currentUserHasAssignedDistricts && isStateRole) {
+		if (currentUserHasAssignedDistricts && (isStateRole || isTestRole)) {
 			if (selectedDistricts.length === 0) {
 				const userDistrict = getUserDistrict(data.currentUser);
 				if (userDistrict?.length) {
@@ -239,10 +247,7 @@
 		</Form.Field>
 	</div>
 
-	{#if data.roles
-		.find((role: any) => role.id === $formData.role_id)
-		?.label?.toLowerCase()
-		?.includes('state')}
+	{#if showLocationFields}
 		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 			{#if !currentUserIsStateAdmin}
 				<Form.Field {form} name="state_ids">

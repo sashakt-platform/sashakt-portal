@@ -16,6 +16,19 @@ vi.mock('$lib/components/StateSelection.svelte', () => ({
 	}
 }));
 
+// Mock DistrictSelection component (makes fetch calls internally)
+vi.mock('$lib/components/DistrictSelection.svelte', () => ({
+	default: function MockDistrictSelection(options: any) {
+		return {
+			$$set: vi.fn(),
+			$destroy: vi.fn(),
+			$on: vi.fn(),
+			_props: options?.props || {},
+			_target: options?.target
+		};
+	}
+}));
+
 // Mock permissions
 vi.mock('$lib/utils/permissions.js', () => ({
 	hasPermission: vi.fn((user, permission) => {
@@ -275,6 +288,126 @@ describe('UserForm Component', () => {
 			// State field should be hidden for State Admin creating State User
 			expect(screen.queryByText('State')).not.toBeInTheDocument();
 			expect(screen.queryByText('District')).not.toBeInTheDocument();
+		});
+	});
+
+	describe('State Admin creating Test Admin - District Assignment', () => {
+		const mockRolesWithTestAdmin = [
+			{ id: '1', label: 'Admin' },
+			{ id: '2', label: 'State User' },
+			{ id: '3', label: 'Regular User' },
+			{ id: '4', label: 'Test Admin' }
+		];
+
+		const stateAdminWithoutDistricts = {
+			id: 10,
+			permissions: ['create_user'],
+			states: [{ id: 1, name: 'Maharashtra' }],
+			districts: []
+		};
+
+		const stateAdminWithDistricts = {
+			id: 11,
+			permissions: ['create_user'],
+			states: [{ id: 1, name: 'Maharashtra' }],
+			districts: [
+				{ id: 101, name: 'Mumbai' },
+				{ id: 102, name: 'Pune' }
+			]
+		};
+
+		const createLocationTestData = (roleId: string, currentUser: object) => {
+			const mockUserData = {
+				id: '99',
+				full_name: 'New User',
+				email: 'newuser@example.com',
+				phone: '',
+				organization_id: '1',
+				role_id: roleId,
+				is_active: true,
+				states: [],
+				districts: []
+			};
+			return {
+				action: 'edit',
+				form: { data: mockUserData, valid: false },
+				roles: mockRolesWithTestAdmin,
+				organizations: mockOrganizations,
+				currentUser,
+				user: mockUserData
+			};
+		};
+
+		it('should show district field when state admin (no assigned districts) selects test admin role', () => {
+			const data = createLocationTestData('4', stateAdminWithoutDistricts);
+
+			render(UserForm, { data });
+
+			// District dropdown visible — state admin can assign a specific district
+			expect(screen.getByText('District')).toBeInTheDocument();
+		});
+
+		it('should hide state field for state admin creating test admin (state is auto-assigned)', () => {
+			const data = createLocationTestData('4', stateAdminWithoutDistricts);
+
+			render(UserForm, { data });
+
+			// State field hidden — auto-assigned from state admin's state
+			expect(screen.queryByText('State')).not.toBeInTheDocument();
+			// District field visible — state admin without districts can choose
+			expect(screen.getByText('District')).toBeInTheDocument();
+		});
+
+		it('should hide district field when state admin with assigned districts creates test admin (districts auto-assigned)', () => {
+			const data = createLocationTestData('4', stateAdminWithDistricts);
+
+			render(UserForm, { data });
+
+			// Both fields hidden — state and districts are auto-assigned from state admin's profile
+			expect(screen.queryByText('State')).not.toBeInTheDocument();
+			expect(screen.queryByText('District')).not.toBeInTheDocument();
+		});
+
+		it('should hide location section when state admin selects a non-state/test role', () => {
+			// 'Admin' role label does not include 'state' or 'test'
+			const data = createLocationTestData('1', stateAdminWithoutDistricts);
+
+			render(UserForm, { data });
+
+			expect(screen.queryByText('State')).not.toBeInTheDocument();
+			expect(screen.queryByText('District')).not.toBeInTheDocument();
+		});
+
+		it('should show district field when super admin edits a test admin user (regression)', () => {
+			// Regression: editing a test admin should show location fields for any admin,
+			// not just state admins
+			const testAdminUser = {
+				id: '50',
+				full_name: 'Test Admin User',
+				email: 'testadmin@example.com',
+				role_id: '4',
+				organization_id: '1',
+				is_active: true,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: [{ id: 101, name: 'Mumbai' }]
+			};
+
+			const data = {
+				action: 'edit',
+				form: { data: testAdminUser, valid: false },
+				roles: mockRolesWithTestAdmin,
+				organizations: mockOrganizations,
+				currentUser: {
+					id: 1,
+					permissions: ['update_user', 'create_organization'] // Super admin
+				},
+				user: testAdminUser
+			};
+
+			render(UserForm, { data });
+
+			// District label visible — super admin is not a state admin so dropdown is shown
+			expect(screen.getByText('District')).toBeInTheDocument();
 		});
 	});
 });

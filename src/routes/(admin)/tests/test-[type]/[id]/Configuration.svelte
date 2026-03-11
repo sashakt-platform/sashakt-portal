@@ -260,6 +260,17 @@
 					)}
 				</div>
 			</div>
+			<div class="flex flex-row gap-3 align-top">
+				<div class="my-auto w-fit gap-4">
+					<Checkbox bind:checked={$formData.bookmark} />
+				</div>
+				<div class="w-full">
+					{@render headingSubheading(
+						'Enable Mark for Review',
+						'Allow candidates to mark questions for review during the test.'
+					)}
+				</div>
+			</div>
 
 			{#if $formData.random_tag_count.length == 0}
 				<div class="flex flex-row gap-3 align-top">

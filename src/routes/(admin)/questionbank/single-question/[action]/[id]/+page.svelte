@@ -69,6 +69,18 @@
 				$formData.question_type === QuestionTypeEnum.NumericalInteger
 			) {
 				$formData.options = [];
+			} else if ($formData.question_type === QuestionTypeEnum.MatrixMatch) {
+				$formData.options = {
+					rows: {
+						label: matrixRowLabel,
+						items: matrixLeftItems.map(({ id, key, value }) => ({ id, key, value }))
+					},
+					columns: {
+						label: matrixColLabel,
+						items: matrixRightItems.map(({ id, key, value }) => ({ id, key, value }))
+					}
+				};
+				$formData.correct_answer = matrixMatches;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -118,6 +130,20 @@
 					correct_answer: false
 				}))
 	);
+	let matrixRowLabel = $state('Column A');
+	let matrixColLabel = $state('Column B');
+	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
+		Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
+	);
+	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
+		Array.from({ length: 4 }, (_, i) => ({
+			id: i + 1,
+			key: String.fromCharCode(65 + i),
+			value: ''
+		}))
+	);
+	let matrixMatches = $state<Record<string, number[]>>({});
+
 	let openTagDialog: boolean = $state(false);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
@@ -144,6 +170,14 @@
 				answer == null ||
 				(typeof answer === 'number' && isNaN(answer)) ||
 				String(answer).trim() === ''
+			);
+		}
+
+		if (type === QuestionTypeEnum.MatrixMatch) {
+			return (
+				matrixLeftItems.some((i) => !i.value.trim()) ||
+				matrixRightItems.some((i) => !i.value.trim()) ||
+				matrixLeftItems.some((i) => !matrixMatches[i.key])
 			);
 		}
 
@@ -376,6 +410,185 @@
 								>
 									<Plus />Add Answer</Button
 								>
+							</div>
+						</div>
+					{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
+						<div class="flex flex-col gap-4">
+							{@render snippetHeading('Match The Following')}
+							<div class="flex gap-4">
+								<div
+									class="flex flex-1 flex-col gap-2"
+									use:dragHandleZone={{ items: matrixLeftItems, flipDurationMs: 150 }}
+									onconsider={({ detail }) => (matrixLeftItems = detail.items)}
+									onfinalize={({ detail }) => {
+										matrixLeftItems = detail.items.map((item, i) => ({
+											...item,
+											key: String(i + 1)
+										}));
+										matrixMatches = {};
+									}}
+								>
+									<Input bind:value={matrixRowLabel} placeholder="Column A" class="font-semibold" />
+									{#each matrixLeftItems as item, index (item.id)}
+										<div class="group flex flex-row items-center gap-2">
+											<div
+												class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
+											>
+												{item.key}
+											</div>
+											<div class="flex flex-1 flex-row rounded-sm border border-black">
+												<span use:dragHandle aria-label="drag handle">
+													<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+												</span>
+												<Input class="border-0" bind:value={matrixLeftItems[index].value} />
+											</div>
+											<Trash_2
+												size={16}
+												class={[
+													'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+													matrixLeftItems.length > 1 ? 'cursor-pointer group-hover:opacity-100' : ''
+												]}
+												onclick={() => {
+													if (matrixLeftItems.length > 1) {
+														const removedKey = matrixLeftItems[index].key;
+														matrixLeftItems = matrixLeftItems
+															.filter((_, i) => i !== index)
+															.map((item, i) => ({ ...item, key: String(i + 1) }));
+														const { [removedKey]: _, ...rest } = matrixMatches;
+														matrixMatches = rest;
+													}
+												}}
+											/>
+										</div>
+									{/each}
+									<Button
+										variant="outline"
+										class="text-primary border-primary mt-1 self-start"
+										onclick={() => {
+											matrixLeftItems.push({
+												id: Date.now(),
+												key: String(matrixLeftItems.length + 1),
+												value: ''
+											});
+										}}
+									>
+										<Plus />Add Item
+									</Button>
+								</div>
+
+								<div
+									class="flex flex-1 flex-col gap-2"
+									use:dragHandleZone={{ items: matrixRightItems, flipDurationMs: 150 }}
+									onconsider={({ detail }) => (matrixRightItems = detail.items)}
+									onfinalize={({ detail }) => {
+										matrixRightItems = detail.items.map((item, i) => ({
+											...item,
+											key: String.fromCharCode(65 + i)
+										}));
+										matrixMatches = {};
+									}}
+								>
+									<Input bind:value={matrixColLabel} placeholder="Column B" class="font-semibold" />
+									{#each matrixRightItems as item, index (item.id)}
+										<div class="group flex flex-row items-center gap-2">
+											<div
+												class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
+											>
+												{item.key}
+											</div>
+											<div class="flex flex-1 flex-row rounded-sm border border-black">
+												<span use:dragHandle aria-label="drag handle">
+													<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+												</span>
+												<Input class="border-0" bind:value={matrixRightItems[index].value} />
+											</div>
+											<Trash_2
+												size={16}
+												class={[
+													'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+													matrixRightItems.length > 1
+														? 'cursor-pointer group-hover:opacity-100'
+														: ''
+												]}
+												onclick={() => {
+													if (matrixRightItems.length > 1) {
+														const removedKey = matrixRightItems[index].key;
+														matrixRightItems = matrixRightItems
+															.filter((_, i) => i !== index)
+															.map((item, i) => ({
+																...item,
+																key: String.fromCharCode(65 + i)
+															}));
+														matrixMatches = Object.fromEntries(
+															Object.entries(matrixMatches).filter(([, v]) => v !== removedKey)
+														);
+													}
+												}}
+											/>
+										</div>
+									{/each}
+									<Button
+										variant="outline"
+										class="text-primary border-primary mt-1 self-start"
+										onclick={() => {
+											matrixRightItems.push({
+												id: Date.now(),
+												key: String.fromCharCode(65 + matrixRightItems.length),
+												value: ''
+											});
+										}}
+									>
+										<Plus />Add Option
+									</Button>
+								</div>
+							</div>
+
+							<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+								<p class="mb-3 text-sm font-semibold text-gray-700">Correct Matches</p>
+
+								<div class="mb-1 flex items-center gap-2">
+									<span class="min-w-0 flex-1 text-xs text-gray-400"
+										>{matrixRowLabel || 'Column A'}</span
+									>
+									<div class="flex gap-2">
+										{#each matrixRightItems as rh (rh.id)}
+											<span class="w-16 truncate text-center text-xs font-medium text-gray-500"
+												>{rh.value || rh.key}</span
+											>
+										{/each}
+									</div>
+								</div>
+								{#each matrixLeftItems as leftItem (leftItem.key)}
+									<div class="flex items-center gap-2 rounded px-1 py-1.5 hover:bg-white">
+										<span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800"
+											>{leftItem.value || leftItem.key}</span
+										>
+										<div class="flex gap-2">
+											{#each matrixRightItems as rightItem (rightItem.id)}
+												{@const checked = (matrixMatches[leftItem.key] ?? []).includes(
+													rightItem.id
+												)}
+												<button
+													type="button"
+													class="w-16 rounded border py-1 text-xs font-semibold transition-colors {checked
+														? 'border-primary bg-primary text-white'
+														: 'hover:border-primary/60 hover:text-primary border-gray-300 text-gray-400'}"
+													onclick={() => {
+														const current = matrixMatches[leftItem.key] ?? [];
+														matrixMatches = {
+															...matrixMatches,
+															[leftItem.key]: checked
+																? current.filter((id) => id !== rightItem.id)
+																: [...current, rightItem.id]
+														};
+													}}
+												>
+													{rightItem.key}
+												</button>
+											{/each}
+										</div>
+									</div>
+								{/each}
 							</div>
 						</div>
 					{:else}

@@ -31,7 +31,7 @@ export const questionSchema = z.object({
 	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
 	options: z.union([z.array(optionSchema), matrixMatchOptionsSchema]).default([]),
 	correct_answer: z
-		.union([z.array(z.number()), z.number(), z.record(z.string(), z.array(z.string()))])
+		.union([z.array(z.number()), z.number(), z.record(z.string(), z.array(z.number()))])
 		.default([]),
 	subjective_answer_limit: z.coerce.number().int().positive().nullable().optional(),
 	is_mandatory: z.boolean().default(false),

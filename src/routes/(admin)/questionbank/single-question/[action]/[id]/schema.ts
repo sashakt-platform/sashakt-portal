@@ -12,7 +12,8 @@ export enum QuestionTypeEnum {
 	MultiChoice = 'multi-choice',
 	Subjective = 'subjective',
 	NumericalInteger = 'numerical-integer',
-	NumericalDecimal = 'numerical-decimal'
+	NumericalDecimal = 'numerical-decimal',
+	MatrixMatch = 'matrix-match'
 }
 
 export const questionSchema = z.object({

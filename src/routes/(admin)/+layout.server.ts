@@ -5,6 +5,7 @@ export const load: LayoutServerLoad = async () => {
 	const { locals } = getRequestEvent();
 
 	return {
-		user: locals.user
+		user: locals.user,
+		organization: locals.organization
 	};
 };

@@ -110,15 +110,22 @@
 {/snippet}
 
 <Sidebar.Root class="bg-white p-3">
+	<Sidebar.Header class="items-center py-4">
+		{#if data.organization?.logo}
+			<img
+				src={data.organization.logo}
+				alt={data.organization?.name}
+				class="h-10 w-auto object-contain"
+			/>
+		{/if}
+		<h4
+			class="text-primary w-full scroll-m-20 text-center text-xl font-extrabold tracking-tighter uppercase"
+		>
+			{data.organization?.name ?? 'Sashakt'}
+		</h4>
+	</Sidebar.Header>
 	<Sidebar.Content>
 		<Sidebar.Group>
-			<Sidebar.GroupLabel
-				><h4
-					class="text-primary w-full scroll-m-20 pb-4 text-xl font-extrabold tracking-tighter uppercase"
-				>
-					Sashakt
-				</h4></Sidebar.GroupLabel
-			>
 			<Sidebar.GroupContent class="pt-4 text-base leading-1 ">
 				<Sidebar.Menu>
 					{@render sidebaritems(menu_items.dashboard)}

@@ -37,7 +37,7 @@ describe('AppSidebar - Organization Branding', () => {
 		expect(screen.queryByRole('img')).not.toBeInTheDocument();
 	});
 
-	it('should show org name when organization has no logo', () => {
+	it('should show "Sashakt" fallback when organization has no logo', () => {
 		render(AppSidebar, {
 			data: {
 				...baseData,
@@ -45,7 +45,7 @@ describe('AppSidebar - Organization Branding', () => {
 			}
 		});
 
-		expect(screen.getByText('Acme Corp')).toBeInTheDocument();
+		expect(screen.getByText('Sashakt')).toBeInTheDocument();
 		expect(screen.queryByRole('img')).not.toBeInTheDocument();
 	});
 
@@ -66,7 +66,7 @@ describe('AppSidebar - Organization Branding', () => {
 		expect(img).toHaveAttribute('alt', 'Acme Corp');
 	});
 
-	it('should show both logo and org name when organization has a logo', () => {
+	it('should show only logo when organization has a logo', () => {
 		render(AppSidebar, {
 			data: {
 				...baseData,
@@ -79,6 +79,7 @@ describe('AppSidebar - Organization Branding', () => {
 		});
 
 		expect(screen.getByRole('img')).toBeInTheDocument();
-		expect(screen.getByText('Acme Corp')).toBeInTheDocument();
+		expect(screen.queryByText('Sashakt')).not.toBeInTheDocument();
+		expect(screen.queryByText('Acme Corp')).not.toBeInTheDocument();
 	});
 });

@@ -262,7 +262,7 @@
 			</div>
 			<div class="flex flex-row gap-3 align-top">
 				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.show_mark_for_review} />
+					<Checkbox bind:checked={$formData.bookmark} />
 				</div>
 				<div class="w-full">
 					{@render headingSubheading(

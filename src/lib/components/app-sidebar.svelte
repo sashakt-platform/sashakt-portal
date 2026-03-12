@@ -110,16 +110,24 @@
 {/snippet}
 
 <Sidebar.Root class="bg-white p-3">
+	<Sidebar.Header class="items-center py-4">
+		{#if data.organization?.logo}
+			<img
+				src={data.organization.logo}
+				alt={data.organization?.name}
+				class="h-10 w-auto object-contain"
+			/>
+		{:else}
+			<h4
+				class="text-primary w-full scroll-m-20 pl-3 text-xl font-extrabold tracking-tighter uppercase"
+			>
+				Sashakt
+			</h4>
+		{/if}
+	</Sidebar.Header>
 	<Sidebar.Content>
 		<Sidebar.Group>
-			<Sidebar.GroupLabel
-				><h4
-					class="text-primary w-full scroll-m-20 pb-4 text-xl font-extrabold tracking-tighter uppercase"
-				>
-					Sashakt
-				</h4></Sidebar.GroupLabel
-			>
-			<Sidebar.GroupContent class="pt-4 text-base leading-1 ">
+			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
 					{@render sidebaritems(menu_items.dashboard)}
 
@@ -129,7 +137,7 @@
 
 					<!---- Collapsible menu for Tests ---->
 					{#if canRead(data.user, 'test') || canRead(data.user, 'test-template')}
-						<Collapsible.Root class="group/collapsible m-1 ">
+						<Collapsible.Root class="group/collapsible m-1">
 							<Sidebar.MenuItem>
 								<Collapsible.Trigger>
 									<Sidebar.MenuButton
@@ -140,7 +148,7 @@
 												<ClipboardList />
 												<span>{menu_items.tests.title}</span>
 												<ChevronRight
-													class="ml-auto items-end transition-transform group-data-[state=open]/collapsible:rotate-90 "
+													class="ml-auto items-end transition-transform group-data-[state=open]/collapsible:rotate-90"
 												/>
 											</a>
 										{/snippet}

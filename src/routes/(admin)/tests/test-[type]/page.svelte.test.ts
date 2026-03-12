@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, fireEvent } from '@testing-library/svelte';
 import TestListingPage from './+page.svelte';
 
 vi.mock('$app/state', () => ({
@@ -59,6 +59,7 @@ vi.mock('./columns.js', () => ({
 }));
 
 import { canCreate, isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions.js';
+import { goto } from '$app/navigation';
 
 const baseData = (is_template: boolean, items: any[] = []) => ({
 	is_template,
@@ -178,6 +179,133 @@ describe('Test Management Listing Page', () => {
 			vi.mocked(hasAssignedDistricts).mockReturnValue(false);
 			render(TestListingPage, { data: withItems(false) });
 			expect(hasAssignedDistricts).toHaveBeenCalled();
+		});
+	});
+
+	// ────────────────────────────────────────────────────────────────────────
+	describe('Search input behavior', () => {
+		// Items must be present so the filters snippet (and the input) renders.
+		function withSearch(search: string, is_template = false) {
+			return {
+				...baseData(is_template, [{ id: '1', name: 'Test A' }]),
+				params: { page: 2, size: 25, search, sortBy: '', sortOrder: 'asc' }
+			};
+		}
+
+		beforeEach(() => {
+			vi.useFakeTimers();
+		});
+
+		afterEach(() => {
+			vi.useRealTimers();
+		});
+
+		it('reflects the current search value from params', () => {
+			render(TestListingPage, { data: withSearch('existing query') });
+			expect(screen.getByPlaceholderText('Search test sessions...')).toHaveValue(
+				'existing query'
+			);
+		});
+
+		it('shows empty value when search param is empty', () => {
+			render(TestListingPage, { data: withSearch('') });
+			expect(screen.getByPlaceholderText('Search test sessions...')).toHaveValue('');
+		});
+
+		it('does not call goto before the 300ms debounce elapses', async () => {
+			render(TestListingPage, { data: withSearch('') });
+			const input = screen.getByPlaceholderText('Search test sessions...');
+
+			await fireEvent.input(input, { target: { value: 'math' } });
+			vi.advanceTimersByTime(299);
+
+			expect(goto).not.toHaveBeenCalled();
+		});
+
+		it('calls goto exactly once after 300ms with the typed value', async () => {
+			render(TestListingPage, { data: withSearch('') });
+			const input = screen.getByPlaceholderText('Search test sessions...');
+
+			await fireEvent.input(input, { target: { value: 'math' } });
+			vi.advanceTimersByTime(300);
+
+			expect(goto).toHaveBeenCalledOnce();
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('search')).toBe('math');
+		});
+
+		it('resets page to 1 on every search regardless of current page', async () => {
+			render(TestListingPage, { data: withSearch('') }); // page starts at 2
+			const input = screen.getByPlaceholderText('Search test sessions...');
+
+			await fireEvent.input(input, { target: { value: 'math' } });
+			vi.advanceTimersByTime(300);
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('page')).toBe('1');
+		});
+
+		it('removes the search param from the URL when input is cleared', async () => {
+			render(TestListingPage, { data: withSearch('old query') });
+			const input = screen.getByPlaceholderText('Search test sessions...');
+
+			await fireEvent.input(input, { target: { value: '' } });
+			vi.advanceTimersByTime(300);
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.has('search')).toBe(false);
+		});
+
+		it('still resets page to 1 when input is cleared', async () => {
+			render(TestListingPage, { data: withSearch('old query') });
+			const input = screen.getByPlaceholderText('Search test sessions...');
+
+			await fireEvent.input(input, { target: { value: '' } });
+			vi.advanceTimersByTime(300);
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('page')).toBe('1');
+		});
+
+		it('calls goto with keepFocus: true and invalidateAll: true', async () => {
+			render(TestListingPage, { data: withSearch('') });
+			const input = screen.getByPlaceholderText('Search test sessions...');
+
+			await fireEvent.input(input, { target: { value: 'math' } });
+			vi.advanceTimersByTime(300);
+
+			expect(goto).toHaveBeenCalledWith(expect.any(URL), {
+				keepFocus: true,
+				invalidateAll: true
+			});
+		});
+
+		it('debounces rapid typing — only one goto call for the final value', async () => {
+			render(TestListingPage, { data: withSearch('') });
+			const input = screen.getByPlaceholderText('Search test sessions...');
+
+			// Simulate user typing quickly
+			await fireEvent.input(input, { target: { value: 'm' } });
+			vi.advanceTimersByTime(100);
+			await fireEvent.input(input, { target: { value: 'ma' } });
+			vi.advanceTimersByTime(100);
+			await fireEvent.input(input, { target: { value: 'mat' } });
+			vi.advanceTimersByTime(100);
+			await fireEvent.input(input, { target: { value: 'math' } });
+			vi.advanceTimersByTime(300); // only this final timeout completes
+
+			expect(goto).toHaveBeenCalledOnce();
+		});
+
+		it('works the same for template mode — uses template placeholder', async () => {
+			render(TestListingPage, { data: withSearch('', true) });
+			const input = screen.getByPlaceholderText('Search test templates...');
+
+			await fireEvent.input(input, { target: { value: 'algebra' } });
+			vi.advanceTimersByTime(300);
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('search')).toBe('algebra');
 		});
 	});
 });

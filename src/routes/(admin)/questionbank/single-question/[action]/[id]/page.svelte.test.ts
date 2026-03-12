@@ -1256,3 +1256,384 @@ describe('Single Question Page - Numerical Auto-Detection', () => {
 		expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
 	});
 });
+
+describe('Single Question Page - Matrix Match Question Type', () => {
+	const matrixMatchQuestionData = {
+		question_text: 'Match the following capitals',
+		question_type: QuestionTypeEnum.MatrixMatch,
+		options: {
+			rows: {
+				label: 'Countries',
+				items: [
+					{ id: 1, key: '1', value: 'India' },
+					{ id: 2, key: '2', value: 'France' }
+				]
+			},
+			columns: {
+				label: 'Capitals',
+				items: [
+					{ id: 10, key: 'A', value: 'New Delhi' },
+					{ id: 11, key: 'B', value: 'Paris' }
+				]
+			}
+		},
+		correct_answer: { '1': [10], '2': [11] },
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 2, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Matrix Match UI Rendering', () => {
+		it('should render "Match The Following" heading for matrix match type', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByText('Match The Following')).toBeInTheDocument();
+		});
+
+		it('should render Correct Matches section', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByText('Correct Matches')).toBeInTheDocument();
+		});
+
+		it('should display prefilled left column label', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Countries')).toBeInTheDocument();
+		});
+
+		it('should display prefilled right column label', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Capitals')).toBeInTheDocument();
+		});
+
+		it('should display prefilled left column items', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('India')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('France')).toBeInTheDocument();
+		});
+
+		it('should display prefilled right column items', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('New Delhi')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Paris')).toBeInTheDocument();
+		});
+
+		it('should render "Add Item" button for left column', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			const buttons = Array.from(container.querySelectorAll('button'));
+			const addItemButton = buttons.find((btn) => btn.textContent?.includes('Add Item'));
+			expect(addItemButton).toBeDefined();
+		});
+
+		it('should render "Add Option" button for right column', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			const buttons = Array.from(container.querySelectorAll('button'));
+			const addOptionButton = buttons.find((btn) => btn.textContent?.includes('Add Option'));
+			expect(addOptionButton).toBeDefined();
+		});
+
+		it('should show column A row label in correct matches grid', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByText('Countries')).toBeInTheDocument();
+		});
+	});
+
+	describe('Matrix Match Save Button State', () => {
+		it('should enable Save when all items filled and all rows have matches', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
+
+		it('should disable Save when question text is empty', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...matrixMatchQuestionData, question_text: '' }
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save when a left item value is empty', () => {
+			const dataWithEmptyLeft = {
+				...matrixMatchQuestionData,
+				options: {
+					...matrixMatchQuestionData.options,
+					rows: {
+						label: 'Countries',
+						items: [
+							{ id: 1, key: '1', value: '' },
+							{ id: 2, key: '2', value: 'France' }
+						]
+					}
+				}
+			};
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: dataWithEmptyLeft } as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save when a right item value is empty', () => {
+			const dataWithEmptyRight = {
+				...matrixMatchQuestionData,
+				options: {
+					...matrixMatchQuestionData.options,
+					columns: {
+						label: 'Capitals',
+						items: [
+							{ id: 10, key: 'A', value: '' },
+							{ id: 11, key: 'B', value: 'Paris' }
+						]
+					}
+				}
+			};
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: dataWithEmptyRight } as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save when a left row has no match assigned', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...matrixMatchQuestionData, correct_answer: { '1': [10] } }
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save on fresh matrix match question with empty items', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: { label: 'Column A', items: [{ id: 1, key: '1', value: '' }] },
+							columns: { label: 'Column B', items: [{ id: 1, key: 'A', value: '' }] }
+						},
+						correct_answer: {},
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+	});
+
+	describe('Matrix Match Item Management', () => {
+		it('should add a new left column item when "Add Item" is clicked', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const initialInputs = screen.getAllByRole('textbox');
+			const addItemButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Item')
+			)!;
+			await fireEvent.click(addItemButton);
+
+			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
+		});
+
+		it('should add a new right column item when "Add Option" is clicked', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const initialInputs = screen.getAllByRole('textbox');
+			const addOptionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Option')
+			)!;
+			await fireEvent.click(addOptionButton);
+
+			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
+		});
+
+		it('should allow editing a left column item value', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const indiaInput = screen.getByDisplayValue('India');
+			await fireEvent.input(indiaInput, { target: { value: 'Japan' } });
+			expect(indiaInput).toHaveValue('Japan');
+		});
+
+		it('should allow editing a right column item value', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const parisInput = screen.getByDisplayValue('Paris');
+			await fireEvent.input(parisInput, { target: { value: 'Tokyo' } });
+			expect(parisInput).toHaveValue('Tokyo');
+		});
+
+		it('should allow editing the left column label', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const countriesLabel = screen.getByDisplayValue('Countries');
+			await fireEvent.input(countriesLabel, { target: { value: 'Cities' } });
+			expect(countriesLabel).toHaveValue('Cities');
+		});
+
+		it('should allow editing the right column label', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const capitalsLabel = screen.getByDisplayValue('Capitals');
+			await fireEvent.input(capitalsLabel, { target: { value: 'Populations' } });
+			expect(capitalsLabel).toHaveValue('Populations');
+		});
+	});
+
+	describe('Matrix Match Correct Matches Toggle', () => {
+		it('should render match toggle buttons for each left-right pair', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+			expect(matchButtons.length).toBe(4);
+		});
+
+		it('should toggle a match when a match button is clicked', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+
+			const franceParisButton = matchButtons[3];
+			expect(franceParisButton).toHaveClass('bg-primary');
+
+			await fireEvent.click(franceParisButton);
+			expect(franceParisButton).not.toHaveClass('bg-primary');
+		});
+
+		it('should add a match when an unselected match button is clicked', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+
+			const indiaParisButton = matchButtons[1];
+			expect(indiaParisButton).not.toHaveClass('bg-primary');
+
+			await fireEvent.click(indiaParisButton);
+			expect(indiaParisButton).toHaveClass('bg-primary');
+		});
+	});
+
+	describe('Matrix Match Default State (Create Mode)', () => {
+		it('should render "Match The Following" when matrix-match type is set via form default', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: '',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: Array.from({ length: 4 }, (_, i) => ({
+									id: i + 1,
+									key: String(i + 1),
+									value: ''
+								}))
+							},
+							columns: {
+								label: 'Column B',
+								items: Array.from({ length: 4 }, (_, i) => ({
+									id: i + 1,
+									key: String.fromCharCode(65 + i),
+									value: ''
+								}))
+							}
+						},
+						correct_answer: {},
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			expect(screen.getByText('Match The Following')).toBeInTheDocument();
+		});
+
+		it('should show default "Column A" placeholder in left label input', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Q?',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: { label: 'Column A', items: [] },
+							columns: { label: 'Column B', items: [] }
+						},
+						correct_answer: {},
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			expect(screen.getByDisplayValue('Column A')).toBeInTheDocument();
+		});
+
+		it('should show default "Column B" placeholder in right label input', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Q?',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: { label: 'Column A', items: [] },
+							columns: { label: 'Column B', items: [] }
+						},
+						correct_answer: {},
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			expect(screen.getByDisplayValue('Column B')).toBeInTheDocument();
+		});
+	});
+});

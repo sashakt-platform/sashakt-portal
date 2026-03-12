@@ -1356,6 +1356,38 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			});
 			expect(screen.getByText('Countries')).toBeInTheDocument();
 		});
+
+		it('should show column B label in correct matches grid', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			expect(screen.getByText('Capitals')).toBeInTheDocument();
+		});
+
+		it('should show default "Column B" when no label is set', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						...matrixMatchQuestionData,
+						options: {
+							rows: { label: '', items: matrixMatchQuestionData.options.rows.items },
+							columns: { label: '', items: matrixMatchQuestionData.options.columns.items }
+						}
+					}
+				} as any
+			});
+			expect(screen.getByText('Column B')).toBeInTheDocument();
+		});
+
+		it('should update column B label when matrixColLabel changes', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+			const capitalsLabel = screen.getByDisplayValue('Capitals');
+			await fireEvent.input(capitalsLabel, { target: { value: 'Populations' } });
+			expect(screen.getByText('Populations')).toBeInTheDocument();
+		});
 	});
 
 	describe('Matrix Match Save Button State', () => {

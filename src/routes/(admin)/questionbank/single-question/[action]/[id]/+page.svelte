@@ -111,7 +111,12 @@
 		};
 	}
 
-	const isMatrixOptions = (opts: unknown): opts is { rows: { label: string; items: { id: number; key: string; value: string }[] }; columns: { label: string; items: { id: number; key: string; value: string }[] } } =>
+	const isMatrixOptions = (
+		opts: unknown
+	): opts is {
+		rows: { label: string; items: { id: number; key: string; value: string }[] };
+		columns: { label: string; items: { id: number; key: string; value: string }[] };
+	} =>
 		opts !== null && typeof opts === 'object' && !Array.isArray(opts) && 'rows' in (opts as object);
 
 	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
@@ -132,24 +137,27 @@
 				}))
 	);
 
-	const existingMatrixOptions = questionData?.options && isMatrixOptions(questionData.options)
-		? questionData.options
-		: null;
+	const existingMatrixOptions =
+		questionData?.options && isMatrixOptions(questionData.options) ? questionData.options : null;
 
 	let matrixRowLabel = $state(existingMatrixOptions?.rows.label ?? 'Column A');
 	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Column B');
 	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
-		existingMatrixOptions?.rows.items ?? Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
+		existingMatrixOptions?.rows.items ??
+			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
 	);
 	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
-		existingMatrixOptions?.columns.items ?? Array.from({ length: 4 }, (_, i) => ({
-			id: i + 1,
-			key: String.fromCharCode(65 + i),
-			value: ''
-		}))
+		existingMatrixOptions?.columns.items ??
+			Array.from({ length: 4 }, (_, i) => ({
+				id: i + 1,
+				key: String.fromCharCode(65 + i),
+				value: ''
+			}))
 	);
 	let matrixMatches = $state<Record<string, number[]>>(
-		questionData?.correct_answer && !Array.isArray(questionData.correct_answer) && typeof questionData.correct_answer === 'object'
+		questionData?.correct_answer &&
+			!Array.isArray(questionData.correct_answer) &&
+			typeof questionData.correct_answer === 'object'
 			? (questionData.correct_answer as Record<string, number[]>)
 			: {}
 	);
@@ -556,22 +564,31 @@
 							<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
 								<p class="mb-3 text-sm font-semibold text-gray-700">Correct Matches</p>
 
-								<div class="mb-1 flex items-center gap-2">
-									<span class="min-w-0 flex-1 text-xs text-gray-400"
+								<div class="mb-2 flex items-end gap-4 border-b border-gray-200 pb-2">
+									<span class="min-w-0 flex-1 text-xs font-medium text-gray-500"
 										>{matrixRowLabel || 'Column A'}</span
 									>
-									<div class="flex gap-2">
-										{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}
-											<span class="w-16 truncate text-center text-xs font-medium text-gray-500"
-												>{rightColumnItem.value || rightColumnItem.key}</span
-											>
-										{/each}
+									<div class="flex flex-col items-center gap-1">
+										<span class="text-xs font-medium tracking-wide text-gray-500"
+											>{matrixColLabel || 'Column B'}</span
+										>
+										<div class="flex gap-2">
+											{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}
+												<span class="w-16 truncate text-center text-xs text-gray-400"
+													>{rightColumnItem.value || rightColumnItem.key}</span
+												>
+											{/each}
+										</div>
 									</div>
 								</div>
+
 								{#each matrixLeftItems as leftItem (leftItem.key)}
-									<div class="flex items-center gap-2 rounded px-1 py-1.5 hover:bg-white">
+									<div
+										class="flex items-center gap-4 rounded px-1 py-2 transition-colors hover:bg-white"
+									>
 										<span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800"
-											><span class="text-muted-foreground mr-1 font-semibold">{leftItem.key}.</span>{leftItem.value || leftItem.key}</span
+											><span class="text-muted-foreground mr-1 font-semibold">{leftItem.key}.</span
+											>{leftItem.value || leftItem.key}</span
 										>
 										<div class="flex gap-2">
 											{#each matrixRightItems as rightItem (rightItem.id)}
@@ -580,9 +597,9 @@
 												)}
 												<button
 													type="button"
-													class="w-16 rounded border py-1 text-xs font-semibold transition-colors {checked
-														? 'border-primary bg-primary text-white'
-														: 'hover:border-primary/60 hover:text-primary border-gray-300 text-gray-400'}"
+													class="w-16 rounded border py-1 text-xs font-semibold transition-all duration-150 {checked
+														? 'border-primary bg-primary text-white shadow-sm'
+														: 'hover:border-primary/60 hover:text-primary border-gray-200 bg-white text-gray-400'}"
 													onclick={() => {
 														const current = matrixMatches[leftItem.key] ?? [];
 														matrixMatches = {

@@ -571,7 +571,7 @@
 								{#each matrixLeftItems as leftItem (leftItem.key)}
 									<div class="flex items-center gap-2 rounded px-1 py-1.5 hover:bg-white">
 										<span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800"
-											>{leftItem.value || leftItem.key}</span
+											><span class="text-muted-foreground mr-1 font-semibold">{leftItem.key}.</span>{leftItem.value || leftItem.key}</span
 										>
 										<div class="flex gap-2">
 											{#each matrixRightItems as rightItem (rightItem.id)}

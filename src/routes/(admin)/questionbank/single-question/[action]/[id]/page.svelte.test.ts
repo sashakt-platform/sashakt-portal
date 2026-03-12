@@ -1479,6 +1479,46 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			});
 			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
 		});
+
+		it('should disable Save when a left row has an empty array match (all deselected in edit mode)', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						...matrixMatchQuestionData,
+						correct_answer: { '1': [10], '2': [] }
+					}
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save when all matches are cleared (empty arrays for every row)', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						...matrixMatchQuestionData,
+						correct_answer: { '1': [], '2': [] }
+					}
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should re-disable Save after toggling off the last match in edit mode', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixMatchQuestionData } as any
+			});
+
+			expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
+
+			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+
+			await fireEvent.click(matchButtons[3]);
+
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
 	});
 
 	describe('Matrix Match Item Management', () => {

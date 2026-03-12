@@ -195,7 +195,7 @@
 			return (
 				matrixLeftItems.some((i) => !i.value.trim()) ||
 				matrixRightItems.some((i) => !i.value.trim()) ||
-				matrixLeftItems.some((i) => !matrixMatches[i.key])
+				matrixLeftItems.some((i) => !matrixMatches[i.key]?.length)
 			);
 		}
 

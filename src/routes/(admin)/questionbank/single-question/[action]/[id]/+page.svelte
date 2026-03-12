@@ -111,18 +111,19 @@
 		};
 	}
 
-	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
-		questionData && questionData.options
-			? questionData.options.map((v, k) => {
-					const { id, key, value } = v;
+	const isMatrixOptions = (opts: unknown): opts is { rows: { label: string; items: { id: number; key: string; value: string }[] }; columns: { label: string; items: { id: number; key: string; value: string }[] } } =>
+		opts !== null && typeof opts === 'object' && !Array.isArray(opts) && 'rows' in (opts as object);
 
-					return {
-						id,
-						key,
-						value: value || '',
-						correct_answer: questionData?.correct_answer?.includes(id) ? true : false
-					};
-				})
+	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
+		questionData && questionData.options && Array.isArray(questionData.options)
+			? (questionData.options as { id: number; key: string; value: string }[]).map((v) => ({
+					id: v.id,
+					key: v.key,
+					value: v.value || '',
+					correct_answer: Array.isArray(questionData?.correct_answer)
+						? (questionData.correct_answer as number[]).includes(v.id)
+						: false
+				}))
 			: Array.from({ length: 4 }, (_, i) => ({
 					id: i + 1,
 					key: String.fromCharCode(65 + i),
@@ -130,19 +131,28 @@
 					correct_answer: false
 				}))
 	);
-	let matrixRowLabel = $state('Column A');
-	let matrixColLabel = $state('Column B');
+
+	const existingMatrixOptions = questionData?.options && isMatrixOptions(questionData.options)
+		? questionData.options
+		: null;
+
+	let matrixRowLabel = $state(existingMatrixOptions?.rows.label ?? 'Column A');
+	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Column B');
 	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
-		Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
+		existingMatrixOptions?.rows.items ?? Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
 	);
 	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
-		Array.from({ length: 4 }, (_, i) => ({
+		existingMatrixOptions?.columns.items ?? Array.from({ length: 4 }, (_, i) => ({
 			id: i + 1,
 			key: String.fromCharCode(65 + i),
 			value: ''
 		}))
 	);
-	let matrixMatches = $state<Record<string, number[]>>({});
+	let matrixMatches = $state<Record<string, number[]>>(
+		questionData?.correct_answer && !Array.isArray(questionData.correct_answer) && typeof questionData.correct_answer === 'object'
+			? (questionData.correct_answer as Record<string, number[]>)
+			: {}
+	);
 
 	let openTagDialog: boolean = $state(false);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
@@ -551,9 +561,9 @@
 										>{matrixRowLabel || 'Column A'}</span
 									>
 									<div class="flex gap-2">
-										{#each matrixRightItems as rh (rh.id)}
+										{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}
 											<span class="w-16 truncate text-center text-xs font-medium text-gray-500"
-												>{rh.value || rh.key}</span
+												>{rightColumnItem.value || rightColumnItem.key}</span
 											>
 										{/each}
 									</div>

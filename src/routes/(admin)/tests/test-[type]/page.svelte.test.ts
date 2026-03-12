@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen, fireEvent } from '@testing-library/svelte';
+import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import TestListingPage from './+page.svelte';
 
 vi.mock('$app/state', () => ({
@@ -27,7 +27,9 @@ vi.mock('$lib/utils/permissions.js', () => ({
 }));
 
 vi.mock('$lib/components/data-table/index.js', () => ({
-	DataTable: vi.fn()
+	// The DataTable mock must read `columns` from its props so Svelte 5 evaluates
+	// the lazy $derived(columns) — which is the only trigger for createTestColumns.
+	DataTable: vi.fn((_, props: any) => void props?.columns)
 }));
 
 vi.mock('$lib/components/StateSelection.svelte', () => ({
@@ -54,12 +56,19 @@ vi.mock('$lib/components/TagTypeSelection.svelte', () => ({
 	}
 }));
 
+// Shared ref populated inside the mock factory so sort tests can call handleSort directly.
+const sortRef = vi.hoisted(() => ({ handleSort: null as ((col: string) => void) | null }));
+
 vi.mock('./columns.js', () => ({
-	createTestColumns: vi.fn(() => [])
+	createTestColumns: vi.fn((...args: any[]) => {
+		sortRef.handleSort = args[2];
+		return [];
+	})
 }));
 
 import { canCreate, isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
+import { page } from '$app/state';
 
 const baseData = (is_template: boolean, items: any[] = []) => ({
 	is_template,
@@ -306,6 +315,85 @@ describe('Test Management Listing Page', () => {
 
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
 			expect(calledUrl.searchParams.get('search')).toBe('algebra');
+		});
+	});
+
+	// ────────────────────────────────────────────────────────────────────────
+	describe('Sorting behavior (handleSort)', () => {
+		// handleSort is the 3rd arg passed to createTestColumns; captured via sortRef.
+		// We wait for it because $derived(columns) is lazy and resolves after the
+		// $effect flips noTestCreatedYet → false, which triggers a re-render.
+		beforeEach(async () => {
+			sortRef.handleSort = null;
+			(page as any).url = new URL('http://localhost/tests/test-session');
+			render(TestListingPage, { data: baseData(false, [{ id: '1', name: 'Test A' }]) });
+			await waitFor(() => {
+				if (!sortRef.handleSort) throw new Error('handleSort not captured yet');
+			});
+		});
+
+		it('sets sortBy to the column and sortOrder to asc when clicking an unsorted column', () => {
+			sortRef.handleSort!('name');
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('sortBy')).toBe('name');
+			expect(calledUrl.searchParams.get('sortOrder')).toBe('asc');
+		});
+
+		it('toggles sortOrder from asc to desc when clicking the already-active column', () => {
+			(page as any).url = new URL(
+				'http://localhost/tests/test-session?sortBy=name&sortOrder=asc'
+			);
+			sortRef.handleSort!('name');
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('sortOrder')).toBe('desc');
+		});
+
+		it('keeps sortBy unchanged when toggling sort direction', () => {
+			(page as any).url = new URL(
+				'http://localhost/tests/test-session?sortBy=name&sortOrder=asc'
+			);
+			sortRef.handleSort!('name');
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('sortBy')).toBe('name');
+		});
+
+		it('toggles sortOrder from desc to asc when clicking the already-active column again', () => {
+			(page as any).url = new URL(
+				'http://localhost/tests/test-session?sortBy=name&sortOrder=desc'
+			);
+			sortRef.handleSort!('name');
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('sortOrder')).toBe('asc');
+		});
+
+		it('switches sortBy and resets sortOrder to asc when clicking a different column', () => {
+			(page as any).url = new URL(
+				'http://localhost/tests/test-session?sortBy=name&sortOrder=desc'
+			);
+			sortRef.handleSort!('created_at');
+
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('sortBy')).toBe('created_at');
+			expect(calledUrl.searchParams.get('sortOrder')).toBe('asc');
+		});
+
+		it('calls goto exactly once per sort action', () => {
+			sortRef.handleSort!('name');
+
+			expect(goto).toHaveBeenCalledOnce();
+		});
+
+		it('calls goto with keepFocus: true and invalidateAll: true', () => {
+			sortRef.handleSort!('name');
+
+			expect(goto).toHaveBeenCalledWith(expect.any(URL), {
+				keepFocus: true,
+				invalidateAll: true
+			});
 		});
 	});
 });

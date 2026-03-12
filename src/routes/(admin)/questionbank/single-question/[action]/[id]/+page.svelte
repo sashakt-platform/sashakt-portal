@@ -434,51 +434,53 @@
 						<div class="flex flex-col gap-4">
 							{@render snippetHeading('Match The Following')}
 							<div class="flex gap-4">
-								<div
-									class="flex flex-1 flex-col gap-2"
-									use:dragHandleZone={{ items: matrixLeftItems, flipDurationMs: 150 }}
-									onconsider={({ detail }) => (matrixLeftItems = detail.items)}
-									onfinalize={({ detail }) => {
-										matrixLeftItems = detail.items.map((item, i) => ({
-											...item,
-											key: String(i + 1)
-										}));
-										matrixMatches = {};
-									}}
-								>
+								<div class="flex flex-1 flex-col gap-2">
 									<Input bind:value={matrixRowLabel} placeholder="Column A" class="font-semibold" />
-									{#each matrixLeftItems as item, index (item.id)}
-										<div class="group flex flex-row items-center gap-2">
-											<div
-												class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
-											>
-												{item.key}
+									<div
+										class="flex flex-col gap-2"
+										use:dragHandleZone={{ items: matrixLeftItems, flipDurationMs: 150, type: 'matrix-left' }}
+										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
+										onfinalize={({ detail }) => {
+											matrixLeftItems = detail.items.map((item, i) => ({
+												...item,
+												key: String(i + 1)
+											}));
+											matrixMatches = {};
+										}}
+									>
+										{#each matrixLeftItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<div class="flex flex-1 flex-row rounded-sm border border-black">
+													<span use:dragHandle aria-label="drag handle">
+														<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+													</span>
+													<Input class="border-0" bind:value={matrixLeftItems[index].value} />
+												</div>
+												<Trash_2
+													size={16}
+													class={[
+														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+														matrixLeftItems.length > 1 ? 'cursor-pointer group-hover:opacity-100' : ''
+													]}
+													onclick={() => {
+														if (matrixLeftItems.length > 1) {
+															const removedKey = matrixLeftItems[index].key;
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({ ...item, key: String(i + 1) }));
+															const { [removedKey]: _, ...rest } = matrixMatches;
+															matrixMatches = rest;
+														}
+													}}
+												/>
 											</div>
-											<div class="flex flex-1 flex-row rounded-sm border border-black">
-												<span use:dragHandle aria-label="drag handle">
-													<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
-												</span>
-												<Input class="border-0" bind:value={matrixLeftItems[index].value} />
-											</div>
-											<Trash_2
-												size={16}
-												class={[
-													'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-													matrixLeftItems.length > 1 ? 'cursor-pointer group-hover:opacity-100' : ''
-												]}
-												onclick={() => {
-													if (matrixLeftItems.length > 1) {
-														const removedKey = matrixLeftItems[index].key;
-														matrixLeftItems = matrixLeftItems
-															.filter((_, i) => i !== index)
-															.map((item, i) => ({ ...item, key: String(i + 1) }));
-														const { [removedKey]: _, ...rest } = matrixMatches;
-														matrixMatches = rest;
-													}
-												}}
-											/>
-										</div>
-									{/each}
+										{/each}
+									</div>
 									<Button
 										variant="outline"
 										class="text-primary border-primary mt-1 self-start"
@@ -494,57 +496,59 @@
 									</Button>
 								</div>
 
-								<div
-									class="flex flex-1 flex-col gap-2"
-									use:dragHandleZone={{ items: matrixRightItems, flipDurationMs: 150 }}
-									onconsider={({ detail }) => (matrixRightItems = detail.items)}
-									onfinalize={({ detail }) => {
-										matrixRightItems = detail.items.map((item, i) => ({
-											...item,
-											key: String.fromCharCode(65 + i)
-										}));
-										matrixMatches = {};
-									}}
-								>
+								<div class="flex flex-1 flex-col gap-2">
 									<Input bind:value={matrixColLabel} placeholder="Column B" class="font-semibold" />
-									{#each matrixRightItems as item, index (item.id)}
-										<div class="group flex flex-row items-center gap-2">
-											<div
-												class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
-											>
-												{item.key}
+									<div
+										class="flex flex-col gap-2"
+										use:dragHandleZone={{ items: matrixRightItems, flipDurationMs: 150, type: 'matrix-right' }}
+										onconsider={({ detail }) => (matrixRightItems = detail.items)}
+										onfinalize={({ detail }) => {
+											matrixRightItems = detail.items.map((item, i) => ({
+												...item,
+												key: String.fromCharCode(65 + i)
+											}));
+											matrixMatches = {};
+										}}
+									>
+										{#each matrixRightItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<div class="flex flex-1 flex-row rounded-sm border border-black">
+													<span use:dragHandle aria-label="drag handle">
+														<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+													</span>
+													<Input class="border-0" bind:value={matrixRightItems[index].value} />
+												</div>
+												<Trash_2
+													size={16}
+													class={[
+														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+														matrixRightItems.length > 1
+															? 'cursor-pointer group-hover:opacity-100'
+															: ''
+													]}
+													onclick={() => {
+														if (matrixRightItems.length > 1) {
+															const removedKey = matrixRightItems[index].key;
+															matrixRightItems = matrixRightItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({
+																	...item,
+																	key: String.fromCharCode(65 + i)
+																}));
+															matrixMatches = Object.fromEntries(
+																Object.entries(matrixMatches).filter(([, v]) => v !== removedKey)
+															);
+														}
+													}}
+												/>
 											</div>
-											<div class="flex flex-1 flex-row rounded-sm border border-black">
-												<span use:dragHandle aria-label="drag handle">
-													<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
-												</span>
-												<Input class="border-0" bind:value={matrixRightItems[index].value} />
-											</div>
-											<Trash_2
-												size={16}
-												class={[
-													'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-													matrixRightItems.length > 1
-														? 'cursor-pointer group-hover:opacity-100'
-														: ''
-												]}
-												onclick={() => {
-													if (matrixRightItems.length > 1) {
-														const removedKey = matrixRightItems[index].key;
-														matrixRightItems = matrixRightItems
-															.filter((_, i) => i !== index)
-															.map((item, i) => ({
-																...item,
-																key: String.fromCharCode(65 + i)
-															}));
-														matrixMatches = Object.fromEntries(
-															Object.entries(matrixMatches).filter(([, v]) => v !== removedKey)
-														);
-													}
-												}}
-											/>
-										</div>
-									{/each}
+										{/each}
+									</div>
 									<Button
 										variant="outline"
 										class="text-primary border-primary mt-1 self-start"

@@ -741,7 +741,13 @@
 						instructions: $formData.instructions,
 						marking_scheme: $formData.marking_scheme,
 						is_mandatory: $formData.is_mandatory,
-						question_type: $formData.question_type
+						question_type: $formData.question_type,
+						matrix: {
+							rowLabel: matrixRowLabel,
+							colLabel: matrixColLabel,
+							rows: matrixLeftItems,
+							columns: matrixRightItems
+						}
 					}}
 				/>
 

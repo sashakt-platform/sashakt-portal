@@ -1332,22 +1332,22 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			expect(screen.getByDisplayValue('Paris')).toBeInTheDocument();
 		});
 
-		it('should render "Add Item" button for left column', () => {
+		it('should render "Add Question" button for left column', () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 			const buttons = Array.from(container.querySelectorAll('button'));
-			const addItemButton = buttons.find((btn) => btn.textContent?.includes('Add Item'));
-			expect(addItemButton).toBeDefined();
+			const addQuestionButton = buttons.find((btn) => btn.textContent?.includes('Add Question'));
+			expect(addQuestionButton).toBeDefined();
 		});
 
-		it('should render "Add Option" button for right column', () => {
+		it('should render "Add Answer" button for right column', () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 			const buttons = Array.from(container.querySelectorAll('button'));
-			const addOptionButton = buttons.find((btn) => btn.textContent?.includes('Add Option'));
-			expect(addOptionButton).toBeDefined();
+			const addAnswerButton = buttons.find((btn) => btn.textContent?.includes('Add Answer'));
+			expect(addAnswerButton).toBeDefined();
 		});
 
 		it('should show column A row label in correct matches grid', () => {
@@ -1364,20 +1364,18 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			expect(screen.getByText('Capitals')).toBeInTheDocument();
 		});
 
-		it('should show default "Column B" when no label is set', () => {
+		it('should show default labels when no matrix options exist', () => {
 			render(SingleQuestionPage, {
 				data: {
 					...baseData,
 					questionData: {
 						...matrixMatchQuestionData,
-						options: {
-							rows: { label: '', items: matrixMatchQuestionData.options.rows.items },
-							columns: { label: '', items: matrixMatchQuestionData.options.columns.items }
-						}
+						options: null
 					}
 				} as any
 			});
-			expect(screen.getByText('Column B')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Questions')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Answers')).toBeInTheDocument();
 		});
 
 		it('should update column B label when matrixColLabel changes', async () => {
@@ -1522,30 +1520,30 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 	});
 
 	describe('Matrix Match Item Management', () => {
-		it('should add a new left column item when "Add Item" is clicked', async () => {
+		it('should add a new left column item when "Add Question" is clicked', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
 			const initialInputs = screen.getAllByRole('textbox');
-			const addItemButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Item')
+			const addQuestionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Question')
 			)!;
-			await fireEvent.click(addItemButton);
+			await fireEvent.click(addQuestionButton);
 
 			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
 		});
 
-		it('should add a new right column item when "Add Option" is clicked', async () => {
+		it('should add a new right column item when "Add Answer" is clicked', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
 			const initialInputs = screen.getAllByRole('textbox');
-			const addOptionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Option')
+			const addAnswerButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Answer')
 			)!;
-			await fireEvent.click(addOptionButton);
+			await fireEvent.click(addAnswerButton);
 
 			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
 		});

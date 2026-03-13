@@ -140,8 +140,8 @@
 	const existingMatrixOptions =
 		questionData?.options && isMatrixOptions(questionData.options) ? questionData.options : null;
 
-	let matrixRowLabel = $state(existingMatrixOptions?.rows.label ?? 'Options');
-	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Matches');
+	let matrixRowLabel = $state(existingMatrixOptions?.rows.label ?? 'Questions');
+	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Answers');
 	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.rows.items ??
 			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))

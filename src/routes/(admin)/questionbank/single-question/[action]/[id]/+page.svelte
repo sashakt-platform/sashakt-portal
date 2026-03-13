@@ -140,8 +140,8 @@
 	const existingMatrixOptions =
 		questionData?.options && isMatrixOptions(questionData.options) ? questionData.options : null;
 
-	let matrixRowLabel = $state(existingMatrixOptions?.rows.label ?? 'Column A');
-	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Column B');
+	let matrixRowLabel = $state(existingMatrixOptions?.rows.label ?? 'Options');
+	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Matches');
 	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.rows.items ??
 			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
@@ -435,10 +435,14 @@
 							{@render snippetHeading('Match The Following')}
 							<div class="flex gap-4">
 								<div class="flex flex-1 flex-col gap-2">
-									<Input bind:value={matrixRowLabel} placeholder="Column A" class="font-semibold" />
+									<Input bind:value={matrixRowLabel} class="font-semibold" />
 									<div
 										class="flex flex-col gap-2"
-										use:dragHandleZone={{ items: matrixLeftItems, flipDurationMs: 150, type: 'matrix-left' }}
+										use:dragHandleZone={{
+											items: matrixLeftItems,
+											flipDurationMs: 150,
+											type: 'matrix-left'
+										}}
 										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
 										onfinalize={({ detail }) => {
 											matrixLeftItems = detail.items.map((item, i) => ({
@@ -457,7 +461,9 @@
 												</div>
 												<div class="flex flex-1 flex-row rounded-sm border border-black">
 													<span use:dragHandle aria-label="drag handle">
-														<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+														<GripVertical
+															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+														/>
 													</span>
 													<Input class="border-0" bind:value={matrixLeftItems[index].value} />
 												</div>
@@ -465,7 +471,9 @@
 													size={16}
 													class={[
 														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-														matrixLeftItems.length > 1 ? 'cursor-pointer group-hover:opacity-100' : ''
+														matrixLeftItems.length > 1
+															? 'cursor-pointer group-hover:opacity-100'
+															: ''
 													]}
 													onclick={() => {
 														if (matrixLeftItems.length > 1) {
@@ -492,15 +500,19 @@
 											});
 										}}
 									>
-										<Plus />Add Item
+										<Plus />Add Question
 									</Button>
 								</div>
 
 								<div class="flex flex-1 flex-col gap-2">
-									<Input bind:value={matrixColLabel} placeholder="Column B" class="font-semibold" />
+									<Input bind:value={matrixColLabel} class="font-semibold" />
 									<div
 										class="flex flex-col gap-2"
-										use:dragHandleZone={{ items: matrixRightItems, flipDurationMs: 150, type: 'matrix-right' }}
+										use:dragHandleZone={{
+											items: matrixRightItems,
+											flipDurationMs: 150,
+											type: 'matrix-right'
+										}}
 										onconsider={({ detail }) => (matrixRightItems = detail.items)}
 										onfinalize={({ detail }) => {
 											matrixRightItems = detail.items.map((item, i) => ({
@@ -519,7 +531,9 @@
 												</div>
 												<div class="flex flex-1 flex-row rounded-sm border border-black">
 													<span use:dragHandle aria-label="drag handle">
-														<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
+														<GripVertical
+															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+														/>
 													</span>
 													<Input class="border-0" bind:value={matrixRightItems[index].value} />
 												</div>
@@ -560,7 +574,7 @@
 											});
 										}}
 									>
-										<Plus />Add Option
+										<Plus />Add Answer
 									</Button>
 								</div>
 							</div>
@@ -570,11 +584,11 @@
 
 								<div class="mb-2 flex items-end gap-4 border-b border-gray-200 pb-2">
 									<span class="min-w-0 flex-1 text-xs font-medium text-gray-500"
-										>{matrixRowLabel || 'Column A'}</span
+										>{matrixRowLabel}</span
 									>
 									<div class="flex flex-col items-center gap-1">
 										<span class="text-xs font-medium tracking-wide text-gray-500"
-											>{matrixColLabel || 'Column B'}</span
+											>{matrixColLabel}</span
 										>
 										<div class="flex gap-2">
 											{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}

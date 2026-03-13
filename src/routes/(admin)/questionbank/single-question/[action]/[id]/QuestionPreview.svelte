@@ -160,7 +160,7 @@
 					<div class="mb-5 grid grid-cols-2 gap-6 border-b border-gray-200 pb-5">
 						<div>
 							<p class="mb-2 text-sm font-semibold text-gray-700">
-								{matrix?.rowLabel || 'Column A'}
+								{matrix?.rowLabel}
 							</p>
 							<div class="flex flex-col gap-2">
 								{#each matrixRows as row (row.id)}
@@ -173,7 +173,7 @@
 						</div>
 						<div>
 							<p class="mb-2 text-sm font-semibold text-gray-700">
-								{matrix?.colLabel || 'Column B'}
+								{matrix?.colLabel}
 							</p>
 							<div class="flex flex-col gap-2">
 								{#each matrixColumns as col (col.id)}

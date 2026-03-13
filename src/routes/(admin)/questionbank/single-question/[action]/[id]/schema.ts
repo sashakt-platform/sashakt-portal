@@ -7,20 +7,32 @@ export const optionSchema = z.object({
 	value: z.string()
 });
 
+export const matrixColumnSchema = z.object({
+	label: z.string(),
+	items: z.array(optionSchema).default([])
+});
+export const matrixMatchOptionsSchema = z.object({
+	rows: matrixColumnSchema,
+	columns: matrixColumnSchema
+});
+
 export enum QuestionTypeEnum {
 	SingleChoice = 'single-choice',
 	MultiChoice = 'multi-choice',
 	Subjective = 'subjective',
 	NumericalInteger = 'numerical-integer',
-	NumericalDecimal = 'numerical-decimal'
+	NumericalDecimal = 'numerical-decimal',
+	MatrixMatch = 'matrix-match'
 }
 
 export const questionSchema = z.object({
 	question_text: z.string().min(1, { error: 'Question text is required' }),
 	instructions: z.string().nullable().optional(),
 	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
-	options: z.array(optionSchema).default([]),
-	correct_answer: z.union([z.array(z.number()), z.number()]).default([]),
+	options: z.union([z.array(optionSchema), matrixMatchOptionsSchema]).default([]),
+	correct_answer: z
+		.union([z.array(z.number()), z.number(), z.record(z.string(), z.array(z.number()))])
+		.default([]),
 	subjective_answer_limit: z.coerce.number().int().positive().nullable().optional(),
 	is_mandatory: z.boolean().default(false),
 	marking_scheme: marksSchema,

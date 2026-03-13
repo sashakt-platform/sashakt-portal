@@ -19,6 +19,12 @@
 	const marking = $derived(data?.marking_scheme || { correct: 1, wrong: 0, skipped: 0 });
 	const mandatory = $derived(data?.is_mandatory || false);
 	const validOptions = $derived(options.filter((opt: any) => opt.value.trim() !== ''));
+	type MatrixItem = { id: number; key: string; value: string };
+	const matrix = $derived(data?.matrix || null);
+	const matrixRows = $derived(matrix?.rows?.filter((r: MatrixItem) => r.value.trim() !== '') ?? []);
+	const matrixColumns = $derived(
+		matrix?.columns?.filter((c: MatrixItem) => c.value.trim() !== '') ?? []
+	);
 
 	const questionType = $derived.by(() => {
 		if (data?.question_type === QuestionTypeEnum.SingleChoice) {
@@ -35,12 +41,14 @@
 	let selectedMultiChoices: Record<string, boolean> = $state({});
 	let subjectiveAnswer: string = $state('');
 	let numberAnswer: number | null = $state(null);
+	let matrixSelections: Record<string, number[]> = $state({});
 
 	function resetSelections() {
 		selectedSingleChoice = '';
 		selectedMultiChoices = {};
 		subjectiveAnswer = '';
 		numberAnswer = null;
+		matrixSelections = {};
 	}
 </script>
 
@@ -147,6 +155,83 @@
 				{/each}
 			{:else if questionType === QuestionTypeEnum.NumericalInteger || questionType === QuestionTypeEnum.NumericalDecimal}
 				<Input type="number" class="w-full" bind:value={numberAnswer} inputmode="numeric" />
+			{:else if questionType === QuestionTypeEnum.MatrixMatch}
+				{#if matrixRows.length > 0 && matrixColumns.length > 0}
+					<div class="mb-5 grid grid-cols-2 gap-6 border-b border-gray-200 pb-5">
+						<div>
+							<p class="mb-2 text-sm font-semibold text-gray-700">
+								{matrix?.rowLabel}
+							</p>
+							<div class="flex flex-col gap-2">
+								{#each matrixRows as row (row.id)}
+									<p class="text-sm text-gray-800">
+										<span class="font-semibold">{row.key}.</span>
+										<span class="ml-1">{row.value}</span>
+									</p>
+								{/each}
+							</div>
+						</div>
+						<div>
+							<p class="mb-2 text-sm font-semibold text-gray-700">
+								{matrix?.colLabel}
+							</p>
+							<div class="flex flex-col gap-2">
+								{#each matrixColumns as col (col.id)}
+									<p class="text-sm text-gray-800">
+										<span class="font-semibold">{col.key}.</span>
+										<span class="ml-1">{col.value}</span>
+									</p>
+								{/each}
+							</div>
+						</div>
+					</div>
+
+					<div class="overflow-x-auto">
+						<table class="border-collapse text-sm">
+							<thead>
+								<tr>
+									<th class="w-10 px-3 py-2"></th>
+									{#each matrixColumns as col (col.id)}
+										<th class="px-5 py-2 text-center text-sm font-semibold text-gray-700">
+											{col.key}
+										</th>
+									{/each}
+								</tr>
+							</thead>
+							<tbody>
+								{#each matrixRows as row (row.id)}
+									<tr>
+										<td class="px-3 py-3 text-sm font-semibold text-gray-700">{row.key}</td>
+										{#each matrixColumns as col (col.id)}
+											{@const isChecked = (matrixSelections[row.key] ?? []).includes(col.id)}
+											<td class="px-5 py-3 text-center">
+												<Checkbox
+													checked={isChecked}
+													onCheckedChange={() => {
+														const current = matrixSelections[row.key] ?? [];
+														if (current.includes(col.id)) {
+															matrixSelections = {
+																...matrixSelections,
+																[row.key]: current.filter((id) => id !== col.id)
+															};
+														} else {
+															matrixSelections = {
+																...matrixSelections,
+																[row.key]: [...current, col.id]
+															};
+														}
+													}}
+												/>
+											</td>
+										{/each}
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				{:else}
+					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>
+				{/if}
 			{:else}
 				<p class="text-sm text-gray-400 italic">Add options to see them in preview...</p>
 			{/if}

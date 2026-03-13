@@ -69,6 +69,18 @@
 				$formData.question_type === QuestionTypeEnum.NumericalInteger
 			) {
 				$formData.options = [];
+			} else if ($formData.question_type === QuestionTypeEnum.MatrixMatch) {
+				$formData.options = {
+					rows: {
+						label: matrixRowLabel,
+						items: matrixLeftItems.map(({ id, key, value }) => ({ id, key, value }))
+					},
+					columns: {
+						label: matrixColLabel,
+						items: matrixRightItems.map(({ id, key, value }) => ({ id, key, value }))
+					}
+				};
+				$formData.correct_answer = matrixMatches;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -99,18 +111,24 @@
 		};
 	}
 
-	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
-		questionData && questionData.options
-			? questionData.options.map((v, k) => {
-					const { id, key, value } = v;
+	const isMatrixOptions = (
+		opts: unknown
+	): opts is {
+		rows: { label: string; items: { id: number; key: string; value: string }[] };
+		columns: { label: string; items: { id: number; key: string; value: string }[] };
+	} =>
+		opts !== null && typeof opts === 'object' && !Array.isArray(opts) && 'rows' in (opts as object);
 
-					return {
-						id,
-						key,
-						value: value || '',
-						correct_answer: questionData?.correct_answer?.includes(id) ? true : false
-					};
-				})
+	let totalOptions = $state<{ id: number; key: string; value: string; correct_answer: boolean }[]>(
+		questionData && questionData.options && Array.isArray(questionData.options)
+			? (questionData.options as { id: number; key: string; value: string }[]).map((v) => ({
+					id: v.id,
+					key: v.key,
+					value: v.value || '',
+					correct_answer: Array.isArray(questionData?.correct_answer)
+						? (questionData.correct_answer as number[]).includes(v.id)
+						: false
+				}))
 			: Array.from({ length: 4 }, (_, i) => ({
 					id: i + 1,
 					key: String.fromCharCode(65 + i),
@@ -118,6 +136,32 @@
 					correct_answer: false
 				}))
 	);
+
+	const existingMatrixOptions =
+		questionData?.options && isMatrixOptions(questionData.options) ? questionData.options : null;
+
+	let matrixRowLabel = $state(existingMatrixOptions?.rows.label ?? 'Questions');
+	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Answers');
+	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
+		existingMatrixOptions?.rows.items ??
+			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
+	);
+	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
+		existingMatrixOptions?.columns.items ??
+			Array.from({ length: 4 }, (_, i) => ({
+				id: i + 1,
+				key: String.fromCharCode(65 + i),
+				value: ''
+			}))
+	);
+	let matrixMatches = $state<Record<string, number[]>>(
+		questionData?.correct_answer &&
+			!Array.isArray(questionData.correct_answer) &&
+			typeof questionData.correct_answer === 'object'
+			? (questionData.correct_answer as Record<string, number[]>)
+			: {}
+	);
+
 	let openTagDialog: boolean = $state(false);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
@@ -144,6 +188,14 @@
 				answer == null ||
 				(typeof answer === 'number' && isNaN(answer)) ||
 				String(answer).trim() === ''
+			);
+		}
+
+		if (type === QuestionTypeEnum.MatrixMatch) {
+			return (
+				matrixLeftItems.some((i) => !i.value.trim()) ||
+				matrixRightItems.some((i) => !i.value.trim()) ||
+				matrixLeftItems.some((i) => !matrixMatches[i.key]?.length)
 			);
 		}
 
@@ -243,6 +295,8 @@
 												Subjective
 											{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger || $formData.question_type === QuestionTypeEnum.NumericalDecimal}
 												Numerical
+											{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
+												Matrix Match
 											{:else}
 												Single/Multiple Choice
 											{/if}
@@ -254,6 +308,7 @@
 										>
 										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
 										<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
+										<Select.Item value={QuestionTypeEnum.MatrixMatch}>Matrix Match</Select.Item>
 									</Select.Content>
 								</Select.Root>
 							</div>
@@ -375,6 +430,231 @@
 								>
 							</div>
 						</div>
+					{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
+						<div class="flex flex-col gap-4">
+							{@render snippetHeading('Match The Following')}
+							<div class="flex gap-4">
+								<div class="flex flex-1 flex-col gap-2">
+									<Input bind:value={matrixRowLabel} class="font-semibold" />
+									<div
+										class="flex flex-col gap-2"
+										use:dragHandleZone={{
+											items: matrixLeftItems,
+											flipDurationMs: 150,
+											type: 'matrix-left'
+										}}
+										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
+										onfinalize={({ detail }) => {
+											// Preserve matches by mapping old key using item id
+											const matchesByItemId: Record<number, number[]> = {};
+											for (const item of matrixLeftItems) {
+												if (matrixMatches[item.key]?.length) {
+													matchesByItemId[item.id] = matrixMatches[item.key];
+												}
+											}
+
+											// Reassign keys based on new position
+											matrixLeftItems = detail.items.map((item, i) => ({
+												...item,
+												key: String(i + 1)
+											}));
+
+											// Rebuild matrixMatches using new keys
+											const newMatches: Record<string, number[]> = {};
+											for (const item of matrixLeftItems) {
+												if (matchesByItemId[item.id]) {
+													newMatches[item.key] = matchesByItemId[item.id];
+												}
+											}
+											matrixMatches = newMatches;
+										}}
+									>
+										{#each matrixLeftItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<div class="flex flex-1 flex-row rounded-sm border border-black">
+													<span use:dragHandle aria-label="drag handle">
+														<GripVertical
+															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+														/>
+													</span>
+													<Input class="border-0" bind:value={matrixLeftItems[index].value} />
+												</div>
+												<Trash_2
+													size={16}
+													class={[
+														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+														matrixLeftItems.length > 1
+															? 'cursor-pointer group-hover:opacity-100'
+															: ''
+													]}
+													onclick={() => {
+														if (matrixLeftItems.length > 1) {
+															const removedKey = matrixLeftItems[index].key;
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({ ...item, key: String(i + 1) }));
+															const { [removedKey]: _, ...rest } = matrixMatches;
+															matrixMatches = rest;
+														}
+													}}
+												/>
+											</div>
+										{/each}
+									</div>
+									<Button
+										variant="outline"
+										class="text-primary border-primary mt-1 self-start"
+										onclick={() => {
+											matrixLeftItems.push({
+												id: Date.now(),
+												key: String(matrixLeftItems.length + 1),
+												value: ''
+											});
+										}}
+									>
+										<Plus />Add Question
+									</Button>
+								</div>
+
+								<div class="flex flex-1 flex-col gap-2">
+									<Input bind:value={matrixColLabel} class="font-semibold" />
+									<div
+										class="flex flex-col gap-2"
+										use:dragHandleZone={{
+											items: matrixRightItems,
+											flipDurationMs: 150,
+											type: 'matrix-right'
+										}}
+										onconsider={({ detail }) => (matrixRightItems = detail.items)}
+										onfinalize={({ detail }) => {
+											matrixRightItems = detail.items.map((item, i) => ({
+												...item,
+												key: String.fromCharCode(65 + i)
+											}));
+										}}
+									>
+										{#each matrixRightItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<div class="flex flex-1 flex-row rounded-sm border border-black">
+													<span use:dragHandle aria-label="drag handle">
+														<GripVertical
+															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+														/>
+													</span>
+													<Input class="border-0" bind:value={matrixRightItems[index].value} />
+												</div>
+												<Trash_2
+													size={16}
+													class={[
+														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+														matrixRightItems.length > 1
+															? 'cursor-pointer group-hover:opacity-100'
+															: ''
+													]}
+													onclick={() => {
+														if (matrixRightItems.length > 1) {
+															const removedId = matrixRightItems[index].id;
+															matrixRightItems = matrixRightItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({
+																	...item,
+																	key: String.fromCharCode(65 + i)
+																}));
+															matrixMatches = Object.fromEntries(
+																Object.entries(matrixMatches).map(([k, ids]) => [
+																	k,
+																	ids.filter((id) => id !== removedId)
+																])
+															);
+														}
+													}}
+												/>
+											</div>
+										{/each}
+									</div>
+									<Button
+										variant="outline"
+										class="text-primary border-primary mt-1 self-start"
+										onclick={() => {
+											matrixRightItems.push({
+												id: Date.now(),
+												key: String.fromCharCode(65 + matrixRightItems.length),
+												value: ''
+											});
+										}}
+									>
+										<Plus />Add Answer
+									</Button>
+								</div>
+							</div>
+
+							<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+								<p class="mb-3 text-sm font-semibold text-gray-700">Correct Answers</p>
+
+								<div class="mb-2 flex items-end gap-4 border-b border-gray-200 pb-2">
+									<span class="min-w-0 flex-1 text-xs font-medium text-gray-500"
+										>{matrixRowLabel}</span
+									>
+									<div class="flex flex-col items-center gap-1">
+										<span class="text-xs font-medium tracking-wide text-gray-500"
+											>{matrixColLabel}</span
+										>
+										<div class="flex gap-2">
+											{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}
+												<span class="w-16 truncate text-center text-xs text-gray-400"
+													>{rightColumnItem.value || rightColumnItem.key}</span
+												>
+											{/each}
+										</div>
+									</div>
+								</div>
+
+								{#each matrixLeftItems as leftItem (leftItem.key)}
+									<div
+										class="flex items-center gap-4 rounded px-1 py-2 transition-colors hover:bg-white"
+									>
+										<span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800"
+											><span class="text-muted-foreground mr-1 font-semibold">{leftItem.key}.</span
+											>{leftItem.value || leftItem.key}</span
+										>
+										<div class="flex gap-2">
+											{#each matrixRightItems as rightItem (rightItem.id)}
+												{@const checked = (matrixMatches[leftItem.key] ?? []).includes(
+													rightItem.id
+												)}
+												<button
+													type="button"
+													class="w-16 rounded border py-1 text-xs font-semibold transition-all duration-150 {checked
+														? 'border-primary bg-primary text-white shadow-sm'
+														: 'hover:border-primary/60 hover:text-primary border-gray-200 bg-white text-gray-400'}"
+													onclick={() => {
+														const current = matrixMatches[leftItem.key] ?? [];
+														matrixMatches = {
+															...matrixMatches,
+															[leftItem.key]: checked
+																? current.filter((id) => id !== rightItem.id)
+																: [...current, rightItem.id]
+														};
+													}}
+												>
+													{rightItem.key}
+												</button>
+											{/each}
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
 					{:else}
 						<div class="flex flex-col gap-2">
 							{@render snippetHeading('Correct Answer')}
@@ -494,7 +774,13 @@
 						instructions: $formData.instructions,
 						marking_scheme: $formData.marking_scheme,
 						is_mandatory: $formData.is_mandatory,
-						question_type: $formData.question_type
+						question_type: $formData.question_type,
+						matrix: {
+							rowLabel: matrixRowLabel,
+							colLabel: matrixColLabel,
+							rows: matrixLeftItems,
+							columns: matrixRightItems
+						}
 					}}
 				/>
 

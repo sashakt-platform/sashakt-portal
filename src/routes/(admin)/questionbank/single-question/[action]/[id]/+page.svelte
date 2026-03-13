@@ -445,11 +445,28 @@
 										}}
 										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
 										onfinalize={({ detail }) => {
+											// Preserve matches by mapping old key using item id
+											const matchesByItemId: Record<number, number[]> = {};
+											for (const item of matrixLeftItems) {
+												if (matrixMatches[item.key]?.length) {
+													matchesByItemId[item.id] = matrixMatches[item.key];
+												}
+											}
+
+											// Reassign keys based on new position
 											matrixLeftItems = detail.items.map((item, i) => ({
 												...item,
 												key: String(i + 1)
 											}));
-											matrixMatches = {};
+
+											// Rebuild matrixMatches using new keys
+											const newMatches: Record<string, number[]> = {};
+											for (const item of matrixLeftItems) {
+												if (matchesByItemId[item.id]) {
+													newMatches[item.key] = matchesByItemId[item.id];
+												}
+											}
+											matrixMatches = newMatches;
 										}}
 									>
 										{#each matrixLeftItems as item, index (item.id)}
@@ -519,7 +536,6 @@
 												...item,
 												key: String.fromCharCode(65 + i)
 											}));
-											matrixMatches = {};
 										}}
 									>
 										{#each matrixRightItems as item, index (item.id)}

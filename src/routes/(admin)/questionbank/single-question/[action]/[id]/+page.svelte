@@ -547,7 +547,7 @@
 													]}
 													onclick={() => {
 														if (matrixRightItems.length > 1) {
-															const removedKey = matrixRightItems[index].key;
+															const removedId = matrixRightItems[index].id;
 															matrixRightItems = matrixRightItems
 																.filter((_, i) => i !== index)
 																.map((item, i) => ({
@@ -555,7 +555,10 @@
 																	key: String.fromCharCode(65 + i)
 																}));
 															matrixMatches = Object.fromEntries(
-																Object.entries(matrixMatches).filter(([, v]) => v !== removedKey)
+																Object.entries(matrixMatches).map(([k, ids]) => [
+																	k,
+																	ids.filter((id) => id !== removedId)
+																])
 															);
 														}
 													}}

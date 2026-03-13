@@ -599,7 +599,7 @@
 							</div>
 
 							<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-								<p class="mb-3 text-sm font-semibold text-gray-700">Correct Matches</p>
+								<p class="mb-3 text-sm font-semibold text-gray-700">Correct Answers</p>
 
 								<div class="mb-2 flex items-end gap-4 border-b border-gray-200 pb-2">
 									<span class="min-w-0 flex-1 text-xs font-medium text-gray-500"

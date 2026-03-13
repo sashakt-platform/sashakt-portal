@@ -1295,11 +1295,11 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			expect(screen.getByText('Match The Following')).toBeInTheDocument();
 		});
 
-		it('should render Correct Matches section', () => {
+		it('should render Correct Answers section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
-			expect(screen.getByText('Correct Matches')).toBeInTheDocument();
+			expect(screen.getByText('Correct Answers')).toBeInTheDocument();
 		});
 
 		it('should display prefilled left column label', () => {
@@ -1589,7 +1589,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 		});
 	});
 
-	describe('Matrix Match Correct Matches Toggle', () => {
+	describe('Matrix Match Correct Answers Toggle', () => {
 		it('should render match toggle buttons for each left-right pair', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any

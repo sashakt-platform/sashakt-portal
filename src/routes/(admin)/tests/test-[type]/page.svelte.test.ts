@@ -211,9 +211,7 @@ describe('Test Management Listing Page', () => {
 
 		it('reflects the current search value from params', () => {
 			render(TestListingPage, { data: withSearch('existing query') });
-			expect(screen.getByPlaceholderText('Search test sessions...')).toHaveValue(
-				'existing query'
-			);
+			expect(screen.getByPlaceholderText('Search test sessions...')).toHaveValue('existing query');
 		});
 
 		it('shows empty value when search param is empty', () => {
@@ -341,9 +339,7 @@ describe('Test Management Listing Page', () => {
 		});
 
 		it('toggles sortOrder from asc to desc when clicking the already-active column', () => {
-			(page as any).url = new URL(
-				'http://localhost/tests/test-session?sortBy=name&sortOrder=asc'
-			);
+			(page as any).url = new URL('http://localhost/tests/test-session?sortBy=name&sortOrder=asc');
 			sortRef.handleSort!('name');
 
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
@@ -351,9 +347,7 @@ describe('Test Management Listing Page', () => {
 		});
 
 		it('keeps sortBy unchanged when toggling sort direction', () => {
-			(page as any).url = new URL(
-				'http://localhost/tests/test-session?sortBy=name&sortOrder=asc'
-			);
+			(page as any).url = new URL('http://localhost/tests/test-session?sortBy=name&sortOrder=asc');
 			sortRef.handleSort!('name');
 
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
@@ -361,9 +355,7 @@ describe('Test Management Listing Page', () => {
 		});
 
 		it('toggles sortOrder from desc to asc when clicking the already-active column again', () => {
-			(page as any).url = new URL(
-				'http://localhost/tests/test-session?sortBy=name&sortOrder=desc'
-			);
+			(page as any).url = new URL('http://localhost/tests/test-session?sortBy=name&sortOrder=desc');
 			sortRef.handleSort!('name');
 
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
@@ -371,9 +363,7 @@ describe('Test Management Listing Page', () => {
 		});
 
 		it('switches sortBy and resets sortOrder to asc when clicking a different column', () => {
-			(page as any).url = new URL(
-				'http://localhost/tests/test-session?sortBy=name&sortOrder=desc'
-			);
+			(page as any).url = new URL('http://localhost/tests/test-session?sortBy=name&sortOrder=desc');
 			sortRef.handleSort!('created_at');
 
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];

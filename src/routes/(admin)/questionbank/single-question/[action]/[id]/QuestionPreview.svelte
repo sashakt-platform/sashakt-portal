@@ -159,39 +159,57 @@
 				<Input type="number" class="w-full" bind:value={numberAnswer} inputmode="numeric" />
 			{:else if questionType === QuestionTypeEnum.MatrixRating}
 				{#if matrixRows.length > 0 && matrixColumns.length > 0}
-					<div class="flex flex-col gap-1">
-						<div class="flex items-center border-b border-gray-200 pb-2">
-							<span class="flex-1 text-xs font-semibold text-gray-600">{matrix?.rowLabel}</span>
-							{#each matrixColumns as col (col.id)}
-								<span class="w-14 text-center text-xs font-semibold text-gray-600"
-									>{col.value || col.key}</span
-								>
-							{/each}
-						</div>
-
-						{#each matrixRows as row (row.id)}
-							<RadioGroup.Root
-								value={matrixRatingSelections[row.key] ?? ''}
-								onValueChange={(v) =>
-									(matrixRatingSelections = { ...matrixRatingSelections, [row.key]: v })}
-								class="flex items-center border-b border-gray-100 py-2 last:border-0"
-							>
-								<span class="flex-1 text-sm font-medium text-gray-800">
-									<span class="text-muted-foreground mr-1 font-semibold">{row.key}.</span
-									>{row.value}
-								</span>
-								{#each matrixColumns as col (col.id)}
-									<div class="flex w-14 justify-center">
-										<RadioGroup.Item
-											value={String(col.id)}
-											class={matrixRatingSelections[row.key] === String(col.id)
-												? 'border-primary [&_svg]:fill-primary'
-												: ''}
-										/>
-									</div>
+					<div class="overflow-x-auto">
+						<table class="w-full border-collapse text-sm">
+							<thead>
+								<tr>
+									<th
+										class="border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
+									>
+										{matrix?.rowLabel || 'Item'}
+									</th>
+									{#each matrixColumns as col (col.id)}
+										<th
+											class="border border-gray-200 bg-gray-50 px-4 py-3 text-center text-sm font-semibold text-gray-700"
+										>
+											{col.value || col.key}
+										</th>
+									{/each}
+								</tr>
+							</thead>
+							<tbody>
+								{#each matrixRows as row (row.id)}
+									<tr>
+										<td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800">
+											{row.value}
+										</td>
+										{#each matrixColumns as col (col.id)}
+											<td class="border border-gray-200 px-4 py-3 text-center">
+												<button
+													type="button"
+													role="radio"
+													aria-checked={matrixRatingSelections[row.key] === String(col.id)}
+													class="mx-auto flex size-4 items-center justify-center rounded-full border transition-colors
+														{matrixRatingSelections[row.key] === String(col.id)
+															? 'border-primary'
+															: 'border-gray-400 hover:border-gray-500'}"
+													onclick={() => {
+														matrixRatingSelections = {
+															...matrixRatingSelections,
+															[row.key]: String(col.id)
+														};
+													}}
+												>
+													{#if matrixRatingSelections[row.key] === String(col.id)}
+														<div class="bg-primary size-2 rounded-full"></div>
+													{/if}
+												</button>
+											</td>
+										{/each}
+									</tr>
 								{/each}
-							</RadioGroup.Root>
-						{/each}
+							</tbody>
+						</table>
 					</div>
 				{:else}
 					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>

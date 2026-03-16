@@ -42,6 +42,7 @@
 	let subjectiveAnswer: string = $state('');
 	let numberAnswer: number | null = $state(null);
 	let matrixSelections: Record<string, number[]> = $state({});
+	let matrixRatingSelections: Record<string, string> = $state({});
 
 	function resetSelections() {
 		selectedSingleChoice = '';
@@ -49,6 +50,7 @@
 		subjectiveAnswer = '';
 		numberAnswer = null;
 		matrixSelections = {};
+		matrixRatingSelections = {};
 	}
 </script>
 
@@ -155,6 +157,45 @@
 				{/each}
 			{:else if questionType === QuestionTypeEnum.NumericalInteger || questionType === QuestionTypeEnum.NumericalDecimal}
 				<Input type="number" class="w-full" bind:value={numberAnswer} inputmode="numeric" />
+			{:else if questionType === QuestionTypeEnum.MatrixRating}
+				{#if matrixRows.length > 0 && matrixColumns.length > 0}
+					<div class="flex flex-col gap-1">
+						<div class="flex items-center border-b border-gray-200 pb-2">
+							<span class="flex-1 text-xs font-semibold text-gray-600">{matrix?.rowLabel}</span>
+							{#each matrixColumns as col (col.id)}
+								<span class="w-14 text-center text-xs font-semibold text-gray-600"
+									>{col.value || col.key}</span
+								>
+							{/each}
+						</div>
+
+						{#each matrixRows as row (row.id)}
+							<RadioGroup.Root
+								value={matrixRatingSelections[row.key] ?? ''}
+								onValueChange={(v) =>
+									(matrixRatingSelections = { ...matrixRatingSelections, [row.key]: v })}
+								class="flex items-center border-b border-gray-100 py-2 last:border-0"
+							>
+								<span class="flex-1 text-sm font-medium text-gray-800">
+									<span class="text-muted-foreground mr-1 font-semibold">{row.key}.</span
+									>{row.value}
+								</span>
+								{#each matrixColumns as col (col.id)}
+									<div class="flex w-14 justify-center">
+										<RadioGroup.Item
+											value={String(col.id)}
+											class={matrixRatingSelections[row.key] === String(col.id)
+												? 'border-primary [&_svg]:fill-primary'
+												: ''}
+										/>
+									</div>
+								{/each}
+							</RadioGroup.Root>
+						{/each}
+					</div>
+				{:else}
+					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>
+				{/if}
 			{:else if questionType === QuestionTypeEnum.MatrixMatch}
 				{#if matrixRows.length > 0 && matrixColumns.length > 0}
 					<div class="mb-5 grid grid-cols-2 gap-6 border-b border-gray-200 pb-5">

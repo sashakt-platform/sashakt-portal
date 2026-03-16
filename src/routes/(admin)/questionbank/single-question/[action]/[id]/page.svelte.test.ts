@@ -1257,6 +1257,52 @@ describe('Single Question Page - Numerical Auto-Detection', () => {
 	});
 });
 
+describe('Single Question Page - Matrix Rating Question Type', () => {
+	const matrixRatingQuestionData = {
+		question_text: 'Rate the following',
+		question_type: QuestionTypeEnum.MatrixRating,
+		options: {
+			rows: {
+				label: 'Criteria',
+				items: [
+					{ id: 1, key: '1', value: 'Quality' },
+					{ id: 2, key: '2', value: 'Speed' }
+				]
+			},
+			columns: {
+				label: 'Ratings',
+				items: [
+					{ id: 10, key: 'A', value: 'Poor' },
+					{ id: 11, key: 'B', value: 'Good' }
+				]
+			}
+		},
+		correct_answer: { '1': [10], '2': [11] },
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 2, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('QuestionTypeEnum', () => {
+		it('should have MatrixRating value in QuestionTypeEnum', () => {
+			expect(QuestionTypeEnum.MatrixRating).toBe('matrix-rating');
+		});
+	});
+
+	describe('Question Type Dropdown', () => {
+		it('should show "Matrix Rating" label in trigger when matrix-rating type is set', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByText('Matrix Rating')).toBeInTheDocument();
+		});
+	});
+});
+
 describe('Single Question Page - Matrix Match Question Type', () => {
 	const matrixMatchQuestionData = {
 		question_text: 'Match the following capitals',

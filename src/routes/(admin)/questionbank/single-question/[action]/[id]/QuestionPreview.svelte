@@ -8,8 +8,13 @@
 	import Eye from '@lucide/svelte/icons/eye';
 	import { QuestionTypeEnum } from './schema';
 	import { Input } from '$lib/components/ui/input';
+	import MediaDisplay from '$lib/components/MediaDisplay.svelte';
+	import type { TMedia } from '$lib/types/media';
 
 	const { data } = $props();
+
+	const media = $derived(data?.media as TMedia | null | undefined);
+	const optionMediaMap = $derived((data?.optionMediaMap ?? {}) as Record<number, TMedia | null>);
 
 	let openPreviewDialog: boolean = $state(false);
 
@@ -99,6 +104,7 @@
 				{#if instructions.trim()}
 					<p class="text-muted-foreground mt-2 text-sm">{instructions}</p>
 				{/if}
+				<MediaDisplay {media} />
 			</div>
 
 			{#if questionType === QuestionTypeEnum.Subjective}
@@ -114,17 +120,24 @@
 							{@const uid = `preview-${opt.key}`}
 							<Label
 								for={uid}
-								class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedSingleChoice ===
+								class="flex w-full cursor-pointer flex-col rounded-xl border px-4 py-5 {selectedSingleChoice ===
 								opt.key
 									? 'bg-primary text-muted *:border-muted *:text-muted'
 									: ''}"
 							>
-								<span>{opt.key}. {opt.value}</span>
-								<RadioGroup.Item
-									value={opt.key}
-									id={uid}
-									class={selectedSingleChoice === opt.key ? 'border-white [&_svg]:fill-white' : ''}
-								/>
+								<div class="flex w-full items-center justify-between">
+									<span>{opt.key}. {opt.value}</span>
+									<RadioGroup.Item
+										value={opt.key}
+										id={uid}
+										class={selectedSingleChoice === opt.key
+											? 'border-white [&_svg]:fill-white'
+											: ''}
+									/>
+								</div>
+								{#if optionMediaMap[opt.id]}
+									<MediaDisplay media={optionMediaMap[opt.id]} compact />
+								{/if}
 							</Label>
 						{/each}
 					</RadioGroup.Root>
@@ -137,19 +150,26 @@
 					<div class="flex flex-row items-start space-x-3">
 						<Label
 							for={uid}
-							class="mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedMultiChoices[
+							class="mb-2 flex w-full cursor-pointer flex-col rounded-xl border px-4 py-5 {selectedMultiChoices[
 								opt.key
 							]
 								? 'bg-primary text-muted *:border-muted *:text-muted'
 								: ''}"
 						>
-							<span>{opt.key}. {opt.value}</span>
-							<Checkbox
-								id={uid}
-								checked={selectedMultiChoices[opt.key] || false}
-								onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
-								class={selectedMultiChoices[opt.key] ? 'text-primary! border-white! bg-white!' : ''}
-							/>
+							<div class="flex w-full items-center justify-between">
+								<span>{opt.key}. {opt.value}</span>
+								<Checkbox
+									id={uid}
+									checked={selectedMultiChoices[opt.key] || false}
+									onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
+									class={selectedMultiChoices[opt.key]
+										? 'text-primary! border-white! bg-white!'
+										: ''}
+								/>
+							</div>
+							{#if optionMediaMap[opt.id]}
+								<MediaDisplay media={optionMediaMap[opt.id]} compact />
+							{/if}
 						</Label>
 					</div>
 				{/each}

@@ -424,9 +424,7 @@ describe('Question_preview', () => {
 			});
 			await openDialog();
 
-			expect(
-				screen.queryByText('Add options to see them in preview...')
-			).not.toBeInTheDocument();
+			expect(screen.queryByText('Add options to see them in preview...')).not.toBeInTheDocument();
 		});
 
 		it('allows entering a number value', async () => {

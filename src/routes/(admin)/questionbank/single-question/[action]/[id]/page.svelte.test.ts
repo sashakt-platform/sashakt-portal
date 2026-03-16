@@ -63,9 +63,12 @@ describe('Single Question Page - Create Mode', () => {
 			const questionInput = screen.getByPlaceholderText('Enter your Question...');
 			await fireEvent.input(questionInput, { target: { value: 'What is Svelte?' } });
 
-			const inputs = screen.getAllByRole('textbox');
-			await fireEvent.input(inputs[1], { target: { value: 'A framework' } });
-			await fireEvent.input(inputs[2], { target: { value: 'A library' } });
+			// Find answer option inputs by their name attribute (A, B, C, D)
+			const optionInputs = screen
+				.getAllByRole('textbox')
+				.filter((el) => /^[A-Z]$/.test(el.getAttribute('name') || ''));
+			await fireEvent.input(optionInputs[0], { target: { value: 'A framework' } });
+			await fireEvent.input(optionInputs[1], { target: { value: 'A library' } });
 
 			const checkboxes = screen.getAllByRole('checkbox');
 			await fireEvent.click(checkboxes[1]);

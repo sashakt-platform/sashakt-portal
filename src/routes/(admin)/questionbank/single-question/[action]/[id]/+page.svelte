@@ -239,6 +239,11 @@
 
 <form method="POST" action="?/save" use:enhance>
 	<div class="mx-auto flex flex-col gap-10 py-8">
+		{#snippet matrixAddButton(label: string, onclick: () => void)}
+			<Button variant="outline" class="text-primary border-primary mt-1 self-start" {onclick}>
+				<Plus />{label}
+			</Button>
+		{/snippet}
 		{#snippet matrixTrashButton(canDelete: boolean, onclick: () => void)}
 			<Trash_2
 				size={16}
@@ -529,19 +534,13 @@
 											</div>
 										{/each}
 									</div>
-									<Button
-										variant="outline"
-										class="text-primary border-primary mt-1 self-start"
-										onclick={() => {
-											matrixLeftItems.push({
-												id: Date.now(),
-												key: String(matrixLeftItems.length + 1),
-												value: ''
-											});
-										}}
-									>
-										<Plus />Add Question
-									</Button>
+									{@render matrixAddButton('Add Question', () => {
+										matrixLeftItems.push({
+											id: Date.now(),
+											key: String(matrixLeftItems.length + 1),
+											value: ''
+										});
+									})}
 								</div>
 
 								<div class="flex flex-1 flex-col gap-2">
@@ -596,19 +595,13 @@
 											</div>
 										{/each}
 									</div>
-									<Button
-										variant="outline"
-										class="text-primary border-primary mt-1 self-start"
-										onclick={() => {
-											matrixRightItems.push({
-												id: Date.now(),
-												key: String.fromCharCode(65 + matrixRightItems.length),
-												value: ''
-											});
-										}}
-									>
-										<Plus />Add Answer
-									</Button>
+									{@render matrixAddButton('Add Answer', () => {
+										matrixRightItems.push({
+											id: Date.now(),
+											key: String.fromCharCode(65 + matrixRightItems.length),
+											value: ''
+										});
+									})}
 								</div>
 							</div>
 
@@ -698,19 +691,13 @@
 											</div>
 										{/each}
 									</div>
-									<Button
-										variant="outline"
-										class="text-primary border-primary mt-1 self-start"
-										onclick={() => {
-											matrixLeftItems.push({
-												id: Date.now(),
-												key: String(matrixLeftItems.length + 1),
-												value: ''
-											});
-										}}
-									>
-										<Plus />Add Item
-									</Button>
+									{@render matrixAddButton('Add Item', () => {
+										matrixLeftItems.push({
+											id: Date.now(),
+											key: String(matrixLeftItems.length + 1),
+											value: ''
+										});
+									})}
 								</div>
 
 								<div class="flex flex-1 flex-col gap-2">
@@ -741,19 +728,13 @@
 											</div>
 										{/each}
 									</div>
-									<Button
-										variant="outline"
-										class="text-primary border-primary mt-1 self-start"
-										onclick={() => {
-											matrixRightItems.push({
-												id: Date.now(),
-												key: String.fromCharCode(65 + matrixRightItems.length),
-												value: ''
-											});
-										}}
-									>
-										<Plus />Add Rating
-									</Button>
+									{@render matrixAddButton('Add Rating', () => {
+										matrixRightItems.push({
+											id: Date.now(),
+											key: String.fromCharCode(65 + matrixRightItems.length),
+											value: ''
+										});
+									})}
 								</div>
 							</div>
 						</div>

@@ -160,6 +160,52 @@ describe('actions.addField — fixed token names', () => {
 		);
 	});
 
+	it('should return fail(500) and show error when a duplicate custom field name is used', async () => {
+		const duplicateName = 'participant_city';
+		const firstField = { ...validFieldBase, name: duplicateName, label: 'City' };
+		const secondField = { ...validFieldBase, name: duplicateName, label: 'City Again' };
+
+		// First call succeeds
+		mockFetch.mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ id: 10, ...firstField })
+		});
+
+		const firstResult = await actions.addField({
+			request: buildRequest(firstField),
+			params: { action: 'edit', id: '42' },
+			cookies: {} as any
+		} as any);
+
+		expect(firstResult).toEqual({ success: true, id: 10 });
+
+		vi.clearAllMocks();
+
+		// Second call with the same name is rejected by the backend
+		const backendErrorMsg = `Field with name '${duplicateName}' already exists in this form.`;
+		mockFetch.mockResolvedValueOnce({
+			ok: false,
+			json: async () => ({
+				detail: [{ msg: backendErrorMsg }]
+			})
+		});
+
+		await actions.addField({
+			request: buildRequest(secondField),
+			params: { action: 'edit', id: '42' },
+			cookies: {} as any
+		} as any);
+
+		const { fail } = await import('@sveltejs/kit');
+		expect(fail).toHaveBeenCalledWith(500, {});
+
+		const { setFlash } = await import('sveltekit-flash-message/server');
+		expect(setFlash).toHaveBeenCalledWith(
+			expect.objectContaining({ type: 'error', message: backendErrorMsg }),
+			expect.anything()
+		);
+	});
+
 	it('should succeed when a non-reserved name is used', async () => {
 		const fieldData = { ...validFieldBase, name: 'full_name_custom' };
 

@@ -1277,7 +1277,7 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 				]
 			}
 		},
-		correct_answer: { '1': [10], '2': [11] },
+		correct_answer: null,
 		is_mandatory: false,
 		is_active: true,
 		marking_scheme: { correct: 2, wrong: 0, skipped: 0 }

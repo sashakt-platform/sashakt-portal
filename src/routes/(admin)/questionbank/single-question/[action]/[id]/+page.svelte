@@ -81,6 +81,18 @@
 					}
 				};
 				$formData.correct_answer = matrixMatches;
+			} else if ($formData.question_type === QuestionTypeEnum.MatrixRating) {
+				$formData.options = {
+					rows: {
+						label: matrixRowLabel,
+						items: matrixLeftItems.map(({ id, key, value }) => ({ id, key, value }))
+					},
+					columns: {
+						label: matrixColLabel,
+						items: matrixRightItems.map(({ id, key, value }) => ({ id, key, value }))
+					}
+				};
+				$formData.correct_answer = [];
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -196,6 +208,13 @@
 				matrixLeftItems.some((i) => !i.value.trim()) ||
 				matrixRightItems.some((i) => !i.value.trim()) ||
 				matrixLeftItems.some((i) => !matrixMatches[i.key]?.length)
+			);
+		}
+
+		if (type === QuestionTypeEnum.MatrixRating) {
+			return (
+				matrixLeftItems.some((i) => !i.value.trim()) ||
+				matrixRightItems.some((i) => !i.value.trim())
 			);
 		}
 
@@ -656,6 +675,112 @@
 										</div>
 									</div>
 								{/each}
+							</div>
+						</div>
+					{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
+						<div class="flex flex-col gap-4">
+							{@render snippetHeading('Rating Matrix')}
+							<div class="flex gap-4">
+								<div class="flex flex-1 flex-col gap-2">
+									<Input bind:value={matrixRowLabel} class="font-semibold" />
+									<p class="text-xs font-medium text-gray-500">Items to Rate</p>
+									<div class="flex flex-col gap-2">
+										{#each matrixLeftItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<Input
+													class="flex-1 border border-black"
+													bind:value={matrixLeftItems[index].value}
+												/>
+												<Trash_2
+													size={16}
+													class={[
+														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+														matrixLeftItems.length > 1
+															? 'cursor-pointer group-hover:opacity-100'
+															: ''
+													]}
+													onclick={() => {
+														if (matrixLeftItems.length > 1) {
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((it, i) => ({ ...it, key: String(i + 1) }));
+														}
+													}}
+												/>
+											</div>
+										{/each}
+									</div>
+									<Button
+										variant="outline"
+										class="text-primary border-primary mt-1 self-start"
+										onclick={() => {
+											matrixLeftItems.push({
+												id: Date.now(),
+												key: String(matrixLeftItems.length + 1),
+												value: ''
+											});
+										}}
+									>
+										<Plus />Add Item
+									</Button>
+								</div>
+
+								<div class="flex flex-1 flex-col gap-2">
+									<Input bind:value={matrixColLabel} class="font-semibold" />
+									<p class="text-xs font-medium text-gray-500">Rating Options</p>
+									<div class="flex flex-col gap-2">
+										{#each matrixRightItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<Input
+													class="flex-1 border border-black"
+													bind:value={matrixRightItems[index].value}
+												/>
+												<Trash_2
+													size={16}
+													class={[
+														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+														matrixRightItems.length > 1
+															? 'cursor-pointer group-hover:opacity-100'
+															: ''
+													]}
+													onclick={() => {
+														if (matrixRightItems.length > 1) {
+															matrixRightItems = matrixRightItems
+																.filter((_, i) => i !== index)
+																.map((it, i) => ({
+																	...it,
+																	key: String.fromCharCode(65 + i)
+																}));
+														}
+													}}
+												/>
+											</div>
+										{/each}
+									</div>
+									<Button
+										variant="outline"
+										class="text-primary border-primary mt-1 self-start"
+										onclick={() => {
+											matrixRightItems.push({
+												id: Date.now(),
+												key: String.fromCharCode(65 + matrixRightItems.length),
+												value: ''
+											});
+										}}
+									>
+										<Plus />Add Rating
+									</Button>
+								</div>
 							</div>
 						</div>
 					{:else}

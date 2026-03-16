@@ -213,7 +213,7 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: errorMessage.detail[0].msg || errorMessage.detail || 'Failed to add field'
+					message: errorMessage.detail?.[0]?.msg || errorMessage.detail || 'Failed to add field'
 				},
 				cookies
 			);

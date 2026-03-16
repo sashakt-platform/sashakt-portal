@@ -239,6 +239,16 @@
 
 <form method="POST" action="?/save" use:enhance>
 	<div class="mx-auto flex flex-col gap-10 py-8">
+		{#snippet matrixTrashButton(canDelete: boolean, onclick: () => void)}
+			<Trash_2
+				size={16}
+				class={[
+					'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
+					canDelete ? 'cursor-pointer group-hover:opacity-100' : ''
+				]}
+				{onclick}
+			/>
+		{/snippet}
 		{#snippet snippetHeading(title: string)}
 			<div class="bg-primary-foreground flex flex-row gap-3 rounded-sm px-4 py-3 align-middle">
 				<Label class="text-md my-auto font-bold">{title}</Label><Info
@@ -506,25 +516,16 @@
 													</span>
 													<Input class="border-0" bind:value={matrixLeftItems[index].value} />
 												</div>
-												<Trash_2
-													size={16}
-													class={[
-														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-														matrixLeftItems.length > 1
-															? 'cursor-pointer group-hover:opacity-100'
-															: ''
-													]}
-													onclick={() => {
-														if (matrixLeftItems.length > 1) {
-															const removedKey = matrixLeftItems[index].key;
-															matrixLeftItems = matrixLeftItems
-																.filter((_, i) => i !== index)
-																.map((item, i) => ({ ...item, key: String(i + 1) }));
-															const { [removedKey]: _, ...rest } = matrixMatches;
-															matrixMatches = rest;
-														}
-													}}
-												/>
+												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+													if (matrixLeftItems.length > 1) {
+														const removedKey = matrixLeftItems[index].key;
+														matrixLeftItems = matrixLeftItems
+															.filter((_, i) => i !== index)
+															.map((item, i) => ({ ...item, key: String(i + 1) }));
+														const { [removedKey]: _, ...rest } = matrixMatches;
+														matrixMatches = rest;
+													}
+												})}
 											</div>
 										{/each}
 									</div>
@@ -575,32 +576,23 @@
 													</span>
 													<Input class="border-0" bind:value={matrixRightItems[index].value} />
 												</div>
-												<Trash_2
-													size={16}
-													class={[
-														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-														matrixRightItems.length > 1
-															? 'cursor-pointer group-hover:opacity-100'
-															: ''
-													]}
-													onclick={() => {
-														if (matrixRightItems.length > 1) {
-															const removedId = matrixRightItems[index].id;
-															matrixRightItems = matrixRightItems
-																.filter((_, i) => i !== index)
-																.map((item, i) => ({
-																	...item,
-																	key: String.fromCharCode(65 + i)
-																}));
-															matrixMatches = Object.fromEntries(
-																Object.entries(matrixMatches).map(([k, ids]) => [
-																	k,
-																	ids.filter((id) => id !== removedId)
-																])
-															);
-														}
-													}}
-												/>
+												{@render matrixTrashButton(matrixRightItems.length > 1, () => {
+													if (matrixRightItems.length > 1) {
+														const removedId = matrixRightItems[index].id;
+														matrixRightItems = matrixRightItems
+															.filter((_, i) => i !== index)
+															.map((item, i) => ({
+																...item,
+																key: String.fromCharCode(65 + i)
+															}));
+														matrixMatches = Object.fromEntries(
+															Object.entries(matrixMatches).map(([k, ids]) => [
+																k,
+																ids.filter((id) => id !== removedId)
+															])
+														);
+													}
+												})}
 											</div>
 										{/each}
 									</div>
@@ -696,22 +688,13 @@
 													class="flex-1 border border-black"
 													bind:value={matrixLeftItems[index].value}
 												/>
-												<Trash_2
-													size={16}
-													class={[
-														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-														matrixLeftItems.length > 1
-															? 'cursor-pointer group-hover:opacity-100'
-															: ''
-													]}
-													onclick={() => {
-														if (matrixLeftItems.length > 1) {
-															matrixLeftItems = matrixLeftItems
-																.filter((_, i) => i !== index)
-																.map((it, i) => ({ ...it, key: String(i + 1) }));
-														}
-													}}
-												/>
+												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+													if (matrixLeftItems.length > 1) {
+														matrixLeftItems = matrixLeftItems
+															.filter((_, i) => i !== index)
+															.map((it, i) => ({ ...it, key: String(i + 1) }));
+													}
+												})}
 											</div>
 										{/each}
 									</div>
@@ -745,25 +728,16 @@
 													class="flex-1 border border-black"
 													bind:value={matrixRightItems[index].value}
 												/>
-												<Trash_2
-													size={16}
-													class={[
-														'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-														matrixRightItems.length > 1
-															? 'cursor-pointer group-hover:opacity-100'
-															: ''
-													]}
-													onclick={() => {
-														if (matrixRightItems.length > 1) {
-															matrixRightItems = matrixRightItems
-																.filter((_, i) => i !== index)
-																.map((it, i) => ({
-																	...it,
-																	key: String.fromCharCode(65 + i)
-																}));
-														}
-													}}
-												/>
+												{@render matrixTrashButton(matrixRightItems.length > 1, () => {
+													if (matrixRightItems.length > 1) {
+														matrixRightItems = matrixRightItems
+															.filter((_, i) => i !== index)
+															.map((it, i) => ({
+																...it,
+																key: String.fromCharCode(65 + i)
+															}));
+													}
+												})}
 											</div>
 										{/each}
 									</div>

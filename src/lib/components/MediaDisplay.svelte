@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { TMedia } from '$lib/types/media';
-	import ImageOff from '@lucide/svelte/icons/image-off';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	let {

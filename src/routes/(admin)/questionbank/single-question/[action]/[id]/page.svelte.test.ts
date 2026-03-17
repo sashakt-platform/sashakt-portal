@@ -1301,6 +1301,247 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 			expect(screen.getByText('Matrix Rating')).toBeInTheDocument();
 		});
 	});
+
+	describe('Matrix Rating UI Rendering', () => {
+		it('should render "Rating Matrix" heading for matrix rating type', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByText('Rating Matrix')).toBeInTheDocument();
+		});
+
+		it('should render "Items to Rate" label', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByText('Items to Rate')).toBeInTheDocument();
+		});
+
+		it('should render "Rating Options" label', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByText('Rating Options')).toBeInTheDocument();
+		});
+
+		it('should display prefilled row label', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Criteria')).toBeInTheDocument();
+		});
+
+		it('should display prefilled column label', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Ratings')).toBeInTheDocument();
+		});
+
+		it('should display prefilled row items', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Quality')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Speed')).toBeInTheDocument();
+		});
+
+		it('should display prefilled rating option items', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Poor')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Good')).toBeInTheDocument();
+		});
+
+		it('should render "Add Item" button for row column', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			const buttons = Array.from(container.querySelectorAll('button'));
+			expect(buttons.find((btn) => btn.textContent?.includes('Add Item'))).toBeDefined();
+		});
+
+		it('should render "Add Rating" button for rating options column', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			const buttons = Array.from(container.querySelectorAll('button'));
+			expect(buttons.find((btn) => btn.textContent?.includes('Add Rating'))).toBeDefined();
+		});
+
+		it('should show default labels when no matrix options exist', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...matrixRatingQuestionData, options: null }
+				} as any
+			});
+			expect(screen.getByDisplayValue('Questions')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Answers')).toBeInTheDocument();
+		});
+
+		it('should not render "Correct Answers" section for matrix rating', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.queryByText('Correct Answers')).not.toBeInTheDocument();
+		});
+	});
+
+	describe('Matrix Rating Save Button State', () => {
+		it('should enable Save when all items and ratings are filled', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
+		});
+
+		it('should disable Save when question text is empty', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...matrixRatingQuestionData, question_text: '' }
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save when a row item value is empty', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						...matrixRatingQuestionData,
+						options: {
+							...matrixRatingQuestionData.options,
+							rows: {
+								label: 'Criteria',
+								items: [
+									{ id: 1, key: '1', value: '' },
+									{ id: 2, key: '2', value: 'Speed' }
+								]
+							}
+						}
+					}
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save when a rating option value is empty', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						...matrixRatingQuestionData,
+						options: {
+							...matrixRatingQuestionData.options,
+							columns: {
+								label: 'Ratings',
+								items: [
+									{ id: 10, key: 'A', value: 'Poor' },
+									{ id: 11, key: 'B', value: '' }
+								]
+							}
+						}
+					}
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+
+		it('should disable Save on fresh matrix rating with empty items', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Rate it',
+						question_type: QuestionTypeEnum.MatrixRating,
+						options: {
+							rows: { label: 'Items', items: [{ id: 1, key: '1', value: '' }] },
+							columns: { label: 'Ratings', items: [{ id: 1, key: 'A', value: '' }] }
+						},
+						correct_answer: null,
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+	});
+
+	describe('Matrix Rating Item Management', () => {
+		it('should add a new row item when "Add Item" is clicked', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+
+			const initialInputs = screen.getAllByRole('textbox');
+			const addItemButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Item')
+			)!;
+			await fireEvent.click(addItemButton);
+
+			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
+		});
+
+		it('should add a new rating option when "Add Rating" is clicked', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+
+			const initialInputs = screen.getAllByRole('textbox');
+			const addRatingButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Rating')
+			)!;
+			await fireEvent.click(addRatingButton);
+
+			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
+		});
+
+		it('should allow editing a row item value', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+
+			const qualityInput = screen.getByDisplayValue('Quality');
+			await fireEvent.input(qualityInput, { target: { value: 'Reliability' } });
+			expect(qualityInput).toHaveValue('Reliability');
+		});
+
+		it('should allow editing a rating option value', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+
+			const poorInput = screen.getByDisplayValue('Poor');
+			await fireEvent.input(poorInput, { target: { value: 'Below Average' } });
+			expect(poorInput).toHaveValue('Below Average');
+		});
+
+		it('should allow editing the row column label', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+
+			const criteriaLabel = screen.getByDisplayValue('Criteria');
+			await fireEvent.input(criteriaLabel, { target: { value: 'Dimensions' } });
+			expect(criteriaLabel).toHaveValue('Dimensions');
+		});
+
+		it('should allow editing the rating column label', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixRatingQuestionData } as any
+			});
+
+			const ratingsLabel = screen.getByDisplayValue('Ratings');
+			await fireEvent.input(ratingsLabel, { target: { value: 'Scale' } });
+			expect(ratingsLabel).toHaveValue('Scale');
+		});
+	});
 });
 
 describe('Single Question Page - Matrix Match Question Type', () => {

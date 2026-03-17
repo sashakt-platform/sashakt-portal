@@ -546,7 +546,6 @@ describe('Question_preview', () => {
 		it('renders a table with column headers', async () => {
 			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
 			await openDialog();
-			screen.logTestingPlaygroundURL();
 
 			expect(screen.getByRole('table')).toBeInTheDocument();
 			expect(screen.getByText('Poor')).toBeInTheDocument();

@@ -245,14 +245,21 @@
 			</Button>
 		{/snippet}
 		{#snippet matrixTrashButton(canDelete: boolean, onclick: () => void)}
-			<Trash_2
-				size={16}
-				class={[
-					'text-muted-foreground hover:text-destructive shrink-0 opacity-0',
-					canDelete ? 'cursor-pointer group-hover:opacity-100' : ''
-				]}
+			<button
+				type="button"
 				{onclick}
-			/>
+				disabled={!canDelete}
+				aria-label="Delete row"
+				class={[
+					'shrink-0 opacity-0',
+					canDelete ? 'cursor-pointer group-hover:opacity-100' : 'cursor-default'
+				]}
+			>
+				<Trash_2
+					size={16}
+					class="text-muted-foreground hover:text-destructive"
+				/>
+			</button>
 		{/snippet}
 		{#snippet snippetHeading(title: string)}
 			<div class="bg-primary-foreground flex flex-row gap-3 rounded-sm px-4 py-3 align-middle">

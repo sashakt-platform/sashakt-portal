@@ -49,5 +49,8 @@ export const createQuestionColumns = (
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)
 	}),
-	createActionsColumn<Question>('Question', '/questionbank/single-question', permissions)
+	createActionsColumn<Question>('Question', '/questionbank/single-question', {
+		...permissions,
+		editInline: true
+	})
 ];

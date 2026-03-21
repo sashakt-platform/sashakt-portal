@@ -36,9 +36,16 @@ export const createActionsColumn = <T extends { id: string | number }>(
 	options?: {
 		canEdit?: boolean;
 		canDelete?: boolean;
-		customActions?: (
-			row: T
-		) => { label: string; href?: string; action?: () => void; icon?: string; method?: string }[];
+		editInline?: boolean;
+		deleteInline?: boolean;
+		customActions?: (row: T) => {
+			label: string;
+			href?: string;
+			action?: () => void;
+			icon?: string;
+			method?: string;
+			inline?: boolean;
+		}[];
 	}
 ): ColumnDef<T> => ({
 	id: 'actions',
@@ -52,6 +59,8 @@ export const createActionsColumn = <T extends { id: string | number }>(
 			deleteUrl: `${baseUrl}/delete/${row.original.id}?/delete`,
 			canEdit: options?.canEdit ?? true,
 			canDelete: options?.canDelete ?? true,
+			editInline: options?.editInline ?? false,
+			deleteInline: options?.deleteInline ?? false,
 			customActions: options?.customActions?.(row.original) ?? []
 		});
 	}

@@ -338,6 +338,149 @@ describe('DataTableActions', () => {
 		});
 	});
 
+	describe('Inline Actions', () => {
+		it('should render inline edit button with sr-only label', () => {
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					editInline: true,
+					canDelete: false
+				}
+			});
+
+			// Inline edit renders as a button with sr-only "Edit" text
+			expect(screen.getByText('Edit')).toBeInTheDocument();
+			// No overflow dropdown since delete is disabled and edit is inline
+			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
+		});
+
+		it('should render inline delete button with sr-only label', () => {
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					canEdit: false,
+					deleteInline: true
+				}
+			});
+
+			expect(screen.getByText('Delete')).toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
+		});
+
+		it('should call onDelete when inline delete is clicked', async () => {
+			const onDelete = vi.fn();
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					canEdit: false,
+					deleteInline: true,
+					onDelete
+				}
+			});
+
+			const deleteButton = screen.getByText('Delete').closest('button');
+			expect(deleteButton).toBeInTheDocument();
+			await fireEvent.click(deleteButton!);
+
+			expect(onDelete).toHaveBeenCalledTimes(1);
+		});
+
+		it('should render inline custom action with icon', () => {
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					canEdit: false,
+					canDelete: false,
+					customActions: [
+						{ label: 'View Details', href: '/details/1', icon: 'external-link', inline: true }
+					]
+				}
+			});
+
+			// Inline custom action shows sr-only label
+			expect(screen.getByText('View Details')).toBeInTheDocument();
+			// No overflow dropdown
+			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
+		});
+
+		it('should fall back to overflow when inline custom action has no icon', async () => {
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					canEdit: false,
+					canDelete: false,
+					customActions: [{ label: 'No Icon Action', href: '/action', inline: true }]
+				}
+			});
+
+			// Should be in overflow dropdown since no icon
+			const button = screen.getByRole('button', { name: /Open menu/i });
+			await fireEvent.click(button);
+
+			expect(screen.getByText('No Icon Action')).toBeInTheDocument();
+		});
+
+		it('should show mixed inline and overflow actions', async () => {
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					editInline: true,
+					canDelete: true,
+					customActions: [
+						{ label: 'View', href: '/view/1', icon: 'external-link', inline: true },
+						{ label: 'Clone', href: '/clone/1', icon: 'copy' }
+					]
+				}
+			});
+
+			// Inline: Edit (sr-only) and View (sr-only) should be visible
+			expect(screen.getByText('Edit')).toBeInTheDocument();
+			expect(screen.getByText('View')).toBeInTheDocument();
+
+			// Overflow dropdown should exist for Delete and Clone
+			const menuButton = screen.getByRole('button', { name: /Open menu/i });
+			await fireEvent.click(menuButton);
+
+			expect(screen.getByText('Delete')).toBeInTheDocument();
+			expect(screen.getByText('Clone')).toBeInTheDocument();
+		});
+
+		it('should hide overflow dropdown when all actions are inline', () => {
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					editInline: true,
+					deleteInline: true,
+					customActions: []
+				}
+			});
+
+			// Both Edit and Delete are inline
+			expect(screen.getByText('Edit')).toBeInTheDocument();
+			expect(screen.getByText('Delete')).toBeInTheDocument();
+			// No overflow dropdown
+			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
+		});
+
+		it('should render inline custom action with callback', async () => {
+			const customAction = vi.fn();
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					canEdit: false,
+					canDelete: false,
+					customActions: [{ label: 'Run Action', action: customAction, icon: 'copy', inline: true }]
+				}
+			});
+
+			const actionButton = screen.getByText('Run Action').closest('button');
+			expect(actionButton).toBeInTheDocument();
+			await fireEvent.click(actionButton!);
+
+			expect(customAction).toHaveBeenCalledTimes(1);
+		});
+	});
+
 	describe('Edge Cases', () => {
 		it('should handle all options together', async () => {
 			const onDelete = vi.fn();

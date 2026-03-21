@@ -2,12 +2,13 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
-	import FileQuestion from '@lucide/svelte/icons/file-question';
+	import ChartColumnIncreasing from '@lucide/svelte/icons/chart-column-increasing';
+	import FileWarning from '@lucide/svelte/icons/file-warning';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
+	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import User from '@lucide/svelte/icons/user';
-	import Tags from '@lucide/svelte/icons/tags';
+	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
 	import Building from '@lucide/svelte/icons/building-2';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
@@ -15,6 +16,7 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
+	import Settings from '@lucide/svelte/icons/settings';
 	import { goto } from '$app/navigation';
 
 	// Menu items.
@@ -22,21 +24,22 @@
 		dashboard: {
 			title: 'Dashboard',
 			url: '/dashboard',
-			icon: LayoutGrid
+			icon: ChartColumnIncreasing
 		},
 		question: {
 			title: 'Question Bank',
 			url: '/questionbank',
-			icon: FileQuestion
+			icon: FileWarning
 		},
 		tests: {
-			title: 'Test Management',
+			title: 'Tests Templates',
 			url: '/tests',
 			icon: ClipboardList,
 			submenu: {
 				test_sessions: {
 					title: 'Test Sessions',
-					url: '/tests/test-session'
+					url: '/tests/test-session',
+					icon: ClipboardCheck
 				},
 				test_template: {
 					title: 'Test Template',
@@ -45,9 +48,9 @@
 			}
 		},
 		tags: {
-			title: 'Tags',
+			title: 'Tag Management',
 			url: '/tags',
-			icon: Tags
+			icon: MessageSquareCode
 		},
 		forms: {
 			title: 'Forms',
@@ -211,9 +214,22 @@
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
-	<Sidebar.Footer class="border-t border-white/20">
+	<Sidebar.Footer>
 		<Sidebar.Menu>
-			<Sidebar.MenuItem>
+			<Sidebar.MenuItem class="m-1">
+				<Sidebar.MenuButton
+					isActive={currentitem == 'Settings'}
+					onclick={() => handleMenuClick('Settings')}
+				>
+					{#snippet child({ props })}
+						<a href="/organization" {...props}>
+							<Settings />
+							<span>Settings</span>
+						</a>
+					{/snippet}
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+			<Sidebar.MenuItem class="m-1">
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>
 						{#snippet child({ props })}
@@ -221,8 +237,8 @@
 								{...props}
 								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 							>
-								{data.user && data.user.full_name}
-								<ChevronUp class="ml-auto" />
+								<User />
+								<span>{data.user && data.user.full_name}</span>
 							</Sidebar.MenuButton>
 						{/snippet}
 					</DropdownMenu.Trigger>

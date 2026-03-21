@@ -25,7 +25,6 @@
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
 	import MediaManager from '$lib/components/MediaManager.svelte';
-	import MediaDisplay from '$lib/components/MediaDisplay.svelte';
 	import type { TMedia } from '$lib/types/media';
 	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
@@ -201,6 +200,24 @@
 	let questionMedia = $state<TMedia | null>(questionData?.media ?? null);
 	let optionMediaMap = $state<Record<number, TMedia | null>>({});
 	let optionMediaVisible = $state<Record<number, boolean>>({});
+
+	// Auto-expand options that have existing media
+	if (questionData?.options) {
+		if (Array.isArray(questionData.options)) {
+			for (const opt of questionData.options as any[]) {
+				if (opt.media?.image || opt.media?.external_media) {
+					optionMediaVisible[opt.id] = true;
+				}
+			}
+		} else if (questionData.options && typeof questionData.options === 'object' && 'rows' in (questionData.options as any)) {
+			const matrixOpts = questionData.options as any;
+			for (const item of [...(matrixOpts.rows?.items ?? []), ...(matrixOpts.columns?.items ?? [])]) {
+				if (item.media?.image || item.media?.external_media) {
+					optionMediaVisible[item.id] = true;
+				}
+			}
+		}
+	}
 	let questionMediaVisible = $state(
 		!!(questionData?.media?.image || questionData?.media?.external_media)
 	);
@@ -483,7 +500,7 @@
 								onclick={() => (questionMediaVisible = !questionMediaVisible)}
 							>
 								<ImageIcon size={16} />
-								{questionMediaVisible ? 'Hide media' : 'Add media'}
+								{questionMediaVisible ? 'Hide media' : (questionMedia?.image || questionMedia?.external_media) ? 'Show media' : 'Add media'}
 							</button>
 							{#if !questionMediaVisible && (questionMedia?.image || questionMedia?.external_media)}
 								<span class="text-xs text-gray-400">(media attached)</span>
@@ -509,8 +526,6 @@
 										}
 									: undefined}
 							/>
-						{:else if questionMedia?.image || questionMedia?.external_media}
-							<MediaDisplay media={questionMedia} compact />
 						{/if}
 
 						<div class="flex flex-col gap-4">
@@ -641,7 +656,7 @@
 													onclick={() => (optionMediaVisible[id] = !optionMediaVisible[id])}
 												>
 													<ImageIcon size={14} />
-													{optionMediaVisible[id] ? 'Hide media' : 'Media'}
+													{optionMediaVisible[id] ? 'Hide media' : (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media) ? 'Show media' : 'Add media'}
 												</button>
 												{#if !optionMediaVisible[id] && (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media)}
 													<span class="text-xs text-gray-400">(media attached)</span>
@@ -671,8 +686,6 @@
 															}
 														: undefined}
 												/>
-											{:else if optionMediaMap[id]?.image || optionMediaMap[id]?.external_media}
-												<MediaDisplay media={optionMediaMap[id]} compact />
 											{/if}
 										</div>
 										<div
@@ -832,8 +845,6 @@
 																}
 															: undefined}
 													/>
-												{:else if optionMediaMap[item.id]?.image || optionMediaMap[item.id]?.external_media}
-													<MediaDisplay media={optionMediaMap[item.id]} compact />
 												{/if}
 											</div>
 										{/each}
@@ -949,8 +960,6 @@
 																}
 															: undefined}
 													/>
-												{:else if optionMediaMap[item.id]?.image || optionMediaMap[item.id]?.external_media}
-													<MediaDisplay media={optionMediaMap[item.id]} compact />
 												{/if}
 											</div>
 										{/each}

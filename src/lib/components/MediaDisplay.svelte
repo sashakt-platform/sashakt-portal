@@ -3,11 +3,9 @@
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 
 	let {
-		media,
-		compact = false
+		media
 	}: {
 		media: TMedia | null | undefined;
-		compact?: boolean;
 	} = $props();
 
 	const hasImage = $derived(media?.image);
@@ -21,9 +19,9 @@
 </script>
 
 {#if media && (hasImage || hasExternal)}
-	<div class="flex flex-col gap-3 {compact ? 'mt-1' : 'mt-3'}">
+	<div class="mt-1 flex flex-col gap-3">
 		{#if hasImage}
-			<div class={compact ? 'max-w-48' : 'max-w-md'}>
+			<div class="max-w-48">
 				{#if media.image?.url}
 					<img
 						src={media.image.url}
@@ -47,7 +45,7 @@
 		{#if hasExternal}
 			{#if isEmbeddable}
 				<div
-					class={compact ? 'max-w-64' : 'max-w-lg'}
+					class="max-w-64"
 					style={hasExternal.provider === 'spotify' ? 'height: 152px;' : 'aspect-ratio: 16/9;'}
 				>
 					<iframe

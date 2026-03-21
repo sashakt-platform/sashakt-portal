@@ -169,7 +169,7 @@
 			</div>
 
 			{#if media.external_media.embed_url}
-				<MediaDisplay media={{ external_media: media.external_media }} compact />
+				<MediaDisplay media={{ external_media: media.external_media }} />
 			{/if}
 		{:else}
 			<div class="flex gap-2">

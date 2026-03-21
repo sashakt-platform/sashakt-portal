@@ -136,7 +136,7 @@
 									/>
 								</div>
 								{#if optionMediaMap[opt.id]}
-									<MediaDisplay media={optionMediaMap[opt.id]} compact />
+									<MediaDisplay media={optionMediaMap[opt.id]} />
 								{/if}
 							</Label>
 						{/each}
@@ -168,7 +168,7 @@
 								/>
 							</div>
 							{#if optionMediaMap[opt.id]}
-								<MediaDisplay media={optionMediaMap[opt.id]} compact />
+								<MediaDisplay media={optionMediaMap[opt.id]} />
 							{/if}
 						</Label>
 					</div>

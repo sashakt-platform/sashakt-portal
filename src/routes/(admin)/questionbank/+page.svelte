@@ -206,8 +206,9 @@
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'question')}
 			<a href="/questionbank/single-question/add/new"
-				><Button class="border-primary bg-white text-primary font-semibold hover:bg-primary/5" variant="outline"
-					><Plus class="h-4 w-4" />Create Question</Button
+				><Button
+					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
+					variant="outline"><Plus class="h-4 w-4" />Create Question</Button
 				></a
 			>
 			<a href="/questionbank/import"
@@ -239,24 +240,28 @@
 						<div class="mt-8 flex flex-col gap-6 sm:flex-row">
 							<a
 								href="/questionbank/single-question/add/new"
-								class="flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors hover:border-primary hover:bg-primary/5"
+								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
 							>
-								<div class="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-									<Upload class="h-6 w-6 text-primary" />
+								<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
+									<Upload class="text-primary h-6 w-6" />
 								</div>
-								<h3 class="mt-5 text-center text-base font-semibold text-gray-800">Create Question</h3>
+								<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
+									Create Question
+								</h3>
 								<p class="mt-1 text-center text-sm text-gray-400">Create questions from scratch.</p>
 							</a>
 
 							<a
 								href="/questionbank/import"
-								class="flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors hover:border-primary hover:bg-primary/5"
+								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
 							>
-								<div class="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-									<FileSpreadsheet class="h-6 w-6 text-primary" />
+								<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
+									<FileSpreadsheet class="text-primary h-6 w-6" />
 								</div>
 								<h3 class="mt-5 text-center text-base font-semibold text-gray-800">Bulk Upload</h3>
-								<p class="mt-1 text-center text-sm text-gray-400">Upload multiple questions at once.</p>
+								<p class="mt-1 text-center text-sm text-gray-400">
+									Upload multiple questions at once.
+								</p>
 							</a>
 						</div>
 					{/if}

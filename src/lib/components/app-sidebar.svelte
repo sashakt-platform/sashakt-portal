@@ -30,7 +30,7 @@
 			icon: FileWarning
 		},
 		test_template: {
-			title: 'Tests Templates',
+			title: 'Test Templates',
 			url: '/tests/test-template',
 			icon: ClipboardList
 		},
@@ -114,7 +114,7 @@
 			/>
 		{:else}
 			<h4
-				class="w-full scroll-m-20 pl-3 text-xl font-extrabold tracking-tighter uppercase text-white"
+				class="w-full scroll-m-20 pl-3 text-xl font-extrabold tracking-tighter text-white uppercase"
 			>
 				Sashakt
 			</h4>

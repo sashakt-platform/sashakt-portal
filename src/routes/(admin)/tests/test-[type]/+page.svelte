@@ -151,7 +151,7 @@
 		{:else if !data?.is_template && canCreate(data.user, 'test')}
 			<a href={page.url.pathname + '/new'}
 				><Button
-					class="border-primary bg-white text-primary font-semibold hover:bg-primary/5"
+					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
 					variant="outline"><Plus />Create Manually</Button
 				></a
 			>
@@ -168,12 +168,10 @@
 					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
 				>
 					{#if data?.is_template}
-						<div class="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10">
-							<ClipboardList class="h-7 w-7 text-primary" />
+						<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
+							<ClipboardList class="text-primary h-7 w-7" />
 						</div>
-						<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
-							No test templates yet
-						</h2>
+						<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No test templates yet</h2>
 						<p class="mt-2 max-w-md text-center text-sm text-gray-400">
 							Create your first test template to get started. Templates let you define question
 							sets, scoring rules, and test configurations that can be reused across multiple test
@@ -196,12 +194,10 @@
 							<div class="mt-8 flex flex-col gap-6 sm:flex-row">
 								<a
 									href={page.url.pathname + '/new'}
-									class="flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors hover:border-primary hover:bg-primary/5"
+									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
 								>
-									<div
-										class="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10"
-									>
-										<Upload class="h-6 w-6 text-primary" />
+									<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
+										<Upload class="text-primary h-6 w-6" />
 									</div>
 									<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
 										Build from Scratch
@@ -213,12 +209,10 @@
 
 								<a
 									href="/tests/test-template"
-									class="flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors hover:border-primary hover:bg-primary/5"
+									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
 								>
-									<div
-										class="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10"
-									>
-										<FileSpreadsheet class="h-6 w-6 text-primary" />
+									<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
+										<FileSpreadsheet class="text-primary h-6 w-6" />
 									</div>
 									<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
 										Build from Template

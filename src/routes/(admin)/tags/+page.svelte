@@ -131,8 +131,8 @@
 				<div
 					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
 				>
-					<div class="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10">
-						<MessageSquareCode class="h-7 w-7 text-primary" />
+					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
+						<MessageSquareCode class="text-primary h-7 w-7" />
 					</div>
 					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No tag types yet</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">

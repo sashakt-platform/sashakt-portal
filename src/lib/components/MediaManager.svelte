@@ -2,6 +2,7 @@
 	import type { TMedia } from '$lib/types/media';
 	import Upload from '@lucide/svelte/icons/upload';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import X from '@lucide/svelte/icons/x';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -28,6 +29,28 @@
 	let previewUrl = $state<string | null>(null);
 	let selectedFile = $state<File | null>(null);
 	let externalUrlInput = $state('');
+	let isDeletingImage = $state(false);
+	let isDeletingExternal = $state(false);
+
+	async function handleDeleteImage() {
+		if (!onDeleteImage) return;
+		isDeletingImage = true;
+		try {
+			await onDeleteImage();
+		} finally {
+			isDeletingImage = false;
+		}
+	}
+
+	async function handleDeleteExternal() {
+		if (!onDeleteExternal) return;
+		isDeletingExternal = true;
+		try {
+			await onDeleteExternal();
+		} finally {
+			isDeletingExternal = false;
+		}
+	}
 
 	const MAX_FILE_SIZE_MB = 5;
 	const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
@@ -100,9 +123,20 @@
 						<p class="text-xs text-gray-500">{media.image.alt_text}</p>
 					{/if}
 					{#if onDeleteImage}
-						<Button variant="destructive" size="sm" class="mt-1 w-fit" onclick={onDeleteImage}>
-							<Trash_2 size={14} class="mr-1" />
-							Delete
+						<Button
+							variant="destructive"
+							size="sm"
+							class="mt-1 w-fit"
+							onclick={handleDeleteImage}
+							disabled={isDeletingImage}
+						>
+							{#if isDeletingImage}
+								<Loader2 size={14} class="mr-1 animate-spin" />
+								Deleting...
+							{:else}
+								<Trash_2 size={14} class="mr-1" />
+								Delete
+							{/if}
 						</Button>
 					{/if}
 				</div>
@@ -165,9 +199,19 @@
 					</a>
 				</div>
 				{#if onDeleteExternal}
-					<Button variant="destructive" size="sm" onclick={onDeleteExternal}>
-						<Trash_2 size={14} class="mr-1" />
-						Delete
+					<Button
+						variant="destructive"
+						size="sm"
+						onclick={handleDeleteExternal}
+						disabled={isDeletingExternal}
+					>
+						{#if isDeletingExternal}
+							<Loader2 size={14} class="mr-1 animate-spin" />
+							Deleting...
+						{:else}
+							<Trash_2 size={14} class="mr-1" />
+							Delete
+						{/if}
 					</Button>
 				{/if}
 			</div>

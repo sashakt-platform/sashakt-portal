@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Info from '@lucide/svelte/icons/info';
 	import ImageIcon from '@lucide/svelte/icons/image';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -52,15 +53,33 @@
 		validators: zod4Client(questionSchema),
 		dataType: 'json',
 		onResult: async ({ result }) => {
+			const hasStaged =
+				stagedImageFile ||
+				stagedExternalUrl.trim() ||
+				Object.values(stagedOptionFiles).some((f) => f) ||
+				Object.values(stagedOptionUrls).some((u) => u?.trim());
+
 			if (result.type === 'success' && result.data?.newQuestionId) {
-				// New question created — upload staged media then redirect
 				const newId = result.data.newQuestionId;
-				await uploadStagedMedia(newId, result.data.newQuestionData);
+				if (hasStaged) {
+					isSaving = true;
+					try {
+						await uploadStagedMedia(newId, result.data.newQuestionData);
+					} finally {
+						isSaving = false;
+					}
+				}
 				toast.success('Question saved successfully');
 				goto('/questionbank');
 			} else if (result.type === 'redirect' && questionId) {
-				// Existing question saved — upload staged media then follow redirect
-				await uploadStagedMedia(questionId);
+				if (hasStaged) {
+					isSaving = true;
+					try {
+						await uploadStagedMedia(questionId);
+					} finally {
+						isSaving = false;
+					}
+				}
 				goto(result.location);
 			}
 		},
@@ -209,9 +228,16 @@
 					optionMediaVisible[opt.id] = true;
 				}
 			}
-		} else if (questionData.options && typeof questionData.options === 'object' && 'rows' in (questionData.options as any)) {
+		} else if (
+			questionData.options &&
+			typeof questionData.options === 'object' &&
+			'rows' in (questionData.options as any)
+		) {
 			const matrixOpts = questionData.options as any;
-			for (const item of [...(matrixOpts.rows?.items ?? []), ...(matrixOpts.columns?.items ?? [])]) {
+			for (const item of [
+				...(matrixOpts.rows?.items ?? []),
+				...(matrixOpts.columns?.items ?? [])
+			]) {
 				if (item.media?.image || item.media?.external_media) {
 					optionMediaVisible[item.id] = true;
 				}
@@ -221,6 +247,9 @@
 	let questionMediaVisible = $state(
 		!!(questionData?.media?.image || questionData?.media?.external_media)
 	);
+
+	// Loading state for media operations
+	let isSaving = $state(false);
 
 	// Staged media for new questions (uploaded after question creation)
 	let stagedImageFile = $state<File | null>(null);
@@ -500,7 +529,11 @@
 								onclick={() => (questionMediaVisible = !questionMediaVisible)}
 							>
 								<ImageIcon size={16} />
-								{questionMediaVisible ? 'Hide media' : (questionMedia?.image || questionMedia?.external_media) ? 'Show media' : 'Add media'}
+								{questionMediaVisible
+									? 'Hide media'
+									: questionMedia?.image || questionMedia?.external_media
+										? 'Show media'
+										: 'Add media'}
 							</button>
 							{#if !questionMediaVisible && (questionMedia?.image || questionMedia?.external_media)}
 								<span class="text-xs text-gray-400">(media attached)</span>
@@ -656,7 +689,11 @@
 													onclick={() => (optionMediaVisible[id] = !optionMediaVisible[id])}
 												>
 													<ImageIcon size={14} />
-													{optionMediaVisible[id] ? 'Hide media' : (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media) ? 'Show media' : 'Add media'}
+													{optionMediaVisible[id]
+														? 'Hide media'
+														: optionMediaMap[id]?.image || optionMediaMap[id]?.external_media
+															? 'Show media'
+															: 'Add media'}
 												</button>
 												{#if !optionMediaVisible[id] && (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media)}
 													<span class="text-xs text-gray-400">(media attached)</span>
@@ -1168,9 +1205,18 @@
 					}}
 				/>
 
-				<Button class="bg-primary text-sm sm:text-base" disabled={isDisabled} onclick={submit}
-					>Save</Button
+				<Button
+					class="bg-primary text-sm sm:text-base"
+					disabled={isDisabled || isSaving}
+					onclick={submit}
 				>
+					{#if isSaving}
+						<Loader2 size={16} class="mr-1 animate-spin" />
+						Uploading media...
+					{:else}
+						Save
+					{/if}
+				</Button>
 			</div>
 		</div>
 	</div>

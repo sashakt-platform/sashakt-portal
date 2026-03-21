@@ -14,6 +14,7 @@
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
 	import Settings from '@lucide/svelte/icons/settings';
+	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { goto } from '$app/navigation';
 
 	// Menu items.
@@ -104,7 +105,7 @@
 {/snippet}
 
 <Sidebar.Root>
-	<Sidebar.Header class="items-center py-4">
+	<Sidebar.Header class="flex-row items-center justify-between py-4">
 		{#if data.organization?.logo}
 			<img
 				src={data.organization.logo}
@@ -118,6 +119,12 @@
 				Sashakt
 			</h4>
 		{/if}
+		<button
+			onclick={() => sidebar.toggle()}
+			class="flex h-8 w-8 items-center justify-center rounded-md border border-white/30 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+		>
+			<ChevronsLeft class="h-5 w-5" />
+		</button>
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<Sidebar.Group>

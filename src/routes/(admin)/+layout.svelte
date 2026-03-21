@@ -18,14 +18,11 @@
 
 <Sidebar.Provider>
 	<AppSidebar {data} />
+	<Sidebar.Trigger
+		class="fixed top-1/2 left-0 z-20 hidden size-9 -translate-y-1/2 rounded-r-md border border-l-0 border-gray-300 bg-white text-primary shadow-sm hover:bg-gray-50 peer-data-[state=collapsed]:flex"
+	/>
 	<main class="flex h-screen w-full flex-col overflow-x-hidden">
-		<div class="shadow-lg">
-			<div class="my-4">
-				<Sidebar.Trigger class="mx-2 w-14 rounded-none border-r-2 sm:mx-4" />
-			</div>
-			<hr class="w-full" />
-		</div>
-		<div>
+		<div class="flex-1 overflow-y-auto">
 			<Toaster richColors />
 			{@render children?.()}
 		</div>

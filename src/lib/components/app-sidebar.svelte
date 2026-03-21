@@ -94,7 +94,7 @@
 </script>
 
 {#snippet sidebaritems(item: any)}
-	<Sidebar.MenuItem class="text-secondary-foreground m-1">
+	<Sidebar.MenuItem class="m-1">
 		<Sidebar.MenuButton
 			isActive={currentitem == item.title}
 			onclick={() => handleMenuClick(item.title)}
@@ -109,7 +109,7 @@
 	</Sidebar.MenuItem>
 {/snippet}
 
-<Sidebar.Root class="bg-white p-3">
+<Sidebar.Root class="p-3">
 	<Sidebar.Header class="items-center py-4">
 		{#if data.organization?.logo}
 			<img
@@ -119,7 +119,7 @@
 			/>
 		{:else}
 			<h4
-				class="text-primary w-full scroll-m-20 pl-3 text-xl font-extrabold tracking-tighter uppercase"
+				class="w-full scroll-m-20 pl-3 text-xl font-extrabold tracking-tighter uppercase text-white"
 			>
 				Sashakt
 			</h4>
@@ -211,7 +211,7 @@
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
-	<Sidebar.Footer class="border-t-primary">
+	<Sidebar.Footer class="border-t border-white/20">
 		<Sidebar.Menu>
 			<Sidebar.MenuItem>
 				<DropdownMenu.Root>

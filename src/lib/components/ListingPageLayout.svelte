@@ -58,6 +58,7 @@
 			</div>
 		{/if}
 	</div>
+	<hr class="border-gray-200" />
 
 	<!-- Empty State -->
 	{#if showEmptyState && emptyState}

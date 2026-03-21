@@ -206,9 +206,13 @@
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'question')}
 			<a href="/questionbank/single-question/add/new"
-				><Button class="font-bold" variant="outline"><Plus />Create Question</Button></a
+				><Button class="border-primary bg-white text-primary font-semibold hover:bg-primary/5" variant="outline"
+					><Plus class="h-4 w-4" />Create Question</Button
+				></a
 			>
-			<a href="/questionbank/import"><Button class="font-bold"><Plus />Bulk Upload</Button></a>
+			<a href="/questionbank/import"
+				><Button class="font-semibold"><Plus class="h-4 w-4" />Bulk Upload</Button></a
+			>
 		{/if}
 	{/snippet}
 
@@ -224,9 +228,9 @@
 
 	{#snippet emptyState()}
 		{#if noQuestionCreatedYet}
-			<div class="mx-4 sm:mx-8 md:mx-10">
+			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
 				<div
-					class="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
 				>
 					<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">Create your first question</h2>
 					<p class="mt-2 text-sm text-gray-400">Choose a method to get started</p>

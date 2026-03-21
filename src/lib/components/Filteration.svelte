@@ -54,8 +54,7 @@
 {#snippet myBadge(children: Filter)}
 	<Badge
 		variant="default"
-		style="background-color:#3587B4"
-		class="m-1 flex items-center gap-1 rounded-sm "
+		class="m-1 flex items-center gap-1 rounded-full bg-primary"
 	>
 		{children.name}
 		<button

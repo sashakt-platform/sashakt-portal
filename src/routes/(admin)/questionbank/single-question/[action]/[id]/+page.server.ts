@@ -180,7 +180,7 @@ export const actions: Actions = {
 						const existing = existingQuestion.options.find((e: any) => e.id === opt.id);
 						return existing?.media ? { ...opt, media: existing.media } : opt;
 					});
-				} else if (options && typeof options === 'object' && 'rows' in options) {
+				} else if (typeof options === 'object' && 'rows' in options) {
 					const existingOpts = existingQuestion.options;
 					if (existingOpts?.rows?.items) {
 						options.rows.items = options.rows.items.map((item: any) => {

@@ -12,6 +12,7 @@
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
 
 	const { data } = $props();
 	let deleteAction: string | null = $state(null);
@@ -100,6 +101,8 @@
 			canDelete: canDelete(data.user, 'tag')
 		})
 	);
+
+	const noTagTypesCreatedYet = $derived(tagTypesTotalItems === 0 && tagsTotalItems === 0);
 </script>
 
 <DeleteDialog
@@ -108,15 +111,42 @@
 />
 
 <ListingPageLayout
-	title="Tags"
+	title="Tag Management"
 	subtitle=""
+	showEmptyState={noTagTypesCreatedYet}
 	infoLabel="Help: Tag Management"
 	infoDescription="Manage all tags and tag types here. You can create, edit, or delete tags and tag types using the available actions."
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'tag')}
-			<a href="/tags/tag/add/new"><Button class="font-semibold"><Plus />Create a Tag</Button></a>
-			<a href="/tags/tagtype/add/new"><Button class="font-semibold"><Plus />Create Tag Type</Button></a>
+			<a href="/tags/tagtype/add/new"
+				><Button class="font-semibold"><Plus />Create Tag Type</Button></a
+			>
+		{/if}
+	{/snippet}
+
+	{#snippet emptyState()}
+		{#if noTagTypesCreatedYet}
+			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
+				<div
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+				>
+					<div class="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10">
+						<MessageSquareCode class="h-7 w-7 text-primary" />
+					</div>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No tag types yet</h2>
+					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
+						Create your first test tag type to get started. Tags types let you filter questions.
+					</p>
+					{#if canCreate(data.user, 'tag')}
+						<div class="mt-6">
+							<a href="/tags/tagtype/add/new"
+								><Button class="font-semibold"><Plus />Create Tag Type</Button></a
+							>
+						</div>
+					{/if}
+				</div>
+			</div>
 		{/if}
 	{/snippet}
 

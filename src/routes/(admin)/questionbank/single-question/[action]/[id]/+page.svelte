@@ -61,26 +61,39 @@
 
 			if (result.type === 'success' && result.data?.newQuestionId) {
 				const newId = result.data.newQuestionId;
+				let uploadOk = true;
 				if (hasStaged) {
 					isSaving = true;
 					try {
-						await uploadStagedMedia(newId, result.data.newQuestionData);
+						uploadOk = await uploadStagedMedia(newId, result.data.newQuestionData);
 					} finally {
 						isSaving = false;
 					}
 				}
-				toast.success('Question saved successfully');
-				goto('/questionbank');
+				if (uploadOk) {
+					toast.success('Question saved successfully');
+					goto('/questionbank');
+				} else {
+					// Question was created but media failed — redirect to edit page so user can retry
+					toast.error('Question saved but some media failed to upload. Redirecting to edit page.');
+					goto(`/questionbank/single-question/edit/${newId}`);
+				}
 			} else if (result.type === 'redirect' && questionId) {
+				let uploadOk = true;
 				if (hasStaged) {
 					isSaving = true;
 					try {
-						await uploadStagedMedia(questionId);
+						uploadOk = await uploadStagedMedia(questionId);
 					} finally {
 						isSaving = false;
 					}
 				}
-				goto(result.location);
+				if (uploadOk) {
+					goto(result.location);
+				} else {
+					// Question was saved but media failed — stay on page so user can retry
+					toast.error('Question saved but some media failed to upload.');
+				}
 			}
 		},
 		onSubmit: () => {
@@ -307,8 +320,9 @@
 		}
 	}
 
-	async function uploadStagedMedia(newQuestionId: number, newQuestionData?: any) {
+	async function uploadStagedMedia(newQuestionId: number, newQuestionData?: any): Promise<boolean> {
 		const basePath = `/api/media/questions/${newQuestionId}`;
+		const errors: string[] = [];
 
 		// Upload question-level media
 		if (stagedImageFile) {
@@ -321,10 +335,10 @@
 				});
 				if (!res.ok) {
 					const errData = await res.json();
-					toast.error(errData.detail || 'Failed to upload image');
+					errors.push(errData.detail || 'Failed to upload image');
 				}
 			} catch {
-				toast.error('Failed to upload image');
+				errors.push('Failed to upload image');
 			}
 		}
 
@@ -336,10 +350,10 @@
 				);
 				if (!res.ok) {
 					const errData = await res.json();
-					toast.error(errData.detail || 'Failed to add external media');
+					errors.push(errData.detail || 'Failed to add external media');
 				}
 			} catch {
-				toast.error('Failed to add external media');
+				errors.push('Failed to add external media');
 			}
 		}
 
@@ -348,7 +362,10 @@
 			Object.values(stagedOptionFiles).some((f) => f) ||
 			Object.values(stagedOptionUrls).some((u) => u?.trim());
 
-		if (!hasOptionMedia) return;
+		if (!hasOptionMedia) {
+			for (const err of errors) toast.error(err);
+			return errors.length === 0;
+		}
 
 		// Resolve client-side option id → backend option id
 		// For existing questions, client IDs = backend IDs (loaded from server)
@@ -394,12 +411,15 @@
 			try {
 				const formData = new FormData();
 				formData.append('file', file);
-				await fetch(`${basePath}/options/${backendId}/image`, {
+				const res = await fetch(`${basePath}/options/${backendId}/image`, {
 					method: 'POST',
 					body: formData
 				});
+				if (!res.ok) {
+					errors.push('Failed to upload option image');
+				}
 			} catch {
-				toast.error('Failed to upload option image');
+				errors.push('Failed to upload option image');
 			}
 		}
 
@@ -409,14 +429,30 @@
 			if (!backendId) continue;
 
 			try {
-				await fetch(
+				const res = await fetch(
 					`${basePath}/options/${backendId}/external?url=${encodeURIComponent(url.trim())}`,
 					{ method: 'POST' }
 				);
+				if (!res.ok) {
+					errors.push('Failed to add option external media');
+				}
 			} catch {
-				toast.error('Failed to add option external media');
+				errors.push('Failed to add option external media');
 			}
 		}
+
+		for (const err of errors) toast.error(err);
+		return errors.length === 0;
+	}
+
+	async function deleteMedia(path: string) {
+		const res = await fetch(path, { method: 'DELETE' });
+		if (!res.ok) {
+			const errData = await res.json().catch(() => ({}));
+			toast.error(errData.detail || 'Failed to delete media');
+			return;
+		}
+		await refreshQuestion();
 	}
 
 	$effect(() => {
@@ -539,24 +575,16 @@
 								<span class="text-xs text-gray-400">(media attached)</span>
 							{/if}
 						</div>
-						{#if questionMediaVisible}
+						{#if questionMediaVisible || stagedImageFile || stagedExternalUrl.trim()}
 							<MediaManager
 								media={questionMedia}
 								onStagedFileChange={(f) => (stagedImageFile = f)}
 								onStagedUrlChange={(u) => (stagedExternalUrl = u)}
 								onDeleteImage={questionId
-									? async () => {
-											await fetch(`/api/media/questions/${questionId}/image`, { method: 'DELETE' });
-											await refreshQuestion();
-										}
+									? () => deleteMedia(`/api/media/questions/${questionId}/image`)
 									: undefined}
 								onDeleteExternal={questionId
-									? async () => {
-											await fetch(`/api/media/questions/${questionId}/external`, {
-												method: 'DELETE'
-											});
-											await refreshQuestion();
-										}
+									? () => deleteMedia(`/api/media/questions/${questionId}/external`)
 									: undefined}
 							/>
 						{/if}
@@ -699,28 +727,16 @@
 													<span class="text-xs text-gray-400">(media attached)</span>
 												{/if}
 											</div>
-											{#if optionMediaVisible[id]}
+											{#if optionMediaVisible[id] || stagedOptionFiles[id] || stagedOptionUrls[id]?.trim()}
 												<MediaManager
 													media={optionMediaMap[id] ?? null}
 													onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
 													onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
 													onDeleteImage={questionId
-														? async () => {
-																await fetch(
-																	`/api/media/questions/${questionId}/options/${id}/image`,
-																	{ method: 'DELETE' }
-																);
-																await refreshQuestion();
-															}
+														? () => deleteMedia(`/api/media/questions/${questionId}/options/${id}/image`)
 														: undefined}
 													onDeleteExternal={questionId
-														? async () => {
-																await fetch(
-																	`/api/media/questions/${questionId}/options/${id}/external`,
-																	{ method: 'DELETE' }
-																);
-																await refreshQuestion();
-															}
+														? () => deleteMedia(`/api/media/questions/${questionId}/options/${id}/external`)
 														: undefined}
 												/>
 											{/if}
@@ -858,28 +874,16 @@
 														}}
 													/>
 												</div>
-												{#if optionMediaVisible[item.id]}
+												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
 													<MediaManager
 														media={optionMediaMap[item.id] ?? null}
 														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
 														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
 														onDeleteImage={questionId
-															? async () => {
-																	await fetch(
-																		`/api/media/questions/${questionId}/options/${item.id}/image`,
-																		{ method: 'DELETE' }
-																	);
-																	await refreshQuestion();
-																}
+															? () => deleteMedia(`/api/media/questions/${questionId}/options/${item.id}/image`)
 															: undefined}
 														onDeleteExternal={questionId
-															? async () => {
-																	await fetch(
-																		`/api/media/questions/${questionId}/options/${item.id}/external`,
-																		{ method: 'DELETE' }
-																	);
-																	await refreshQuestion();
-																}
+															? () => deleteMedia(`/api/media/questions/${questionId}/options/${item.id}/external`)
 															: undefined}
 													/>
 												{/if}
@@ -973,28 +977,16 @@
 														}}
 													/>
 												</div>
-												{#if optionMediaVisible[item.id]}
+												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
 													<MediaManager
 														media={optionMediaMap[item.id] ?? null}
 														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
 														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
 														onDeleteImage={questionId
-															? async () => {
-																	await fetch(
-																		`/api/media/questions/${questionId}/options/${item.id}/image`,
-																		{ method: 'DELETE' }
-																	);
-																	await refreshQuestion();
-																}
+															? () => deleteMedia(`/api/media/questions/${questionId}/options/${item.id}/image`)
 															: undefined}
 														onDeleteExternal={questionId
-															? async () => {
-																	await fetch(
-																		`/api/media/questions/${questionId}/options/${item.id}/external`,
-																		{ method: 'DELETE' }
-																	);
-																	await refreshQuestion();
-																}
+															? () => deleteMedia(`/api/media/questions/${questionId}/options/${item.id}/external`)
 															: undefined}
 													/>
 												{/if}

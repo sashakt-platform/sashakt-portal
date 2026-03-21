@@ -118,14 +118,14 @@
 					<RadioGroup.Root bind:value={selectedSingleChoice}>
 						{#each validOptions as opt}
 							{@const uid = `preview-${opt.key}`}
-							<Label
-								for={uid}
-								class="flex w-full cursor-pointer flex-col rounded-xl border px-4 py-5 {selectedSingleChoice ===
-								opt.key
-									? 'bg-primary text-muted *:border-muted *:text-muted'
-									: ''}"
-							>
-								<div class="flex w-full items-center justify-between">
+							<div>
+								<Label
+									for={uid}
+									class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedSingleChoice ===
+									opt.key
+										? 'bg-primary text-muted *:border-muted *:text-muted'
+										: ''}"
+								>
 									<span>{opt.key}. {opt.value}</span>
 									<RadioGroup.Item
 										value={opt.key}
@@ -134,11 +134,11 @@
 											? 'border-white [&_svg]:fill-white'
 											: ''}
 									/>
-								</div>
+								</Label>
 								{#if optionMediaMap[opt.id]}
 									<MediaDisplay media={optionMediaMap[opt.id]} />
 								{/if}
-							</Label>
+							</div>
 						{/each}
 					</RadioGroup.Root>
 				{:else}
@@ -147,30 +147,28 @@
 			{:else if questionType === QuestionTypeEnum.MultiChoice && validOptions.length > 0}
 				{#each validOptions as opt}
 					{@const uid = `preview-${opt.key}`}
-					<div class="flex flex-row items-start space-x-3">
+					<div class="mb-2">
 						<Label
 							for={uid}
-							class="mb-2 flex w-full cursor-pointer flex-col rounded-xl border px-4 py-5 {selectedMultiChoices[
+							class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedMultiChoices[
 								opt.key
 							]
 								? 'bg-primary text-muted *:border-muted *:text-muted'
 								: ''}"
 						>
-							<div class="flex w-full items-center justify-between">
-								<span>{opt.key}. {opt.value}</span>
-								<Checkbox
-									id={uid}
-									checked={selectedMultiChoices[opt.key] || false}
-									onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
-									class={selectedMultiChoices[opt.key]
-										? 'text-primary! border-white! bg-white!'
-										: ''}
-								/>
-							</div>
-							{#if optionMediaMap[opt.id]}
-								<MediaDisplay media={optionMediaMap[opt.id]} />
-							{/if}
+							<span>{opt.key}. {opt.value}</span>
+							<Checkbox
+								id={uid}
+								checked={selectedMultiChoices[opt.key] || false}
+								onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
+								class={selectedMultiChoices[opt.key]
+									? 'text-primary! border-white! bg-white!'
+									: ''}
+							/>
 						</Label>
+						{#if optionMediaMap[opt.id]}
+							<MediaDisplay media={optionMediaMap[opt.id]} />
+						{/if}
 					</div>
 				{/each}
 			{:else if questionType === QuestionTypeEnum.NumericalInteger || questionType === QuestionTypeEnum.NumericalDecimal}

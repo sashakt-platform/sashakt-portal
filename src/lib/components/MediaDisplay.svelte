@@ -16,6 +16,23 @@
 				hasExternal.provider === 'vimeo' ||
 				hasExternal.provider === 'spotify')
 	);
+
+	function isSafeUrl(url: string | undefined | null): boolean {
+		if (!url) return false;
+		try {
+			const parsed = new URL(url);
+			return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+		} catch {
+			return false;
+		}
+	}
+
+	const safeExternalUrl = $derived(
+		hasExternal?.url && isSafeUrl(hasExternal.url) ? hasExternal.url : null
+	);
+	const safeEmbedUrl = $derived(
+		hasExternal?.embed_url && isSafeUrl(hasExternal.embed_url) ? hasExternal.embed_url : null
+	);
 </script>
 
 {#if media && (hasImage || hasExternal)}
@@ -43,13 +60,13 @@
 		{/if}
 
 		{#if hasExternal}
-			{#if isEmbeddable}
+			{#if isEmbeddable && safeEmbedUrl}
 				<div
 					class="max-w-64"
 					style={hasExternal.provider === 'spotify' ? 'height: 152px;' : 'aspect-ratio: 16/9;'}
 				>
 					<iframe
-						src={hasExternal.embed_url}
+						src={safeEmbedUrl}
 						title={hasExternal.provider}
 						class="h-full w-full rounded-lg"
 						frameborder="0"
@@ -58,9 +75,9 @@
 						sandbox="allow-scripts allow-same-origin allow-presentation"
 					></iframe>
 				</div>
-			{:else}
+			{:else if safeExternalUrl}
 				<a
-					href={hasExternal.url}
+					href={safeExternalUrl}
 					target="_blank"
 					rel="noopener noreferrer"
 					class="text-primary inline-flex items-center gap-1 text-sm hover:underline"
@@ -68,6 +85,11 @@
 					<ExternalLink size={14} />
 					{hasExternal.provider !== 'generic' ? hasExternal.provider : 'External media'}
 				</a>
+			{:else}
+				<span class="text-muted-foreground inline-flex items-center gap-1 text-sm">
+					<ExternalLink size={14} />
+					{hasExternal.provider !== 'generic' ? hasExternal.provider : 'External media'}
+				</span>
 			{/if}
 		{/if}
 	</div>

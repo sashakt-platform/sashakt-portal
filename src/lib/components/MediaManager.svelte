@@ -29,7 +29,8 @@
 	let selectedFile = $state<File | null>(null);
 	let externalUrlInput = $state('');
 
-	const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+	const MAX_FILE_SIZE_MB = 5;
+	const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
 	const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif'];
 	const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 
@@ -39,7 +40,7 @@
 		if (!file) return;
 
 		if (file.size > MAX_FILE_SIZE) {
-			toast.error('File too large. Maximum size is 5MB.');
+			toast.error(`File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB.`);
 			input.value = '';
 			return;
 		}
@@ -50,6 +51,9 @@
 			return;
 		}
 
+		if (previewUrl) {
+			URL.revokeObjectURL(previewUrl);
+		}
 		selectedFile = file;
 		previewUrl = URL.createObjectURL(file);
 		onStagedFileChange?.(file);
@@ -127,7 +131,7 @@
 			>
 				<Upload class="text-primary mb-1 h-6 w-6" />
 				<p class="text-xs text-gray-600">Click to upload image</p>
-				<p class="text-xs text-gray-400">PNG, JPG, WebP, GIF — max 5MB</p>
+				<p class="text-xs text-gray-400">PNG, JPG, WebP, GIF — max {MAX_FILE_SIZE_MB}MB</p>
 			</div>
 		{/if}
 

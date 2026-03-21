@@ -180,7 +180,7 @@
 	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.columns.items ??
 			Array.from({ length: 4 }, (_, i) => ({
-				id: i + 1,
+				id: i + 101,
 				key: String.fromCharCode(65 + i),
 				value: ''
 			}))

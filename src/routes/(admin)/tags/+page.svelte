@@ -115,8 +115,8 @@
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'tag')}
-			<a href="/tags/tag/add/new"><Button class="font-bold"><Plus />Create a Tag</Button></a>
-			<a href="/tags/tagtype/add/new"><Button class="font-bold"><Plus />Create Tag Type</Button></a>
+			<a href="/tags/tag/add/new"><Button class="font-semibold"><Plus />Create a Tag</Button></a>
+			<a href="/tags/tagtype/add/new"><Button class="font-semibold"><Plus />Create Tag Type</Button></a>
 		{/if}
 	{/snippet}
 

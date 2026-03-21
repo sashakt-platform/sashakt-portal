@@ -58,7 +58,7 @@
 		>
 		{#if canCreate(data.user, 'entity')}
 			<a href={resolve(`/entity/view/${data.entityTypeId}/add/new`)}
-				><Button class="font-bold"><Plus />{`Add ${entityTypeName} Record`}</Button></a
+				><Button class="font-semibold"><Plus />{`Add ${entityTypeName} Record`}</Button></a
 			>
 		{/if}
 	{/snippet}

@@ -50,7 +50,7 @@
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'certificate')}
 			<a href="/certificate/add/new">
-				<Button class="font-bold">
+				<Button class="font-semibold">
 					<Plus />Add Certificate
 				</Button>
 			</a>

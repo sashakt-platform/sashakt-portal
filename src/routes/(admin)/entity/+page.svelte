@@ -52,7 +52,7 @@
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'entity')}
-			<a href={resolve('/entity/add/new')}><Button class="font-bold"><Plus />Add Entity</Button></a>
+			<a href={resolve('/entity/add/new')}><Button class="font-semibold"><Plus />Add Entity</Button></a>
 		{/if}
 	{/snippet}
 

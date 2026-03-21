@@ -144,11 +144,11 @@
 	{#snippet headerActions()}
 		{#if !noTestCreatedYet}
 			{#if data?.is_template && canCreate(data.user, 'test-template')}
-				<Button class="font-bold" href={page.url.pathname + '/new'}
+				<Button class="font-semibold" href={page.url.pathname + '/new'}
 					><Plus />Create a test template</Button
 				>
 			{:else if !data?.is_template && canCreate(data.user, 'test')}
-				<Button class="font-bold" href={page.url.pathname + '/new'}
+				<Button class="font-semibold" href={page.url.pathname + '/new'}
 					><Plus />Create a test session</Button
 				>
 			{/if}

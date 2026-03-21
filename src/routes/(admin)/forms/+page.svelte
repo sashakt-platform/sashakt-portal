@@ -50,7 +50,7 @@
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'form')}
 			<a href="/forms/add/new">
-				<Button class="font-bold">
+				<Button class="font-semibold">
 					<Plus />Add Form
 				</Button>
 			</a>

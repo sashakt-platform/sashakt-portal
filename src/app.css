@@ -10,12 +10,12 @@
 		/* Brand */
 		--brand-primary: 243 75% 59%;
 		--brand-dark: 246 49% 21%;
-		--brand-light: 242 68% 90%;
-		--brand-subtle: 240 47% 96%;
+		--brand-light: 242 67% 90%;
+		--brand-subtle: 240 52% 96%;
 
 		/* Neutrals */
-		--gray-800: 217 26% 17%;
-		--gray-500: 218 11% 46%;
+		--gray-800: 215 28% 17%;
+		--gray-500: 220 9% 46%;
 		--gray-400: 0 0% 82%;
 		--gray-300: 0 0% 89%;
 		--gray-200: 0 0% 94%;
@@ -31,19 +31,19 @@
 		--warning-subtle: 30 100% 90%;
 
 		/* Mapped shadcn tokens */
-		--background: 210 20% 98%;
-		--foreground: 217 26% 17%;
+		--background: 0 0% 89%;
+		--foreground: 215 28% 17%;
 		--card: 0 0% 100%;
-		--card-foreground: 217 26% 17%;
+		--card-foreground: 215 28% 17%;
 		--popover: 0 0% 100%;
-		--popover-foreground: 217 26% 17%;
+		--popover-foreground: 215 28% 17%;
 		--primary: 243 75% 59%;
 		--primary-foreground: 0 0% 100%;
-		--secondary: 242 68% 90%;
+		--secondary: 242 67% 90%;
 		--secondary-foreground: 246 49% 21%;
 		--muted: 0 0% 94%;
-		--muted-foreground: 218 11% 46%;
-		--accent: 240 47% 96%;
+		--muted-foreground: 220 9% 46%;
+		--accent: 240 52% 96%;
 		--accent-foreground: 246 49% 21%;
 		--destructive: 352 100% 46%;
 		--destructive-foreground: 0 0% 100%;

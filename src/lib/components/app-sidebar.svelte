@@ -109,7 +109,7 @@
 	</Sidebar.MenuItem>
 {/snippet}
 
-<Sidebar.Root class="p-3">
+<Sidebar.Root>
 	<Sidebar.Header class="items-center py-4">
 		{#if data.organization?.logo}
 			<img

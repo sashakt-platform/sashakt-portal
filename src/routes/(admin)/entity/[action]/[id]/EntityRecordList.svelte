@@ -49,7 +49,7 @@
 
 <ListingPageLayout
 	title={entityTypeName}
-	subtitle={entityTypeDescription}
+	subtitle=""
 	infoLabel="Help: Record management"
 	infoDescription={`This panel displays all ${entityTypeName} records. You can edit or delete an existing record by clicking the three dots next to their entry.`}
 >

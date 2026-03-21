@@ -43,7 +43,7 @@
 
 <ListingPageLayout
 	title="Certificates"
-	subtitle="Manage certificates"
+	subtitle=""
 	infoLabel="Help: Certificate management"
 	infoDescription="This panel displays all certificates in the system. You can edit or delete a certificate by clicking the three dots next to it."
 >

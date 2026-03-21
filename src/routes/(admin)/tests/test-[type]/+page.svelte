@@ -134,7 +134,7 @@
 
 <ListingPageLayout
 	title={data?.is_template ? 'Test templates' : 'Test sessions'}
-	subtitle={data?.is_template ? 'Manage test templates' : 'Manage test sessions'}
+	subtitle=""
 	showEmptyState={noTestCreatedYet}
 	infoLabel={data?.is_template ? 'Help: Test templates' : 'Help: Test sessions'}
 	infoDescription={data?.is_template

@@ -23,7 +23,7 @@
 	/>
 	<main class="flex h-screen w-full flex-col overflow-x-hidden">
 		<div class="flex-1 overflow-y-auto">
-			<Toaster richColors />
+			<Toaster richColors position="bottom-center" />
 			{@render children?.()}
 		</div>
 	</main>

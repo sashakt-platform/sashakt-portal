@@ -10,6 +10,7 @@
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import Boxes from '@lucide/svelte/icons/boxes';
 
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -42,17 +43,48 @@
 			canDelete: canDelete(data.user, 'entity')
 		})
 	);
+
+	const noEntitiesCreatedYet = $derived(totalItems === 0 && !search);
 </script>
 
 <ListingPageLayout
 	title="Entities"
 	subtitle=""
+	showEmptyState={noEntitiesCreatedYet}
 	infoLabel="Help: Entity management"
 	infoDescription="This panel displays all entities in the system. You can view records, edit or delete an entity by clicking the three dots next to their entry."
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'entity')}
-			<a href={resolve('/entity/add/new')}><Button class="font-semibold"><Plus />Add Entity</Button></a>
+			<a href={resolve('/entity/add/new')}
+				><Button class="font-semibold"><Plus />Create Entity</Button></a
+			>
+		{/if}
+	{/snippet}
+
+	{#snippet emptyState()}
+		{#if noEntitiesCreatedYet}
+			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
+				<div
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+				>
+					<div class="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10">
+						<Boxes class="h-7 w-7 text-primary" />
+					</div>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No entities yet</h2>
+					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
+						Create your first entity to get started. Entities let you define custom data types to
+						organize and manage records.
+					</p>
+					{#if canCreate(data.user, 'entity')}
+						<div class="mt-6">
+							<a href={resolve('/entity/add/new')}
+								><Button class="font-semibold"><Plus />Create Entity</Button></a
+							>
+						</div>
+					{/if}
+				</div>
+			</div>
 		{/if}
 	{/snippet}
 

@@ -13,7 +13,7 @@
 <thead
 	bind:this={ref}
 	data-slot="table-header"
-	class={cn('[&_tr]:border-b bg-muted', className)}
+	class={cn('[&_tr]:border-b [&_tr]:bg-muted', className)}
 	{...restProps}
 >
 	{@render children?.()}

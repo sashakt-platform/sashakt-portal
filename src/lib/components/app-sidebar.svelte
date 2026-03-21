@@ -1,16 +1,13 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import ChartColumnIncreasing from '@lucide/svelte/icons/chart-column-increasing';
 	import FileWarning from '@lucide/svelte/icons/file-warning';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import User from '@lucide/svelte/icons/user';
 	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
 	import Building from '@lucide/svelte/icons/building-2';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import FileText from '@lucide/svelte/icons/file-text';
@@ -31,21 +28,15 @@
 			url: '/questionbank',
 			icon: FileWarning
 		},
-		tests: {
+		test_template: {
 			title: 'Tests Templates',
-			url: '/tests',
-			icon: ClipboardList,
-			submenu: {
-				test_sessions: {
-					title: 'Test Sessions',
-					url: '/tests/test-session',
-					icon: ClipboardCheck
-				},
-				test_template: {
-					title: 'Test Template',
-					url: '/tests/test-template'
-				}
-			}
+			url: '/tests/test-template',
+			icon: ClipboardList
+		},
+		test_session: {
+			title: 'Test Sessions',
+			url: '/tests/test-session',
+			icon: ClipboardCheck
 		},
 		tags: {
 			title: 'Tag Management',
@@ -138,59 +129,13 @@
 						{@render sidebaritems(menu_items.question)}
 					{/if}
 
-					<!---- Collapsible menu for Tests ---->
-					{#if canRead(data.user, 'test') || canRead(data.user, 'test-template')}
-						<Collapsible.Root class="group/collapsible m-1">
-							<Sidebar.MenuItem>
-								<Collapsible.Trigger>
-									<Sidebar.MenuButton
-										onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
-									>
-										{#snippet child({ props })}
-											<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
-												<ClipboardList />
-												<span>{menu_items.tests.title}</span>
-												<ChevronRight
-													class="ml-auto items-end transition-transform group-data-[state=open]/collapsible:rotate-90"
-												/>
-											</a>
-										{/snippet}
-									</Sidebar.MenuButton>
-								</Collapsible.Trigger>
-								<Collapsible.Content>
-									<Sidebar.MenuSub>
-										{#if canRead(data.user, 'test')}
-											<Sidebar.MenuButton
-												isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
-												onclick={() =>
-													handleMenuClick(menu_items.tests.submenu.test_sessions.title)}
-											>
-												{#snippet child({ props })}
-													<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
-														<span>{menu_items.tests.submenu.test_sessions.title}</span>
-													</a>
-												{/snippet}
-											</Sidebar.MenuButton>
-										{/if}
-										{#if canRead(data.user, 'test-template')}
-											<Sidebar.MenuButton
-												isActive={currentitem == menu_items.tests.submenu.test_template.title}
-												onclick={() =>
-													handleMenuClick(menu_items.tests.submenu.test_template.title)}
-											>
-												{#snippet child({ props })}
-													<a href={menu_items.tests.submenu.test_template.url} {...props}>
-														<span>{menu_items.tests.submenu.test_template.title}</span>
-													</a>
-												{/snippet}
-											</Sidebar.MenuButton>
-										{/if}
-									</Sidebar.MenuSub>
-								</Collapsible.Content>
-							</Sidebar.MenuItem>
-						</Collapsible.Root>
+					{#if canRead(data.user, 'test-template')}
+						{@render sidebaritems(menu_items.test_template)}
 					{/if}
-					<!---- Collapsible menu for Tests ---->
+
+					{#if canRead(data.user, 'test')}
+						{@render sidebaritems(menu_items.test_session)}
+					{/if}
 
 					{#if canRead(data.user, 'tag')}
 						{@render sidebaritems(menu_items.tags)}

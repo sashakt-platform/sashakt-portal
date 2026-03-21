@@ -30,7 +30,7 @@ export const createQuestionColumns = (
 	}
 ): ColumnDef<Question>[] => [
 	...(enableSelection ? [createSelectionColumn<Question>()] : []),
-	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort, {
+	createSortableColumn('question_text', 'Questions', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.question_text })
 	}),
 	{
@@ -42,9 +42,9 @@ export const createQuestionColumns = (
 		size: 80
 	},
 	{
-		accessorKey: 'tags',
-		header: 'Tags',
-		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
+		accessorKey: 'question_type',
+		header: 'Question Type',
+		cell: ({ row }) => (row.original as any).question_type || ''
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => formatDate(row.original.modified_date)

@@ -28,9 +28,3 @@
 		</div>
 	</main>
 </Sidebar.Provider>
-
-<style>
-	:global(body) {
-		background-color: #f0f9ff;
-	}
-</style>

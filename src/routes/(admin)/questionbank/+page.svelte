@@ -7,6 +7,7 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Upload from '@lucide/svelte/icons/upload';
 	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
+	import Search from '@lucide/svelte/icons/search';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
@@ -271,10 +272,12 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-			<div>
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+			<div class="relative lg:w-80">
+				<Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
 				<Input
-					placeholder="Search questions..."
+					class="rounded-full pl-9"
+					placeholder="Search questions"
 					value={search}
 					oninput={(event) => {
 						const url = new URL(page.url);
@@ -292,18 +295,20 @@
 				/>
 			</div>
 
-			{#if !isStateAdmin(data.user)}
+			<div class="flex flex-1 flex-wrap justify-end gap-4">
+				{#if !isStateAdmin(data.user)}
+					<div>
+						<StateSelection bind:states={filteredStates} filteration={true} />
+					</div>
+				{/if}
+
 				<div>
-					<StateSelection bind:states={filteredStates} filteration={true} />
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
-			{/if}
 
-			<div>
-				<TagsSelection bind:tags={filteredTags} filteration={true} />
-			</div>
-
-			<div>
-				<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+				<div>
+					<TagsSelection bind:tags={filteredTags} filteration={true} />
+				</div>
 			</div>
 		</div>
 	{/snippet}

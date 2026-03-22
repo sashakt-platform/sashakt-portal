@@ -33,9 +33,10 @@ export const createQuestionSelectionColumns = (
 		id: 'answers',
 		header: 'Answers',
 		cell: ({ row }) => {
-			return renderComponent(Eye, { class: 'text-gray-400 cursor-pointer' });
+			return renderComponent(Eye, { class: 'text-gray-400 cursor-pointer mx-auto' });
 		},
-		size: 80
+		size: 80,
+		meta: { align: 'center' as const }
 	},
 	{
 		accessorKey: 'tags',

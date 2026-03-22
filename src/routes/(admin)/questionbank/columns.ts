@@ -38,9 +38,10 @@ export const createQuestionColumns = (
 		id: 'answers',
 		header: 'Answers',
 		cell: ({ row }) => {
-			return renderComponent(Eye, { class: 'text-gray-400' });
+			return renderComponent(Eye, { class: 'text-gray-400 mx-auto' });
 		},
-		size: 80
+		size: 80,
+		meta: { align: 'center' as const }
 	},
 	{
 		accessorKey: 'question_type',

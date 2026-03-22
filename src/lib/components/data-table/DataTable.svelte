@@ -108,6 +108,25 @@
 		return columnId === growColumnId;
 	}
 
+	const alignmentClasses = {
+		left: 'text-left',
+		center: 'text-center',
+		right: 'text-right'
+	} as const;
+
+	function getHeaderClasses(column: any): string {
+		return isGrowColumn(column.id) ? 'w-full' : '';
+	}
+
+	function getCellClasses(column: any, extraClass: string = ''): string {
+		const parts: string[] = [];
+		if (isGrowColumn(column.id)) parts.push('w-full');
+		const align = column.columnDef.meta?.align;
+		if (align) parts.push(alignmentClasses[align]);
+		if (extraClass) parts.push(extraClass);
+		return parts.join(' ');
+	}
+
 	// create table
 	const table = $derived(
 		createSvelteTable({
@@ -169,7 +188,7 @@
 						{#each headerGroup.headers as header (header.id)}
 							<Table.Head
 								colspan={header.colSpan}
-								class={isGrowColumn(header.column.id) ? 'w-full' : ''}
+								class={getHeaderClasses(header.column)}
 							>
 								{#if !header.isPlaceholder}
 									<FlexRender
@@ -191,9 +210,9 @@
 					>
 						{#each row.getVisibleCells() as cell (cell.id)}
 							<Table.Cell
-								class="{isGrowColumn(cell.column.id) ? 'w-full' : ''} {expandable && expandColumnId && cell.column.id === expandColumnId
+								class={getCellClasses(cell.column, expandable && expandColumnId && cell.column.id === expandColumnId
 									? 'cursor-pointer'
-									: ''}"
+									: '')}
 								onclick={expandable &&
 								expandColumnId &&
 								cell.column.id === expandColumnId &&

@@ -36,5 +36,8 @@ export const createColumns = (
 		cell: ({ row }) => formatDate(row.original.modified_date),
 		size: 140
 	}),
-	createActionsColumn<Certificate>('Certificate', '/certificate', { ...permissions, editInline: true })
+	createActionsColumn<Certificate>('Certificate', '/certificate', {
+		...permissions,
+		editInline: true
+	})
 ];

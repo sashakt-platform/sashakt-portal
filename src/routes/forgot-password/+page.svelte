@@ -19,7 +19,7 @@
 	let emailSent = $derived(!!$message);
 </script>
 
-<div class="flex h-screen items-center justify-center bg-accent">
+<div class="bg-accent flex h-screen items-center justify-center">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
 			{#if data.organizationData?.logo}
@@ -101,7 +101,7 @@
 									? `/login?organization=${data.organizationData.shortcode}`
 									: '/login'
 							)}
-							class="text-sm text-gray-500 hover:text-primary hover:underline focus:outline-none"
+							class="hover:text-primary text-sm text-gray-500 hover:underline focus:outline-none"
 						>
 							Back to Login
 						</a>

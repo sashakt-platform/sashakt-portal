@@ -52,10 +52,13 @@
 </script>
 
 {#snippet myBadge(children: Filter)}
-	<Badge variant="outline" class="m-1 flex items-center gap-1 rounded-full border border-primary/20 bg-secondary font-semibold text-primary">
+	<Badge
+		variant="outline"
+		class="border-primary/20 bg-secondary text-primary m-1 flex items-center gap-1 rounded-full border font-semibold"
+	>
 		{children.name}
 		<button
-			class="ml-1 text-primary/50 hover:text-primary focus:outline-none"
+			class="text-primary/50 hover:text-primary ml-1 focus:outline-none"
 			type="button"
 			onclick={(e) => {
 				e.stopPropagation();
@@ -130,7 +133,11 @@
 								{@render myBadge(items[1])}
 							{/if}
 						</span>
-						<Badge variant="outline" class="shrink-0 rounded-full border border-primary/20 bg-secondary font-semibold text-primary">+{items?.length - 2}</Badge>
+						<Badge
+							variant="outline"
+							class="border-primary/20 bg-secondary text-primary shrink-0 rounded-full border font-semibold"
+							>+{items?.length - 2}</Badge
+						>
 					{/if}
 				{:else if !items || items.length === 0}
 					{placeholder}

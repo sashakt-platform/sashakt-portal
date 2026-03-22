@@ -44,7 +44,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<p class="text-muted-foreground mt-2 font-semibold">Upload summary</p>
-		<Table.Root class="rounded-lg bg-accent">
+		<Table.Root class="bg-accent rounded-lg">
 			{#if $message.failed_questions}
 				<Table.Caption class="text-left">
 					Download the error report to fix the row-specific issues and re-upload the file after
@@ -147,7 +147,7 @@
 
 				<div class="flex flex-col px-6">
 					<div
-						class="my-6 cursor-pointer items-center rounded-xl border-2 border-dotted border-primary/50 py-6 text-center"
+						class="border-primary/50 my-6 cursor-pointer items-center rounded-xl border-2 border-dotted py-6 text-center"
 						onclick={() => document.querySelector('input[type=file]').click()}
 						onkeydown={(e) =>
 							e.key === 'Enter' && document.querySelector('input[type=file]').click()}
@@ -172,13 +172,11 @@
 							</svg>
 						</div>
 
-						<p class="text-lg font-bold text-primary">
-							Click to upload Questions
-						</p>
+						<p class="text-primary text-lg font-bold">Click to upload Questions</p>
 						<p class="text-sm text-gray-400">CSV | File size limit: 20MB</p>
 					</div>
 					{#if $form.file}
-						<div class="flex flex-row gap-2 bg-accent p-4">
+						<div class="bg-accent flex flex-row gap-2 p-4">
 							<svg
 								class="m-1"
 								width="52"

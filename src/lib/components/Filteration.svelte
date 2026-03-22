@@ -52,10 +52,7 @@
 </script>
 
 {#snippet myBadge(children: Filter)}
-	<Badge
-		variant="default"
-		class="m-1 flex items-center gap-1 rounded-full bg-primary"
-	>
+	<Badge variant="default" class="bg-primary m-1 flex items-center gap-1 rounded-full">
 		{children.name}
 		<button
 			class="ml-2 text-white hover:text-gray-400 focus:outline-none"

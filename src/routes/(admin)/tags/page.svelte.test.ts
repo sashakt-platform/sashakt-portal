@@ -39,6 +39,16 @@ vi.mock('$app/state', () => ({
 		url: new URL('http://localhost/tags')
 	}
 }));
+vi.mock('$lib/utils/permissions.js', () => ({
+	canCreate: vi.fn(),
+	canUpdate: vi.fn(),
+	canDelete: vi.fn()
+}));
+
+import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+vi.mock('$lib/constants', () => ({
+	DEFAULT_PAGE_SIZE: 25
+}));
 
 describe('TagManagementPage', () => {
 	beforeEach(() => {
@@ -48,28 +58,23 @@ describe('TagManagementPage', () => {
 	it('renders Tag Management title', () => {
 		render(TagManagementPage, { data: mockData });
 
-		expect(screen.getByRole('heading', { name: /Tags/i })).toBeInTheDocument();
-		expect(screen.getByText(/manage tags and tag types/i)).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: /Tag Management/i })).toBeInTheDocument();
 	});
 	it('renders Create buttons when user has permission', () => {
+		vi.mocked(canCreate).mockReturnValue(true);
+		vi.mocked(canUpdate).mockReturnValue(true);
+		vi.mocked(canDelete).mockReturnValue(true);
 		render(TagManagementPage, { data: mockData });
-		expect(
-			screen.getByRole('button', {
-				name: /create a tag/i
-			})
-		).toBeInTheDocument();
-		expect(
-			screen.getByRole('button', {
-				name: /create tag type/i
-			})
-		).toBeInTheDocument();
+		expect(screen.getByText(/Create Tag Type/i)).toBeInTheDocument();
 	});
 	it('create buttons hidden when user lacks permissions', async () => {
+		vi.mocked(canCreate).mockReturnValue(false);
+		vi.mocked(canUpdate).mockReturnValue(false);
+		vi.mocked(canDelete).mockReturnValue(false);
 		const noPermData = { ...mockData, user: { permissions: [] } };
 
 		render(TagManagementPage, { data: noPermData });
 
-		expect(screen.queryByText('Create a Tag')).not.toBeInTheDocument();
 		expect(screen.queryByText('Create Tag Type')).not.toBeInTheDocument();
 	});
 

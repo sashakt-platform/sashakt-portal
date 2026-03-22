@@ -8,6 +8,23 @@ vi.mock('sveltekit-superforms/adapters', () => ({
 	zod4Client: vi.fn((schema: unknown) => schema)
 }));
 
+vi.mock('$lib/components/TagsSelection.svelte', () => ({
+	default: function MockTagsSelection() {
+		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
+	}
+}));
+
+vi.mock('$lib/components/StateSelection.svelte', () => ({
+	default: function MockStateSelection() {
+		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
+	}
+}));
+
+vi.mock('$lib/utils/permissions.js', () => ({
+	isStateAdmin: vi.fn(() => false),
+	getUserState: vi.fn(() => null)
+}));
+
 const baseForm = {
 	question_text: '',
 	is_mandatory: false,

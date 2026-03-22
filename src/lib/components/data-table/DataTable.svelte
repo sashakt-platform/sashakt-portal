@@ -186,10 +186,7 @@
 				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
 					<Table.Row class="bg-primary-foreground">
 						{#each headerGroup.headers as header (header.id)}
-							<Table.Head
-								colspan={header.colSpan}
-								class={getHeaderClasses(header.column)}
-							>
+							<Table.Head colspan={header.colSpan} class={getHeaderClasses(header.column)}>
 								{#if !header.isPlaceholder}
 									<FlexRender
 										content={header.column.columnDef.header}
@@ -210,9 +207,12 @@
 					>
 						{#each row.getVisibleCells() as cell (cell.id)}
 							<Table.Cell
-								class={getCellClasses(cell.column, expandable && expandColumnId && cell.column.id === expandColumnId
-									? 'cursor-pointer'
-									: '')}
+								class={getCellClasses(
+									cell.column,
+									expandable && expandColumnId && cell.column.id === expandColumnId
+										? 'cursor-pointer'
+										: ''
+								)}
 								onclick={expandable &&
 								expandColumnId &&
 								cell.column.id === expandColumnId &&

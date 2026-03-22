@@ -10,7 +10,10 @@
 	}: WithElementRef<HTMLTableAttributes> = $props();
 </script>
 
-<div data-slot="table-container" class="relative w-full overflow-hidden rounded-xl border border-gray-200">
+<div
+	data-slot="table-container"
+	class="relative w-full overflow-hidden rounded-xl border border-gray-200"
+>
 	<table
 		bind:this={ref}
 		data-slot="table"

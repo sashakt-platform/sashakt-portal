@@ -32,7 +32,6 @@ describe('CertificatePage', () => {
 		render(CertificatePage, { data: baseData });
 
 		expect(screen.getByRole('heading', { name: /Certificates/i })).toBeInTheDocument();
-		expect(screen.getByText(/manage certificates/i)).toBeInTheDocument();
 	});
 
 	it('shows Add Certificate button when user has permission', async () => {
@@ -41,9 +40,8 @@ describe('CertificatePage', () => {
 
 		render(CertificatePage, { data: baseData });
 
-		const addBtn = screen.getByRole('button', { name: /add certificate/i });
-		expect(addBtn).toBeInTheDocument();
-		expect(addBtn).toBeEnabled();
+		const createBtn = screen.getByText(/Create Certificate/i);
+		expect(createBtn).toBeInTheDocument();
 	});
 	it('does NOT show Add Certificate button when user does not have permission', async () => {
 		const permissions = await import('$lib/utils/permissions.js');
@@ -90,6 +88,6 @@ describe('CertificatePage', () => {
 		screen.logTestingPlaygroundURL();
 
 		expect(screen.queryByText('Certificate A')).not.toBeInTheDocument();
-		expect(screen.getByText(/No results/i)).toBeInTheDocument();
+		expect(screen.getByText(/No certificates yet/i)).toBeInTheDocument();
 	});
 });

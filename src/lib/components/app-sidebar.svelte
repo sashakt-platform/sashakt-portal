@@ -16,6 +16,7 @@
 	import Settings from '@lucide/svelte/icons/settings';
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	// Menu items.
 	const menu_items = {
@@ -95,7 +96,7 @@
 			onclick={() => handleMenuClick(item.title)}
 		>
 			{#snippet child({ props })}
-				<a href={item.url} {...props}>
+				<a href={resolve(item.url)} {...props}>
 					<item.icon />
 					<span>{item.title}</span>
 				</a>
@@ -174,7 +175,7 @@
 					onclick={() => handleMenuClick('Settings')}
 				>
 					{#snippet child({ props })}
-						<a href="/organization" {...props}>
+						<a href={resolve('/organization')} {...props}>
 							<Settings />
 							<span>Settings</span>
 						</a>
@@ -200,19 +201,21 @@
 						class="w-(--bits-dropdown-menu-anchor-width)"
 					>
 						{#if hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)}
-							<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/organization')}>
+							<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/organization'))}>
 								<Building class="mr-2 size-4" />
 								<span>My Organization</span>
 							</DropdownMenu.Item>
 							<DropdownMenu.Separator />
 						{/if}
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/profile')}>
+						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/profile'))}>
 							<span>My Profile</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/profile/password')}>
+						<DropdownMenu.Item
+							onSelect={() => handleDropdownNavigate(resolve('/profile/password'))}
+						>
 							<span>Change Password</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/logout')}>
+						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/logout'))}>
 							<span>Sign out</span>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>

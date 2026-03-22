@@ -8,6 +8,7 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { createFormSchema, editFormSchema, type FormFormSchema } from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import { resolve } from '$app/paths';
 	import FieldList from './FieldList.svelte';
 	import FieldEditor from './FieldEditor.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
@@ -172,7 +173,7 @@
 
 	<div class="sticky bottom-0 my-2 flex w-full border-t-4 bg-white p-3 sm:my-4 sm:p-4">
 		<div class="flex w-full justify-between gap-2">
-			<a href="/forms/">
+			<a href={resolve('/forms/')}>
 				<Button variant="outline" class="text-primary border-primary border-1 text-sm sm:text-base">
 					Cancel
 				</Button>

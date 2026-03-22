@@ -12,6 +12,7 @@ import {
 	getUserDistrict,
 	type User
 } from '$lib/utils/permissions.js';
+import { resolve } from '$app/paths';
 
 export interface Test {
 	id: string;
@@ -104,7 +105,7 @@ export const createTestColumns = (
 
 			customActions.push({
 				label: 'Make a Copy',
-				href: `${baseUrl}/${test.id}?/clone`,
+				href: resolve(`${baseUrl}/${test.id}?/clone`),
 				icon: 'copy',
 				method: 'POST'
 			});
@@ -113,7 +114,7 @@ export const createTestColumns = (
 			if (isTemplate) {
 				customActions.push({
 					label: 'Make a Test',
-					href: `/tests/test-session/convert/?template_id=${test.id}`,
+					href: resolve(`/tests/test-session/convert/?template_id=${test.id}`),
 					icon: 'file-plus'
 				});
 			} else {
@@ -157,8 +158,8 @@ export const createTestColumns = (
 			return renderComponent(DataTableActions, {
 				id: test.id,
 				entityName: isTemplate ? 'Test Template' : 'Test Session',
-				editUrl: `${baseUrl}/${test.id}/`,
-				deleteUrl: `${baseUrl}/${test.id}?/delete`,
+				editUrl: resolve(`${baseUrl}/${test.id}/`),
+				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,
 				onDelete: () => onDelete(test.id),
 				canEdit: (permissions?.canEdit ?? true) && !isRestricted,

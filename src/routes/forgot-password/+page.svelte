@@ -6,6 +6,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { forgotPasswordSchema } from './schema';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
@@ -67,9 +68,11 @@
 						<Button
 							variant="default"
 							class="mt-4 w-full py-5"
-							href={data.organizationData?.shortcode
-								? `/login?organization=${data.organizationData.shortcode}`
-								: '/login'}>Back to Login</Button
+							href={resolve(
+								data.organizationData?.shortcode
+									? `/login?organization=${data.organizationData.shortcode}`
+									: '/login'
+							)}>Back to Login</Button
 						>
 					</div>
 				{:else}
@@ -93,9 +96,11 @@
 					</form>
 					<div class="mt-4 text-right">
 						<a
-							href={data.organizationData?.shortcode
-								? `/login?organization=${data.organizationData.shortcode}`
-								: '/login'}
+							href={resolve(
+								data.organizationData?.shortcode
+									? `/login?organization=${data.organizationData.shortcode}`
+									: '/login'
+							)}
 							class="text-sm text-gray-500 hover:text-blue-600 hover:underline focus:outline-none"
 						>
 							Back to Login

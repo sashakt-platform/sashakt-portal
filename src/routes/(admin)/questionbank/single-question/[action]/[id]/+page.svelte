@@ -22,6 +22,7 @@
 	import QuestionPreview from './QuestionPreview.svelte';
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
+	import { resolve } from '$app/paths';
 	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
 
 	const {
@@ -761,7 +762,7 @@
 	</div>
 	<div class="sticky bottom-0 my-2 flex w-full border-t-4 bg-white p-3 sm:my-4 sm:p-4">
 		<div class="flex w-full justify-between gap-2">
-			<a href="/questionbank">
+			<a href={resolve('/questionbank')}>
 				<Button variant="outline" class="text-primary border-primary border-1 text-sm sm:text-base"
 					>Cancel</Button
 				>

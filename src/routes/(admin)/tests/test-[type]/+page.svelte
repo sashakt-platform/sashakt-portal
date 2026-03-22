@@ -7,6 +7,7 @@
 	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { DataTable } from '$lib/components/data-table/index.js';
 	import { createTestColumns, type Test } from './columns.js';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
@@ -155,7 +156,7 @@
 					variant="outline"><Plus />Create Manually</Button
 				></a
 			>
-			<a href="/tests/test-template"
+			<a href={resolve('/tests/test-template')}
 				><Button class="font-semibold"><Plus />Create from Template</Button></a
 			>
 		{/if}
@@ -208,7 +209,7 @@
 								</a>
 
 								<a
-									href="/tests/test-template"
+									href={resolve('/tests/test-template')}
 									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
 								>
 									<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">

@@ -14,6 +14,7 @@
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import { type Filter } from '$lib/types/filters';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
@@ -206,13 +207,13 @@
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'question')}
-			<a href="/questionbank/single-question/add/new"
+			<a href={resolve('/questionbank/single-question/add/new')}
 				><Button
 					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
 					variant="outline"><Plus class="h-4 w-4" />Create Question</Button
 				></a
 			>
-			<a href="/questionbank/import"
+			<a href={resolve('/questionbank/import')}
 				><Button class="font-semibold"><Plus class="h-4 w-4" />Bulk Upload</Button></a
 			>
 		{/if}
@@ -240,7 +241,7 @@
 					{#if canCreate(data.user, 'question')}
 						<div class="mt-8 flex flex-col gap-6 sm:flex-row">
 							<a
-								href="/questionbank/single-question/add/new"
+								href={resolve('/questionbank/single-question/add/new')}
 								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
 							>
 								<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
@@ -253,7 +254,7 @@
 							</a>
 
 							<a
-								href="/questionbank/import"
+								href={resolve('/questionbank/import')}
 								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
 							>
 								<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">

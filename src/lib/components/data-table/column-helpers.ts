@@ -2,6 +2,7 @@ import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions, DataTableSortButton } from './index.js';
 import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+import { resolve } from '$app/paths';
 
 /**
  *  Function to create a sortable column with the given configuration
@@ -64,8 +65,8 @@ export const createActionsColumn = <T extends { id: string | number }>(
 			return renderComponent(DataTableActions, {
 				id: row.original.id,
 				entityName,
-				editUrl: `${baseUrl}/edit/${row.original.id}`,
-				deleteUrl: `${baseUrl}/delete/${row.original.id}?/delete`,
+				editUrl: resolve(`${baseUrl}/edit/${row.original.id}`),
+				deleteUrl: resolve(`${baseUrl}/delete/${row.original.id}?/delete`),
 				canEdit: options?.canEdit ?? true,
 				canDelete: options?.canDelete ?? true,
 				editInline: options?.editInline ?? false,

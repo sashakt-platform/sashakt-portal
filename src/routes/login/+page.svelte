@@ -5,6 +5,7 @@
 	import LoginForm from './LoginForm.svelte';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
 	let { data }: { data: PageData } = $props();
@@ -46,9 +47,11 @@
 				<LoginForm data={{ form: data.loginForm }} />
 				<div class="mt-4 text-right">
 					<a
-						href={data.organizationData?.shortcode
-							? `/forgot-password?organization=${data.organizationData?.shortcode}`
-							: '/forgot-password'}
+						href={resolve(
+							data.organizationData?.shortcode
+								? `/forgot-password?organization=${data.organizationData?.shortcode}`
+								: '/forgot-password'
+						)}
 						class="text-sm text-gray-500 hover:text-blue-600 hover:underline focus:outline-none"
 					>
 						Forgot your password?

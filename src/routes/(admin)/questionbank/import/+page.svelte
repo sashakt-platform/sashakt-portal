@@ -13,6 +13,7 @@
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
+	import { resolve } from '$app/paths';
 
 	let { data } = $props();
 	const { form, enhance, submit, message } = superForm(data.form, {
@@ -90,7 +91,7 @@
 					<Dialog.Close>
 						<Button class="bg-primary-foreground text-primary mr-2">Upload more</Button>
 					</Dialog.Close>
-					<a href="/questionbank" class="bg-primary rounded-md px-5 py-2 text-white"
+					<a href={resolve('/questionbank')} class="bg-primary rounded-md px-5 py-2 text-white"
 						>Go to question bank</a
 					>
 				</div>

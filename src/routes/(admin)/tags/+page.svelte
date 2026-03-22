@@ -5,6 +5,7 @@
 	import { createTagTypesColumns } from './tag-types-columns';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
@@ -119,7 +120,7 @@
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'tag')}
-			<a href="/tags/tagtype/add/new"
+			<a href={resolve('/tags/tagtype/add/new')}
 				><Button class="font-semibold"><Plus />Create Tag Type</Button></a
 			>
 		{/if}
@@ -140,7 +141,7 @@
 					</p>
 					{#if canCreate(data.user, 'tag')}
 						<div class="mt-6">
-							<a href="/tags/tagtype/add/new"
+							<a href={resolve('/tags/tagtype/add/new')}
 								><Button class="font-semibold"><Plus />Create Tag Type</Button></a
 							>
 						</div>

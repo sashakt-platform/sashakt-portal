@@ -108,7 +108,7 @@
 					</div>
 					<div class="flex flex-wrap items-center gap-2 text-sm sm:flex-row">
 						<span
-							class="my-2 rounded-sm bg-[#E8F1F7] p-1 px-2 text-xs font-bold sm:my-4 sm:mr-4 sm:text-sm"
+							class="my-2 rounded-sm bg-secondary p-1 px-2 text-xs font-bold sm:my-4 sm:mr-4 sm:text-sm"
 							>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
 						>
 						<span class="text-gray-500"
@@ -143,7 +143,7 @@
 							Add the relevant questions to your test {$formData.is_template ? 'template' : ''}
 						</p>
 						<Button
-							class="mt-6 bg-[#0369A1]"
+							class="mt-6 bg-primary"
 							onclick={() => {
 								dialogOpen = true;
 								const url = new URL(page.url);

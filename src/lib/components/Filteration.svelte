@@ -52,10 +52,10 @@
 </script>
 
 {#snippet myBadge(children: Filter)}
-	<Badge variant="outline" class="m-1 flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-100 font-semibold text-indigo-700">
+	<Badge variant="outline" class="m-1 flex items-center gap-1 rounded-full border border-primary/20 bg-secondary font-semibold text-primary">
 		{children.name}
 		<button
-			class="ml-1 text-indigo-400 hover:text-indigo-700 focus:outline-none"
+			class="ml-1 text-primary/50 hover:text-primary focus:outline-none"
 			type="button"
 			onclick={(e) => {
 				e.stopPropagation();
@@ -130,7 +130,7 @@
 								{@render myBadge(items[1])}
 							{/if}
 						</span>
-						<Badge variant="outline" class="shrink-0 rounded-full border border-indigo-200 bg-indigo-100 font-semibold text-indigo-700">+{items?.length - 2}</Badge>
+						<Badge variant="outline" class="shrink-0 rounded-full border border-primary/20 bg-secondary font-semibold text-primary">+{items?.length - 2}</Badge>
 					{/if}
 				{:else if !items || items.length === 0}
 					{placeholder}

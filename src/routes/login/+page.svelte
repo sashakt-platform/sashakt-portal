@@ -23,7 +23,7 @@
 <div>
 	<Toaster richColors />
 </div>
-<div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">
+<div class="flex h-screen items-center justify-center bg-accent">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
 			{#if data.organizationData?.logo}
@@ -52,7 +52,7 @@
 								? `/forgot-password?organization=${data.organizationData?.shortcode}`
 								: '/forgot-password'
 						)}
-						class="text-sm text-gray-500 hover:text-blue-600 hover:underline focus:outline-none"
+						class="text-sm text-gray-500 hover:text-primary hover:underline focus:outline-none"
 					>
 						Forgot your password?
 					</a>

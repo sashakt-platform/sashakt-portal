@@ -37,16 +37,16 @@
 											class="z-10 flex h-4 w-4 items-center justify-center  rounded-full   bg-green-600 text-white "
 										/>
 									{:else}
-										<div class="z-10 h-4 w-4 rounded-full border-1 bg-sky-100"></div>
+										<div class="z-10 h-4 w-4 rounded-full border-1 bg-secondary"></div>
 									{/if}
 
 									{#if i < length - 1}
-										<div class="absolute h-32 w-0.5 bg-sky-100"></div>
+										<div class="absolute h-32 w-0.5 bg-secondary"></div>
 									{/if}
 								</div>
 
 								<p
-									class="flex h-8 w-15 items-center justify-center rounded-md bg-sky-50 text-[14px] font-semibold"
+									class="flex h-8 w-15 items-center justify-center rounded-md bg-accent text-[14px] font-semibold"
 								>
 									#{length - i}
 								</p>

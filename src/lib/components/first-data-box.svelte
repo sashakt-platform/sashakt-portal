@@ -54,7 +54,7 @@
 			<a href={leftButton.link}>
 				<Button
 					variant="outline"
-					class="h-12 w-full cursor-pointer hover:bg-[#0369A1] hover:text-white sm:w-auto"
+					class="h-12 w-full cursor-pointer hover:bg-primary hover:text-white sm:w-auto"
 					onclick={leftButton.click}><Plus /> {leftButton.title}</Button
 				>
 			</a>

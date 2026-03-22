@@ -90,7 +90,7 @@
 					<Button
 						variant="ghost"
 						size="sm"
-						class="bg-[hsla(242,67%,90%,1)] text-indigo-700 hover:bg-[hsla(242,67%,85%,1)]"
+						class="bg-secondary font-semibold text-primary hover:bg-primary/20"
 					>
 						<Pencil class="h-4 w-4" />
 						Edit
@@ -118,7 +118,7 @@
 							type="submit"
 							variant="ghost"
 							size="sm"
-							class="bg-[hsla(242,67%,90%,1)] text-indigo-700 hover:bg-[hsla(242,67%,85%,1)]"
+							class="bg-secondary font-semibold text-primary hover:bg-primary/20"
 						>
 							{#if IconComponent}
 								<IconComponent class="h-4 w-4" />
@@ -131,7 +131,7 @@
 						<Button
 							variant="ghost"
 							size="sm"
-							class="bg-[hsla(242,67%,90%,1)] text-indigo-700 hover:bg-[hsla(242,67%,85%,1)]"
+							class="bg-secondary font-semibold text-primary hover:bg-primary/20"
 						>
 							{#if IconComponent}
 								<IconComponent class="h-4 w-4" />
@@ -143,7 +143,7 @@
 					<Button
 						variant="ghost"
 						size="sm"
-						class="bg-[hsla(242,67%,90%,1)] text-indigo-700 hover:bg-[hsla(242,67%,85%,1)]"
+						class="bg-secondary font-semibold text-primary hover:bg-primary/20"
 						onclick={action.action}
 					>
 						{#if IconComponent}

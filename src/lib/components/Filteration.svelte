@@ -52,12 +52,11 @@
 </script>
 
 {#snippet myBadge(children: Filter)}
-	<Badge variant="default" class="bg-primary m-1 flex items-center gap-1 rounded-full">
+	<Badge variant="outline" class="m-1 flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-100 font-semibold text-indigo-700">
 		{children.name}
 		<button
-			class="ml-2 text-white hover:text-gray-400 focus:outline-none"
+			class="ml-1 text-indigo-400 hover:text-indigo-700 focus:outline-none"
 			type="button"
-			style="margin-left:auto;"
 			onclick={(e) => {
 				e.stopPropagation();
 				const url = new URL(page.url);
@@ -131,7 +130,7 @@
 								{@render myBadge(items[1])}
 							{/if}
 						</span>
-						<span class="shrink-0 whitespace-nowrap">+ {items?.length - 2}</span>
+						<Badge variant="outline" class="shrink-0 rounded-full border border-indigo-200 bg-indigo-100 font-semibold text-indigo-700">+{items?.length - 2}</Badge>
 					{/if}
 				{:else if !items || items.length === 0}
 					{placeholder}

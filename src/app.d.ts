@@ -1,5 +1,15 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
+import type { RowData } from '@tanstack/table-core';
+
+declare module '@tanstack/table-core' {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	interface ColumnMeta<TData extends RowData, TValue> {
+		grow?: boolean;
+		align?: 'left' | 'center' | 'right';
+	}
+}
+
 declare global {
 	namespace App {
 		// interface Error {}

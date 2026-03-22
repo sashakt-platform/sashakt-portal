@@ -14,7 +14,7 @@
 <Sonner
 	theme={mode.current}
 	class="toaster group"
-	style="--normal-bg: var(--color-popover); --normal-text: var(--color-popover-foreground); --normal-border: var(--color-border);"
+	style="--normal-bg: var(--color-popover); --normal-text: var(--color-popover-foreground); --normal-border: var(--color-border); --success-bg: #0AA978; --success-border: #089968; --success-text: white; --error-bg: #EA001F; --error-border: #d4001b; --error-text: white; --warning-bg: #E8900E; --warning-border: #d0810c; --warning-text: white;"
 	{...restProps}
 	>{#snippet loadingIcon()}
 		<Loader2Icon class="size-4 animate-spin" />
@@ -32,3 +32,9 @@
 		<TriangleAlertIcon class="size-4" />
 	{/snippet}
 </Sonner>
+
+<style>
+	:global([data-sonner-toaster][data-x-position='center']) {
+		left: calc(50% + var(--sidebar-width, 16rem) / 2) !important;
+	}
+</style>

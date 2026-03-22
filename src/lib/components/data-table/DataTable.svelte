@@ -93,6 +93,40 @@
 		}
 	});
 
+	// Determine which column should grow to fill remaining space
+	const growColumnId = $derived.by(() => {
+		const explicit = columns.find((col: any) => col.meta?.grow);
+		if (explicit) return (explicit as any).id || (explicit as any).accessorKey;
+		// Fallback: first column without explicit size that isn't select/actions
+		const fallback = columns.find(
+			(col: any) => col.size === undefined && col.id !== 'select' && col.id !== 'actions'
+		);
+		return fallback ? (fallback as any).id || (fallback as any).accessorKey : null;
+	});
+
+	function isGrowColumn(columnId: string): boolean {
+		return columnId === growColumnId;
+	}
+
+	const alignmentClasses = {
+		left: 'text-left',
+		center: 'text-center',
+		right: 'text-right'
+	} as const;
+
+	function getHeaderClasses(column: any): string {
+		return isGrowColumn(column.id) ? 'w-full' : '';
+	}
+
+	function getCellClasses(column: any, extraClass: string = ''): string {
+		const parts: string[] = [];
+		if (isGrowColumn(column.id)) parts.push('w-full');
+		const align = column.columnDef.meta?.align;
+		if (align) parts.push(alignmentClasses[align]);
+		if (extraClass) parts.push(extraClass);
+		return parts.join(' ');
+	}
+
 	// create table
 	const table = $derived(
 		createSvelteTable({
@@ -152,7 +186,7 @@
 				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
 					<Table.Row class="bg-primary-foreground">
 						{#each headerGroup.headers as header (header.id)}
-							<Table.Head colspan={header.colSpan}>
+							<Table.Head colspan={header.colSpan} class={getHeaderClasses(header.column)}>
 								{#if !header.isPlaceholder}
 									<FlexRender
 										content={header.column.columnDef.header}
@@ -173,9 +207,12 @@
 					>
 						{#each row.getVisibleCells() as cell (cell.id)}
 							<Table.Cell
-								class={expandable && expandColumnId && cell.column.id === expandColumnId
-									? 'cursor-pointer'
-									: ''}
+								class={getCellClasses(
+									cell.column,
+									expandable && expandColumnId && cell.column.id === expandColumnId
+										? 'cursor-pointer'
+										: ''
+								)}
 								onclick={expandable &&
 								expandColumnId &&
 								cell.column.id === expandColumnId &&

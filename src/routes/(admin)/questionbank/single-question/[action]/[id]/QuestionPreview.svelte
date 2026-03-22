@@ -71,12 +71,12 @@
 	<Dialog.Overlay class="fixed bg-black/30 backdrop-blur-sm" />
 
 	<Dialog.Content
-		class="flex max-h-[90vh] w-[95vw] max-w-4xl flex-col items-start gap-6 rounded-xl bg-blue-50 p-8 shadow-2xl sm:w-[90vw]"
+		class="bg-accent flex max-h-[90vh] w-[95vw] max-w-4xl flex-col items-start gap-6 rounded-xl p-8 shadow-2xl sm:w-[90vw]"
 	>
 		<h2 class="text-xl font-bold text-gray-800">Preview</h2>
 
 		<div
-			class="w-full overflow-y-auto rounded-xl border border-blue-100 bg-white p-6 shadow-md sm:p-8"
+			class="border-secondary w-full overflow-y-auto rounded-xl border bg-white p-6 shadow-md sm:p-8"
 		>
 			<div class="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
 				<span class="text-sm font-medium text-gray-500">1 of 1</span>

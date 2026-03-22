@@ -5,6 +5,7 @@
 	import LoginForm from './LoginForm.svelte';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 
 	let { data }: { data: PageData } = $props();
@@ -22,7 +23,7 @@
 <div>
 	<Toaster richColors />
 </div>
-<div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">
+<div class="bg-accent flex h-screen items-center justify-center">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
 			{#if data.organizationData?.logo}
@@ -46,10 +47,12 @@
 				<LoginForm data={{ form: data.loginForm }} />
 				<div class="mt-4 text-right">
 					<a
-						href={data.organizationData?.shortcode
-							? `/forgot-password?organization=${data.organizationData?.shortcode}`
-							: '/forgot-password'}
-						class="text-sm text-gray-500 hover:text-blue-600 hover:underline focus:outline-none"
+						href={resolve(
+							data.organizationData?.shortcode
+								? `/forgot-password?organization=${data.organizationData?.shortcode}`
+								: '/forgot-password'
+						)}
+						class="hover:text-primary text-sm text-gray-500 hover:underline focus:outline-none"
 					>
 						Forgot your password?
 					</a>

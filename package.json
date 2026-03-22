@@ -64,6 +64,7 @@
 		]
 	},
 	"dependencies": {
+		"@fontsource/open-sans": "^5.2.7",
 		"@sentry/sveltekit": "^10.34.0",
 		"@tanstack/table-core": "^8.21.3",
 		"svelte-dnd-action": "^0.9.69",

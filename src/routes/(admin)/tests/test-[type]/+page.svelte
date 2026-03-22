@@ -1,10 +1,14 @@
 <script lang="ts">
-	import EmptyBox from '$lib/components/first-data-box.svelte';
 	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
+	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
+	import Upload from '@lucide/svelte/icons/upload';
+	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
+	import Search from '@lucide/svelte/icons/search';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { DataTable } from '$lib/components/data-table/index.js';
 	import { createTestColumns, type Test } from './columns.js';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
@@ -133,8 +137,8 @@
 />
 
 <ListingPageLayout
-	title={data?.is_template ? 'Test templates' : 'Test sessions'}
-	subtitle={data?.is_template ? 'Manage test templates' : 'Manage test sessions'}
+	title={data?.is_template ? 'Test Templates' : 'Test Sessions'}
+	subtitle=""
 	showEmptyState={noTestCreatedYet}
 	infoLabel={data?.is_template ? 'Help: Test templates' : 'Help: Test sessions'}
 	infoDescription={data?.is_template
@@ -142,52 +146,99 @@
 		: 'This panel lists all your test sessions. You can create, edit, or delete a test ,clone an existing test setup, or download the test’s QR code for easy sharing.'}
 >
 	{#snippet headerActions()}
-		{#if !noTestCreatedYet}
-			{#if data?.is_template && canCreate(data.user, 'test-template')}
-				<Button class="font-bold" href={page.url.pathname + '/new'}
-					><Plus />Create a test template</Button
-				>
-			{:else if !data?.is_template && canCreate(data.user, 'test')}
-				<Button class="font-bold" href={page.url.pathname + '/new'}
-					><Plus />Create a test session</Button
-				>
-			{/if}
+		{#if data?.is_template && canCreate(data.user, 'test-template')}
+			<Button class="font-semibold" href={page.url.pathname + '/new'}
+				><Plus />Create Test Template</Button
+			>
+		{:else if !data?.is_template && canCreate(data.user, 'test')}
+			<a href={page.url.pathname + '/new'}
+				><Button
+					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
+					variant="outline"><Plus />Create Manually</Button
+				></a
+			>
+			<a href={resolve('/tests/test-template')}
+				><Button class="font-semibold"><Plus />Create from Template</Button></a
+			>
 		{/if}
 	{/snippet}
 
 	{#snippet emptyState()}
 		{#if noTestCreatedYet}
-			<EmptyBox
-				title={data?.is_template
-					? 'Create your first test template'
-					: 'Create your first test session'}
-				subtitle={data?.is_template
-					? 'Click on create a test template to create test templates to be assigned'
-					: 'Click on create a test to create tests to be conducted'}
-				leftButton={{
-					title: `${data?.is_template ? 'Create Test Template' : 'Create Custom Test'}`,
-					link: '/tests/test-' + (data?.is_template ? 'template' : 'session') + '/new',
-					click: () => {
-						return null;
-					}
-				}}
-				rightButton={!data?.is_template
-					? {
-							title: `Create from test Template`,
-							link: '/tests/test-template',
-							click: () => {
-								return null;
-							}
-						}
-					: null}
-			/>
+			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
+				<div
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+				>
+					{#if data?.is_template}
+						<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
+							<ClipboardList class="text-primary h-7 w-7" />
+						</div>
+						<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No test templates yet</h2>
+						<p class="mt-2 max-w-md text-center text-sm text-gray-400">
+							Create your first test template to get started. Templates let you define question
+							sets, scoring rules, and test configurations that can be reused across multiple test
+							sessions.
+						</p>
+						{#if canCreate(data.user, 'test-template')}
+							<div class="mt-6">
+								<Button class="font-semibold" href={page.url.pathname + '/new'}
+									><Plus />Create Test Template</Button
+								>
+							</div>
+						{/if}
+					{:else}
+						<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">
+							Create your first test session
+						</h2>
+						<p class="mt-2 text-sm text-gray-400">Choose a method to get started</p>
+
+						{#if canCreate(data.user, 'test')}
+							<div class="mt-8 flex flex-col gap-6 sm:flex-row">
+								<a
+									href={page.url.pathname + '/new'}
+									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
+								>
+									<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
+										<Upload class="text-primary h-6 w-6" />
+									</div>
+									<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
+										Build from Scratch
+									</h3>
+									<p class="mt-1 text-center text-sm text-gray-400">
+										Configure everything from scratch, details, questions and rules.
+									</p>
+								</a>
+
+								<a
+									href={resolve('/tests/test-template')}
+									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
+								>
+									<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
+										<FileSpreadsheet class="text-primary h-6 w-6" />
+									</div>
+									<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
+										Build from Template
+									</h3>
+									<p class="mt-1 text-center text-sm text-gray-400">
+										Pick a pre-configured test template and schedule a session.
+									</p>
+								</a>
+							</div>
+						{/if}
+					{/if}
+				</div>
+			</div>
 		{/if}
 	{/snippet}
 
 	{#snippet filters()}
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-			<div>
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+			<div class="relative lg:w-80">
+				<Search
+					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+				/>
 				<Input
+					class="rounded-full pl-9"
 					placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
 					value={search}
 					oninput={(event) => {
@@ -199,7 +250,6 @@
 							} else {
 								url.searchParams.delete('search');
 							}
-							// reset pagination to page 1 when search changes
 							url.searchParams.set('page', '1');
 							goto(url, { keepFocus: true, invalidateAll: true });
 						}, 300);
@@ -207,28 +257,30 @@
 				/>
 			</div>
 
-			{#if !isStateAdmin(data.user)}
+			<div class="flex flex-1 flex-wrap justify-end gap-4">
+				{#if !isStateAdmin(data.user)}
+					<div>
+						<StateSelection bind:states={filteredStates} filteration={true} />
+					</div>
+				{/if}
+
+				{#if !hasAssignedDistricts(data.user)}
+					<div>
+						<DistrictSelection
+							bind:districts={filteredDistricts}
+							selectedStates={filteredStates}
+							filteration={true}
+						/>
+					</div>
+				{/if}
+
 				<div>
-					<StateSelection bind:states={filteredStates} filteration={true} />
+					<TagsSelection bind:tags={filteredTags} filteration={true} />
 				</div>
-			{/if}
 
-			{#if !hasAssignedDistricts(data.user)}
 				<div>
-					<DistrictSelection
-						bind:districts={filteredDistricts}
-						selectedStates={filteredStates}
-						filteration={true}
-					/>
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
-			{/if}
-
-			<div>
-				<TagsSelection bind:tags={filteredTags} filteration={true} />
-			</div>
-
-			<div>
-				<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 			</div>
 		</div>
 	{/snippet}

@@ -18,6 +18,7 @@
 	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
+	import { resolve } from '$app/paths';
 
 	let { data }: { data: any } = $props();
 
@@ -276,7 +277,7 @@
 
 	<div class="flex justify-end gap-4 pt-6">
 		<Button variant="outline" type="button">
-			<a href="/users" class="block">Cancel</a>
+			<a href={resolve('/users')} class="block">Cancel</a>
 		</Button>
 		<Form.Button>Save</Form.Button>
 	</div>

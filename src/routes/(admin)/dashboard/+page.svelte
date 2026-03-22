@@ -204,39 +204,26 @@
 	</div>
 {/snippet}
 
-<Dialog.Root open={false}>
-	<Dialog.Content>
-		<Dialog.Header>
-			<Dialog.Title>Welcome to Sashakt!</Dialog.Title>
-			<Dialog.Description>Here’s what all you can do</Dialog.Description>
-		</Dialog.Header>
-		<div class="w-full rounded-xl p-4" style="background:#F0F9FF">
-			{#each information as item}
-				<div class="mb-4">
-					<p class="font-semibold">{item.title}</p>
-					<p class="text-sm font-light">{item.description}</p>
-				</div>
-			{/each}
+<div class="mx-4 flex flex-col gap-4 py-7 sm:mx-10 sm:flex-row sm:gap-0">
+	<div class="my-auto flex flex-col">
+		<div class="flex w-full items-center align-middle">
+			<div class="flex flex-row">
+				<h2
+					class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
+				>
+					Dashboard
+				</h2>
+				<TooltipInfo
+					label="Help: Dashboard"
+					description="Dashboard provides a quick overview of your organization’s activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
+				/>
+			</div>
 		</div>
-		<Button style="background:#0369A1" class="cursor-pointer">Get Started</Button>
-	</Dialog.Content>
-</Dialog.Root>
-
-<div class="mt-6 ml-4 flex items-center align-middle sm:mt-10 sm:ml-10">
-	<span class="flex flex-row">
-		<h2
-			class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
-		>
-			Dashboard
-		</h2>
-		<TooltipInfo
-			label="Help: Dashboard"
-			description="Dashboard provides a quick overview of your organization's activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
-		/>
-	</span>
+	</div>
 </div>
+<hr class="border-gray-200" />
 
-<div class="mx-4 my-4 flex flex-col gap-6 sm:mx-8">
+<div class="mx-4 mt-4 flex flex-col gap-6 sm:mx-8">
 	<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
 		{#each stats_box as stat (stat.title)}
 			{@render dataBox(stat.title, '', stat.count, false, isLoadingStats)}

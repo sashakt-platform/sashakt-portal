@@ -20,9 +20,12 @@ export const createTagTypesColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<TagType>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		meta: { grow: true }
+	}),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
 	createActionsColumn<TagType>('Tag Type', '/tags/tagtype', permissions)
 ];

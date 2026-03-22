@@ -16,6 +16,7 @@
 		action?: () => void;
 		icon?: string;
 		method?: string;
+		inline?: boolean;
 	}
 
 	let {
@@ -25,7 +26,9 @@
 		customActions = [],
 		onDelete,
 		canEdit = true,
-		canDelete = true
+		canDelete = true,
+		editInline = false,
+		deleteInline = false
 	}: {
 		entityName?: string;
 		editUrl: string;
@@ -34,9 +37,23 @@
 		onDelete?: () => void;
 		canEdit?: boolean;
 		canDelete?: boolean;
+		editInline?: boolean;
+		deleteInline?: boolean;
 	} = $props();
 
 	let deleteAction: string | null = $state(null);
+
+	// Split custom actions: inline requires an icon, otherwise fall back to overflow
+	const inlineCustomActions = $derived(customActions.filter((a) => a.inline && a.icon));
+	const overflowCustomActions = $derived(customActions.filter((a) => !a.inline || !a.icon));
+
+	const hasInlineActions = $derived(
+		(canEdit && editInline) || (canDelete && deleteInline) || inlineCustomActions.length > 0
+	);
+
+	const hasOverflowActions = $derived(
+		(canEdit && !editInline) || (canDelete && !deleteInline) || overflowCustomActions.length > 0
+	);
 
 	function handleDelete() {
 		if (onDelete) {
@@ -65,69 +82,146 @@
 <DeleteDialog bind:action={deleteAction} elementName={entityName} />
 
 {#if canEdit || canDelete || customActions.length > 0}
-	<DropdownMenu.Root>
-		<DropdownMenu.Trigger>
-			{#snippet child({ props })}
-				<Button {...props} variant="ghost" size="icon" class="relative size-8 p-0">
-					<span class="sr-only">Open menu</span>
-					<EllipsisIcon />
-				</Button>
-			{/snippet}
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content>
-			{#if canEdit}
+	<div class="flex items-center gap-1">
+		<!-- INLINE ZONE -->
+		{#if hasInlineActions}
+			{#if canEdit && editInline}
 				<a href={editUrl}>
-					<DropdownMenu.Item class="cursor-pointer">
-						<Pencil />
+					<Button
+						variant="ghost"
+						size="sm"
+						class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
+					>
+						<Pencil class="h-4 w-4" />
 						Edit
-					</DropdownMenu.Item>
+					</Button>
 				</a>
 			{/if}
-			{#if canDelete}
-				<DropdownMenu.Item onclick={handleDelete}>
-					<Trash_2 />
+
+			{#if canDelete && deleteInline}
+				<Button
+					variant="ghost"
+					size="sm"
+					class="bg-red-50 text-red-700 hover:bg-red-100"
+					onclick={handleDelete}
+				>
+					<Trash_2 class="h-4 w-4" />
 					Delete
-				</DropdownMenu.Item>
+				</Button>
 			{/if}
 
-			{#each customActions as action}
+			{#each inlineCustomActions as action}
+				{@const IconComponent = getIcon(action.icon)}
 				{#if action.href && action.method === 'POST'}
-					<form action={action.href} method="POST">
-						<DropdownMenu.Item class="cursor-pointer p-0">
-							<Button
-								type="submit"
-								variant="ghost"
-								size="sm"
-								class="h-auto w-full justify-start p-2"
-							>
-								{@const IconComponent = getIcon(action.icon)}
-								{#if IconComponent}
-									<IconComponent class="h-4 w-4" />
-								{/if}
-								{action.label}
-							</Button>
-						</DropdownMenu.Item>
+					<form action={action.href} method="POST" class="inline">
+						<Button
+							type="submit"
+							variant="ghost"
+							size="sm"
+							class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
+						>
+							{#if IconComponent}
+								<IconComponent class="h-4 w-4" />
+							{/if}
+							{action.label}
+						</Button>
 					</form>
 				{:else if action.href}
 					<a href={action.href}>
-						<DropdownMenu.Item class="cursor-pointer">
-							{@const IconComponent = getIcon(action.icon)}
+						<Button
+							variant="ghost"
+							size="sm"
+							class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
+						>
 							{#if IconComponent}
-								<IconComponent />
+								<IconComponent class="h-4 w-4" />
 							{/if}
 							{action.label}
-						</DropdownMenu.Item>
+						</Button>
 					</a>
 				{:else if action.action}
-					<DropdownMenu.Item onclick={action.action}>
-						{@const IconComponent = getIcon(action.icon)}
+					<Button
+						variant="ghost"
+						size="sm"
+						class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
+						onclick={action.action}
+					>
 						{#if IconComponent}
-							<IconComponent />
+							<IconComponent class="h-4 w-4" />
 						{/if}
 						{action.label}
-					</DropdownMenu.Item>
+					</Button>
 				{/if}
 			{/each}
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
+		{/if}
+
+		<!-- OVERFLOW ZONE -->
+		{#if hasOverflowActions}
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					{#snippet child({ props })}
+						<Button {...props} variant="ghost" size="icon" class="relative size-8 p-0">
+							<span class="sr-only">Open menu</span>
+							<EllipsisIcon />
+						</Button>
+					{/snippet}
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					{#if canEdit && !editInline}
+						<a href={editUrl}>
+							<DropdownMenu.Item class="cursor-pointer">
+								<Pencil />
+								Edit
+							</DropdownMenu.Item>
+						</a>
+					{/if}
+					{#if canDelete && !deleteInline}
+						<DropdownMenu.Item onclick={handleDelete}>
+							<Trash_2 />
+							Delete
+						</DropdownMenu.Item>
+					{/if}
+
+					{#each overflowCustomActions as action}
+						{#if action.href && action.method === 'POST'}
+							<form action={action.href} method="POST">
+								<DropdownMenu.Item class="cursor-pointer p-0">
+									<Button
+										type="submit"
+										variant="ghost"
+										size="sm"
+										class="h-auto w-full justify-start p-2"
+									>
+										{@const IconComponent = getIcon(action.icon)}
+										{#if IconComponent}
+											<IconComponent class="h-4 w-4" />
+										{/if}
+										{action.label}
+									</Button>
+								</DropdownMenu.Item>
+							</form>
+						{:else if action.href}
+							<a href={action.href}>
+								<DropdownMenu.Item class="cursor-pointer">
+									{@const IconComponent = getIcon(action.icon)}
+									{#if IconComponent}
+										<IconComponent />
+									{/if}
+									{action.label}
+								</DropdownMenu.Item>
+							</a>
+						{:else if action.action}
+							<DropdownMenu.Item onclick={action.action}>
+								{@const IconComponent = getIcon(action.icon)}
+								{#if IconComponent}
+									<IconComponent />
+								{/if}
+								{action.label}
+							</DropdownMenu.Item>
+						{/if}
+					{/each}
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
+		{/if}
+	</div>
 {/if}

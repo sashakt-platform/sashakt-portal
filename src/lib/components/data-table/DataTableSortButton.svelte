@@ -19,7 +19,12 @@
 	const isDesc = $derived(isActiveSorted && currentSortOrder === 'desc');
 </script>
 
-<Button {variant} onclick={() => handleSort(columnId)} {...restProps}>
+<Button
+	{variant}
+	class="-ml-3 text-xs font-semibold tracking-wide uppercase"
+	onclick={() => handleSort(columnId)}
+	{...restProps}
+>
 	{title}
 	{#if isDesc}
 		<ArrowDown class="ml-2 size-4" />

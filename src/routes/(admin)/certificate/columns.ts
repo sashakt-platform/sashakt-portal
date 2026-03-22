@@ -25,12 +25,19 @@ export const createColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<Certificate>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		meta: { grow: true }
+	}),
 	createSortableColumn('is_active', 'Active', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => (row.original.is_active ? 'Yes' : 'No')
+		cell: ({ row }) => (row.original.is_active ? 'Yes' : 'No'),
+		size: 100
 	}),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
-	createActionsColumn<Certificate>('Certificate', '/certificate', permissions)
+	createActionsColumn<Certificate>('Certificate', '/certificate', {
+		...permissions,
+		editInline: true
+	})
 ];

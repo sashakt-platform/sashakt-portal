@@ -6,7 +6,7 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">
+<div class="bg-accent flex h-screen items-center justify-center">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
 			<h1 class="text-primary w-full pb-4 text-3xl font-extrabold tracking-tighter">SASHAKT</h1>

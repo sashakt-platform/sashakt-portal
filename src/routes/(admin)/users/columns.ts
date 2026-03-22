@@ -36,5 +36,5 @@ export const createColumns = (
 	createSortableColumn('role_label', 'Role', currentSortBy, currentSortOrder, handleSort, {
 		size: 140
 	}),
-	createActionsColumn<User>('User', '/users', permissions)
+	createActionsColumn<User>('User', '/users', { ...permissions, editInline: true })
 ];

@@ -43,5 +43,5 @@ export const createColumns = (
 		cell: ({ row }) => formatDate(row.original.modified_date),
 		size: 140
 	}),
-	createActionsColumn<Form>('Form', '/forms', permissions)
+	createActionsColumn<Form>('Form', '/forms', { ...permissions, editInline: true })
 ];

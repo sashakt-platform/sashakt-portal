@@ -92,7 +92,7 @@ export const createTestColumns = (
 	}),
 	{
 		id: 'actions',
-		size: 60,
+		size: 240,
 		header: '',
 		enableSorting: false,
 		enableHiding: false,
@@ -115,7 +115,8 @@ export const createTestColumns = (
 				customActions.push({
 					label: 'Make a Test',
 					href: resolve(`/tests/test-session/convert/?template_id=${test.id}`),
-					icon: 'file-plus'
+					icon: 'file-plus',
+					inline: true
 				});
 			} else {
 				// Add session-specific actions
@@ -137,7 +138,8 @@ export const createTestColumns = (
 								console.error('Failed to download QR code:', error);
 							}
 						},
-						icon: 'qr-code'
+						icon: 'qr-code',
+						inline: true
 					});
 				}
 			}
@@ -163,7 +165,8 @@ export const createTestColumns = (
 				customActions,
 				onDelete: () => onDelete(test.id),
 				canEdit: (permissions?.canEdit ?? true) && !isRestricted,
-				canDelete: (permissions?.canDelete ?? true) && !isRestricted
+				canDelete: (permissions?.canDelete ?? true) && !isRestricted,
+				editInline: true
 			});
 		}
 	}

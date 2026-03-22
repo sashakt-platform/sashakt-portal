@@ -35,8 +35,14 @@ export const createColumns = (
 	}),
 	createActionsColumn<EntityType>('Entity', '/entity', {
 		...permissions,
+		editInline: true,
 		customActions: (row) => [
-			{ label: 'View Records', href: resolve(`/entity/view/${row.id}`), icon: 'external-link' }
+			{
+				label: 'View Records',
+				href: resolve(`/entity/view/${row.id}`),
+				icon: 'external-link',
+				inline: true
+			}
 		]
 	})
 ];

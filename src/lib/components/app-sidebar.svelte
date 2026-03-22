@@ -169,19 +169,19 @@
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<Sidebar.Menu>
-			<Sidebar.MenuItem class="m-1">
-				<Sidebar.MenuButton
-					isActive={currentitem == 'Settings'}
-					onclick={() => handleMenuClick('Settings')}
-				>
-					{#snippet child({ props })}
-						<a href={resolve('/organization')} {...props}>
-							<Settings />
-							<span>Settings</span>
-						</a>
-					{/snippet}
-				</Sidebar.MenuButton>
-			</Sidebar.MenuItem>
+			<!-- <Sidebar.MenuItem class="m-1"> -->
+			<!-- 	<Sidebar.MenuButton -->
+			<!-- 		isActive={currentitem == 'Settings'} -->
+			<!-- 		onclick={() => handleMenuClick('Settings')} -->
+			<!-- 	> -->
+			<!-- 		{#snippet child({ props })} -->
+			<!-- 			<a href={resolve('/organization')} {...props}> -->
+			<!-- 				<Settings /> -->
+			<!-- 				<span>Settings</span> -->
+			<!-- 			</a> -->
+			<!-- 		{/snippet} -->
+			<!-- 	</Sidebar.MenuButton> -->
+			<!-- </Sidebar.MenuItem> -->
 			<Sidebar.MenuItem class="m-1">
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>

@@ -156,15 +156,11 @@
 	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Answers');
 	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.rows.items ??
-			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
+			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String.fromCharCode(65 + i), value: '' }))
 	);
 	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.columns.items ??
-			Array.from({ length: 4 }, (_, i) => ({
-				id: i + 1,
-				key: String.fromCharCode(65 + i),
-				value: ''
-			}))
+			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
 	);
 	let matrixMatches = $state<Record<string, number[]>>(
 		questionData?.correct_answer &&
@@ -176,6 +172,10 @@
 
 	let openTagDialog: boolean = $state(false);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
+
+	function nextId(items: { id: number }[]): number {
+		return Math.max(0, ...items.map((i) => i.id)) + 1;
+	}
 
 	$effect(() => {
 		if (
@@ -207,7 +207,7 @@
 			return (
 				matrixLeftItems.some((i) => !i.value.trim()) ||
 				matrixRightItems.some((i) => !i.value.trim()) ||
-				matrixLeftItems.some((i) => !matrixMatches[i.key]?.length)
+				matrixLeftItems.some((i) => !matrixMatches[String(i.id)]?.length)
 			);
 		}
 
@@ -489,28 +489,10 @@
 										}}
 										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
 										onfinalize={({ detail }) => {
-											// Preserve matches by mapping old key using item id
-											const matchesByItemId: Record<number, number[]> = {};
-											for (const item of matrixLeftItems) {
-												if (matrixMatches[item.key]?.length) {
-													matchesByItemId[item.id] = matrixMatches[item.key];
-												}
-											}
-
-											// Reassign keys based on new position
 											matrixLeftItems = detail.items.map((item, i) => ({
 												...item,
-												key: String(i + 1)
+												key: String.fromCharCode(65 + i)
 											}));
-
-											// Rebuild matrixMatches using new keys
-											const newMatches: Record<string, number[]> = {};
-											for (const item of matrixLeftItems) {
-												if (matchesByItemId[item.id]) {
-													newMatches[item.key] = matchesByItemId[item.id];
-												}
-											}
-											matrixMatches = newMatches;
 										}}
 									>
 										{#each matrixLeftItems as item, index (item.id)}
@@ -530,11 +512,11 @@
 												</div>
 												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
 													if (matrixLeftItems.length > 1) {
-														const removedKey = matrixLeftItems[index].key;
+														const deletedId = String(matrixLeftItems[index].id);
 														matrixLeftItems = matrixLeftItems
 															.filter((_, i) => i !== index)
-															.map((item, i) => ({ ...item, key: String(i + 1) }));
-														const { [removedKey]: _, ...rest } = matrixMatches;
+															.map((item, i) => ({ ...item, key: String.fromCharCode(65 + i) }));
+														const { [deletedId]: _, ...rest } = matrixMatches;
 														matrixMatches = rest;
 													}
 												})}
@@ -543,8 +525,8 @@
 									</div>
 									{@render matrixAddButton('Add Question', () => {
 										matrixLeftItems.push({
-											id: Date.now(),
-											key: String(matrixLeftItems.length + 1),
+											id: nextId(matrixLeftItems),
+											key: String.fromCharCode(65 + matrixLeftItems.length),
 											value: ''
 										});
 									})}
@@ -563,7 +545,7 @@
 										onfinalize={({ detail }) => {
 											matrixRightItems = detail.items.map((item, i) => ({
 												...item,
-												key: String.fromCharCode(65 + i)
+												key: String(i + 1)
 											}));
 										}}
 									>
@@ -589,7 +571,7 @@
 															.filter((_, i) => i !== index)
 															.map((item, i) => ({
 																...item,
-																key: String.fromCharCode(65 + i)
+																key: String(i + 1)
 															}));
 														matrixMatches = Object.fromEntries(
 															Object.entries(matrixMatches).map(([k, ids]) => [
@@ -604,8 +586,8 @@
 									</div>
 									{@render matrixAddButton('Add Answer', () => {
 										matrixRightItems.push({
-											id: Date.now(),
-											key: String.fromCharCode(65 + matrixRightItems.length),
+											id: nextId(matrixRightItems),
+											key: String(matrixRightItems.length + 1),
 											value: ''
 										});
 									})}
@@ -643,7 +625,7 @@
 										>
 										<div class="flex gap-2">
 											{#each matrixRightItems as rightItem (rightItem.id)}
-												{@const checked = (matrixMatches[leftItem.key] ?? []).includes(
+												{@const checked = (matrixMatches[String(leftItem.id)] ?? []).includes(
 													rightItem.id
 												)}
 												<button
@@ -652,10 +634,10 @@
 														? 'border-primary bg-primary text-white shadow-sm'
 														: 'hover:border-primary/60 hover:text-primary border-gray-200 bg-white text-gray-400'}"
 													onclick={() => {
-														const current = matrixMatches[leftItem.key] ?? [];
+														const current = matrixMatches[String(leftItem.id)] ?? [];
 														matrixMatches = {
 															...matrixMatches,
-															[leftItem.key]: checked
+															[String(leftItem.id)]: checked
 																? current.filter((id) => id !== rightItem.id)
 																: [...current, rightItem.id]
 														};
@@ -692,7 +674,7 @@
 													if (matrixLeftItems.length > 1) {
 														matrixLeftItems = matrixLeftItems
 															.filter((_, i) => i !== index)
-															.map((it, i) => ({ ...it, key: String(i + 1) }));
+															.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
 													}
 												})}
 											</div>
@@ -700,8 +682,8 @@
 									</div>
 									{@render matrixAddButton('Add Item', () => {
 										matrixLeftItems.push({
-											id: Date.now(),
-											key: String(matrixLeftItems.length + 1),
+											id: nextId(matrixLeftItems),
+											key: String.fromCharCode(65 + matrixLeftItems.length),
 											value: ''
 										});
 									})}
@@ -728,7 +710,7 @@
 															.filter((_, i) => i !== index)
 															.map((it, i) => ({
 																...it,
-																key: String.fromCharCode(65 + i)
+																key: String(i + 1)
 															}));
 													}
 												})}
@@ -737,8 +719,8 @@
 									</div>
 									{@render matrixAddButton('Add Rating', () => {
 										matrixRightItems.push({
-											id: Date.now(),
-											key: String.fromCharCode(65 + matrixRightItems.length),
+											id: nextId(matrixRightItems),
+											key: String(matrixRightItems.length + 1),
 											value: ''
 										});
 									})}

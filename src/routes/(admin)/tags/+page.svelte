@@ -1,115 +1,149 @@
 <script lang="ts">
 	import { DataTable } from '$lib/components/data-table';
 	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
-	import { createTagsColumns } from './tags-columns';
-	import { createTagTypesColumns } from './tag-types-columns';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import Input from '$lib/components/ui/input/input.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { resolve } from '$app/paths';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Plus from '@lucide/svelte/icons/plus';
-	import * as Tabs from '$lib/components/ui/tabs/index.js';
-	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
-	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+	import Plus from '@lucide/svelte/icons/plus';
 	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
+	import Search from '@lucide/svelte/icons/search';
+	import TagTypeDialog from './TagTypeDialog.svelte';
+	import TagDeleteDialog from './TagDeleteDialog.svelte';
+	import { createTagManagementColumns } from './columns';
 
 	const { data } = $props();
-	let deleteAction: string | null = $state(null);
-	let tagsSearchTimeout: ReturnType<typeof setTimeout>;
-	let tagTypesSearchTimeout: ReturnType<typeof setTimeout>;
 
-	// Tags related fields
-	const tagsData = $derived(data?.tags?.items || []);
-	const tagsTotalItems = $derived(data?.tags?.total || 0);
-	const tagsTotalPages = $derived(data?.tagsTotalPages || 0);
-	const tagsCurrentPage = $derived(data?.tagsParams?.page || 1);
-	const tagsPageSize = $derived(data?.tagsParams?.size || DEFAULT_PAGE_SIZE);
-	const tagsSearch = $derived(data?.tagsParams?.search || '');
-	const tagsSortBy = $derived(data?.tagsParams?.sortBy || '');
-	const tagsSortOrder = $derived(data?.tagsParams?.sortOrder || 'asc');
+	// Permissions
+	const userCanCreate = $derived(canCreate(data.user, 'tag'));
+	const userCanUpdate = $derived(canUpdate(data.user, 'tag'));
+	const userCanDelete = $derived(canDelete(data.user, 'tag'));
 
-	// Tag Types related fields
+	// Data
 	const tagTypesData = $derived(data?.tagTypes?.items || []);
 	const tagTypesTotalItems = $derived(data?.tagTypes?.total || 0);
-	const tagTypesTotalPages = $derived(data?.tagTypesTotalPages || 0);
-	const tagTypesCurrentPage = $derived(data?.tagTypesParams?.page || 1);
-	const tagTypesPageSize = $derived(data?.tagTypesParams?.size || DEFAULT_PAGE_SIZE);
-	const tagTypesSearch = $derived(data?.tagTypesParams?.search || '');
-	const tagTypesSortBy = $derived(data?.tagTypesParams?.sortBy || '');
-	const tagTypesSortOrder = $derived(data?.tagTypesParams?.sortOrder || 'asc');
+	const totalPages = $derived(data?.totalPages || 0);
+	const currentPage = $derived(data?.params?.page || 1);
+	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
+	const searchValue = $derived(data?.params?.search || '');
+	const sortBy = $derived(data?.params?.sortBy || '');
+	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
-	function handleTagsSort(columnId: string) {
+	// Tag Type Dialog state
+	let tagTypeDialogOpen = $state(false);
+	let tagTypeDialogMode: 'create' | 'edit' = $state('create');
+	let editingTagType: { id: number; name: string; description?: string | null } | null =
+		$state(null);
+
+	// Tag inline edit state
+	let editingTagId: number | string | null = $state(null);
+	let editingTagName = $state('');
+
+	// Delete dialog state
+	let deleteDialogOpen = $state(false);
+	let deleteElementName = $state('');
+	let deleteElementId: number | string | null = $state(null);
+	let deleteElementType: 'tag' | 'tag type' = $state('tag');
+
+	// Search
+	let searchTimeout: ReturnType<typeof setTimeout>;
+
+	function handleSearch(event: Event) {
+		const target = event.target as HTMLInputElement;
 		const url = new URL(page.url);
-		const newSortOrder = tagsSortBy === columnId && tagsSortOrder === 'asc' ? 'desc' : 'asc';
-
-		url.searchParams.set('tagsSortBy', columnId);
-		url.searchParams.set('tagsSortOrder', newSortOrder);
-		url.searchParams.set('tagsPage', '1');
-
-		goto(url.toString(), { replaceState: false });
+		clearTimeout(searchTimeout);
+		searchTimeout = setTimeout(() => {
+			if (target.value) {
+				url.searchParams.set('search', target.value);
+			} else {
+				url.searchParams.delete('search');
+			}
+			url.searchParams.set('page', '1');
+			goto(url, { keepFocus: true, invalidateAll: true });
+		}, 300);
 	}
 
-	function handleTagTypesSort(columnId: string) {
+	// Sorting
+	function handleSort(columnId: string) {
 		const url = new URL(page.url);
-		const newSortOrder =
-			tagTypesSortBy === columnId && tagTypesSortOrder === 'asc' ? 'desc' : 'asc';
-
-		url.searchParams.set('tagTypesSortBy', columnId);
-		url.searchParams.set('tagTypesSortOrder', newSortOrder);
-		url.searchParams.set('tagTypesPage', '1');
-
-		goto(url.toString(), { replaceState: false });
+		const newOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
+		url.searchParams.set('sort_by', columnId);
+		url.searchParams.set('sort_order', newOrder);
+		url.searchParams.set('page', '1');
+		goto(url, { replaceState: false });
 	}
 
-	// get active tab from URL parameter
-	const activeTab = $derived(page.url.searchParams.get('tab') === 'tagtype' ? 'tagtype' : 'tag');
-
-	function handleTabChange(value: string) {
-		const url = new URL(page.url);
-
-		// set the tab parameter
-		url.searchParams.set('tab', value);
-
-		// reset all URL parameters for both tabs when switching
-		const paramsToReset = [
-			'tagsPage',
-			'tagsSortBy',
-			'tagsSortOrder',
-			'tagTypesPage',
-			'tagTypesSortBy',
-			'tagTypesSortOrder',
-			'search'
-		];
-
-		paramsToReset.forEach((param) => {
-			url.searchParams.delete(param);
-		});
-
-		goto(url.toString(), { replaceState: false });
+	// Tag type actions
+	function openCreateTagType() {
+		tagTypeDialogMode = 'create';
+		editingTagType = null;
+		tagTypeDialogOpen = true;
 	}
 
-	const tagsColumns = $derived(
-		createTagsColumns(tagsSortBy, tagsSortOrder, handleTagsSort, {
-			canEdit: canUpdate(data.user, 'tag'),
-			canDelete: canDelete(data.user, 'tag')
+	function openEditTagType(tagType: { id: number | string; name: string; description?: string }) {
+		tagTypeDialogMode = 'edit';
+		editingTagType = {
+			id: tagType.id as number,
+			name: tagType.name,
+			description: tagType.description
+		};
+		tagTypeDialogOpen = true;
+	}
+
+	function openDeleteTagType(tagType: { id: number | string; name: string }) {
+		deleteElementType = 'tag type';
+		deleteElementId = tagType.id;
+		deleteElementName = tagType.name;
+		deleteDialogOpen = true;
+	}
+
+	// Tag actions
+	function startEditTag(tagId: number | string, tagName: string) {
+		editingTagId = tagId;
+		editingTagName = tagName;
+	}
+
+	function cancelEditTag() {
+		editingTagId = null;
+		editingTagName = '';
+	}
+
+	function openDeleteTag(tagId: number | string, tagName: string) {
+		deleteElementType = 'tag';
+		deleteElementId = tagId;
+		deleteElementName = tagName;
+		deleteDialogOpen = true;
+	}
+
+	// Columns
+	const columns = $derived(
+		createTagManagementColumns(sortBy, sortOrder, handleSort, {
+			canEdit: userCanUpdate,
+			canDelete: userCanDelete,
+			canCreate: userCanCreate,
+			editingTagId,
+			editingTagName,
+			onEditTagType: openEditTagType,
+			onDeleteTagType: openDeleteTagType,
+			onStartEditTag: startEditTag,
+			onCancelEditTag: cancelEditTag,
+			onDeleteTag: openDeleteTag
 		})
 	);
-	const tagTypesColumns = $derived(
-		createTagTypesColumns(tagTypesSortBy, tagTypesSortOrder, handleTagTypesSort, {
-			canEdit: canUpdate(data.user, 'tag'),
-			canDelete: canDelete(data.user, 'tag')
-		})
-	);
 
-	const noTagTypesCreatedYet = $derived(tagTypesTotalItems === 0 && tagsTotalItems === 0);
+	const noTagTypesCreatedYet = $derived(tagTypesTotalItems === 0 && !searchValue);
 </script>
 
-<DeleteDialog
-	bind:action={deleteAction}
-	elementName={deleteAction?.includes('tagtype') ? 'Tag Type' : 'Tag'}
+<TagDeleteDialog
+	bind:open={deleteDialogOpen}
+	elementName={deleteElementName}
+	elementId={deleteElementId}
+	elementType={deleteElementType}
 />
+
+<TagTypeDialog bind:open={tagTypeDialogOpen} mode={tagTypeDialogMode} tagType={editingTagType} />
 
 <ListingPageLayout
 	title="Tag Management"
@@ -119,10 +153,10 @@
 	infoDescription="Manage all tags and tag types here. You can create, edit, or delete tags and tag types using the available actions."
 >
 	{#snippet headerActions()}
-		{#if canCreate(data.user, 'tag')}
-			<a href={resolve('/tags/tagtype/add/new')}
-				><Button class="font-semibold"><Plus />Create Tag Type</Button></a
-			>
+		{#if userCanCreate}
+			<Button class="font-semibold" onclick={openCreateTagType}>
+				<Plus />Create Tag Type
+			</Button>
 		{/if}
 	{/snippet}
 
@@ -137,13 +171,14 @@
 					</div>
 					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No tag types yet</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first test tag type to get started. Tags types let you filter questions.
+						Create your first tag type to get started. Tag types let you categorize and filter
+						questions.
 					</p>
-					{#if canCreate(data.user, 'tag')}
+					{#if userCanCreate}
 						<div class="mt-6">
-							<a href={resolve('/tags/tagtype/add/new')}
-								><Button class="font-semibold"><Plus />Create Tag Type</Button></a
-							>
+							<Button class="font-semibold" onclick={openCreateTagType}>
+								<Plus />Create Tag Type
+							</Button>
 						</div>
 					{/if}
 				</div>
@@ -151,74 +186,26 @@
 		{/if}
 	{/snippet}
 
+	{#snippet filters()}
+		<div class="relative lg:w-80">
+			<Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+			<Input
+				class="rounded-full pl-9"
+				placeholder="Search tag types or tags..."
+				value={searchValue}
+				oninput={handleSearch}
+			/>
+		</div>
+	{/snippet}
+
 	{#snippet content()}
-		<Tabs.Root value={activeTab} onValueChange={handleTabChange} class="w-full">
-			<Tabs.List>
-				<Tabs.Trigger value="tag">Tags</Tabs.Trigger>
-				<Tabs.Trigger value="tagtype">Tag Types</Tabs.Trigger>
-			</Tabs.List>
-			<Tabs.Content value="tag">
-				<div class="flex items-center py-4">
-					<Input
-						placeholder="Search tags..."
-						value={tagsSearch}
-						oninput={(event) => {
-							const url = new URL(page.url);
-							clearTimeout(tagsSearchTimeout);
-							tagsSearchTimeout = setTimeout(() => {
-								if (event.target?.value) {
-									url.searchParams.set('search', event.target.value);
-								} else {
-									url.searchParams.delete('search');
-								}
-								url.searchParams.set('tagsPage', '1');
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}, 300);
-						}}
-						class="max-w-sm"
-					/>
-				</div>
-				<DataTable
-					data={tagsData}
-					columns={tagsColumns}
-					totalItems={tagsTotalItems}
-					totalPages={tagsTotalPages}
-					currentPage={tagsCurrentPage}
-					pageSize={tagsPageSize}
-					paramPrefix="tags"
-				/>
-			</Tabs.Content>
-			<Tabs.Content value="tagtype">
-				<div class="flex items-center py-4">
-					<Input
-						placeholder="Search tag types..."
-						value={tagTypesSearch}
-						oninput={(event) => {
-							const url = new URL(page.url);
-							clearTimeout(tagTypesSearchTimeout);
-							tagTypesSearchTimeout = setTimeout(() => {
-								if (event.target?.value) {
-									url.searchParams.set('search', event.target.value);
-								} else {
-									url.searchParams.delete('search');
-								}
-								url.searchParams.set('tagTypesPage', '1');
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}, 300);
-						}}
-						class="max-w-sm"
-					/>
-				</div>
-				<DataTable
-					data={tagTypesData}
-					columns={tagTypesColumns}
-					totalItems={tagTypesTotalItems}
-					totalPages={tagTypesTotalPages}
-					currentPage={tagTypesCurrentPage}
-					pageSize={tagTypesPageSize}
-					paramPrefix="tagTypes"
-				/>
-			</Tabs.Content>
-		</Tabs.Root>
+		<DataTable
+			data={tagTypesData}
+			{columns}
+			totalItems={tagTypesTotalItems}
+			{totalPages}
+			{currentPage}
+			{pageSize}
+		/>
 	{/snippet}
 </ListingPageLayout>

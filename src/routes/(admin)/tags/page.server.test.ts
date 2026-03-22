@@ -7,18 +7,24 @@ vi.mock('$env/static/private', () => ({
 }));
 
 vi.mock('$lib/server/auth', () => ({
-	requireLogin: vi.fn(() => ({ id: 1 })),
+	requireLogin: vi.fn(() => ({ id: 1, organization_id: 10 })),
 	getSessionTokenCookie: vi.fn(() => 'fake-token')
 }));
 
 vi.mock('$lib/utils/permissions.js', () => ({
 	requirePermission: vi.fn(),
-	PERMISSIONS: { READ_TAG: 'read_tag' }
+	PERMISSIONS: {
+		READ_TAG: 'read_tag',
+		CREATE_TAG: 'create_tag',
+		UPDATE_TAG: 'update_tag',
+		DELETE_TAG: 'delete_tag'
+	}
 }));
 
 const setFlashMock = vi.fn();
 vi.mock('sveltekit-flash-message/server', () => ({
-	setFlash: (...args: any[]) => setFlashMock(...args)
+	setFlash: (...args: any[]) => setFlashMock(...args),
+	redirect: vi.fn()
 }));
 
 global.fetch = vi.fn();
@@ -28,34 +34,32 @@ describe('load function', () => {
 		vi.clearAllMocks();
 	});
 
-	it('returns tags and tagTypes when API succeeds', async () => {
-		(global.fetch as any)
-			.mockResolvedValueOnce({
-				ok: true,
-				json: async () => ({ items: ['t1'], total: 1, pages: 1 })
+	it('returns tagTypes when API succeeds', async () => {
+		(global.fetch as any).mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({
+				items: [{ id: 1, name: 'State', tags: [{ id: 10, name: 'Delhi' }] }],
+				total: 1,
+				pages: 1
 			})
-			.mockResolvedValueOnce({
-				ok: true,
-				json: async () => ({ items: ['tt1'], total: 1, pages: 1 })
-			});
+		});
 
-		const url = new URL('http://test.com/?tagsPage=2&tagsSize=5');
+		const url = new URL('http://test.com/?page=2&size=5');
 
 		const result = await load({
 			cookies: {},
 			url
 		});
 
-		expect(result.tags.items).toEqual(['t1']);
-		expect(result.tagTypes.items).toEqual(['tt1']);
-		expect(result.tagsParams.page).toBe(2);
-		expect(result.tagsParams.size).toBe(5);
+		expect(result.tagTypes.items[0].name).toBe('State');
+		expect(result.params.page).toBe(2);
+		expect(result.params.size).toBe(5);
 	});
 
-	it('returns empty tags when tags API fails', async () => {
+	it('returns empty tagTypes when API fails', async () => {
 		(global.fetch as any).mockResolvedValueOnce({
 			ok: false,
-			json: async () => ({ detail: 'Error fetching tags' })
+			text: async () => 'Error fetching tag types'
 		});
 
 		const url = new URL('http://test.com/?search=hello');
@@ -65,45 +69,15 @@ describe('load function', () => {
 			url
 		});
 
-		expect(setFlashMock).toHaveBeenCalled();
-		expect(result.tags.items).toEqual([]);
 		expect(result.tagTypes.items).toEqual([]);
-		expect(result.tagsParams.search).toBe('hello');
-	});
-
-	it('handles tagTypes API failure gracefully', async () => {
-		(global.fetch as any)
-			.mockResolvedValueOnce({
-				ok: true,
-				json: async () => ({ items: ['taga'], total: 1, pages: 1 })
-			})
-			.mockResolvedValueOnce({
-				ok: false,
-				json: async () => ({ detail: 'TagTypes failed' })
-			});
-
-		const url = new URL('http://test.com/');
-
-		const result = await load({
-			cookies: {},
-			url
-		});
-
-		expect(result.tags.items).toEqual(['taga']);
-		expect(result.tagTypes.items).toEqual([]);
-		expect(setFlashMock).toHaveBeenCalled();
+		expect(result.params.search).toBe('hello');
 	});
 
 	it('uses default pagination when no query params are given', async () => {
-		(global.fetch as any)
-			.mockResolvedValueOnce({
-				ok: true,
-				json: async () => ({ items: [], total: 0, pages: 0 })
-			})
-			.mockResolvedValueOnce({
-				ok: true,
-				json: async () => ({ items: [], total: 0, pages: 0 })
-			});
+		(global.fetch as any).mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ items: [], total: 0, pages: 0 })
+		});
 
 		const url = new URL('http://test.com/');
 
@@ -112,9 +86,7 @@ describe('load function', () => {
 			url
 		});
 
-		expect(result.tagsParams.page).toBe(1);
-		expect(result.tagsParams.size).toBe(DEFAULT_PAGE_SIZE);
-		expect(result.tagTypesParams.page).toBe(1);
-		expect(result.tagTypesParams.size).toBe(DEFAULT_PAGE_SIZE);
+		expect(result.params.page).toBe(1);
+		expect(result.params.size).toBe(DEFAULT_PAGE_SIZE);
 	});
 });

@@ -6,29 +6,36 @@ import { goto } from '$app/navigation';
 import { page } from '$app/state';
 
 const mockData = {
-	user: { id: 1, permissions: ['create_tag', 'update_tag', 'delete_tag'] },
-
-	tags: {
-		items: [{ id: 1, name: 'tag1', description: null, is_active: true }],
-		total: 1,
-		page: 1,
-		size: 25,
-		pages: 1
-	},
+	user: { id: 1, organization_id: 10, permissions: ['create_tag', 'update_tag', 'delete_tag'] },
 
 	tagTypes: {
-		items: [{ id: 10, name: 'type1' }],
-		total: 1,
-		page: 1,
-		size: 25,
+		items: [
+			{
+				id: 1,
+				name: 'Difficulty Level',
+				description: 'Classify questions by how challenging they are',
+				tags: [
+					{ id: 10, name: 'Easy' },
+					{ id: 11, name: 'Medium' },
+					{ id: 12, name: 'Hard' }
+				]
+			},
+			{
+				id: 2,
+				name: 'Subject',
+				description: 'The subject area the question belongs to',
+				tags: [
+					{ id: 20, name: 'Geography' },
+					{ id: 21, name: 'Science' }
+				]
+			}
+		],
+		total: 2,
 		pages: 1
 	},
 
-	tagsParams: { page: 1, size: 25, search: '', sortBy: '', sortOrder: 'asc' },
-	tagTypesParams: { page: 1, size: 25, search: '', sortBy: '', sortOrder: 'asc' },
-
-	tagsTotalPages: 1,
-	tagTypesTotalPages: 1
+	totalPages: 1,
+	params: { page: 1, size: 25, search: '', sortBy: '', sortOrder: 'asc' }
 };
 
 vi.mock('$app/navigation', () => ({
@@ -38,6 +45,9 @@ vi.mock('$app/state', () => ({
 	page: {
 		url: new URL('http://localhost/tags')
 	}
+}));
+vi.mock('$app/forms', () => ({
+	enhance: vi.fn(() => ({ destroy: vi.fn() }))
 }));
 vi.mock('$lib/utils/permissions.js', () => ({
 	canCreate: vi.fn(),
@@ -55,79 +65,86 @@ describe('TagManagementPage', () => {
 		vi.resetAllMocks();
 		page.url = new URL('http://localhost/tags');
 	});
+
 	it('renders Tag Management title', () => {
 		render(TagManagementPage, { data: mockData });
-
 		expect(screen.getByRole('heading', { name: /Tag Management/i })).toBeInTheDocument();
 	});
-	it('renders Create buttons when user has permission', () => {
+
+	it('renders Create Tag Type button when user has permission', () => {
 		vi.mocked(canCreate).mockReturnValue(true);
 		vi.mocked(canUpdate).mockReturnValue(true);
 		vi.mocked(canDelete).mockReturnValue(true);
 		render(TagManagementPage, { data: mockData });
 		expect(screen.getByText(/Create Tag Type/i)).toBeInTheDocument();
 	});
-	it('create buttons hidden when user lacks permissions', async () => {
+
+	it('hides Create Tag Type button when user lacks permissions', () => {
 		vi.mocked(canCreate).mockReturnValue(false);
 		vi.mocked(canUpdate).mockReturnValue(false);
 		vi.mocked(canDelete).mockReturnValue(false);
-		const noPermData = { ...mockData, user: { permissions: [] } };
 
-		render(TagManagementPage, { data: noPermData });
-
+		render(TagManagementPage, { data: mockData });
 		expect(screen.queryByText('Create Tag Type')).not.toBeInTheDocument();
 	});
 
-	it('search input works for tags', async () => {
+	it('renders tag types as rows in the table', () => {
+		vi.mocked(canCreate).mockReturnValue(false);
 		render(TagManagementPage, { data: mockData });
-		const input = screen.getByPlaceholderText('Search tags...') as HTMLInputElement;
+		expect(screen.getByText('Difficulty Level')).toBeInTheDocument();
+		expect(screen.getByText('Subject')).toBeInTheDocument();
+		expect(screen.getByText('Classify questions by how challenging they are')).toBeInTheDocument();
+	});
+
+	it('renders tags as chips grouped by tag type', () => {
+		vi.mocked(canCreate).mockReturnValue(false);
+		render(TagManagementPage, { data: mockData });
+		expect(screen.getByText('Easy')).toBeInTheDocument();
+		expect(screen.getByText('Medium')).toBeInTheDocument();
+		expect(screen.getByText('Hard')).toBeInTheDocument();
+		expect(screen.getByText('Geography')).toBeInTheDocument();
+		expect(screen.getByText('Science')).toBeInTheDocument();
+	});
+
+	it('search input works', async () => {
+		vi.mocked(canCreate).mockReturnValue(false);
+		render(TagManagementPage, { data: mockData });
+		const input = screen.getByPlaceholderText('Search tag types or tags...') as HTMLInputElement;
 		await fireEvent.input(input, { target: { value: 'hello' } });
 		expect(input.value).toBe('hello');
 	});
-	it('tag types search input updates value', async () => {
-		const { page } = await import('$app/state');
-		page.url = new URL('http://localhost/tags?tab=tagtype');
 
+	it('sorting calls goto with correct params', async () => {
+		vi.mocked(canCreate).mockReturnValue(false);
 		render(TagManagementPage, { data: mockData });
 
-		const input = screen.getByPlaceholderText('Search tag types...') as HTMLInputElement;
-
-		await fireEvent.input(input, { target: { value: 'type' } });
-
-		expect(input.value).toBe('type');
-	});
-
-	it('DataTable shows tag items', async () => {
-		render(TagManagementPage, { data: mockData });
-
-		expect(await screen.findByText('tag1')).toBeInTheDocument();
-	});
-	it('sorting tags calls goto with correct params', async () => {
-		render(TagManagementPage, { data: mockData });
-
-		const columnHeader = screen.getByRole('columnheader', { name: 'Name' });
-		const sortBtn = columnHeader.closest('th')!.querySelector('button');
-		expect(sortBtn).toBeTruthy();
-		await fireEvent.click(sortBtn!);
+		const sortButton = screen.getByText('Tag Types').closest('button');
+		expect(sortButton).toBeTruthy();
+		await fireEvent.click(sortButton!);
 		expect(goto).toHaveBeenCalled();
 		const call = vi.mocked(goto).mock.calls[0][0].toString();
-
-		expect(call).toContain('tagsSortBy');
-		expect(call).toContain('tagsSortOrder');
+		expect(call).toContain('sort_by=name');
+		expect(call).toContain('sort_order');
 	});
-	it('sorting tag types calls goto', async () => {
-		page.url = new URL('http://localhost/tags?tab=tagtype');
 
+	it('shows Add tag buttons when user has create permission', () => {
+		vi.mocked(canCreate).mockReturnValue(true);
 		render(TagManagementPage, { data: mockData });
+		const addButtons = screen.getAllByText('Add tag');
+		expect(addButtons.length).toBeGreaterThan(0);
+	});
 
-		const columnHeader = screen.getByRole('columnheader', { name: 'Name' });
-		const sortBtn = columnHeader.closest('th')!.querySelector('button');
-		expect(sortBtn).toBeTruthy();
-		await fireEvent.click(sortBtn!);
-		const call = vi.mocked(goto).mock.calls.at(0)![0].toString();
+	it('hides Add tag buttons when user lacks create permission', () => {
+		vi.mocked(canCreate).mockReturnValue(false);
+		render(TagManagementPage, { data: mockData });
+		expect(screen.queryByText('Add tag')).not.toBeInTheDocument();
+	});
 
-		expect(call).toContain('tagTypesSortBy');
-		expect(call).toContain('tagTypesSortOrder');
-		expect(call).toContain('tagTypesPage=1');
+	it('shows pagination info', () => {
+		vi.mocked(canCreate).mockReturnValue(false);
+		render(TagManagementPage, { data: mockData });
+		expect(screen.getByText(/Showing 1 to/)).toBeInTheDocument();
+		expect(screen.getByText('Previous')).toBeInTheDocument();
+		expect(screen.getByText('Next')).toBeInTheDocument();
 	});
 });

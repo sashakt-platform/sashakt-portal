@@ -424,9 +424,7 @@ describe('Question_preview', () => {
 			});
 			await openDialog();
 
-			expect(
-				screen.queryByText('Add options to see them in preview...')
-			).not.toBeInTheDocument();
+			expect(screen.queryByText('Add options to see them in preview...')).not.toBeInTheDocument();
 		});
 
 		it('allows entering a number value', async () => {
@@ -519,6 +517,189 @@ describe('Question_preview', () => {
 			await openDialog();
 
 			expect(screen.getByRole('spinbutton')).toHaveValue(null);
+		});
+	});
+
+	describe('Matrix Rating preview', () => {
+		function createMatrixRatingData(matrixOverrides = {}) {
+			return createData({
+				question_type: 'matrix-rating',
+				options: [],
+				correct_answer: null,
+				matrix: {
+					rowLabel: 'Criteria',
+					colLabel: 'Ratings',
+					rows: [
+						{ id: 1, key: '1', value: 'Quality' },
+						{ id: 2, key: '2', value: 'Speed' }
+					],
+					columns: [
+						{ id: 10, key: 'A', value: 'Poor' },
+						{ id: 11, key: 'B', value: 'Good' },
+						{ id: 12, key: 'C', value: 'Excellent' }
+					],
+					...matrixOverrides
+				}
+			});
+		}
+
+		it('renders a table with column headers', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			expect(screen.getByRole('table')).toBeInTheDocument();
+			expect(screen.getByText('Poor')).toBeInTheDocument();
+			expect(screen.getByText('Good')).toBeInTheDocument();
+			expect(screen.getByText('Excellent')).toBeInTheDocument();
+		});
+
+		it('renders row label as first column header', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			expect(screen.getByText('Criteria')).toBeInTheDocument();
+		});
+
+		it('renders row values in the table body', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			expect(screen.getByText('Quality')).toBeInTheDocument();
+			expect(screen.getByText('Speed')).toBeInTheDocument();
+		});
+
+		it('renders radio buttons for each row×column combination', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			expect(screen.getAllByRole('radio')).toHaveLength(6);
+		});
+
+		it('all radio buttons start unchecked (aria-checked="false")', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			const radios = screen.getAllByRole('radio');
+			radios.forEach((radio) => {
+				expect(radio).toHaveAttribute('aria-checked', 'false');
+			});
+		});
+
+		it('clicking a radio button marks it as checked', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			const radios = screen.getAllByRole('radio');
+			await fireEvent.click(radios[0]);
+
+			expect(radios[0]).toHaveAttribute('aria-checked', 'true');
+		});
+
+		it('selecting a radio deselects the previous selection in the same row', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			const radios = screen.getAllByRole('radio');
+			await fireEvent.click(radios[0]);
+			expect(radios[0]).toHaveAttribute('aria-checked', 'true');
+
+			await fireEvent.click(radios[1]);
+			expect(radios[1]).toHaveAttribute('aria-checked', 'true');
+			expect(radios[0]).toHaveAttribute('aria-checked', 'false');
+		});
+
+		it('selecting in one row does not affect another row', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			const radios = screen.getAllByRole('radio');
+			await fireEvent.click(radios[0]);
+			await fireEvent.click(radios[4]);
+
+			expect(radios[0]).toHaveAttribute('aria-checked', 'true');
+			expect(radios[4]).toHaveAttribute('aria-checked', 'true');
+
+			expect(radios[3]).toHaveAttribute('aria-checked', 'false');
+			expect(radios[5]).toHaveAttribute('aria-checked', 'false');
+		});
+
+		it('does not render checkboxes or spinbutton or textarea', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+			expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
+			expect(screen.queryByPlaceholderText('Type your answer here...')).not.toBeInTheDocument();
+		});
+
+		it('shows empty state message when matrix has no rows or columns', async () => {
+			render(QuestionPreview, {
+				props: {
+					data: createData({
+						question_type: 'matrix-rating',
+						options: [],
+						correct_answer: null,
+						matrix: { rowLabel: 'Items', colLabel: 'Ratings', rows: [], columns: [] }
+					})
+				}
+			});
+			await openDialog();
+
+			expect(screen.getByText('Add items to see them in preview...')).toBeInTheDocument();
+		});
+
+		it('shows empty state when matrix is null', async () => {
+			render(QuestionPreview, {
+				props: {
+					data: createData({
+						question_type: 'matrix-rating',
+						options: [],
+						correct_answer: null,
+						matrix: null
+					})
+				}
+			});
+			await openDialog();
+
+			expect(screen.getByText('Add items to see them in preview...')).toBeInTheDocument();
+		});
+
+		it('clears selections when dialog closes and reopens', async () => {
+			render(QuestionPreview, { props: { data: createMatrixRatingData() } });
+			await openDialog();
+
+			const radios = screen.getAllByRole('radio');
+			await fireEvent.click(radios[0]);
+			await fireEvent.click(radios[4]);
+			expect(radios[0]).toHaveAttribute('aria-checked', 'true');
+			expect(radios[4]).toHaveAttribute('aria-checked', 'true');
+
+			await fireEvent.click(screen.getByRole('button', { name: /close/i }));
+			await openDialog();
+
+			const freshRadios = screen.getAllByRole('radio');
+			freshRadios.forEach((radio) => {
+				expect(radio).toHaveAttribute('aria-checked', 'false');
+			});
+		});
+
+		it('filters out rows with empty values', async () => {
+			render(QuestionPreview, {
+				props: {
+					data: createMatrixRatingData({
+						rows: [
+							{ id: 1, key: '1', value: 'Quality' },
+							{ id: 2, key: '2', value: '' },
+							{ id: 3, key: '3', value: '   ' }
+						],
+						columns: [{ id: 10, key: 'A', value: 'Poor' }]
+					})
+				}
+			});
+			await openDialog();
+
+			expect(screen.getAllByRole('radio')).toHaveLength(1);
+			expect(screen.getByText('Quality')).toBeInTheDocument();
 		});
 	});
 });

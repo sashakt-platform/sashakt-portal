@@ -5,6 +5,7 @@
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import Upload from '@lucide/svelte/icons/upload';
 	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
+	import Search from '@lucide/svelte/icons/search';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -231,9 +232,11 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-			<div>
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+			<div class="relative lg:w-80">
+				<Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
 				<Input
+					class="rounded-full pl-9"
 					placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
 					value={search}
 					oninput={(event) => {
@@ -245,7 +248,6 @@
 							} else {
 								url.searchParams.delete('search');
 							}
-							// reset pagination to page 1 when search changes
 							url.searchParams.set('page', '1');
 							goto(url, { keepFocus: true, invalidateAll: true });
 						}, 300);
@@ -253,28 +255,30 @@
 				/>
 			</div>
 
-			{#if !isStateAdmin(data.user)}
+			<div class="flex flex-1 flex-wrap justify-end gap-4">
+				{#if !isStateAdmin(data.user)}
+					<div>
+						<StateSelection bind:states={filteredStates} filteration={true} />
+					</div>
+				{/if}
+
+				{#if !hasAssignedDistricts(data.user)}
+					<div>
+						<DistrictSelection
+							bind:districts={filteredDistricts}
+							selectedStates={filteredStates}
+							filteration={true}
+						/>
+					</div>
+				{/if}
+
 				<div>
-					<StateSelection bind:states={filteredStates} filteration={true} />
+					<TagsSelection bind:tags={filteredTags} filteration={true} />
 				</div>
-			{/if}
 
-			{#if !hasAssignedDistricts(data.user)}
 				<div>
-					<DistrictSelection
-						bind:districts={filteredDistricts}
-						selectedStates={filteredStates}
-						filteration={true}
-					/>
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
-			{/if}
-
-			<div>
-				<TagsSelection bind:tags={filteredTags} filteration={true} />
-			</div>
-
-			<div>
-				<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 			</div>
 		</div>
 	{/snippet}

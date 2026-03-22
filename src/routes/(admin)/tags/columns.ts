@@ -37,7 +37,7 @@ export const createTagManagementColumns = (
 				onEdit: callbacks.onEditTagType,
 				onDelete: callbacks.onDeleteTagType
 			}),
-		size: 500
+		size: 600
 	}),
 	{
 		id: 'tags',
@@ -56,6 +56,6 @@ export const createTagManagementColumns = (
 				onCancelEdit: callbacks.onCancelEditTag,
 				onDeleteTag: callbacks.onDeleteTag
 			}),
-		size: 500
+		meta: { grow: true }
 	}
 ];

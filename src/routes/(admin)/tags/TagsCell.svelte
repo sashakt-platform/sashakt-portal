@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
+	import Check from '@lucide/svelte/icons/check';
 	import X from '@lucide/svelte/icons/x';
 	import { enhance } from '$app/forms';
 	import TagChip from './TagChip.svelte';
@@ -72,7 +73,7 @@
 					}}
 				/>
 				<button type="submit" class="text-primary hover:text-primary/80">
-					<Plus class="h-3.5 w-3.5" />
+					<Check class="h-3.5 w-3.5" />
 				</button>
 				<button
 					type="button"

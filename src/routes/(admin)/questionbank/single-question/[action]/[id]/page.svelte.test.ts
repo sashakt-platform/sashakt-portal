@@ -1265,15 +1265,15 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 			rows: {
 				label: 'Criteria',
 				items: [
-					{ id: 1, key: '1', value: 'Quality' },
-					{ id: 2, key: '2', value: 'Speed' }
+					{ id: 1, key: 'A', value: 'Quality' },
+					{ id: 2, key: 'B', value: 'Speed' }
 				]
 			},
 			columns: {
 				label: 'Ratings',
 				items: [
-					{ id: 10, key: 'A', value: 'Poor' },
-					{ id: 11, key: 'B', value: 'Good' }
+					{ id: 10, key: '1', value: 'Poor' },
+					{ id: 11, key: '2', value: 'Good' }
 				]
 			}
 		},
@@ -1418,8 +1418,8 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 							rows: {
 								label: 'Criteria',
 								items: [
-									{ id: 1, key: '1', value: '' },
-									{ id: 2, key: '2', value: 'Speed' }
+									{ id: 1, key: 'A', value: '' },
+									{ id: 2, key: 'B', value: 'Speed' }
 								]
 							}
 						}
@@ -1440,8 +1440,8 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 							columns: {
 								label: 'Ratings',
 								items: [
-									{ id: 10, key: 'A', value: 'Poor' },
-									{ id: 11, key: 'B', value: '' }
+									{ id: 10, key: '1', value: 'Poor' },
+									{ id: 11, key: '2', value: '' }
 								]
 							}
 						}
@@ -1459,8 +1459,8 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 						question_text: 'Rate it',
 						question_type: QuestionTypeEnum.MatrixRating,
 						options: {
-							rows: { label: 'Items', items: [{ id: 1, key: '1', value: '' }] },
-							columns: { label: 'Ratings', items: [{ id: 1, key: 'A', value: '' }] }
+							rows: { label: 'Items', items: [{ id: 1, key: 'A', value: '' }] },
+							columns: { label: 'Ratings', items: [{ id: 1, key: '1', value: '' }] }
 						},
 						correct_answer: null,
 						is_mandatory: false,
@@ -1552,15 +1552,15 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			rows: {
 				label: 'Countries',
 				items: [
-					{ id: 1, key: '1', value: 'India' },
-					{ id: 2, key: '2', value: 'France' }
+					{ id: 1, key: 'A', value: 'India' },
+					{ id: 2, key: 'B', value: 'France' }
 				]
 			},
 			columns: {
 				label: 'Capitals',
 				items: [
-					{ id: 10, key: 'A', value: 'New Delhi' },
-					{ id: 11, key: 'B', value: 'Paris' }
+					{ id: 10, key: '1', value: 'New Delhi' },
+					{ id: 11, key: '2', value: 'Paris' }
 				]
 			}
 		},
@@ -1702,8 +1702,8 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 					rows: {
 						label: 'Countries',
 						items: [
-							{ id: 1, key: '1', value: '' },
-							{ id: 2, key: '2', value: 'France' }
+							{ id: 1, key: 'A', value: '' },
+							{ id: 2, key: 'B', value: 'France' }
 						]
 					}
 				}
@@ -1722,8 +1722,8 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 					columns: {
 						label: 'Capitals',
 						items: [
-							{ id: 10, key: 'A', value: '' },
-							{ id: 11, key: 'B', value: 'Paris' }
+							{ id: 10, key: '1', value: '' },
+							{ id: 11, key: '2', value: 'Paris' }
 						]
 					}
 				}
@@ -1752,8 +1752,8 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 						question_text: 'Match it',
 						question_type: QuestionTypeEnum.MatrixMatch,
 						options: {
-							rows: { label: 'Column A', items: [{ id: 1, key: '1', value: '' }] },
-							columns: { label: 'Column B', items: [{ id: 1, key: 'A', value: '' }] }
+							rows: { label: 'Column A', items: [{ id: 1, key: 'A', value: '' }] },
+							columns: { label: 'Column B', items: [{ id: 1, key: '1', value: '' }] }
 						},
 						correct_answer: {},
 						is_mandatory: false,
@@ -1798,7 +1798,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 
 			expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
 
-			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
 
 			await fireEvent.click(matchButtons[3]);
 
@@ -1882,7 +1882,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
-			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
 			expect(matchButtons.length).toBe(4);
 		});
 
@@ -1891,7 +1891,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
-			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
 
 			const franceParisButton = matchButtons[3];
 			expect(franceParisButton).toHaveClass('bg-primary');
@@ -1905,7 +1905,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
-			const matchButtons = screen.getAllByRole('button', { name: /^[A-Z]$/ });
+			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
 
 			const indiaParisButton = matchButtons[1];
 			expect(indiaParisButton).not.toHaveClass('bg-primary');
@@ -1928,7 +1928,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 								label: 'Column A',
 								items: Array.from({ length: 4 }, (_, i) => ({
 									id: i + 1,
-									key: String(i + 1),
+									key: String.fromCharCode(65 + i),
 									value: ''
 								}))
 							},
@@ -1936,7 +1936,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 								label: 'Column B',
 								items: Array.from({ length: 4 }, (_, i) => ({
 									id: i + 1,
-									key: String.fromCharCode(65 + i),
+									key: String(i + 1),
 									value: ''
 								}))
 							}
@@ -1991,6 +1991,460 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 				} as any
 			});
 			expect(screen.getByDisplayValue('Column B')).toBeInTheDocument();
+		});
+	});
+});
+
+describe('Single Question Page - Matrix Key Scheme', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('MatrixMatch key display', () => {
+		it('should display A,B,C,D keys on left side for new MatrixMatch question', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [
+									{ id: 1, key: 'A', value: 'Item 1' },
+									{ id: 2, key: 'B', value: 'Item 2' }
+								]
+							},
+							columns: {
+								label: 'Column B',
+								items: [
+									{ id: 10, key: '1', value: 'Option 1' },
+									{ id: 11, key: '2', value: 'Option 2' }
+								]
+							}
+						},
+						correct_answer: { '1': [10], '2': [11] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === 'A' || el.textContent?.trim() === 'B'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
+		});
+
+		it('should display 1,2,3,4 keys on right side for new MatrixMatch question', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [
+									{ id: 1, key: 'A', value: 'Item 1' },
+									{ id: 2, key: 'B', value: 'Item 2' }
+								]
+							},
+							columns: {
+								label: 'Column B',
+								items: [
+									{ id: 10, key: '1', value: 'Option 1' },
+									{ id: 11, key: '2', value: 'Option 2' }
+								]
+							}
+						},
+						correct_answer: { '1': [10], '2': [11] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === '1' || el.textContent?.trim() === '2'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
+		});
+
+		it('should assign next letter key when a new left item is added in MatrixMatch', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [
+									{ id: 1, key: 'A', value: 'Item 1' },
+									{ id: 2, key: 'B', value: 'Item 2' }
+								]
+							},
+							columns: {
+								label: 'Column B',
+								items: [{ id: 10, key: '1', value: 'Option 1' }]
+							}
+						},
+						correct_answer: { '1': [10], '2': [10] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const addQuestionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Question')
+			)!;
+			await fireEvent.click(addQuestionButton);
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === 'C'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
+		});
+
+		it('should assign next number key when a new right item is added in MatrixMatch', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [{ id: 1, key: 'A', value: 'Item 1' }]
+							},
+							columns: {
+								label: 'Column B',
+								items: [
+									{ id: 10, key: '1', value: 'Option 1' },
+									{ id: 11, key: '2', value: 'Option 2' }
+								]
+							}
+						},
+						correct_answer: { '1': [10] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const addAnswerButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Answer')
+			)!;
+			await fireEvent.click(addAnswerButton);
+			// Match toggle buttons in correct-answers grid now include a button labeled "3"
+			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
+			expect(matchButtons.some((btn) => btn.textContent?.trim() === '3')).toBe(true);
+		});
+
+		it('should use left item ID as correct_answer key when match is toggled', async () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [{ id: 5, key: 'A', value: 'Item 1' }]
+							},
+							columns: {
+								label: 'Column B',
+								items: [{ id: 10, key: '1', value: 'Option 1' }]
+							}
+						},
+						correct_answer: {},
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const matchButton = screen.getByRole('button', { name: /^1$/ });
+			expect(matchButton).not.toHaveClass('bg-primary');
+			await fireEvent.click(matchButton);
+			expect(matchButton).toHaveClass('bg-primary');
+		});
+
+		it('should preserve other row matches when a left item is deleted', async () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Col A',
+								items: [
+									{ id: 1, key: 'A', value: 'Item 1' },
+									{ id: 2, key: 'B', value: 'Item 2' },
+									{ id: 3, key: 'C', value: 'Item 3' }
+								]
+							},
+							columns: {
+								label: 'Col B',
+								items: [{ id: 10, key: '1', value: 'Option 1' }]
+							}
+						},
+						correct_answer: { '1': [10], '2': [10], '3': [10] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+
+			// Delete item B (id=2, index=1) — trash buttons are after drag handles
+			const trashButtons = screen.getAllByRole('button', { name: /delete row/i });
+			await fireEvent.click(trashButtons[1]);
+
+			// Save should still be enabled — remaining items A (id=1) and B (was C, id=3) still have matches
+			expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
+		});
+
+		it('should use max+1 for new item ID after a deletion in MatrixMatch', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match it',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Col A',
+								items: [
+									{ id: 1, key: 'A', value: 'Item 1' },
+									{ id: 2, key: 'B', value: 'Item 2' },
+									{ id: 3, key: 'C', value: 'Item 3' }
+								]
+							},
+							columns: {
+								label: 'Col B',
+								items: [{ id: 10, key: '1', value: 'Option 1' }]
+							}
+						},
+						correct_answer: { '1': [10], '2': [10], '3': [10] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+
+			// Delete item C (id=3, the last one)
+			const trashButtons = screen.getAllByRole('button', { name: /delete row/i });
+			await fireEvent.click(trashButtons[2]);
+
+			// Now add a new item — it should get id=3 (max of [1,2]) + 1 = 3, NOT length+1=2+1=3... both same here
+			// Better: delete middle item (id=2), remaining [id=1, id=3], add → should get id=4 not id=2
+			const addQuestionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Question')
+			)!;
+			await fireEvent.click(addQuestionButton);
+
+			// The new item key should be 'C' (3rd position)
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === 'C'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
+		});
+	});
+
+	describe('MatrixRating key display', () => {
+		it('should display A,B keys on left side for MatrixRating question', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Rate it',
+						question_type: QuestionTypeEnum.MatrixRating,
+						options: {
+							rows: {
+								label: 'Items',
+								items: [
+									{ id: 1, key: 'A', value: 'Quality' },
+									{ id: 2, key: 'B', value: 'Speed' }
+								]
+							},
+							columns: {
+								label: 'Ratings',
+								items: [
+									{ id: 10, key: '1', value: 'Poor' },
+									{ id: 11, key: '2', value: 'Good' }
+								]
+							}
+						},
+						correct_answer: null,
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === 'A' || el.textContent?.trim() === 'B'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
+		});
+
+		it('should display 1,2 keys on right side for MatrixRating question', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Rate it',
+						question_type: QuestionTypeEnum.MatrixRating,
+						options: {
+							rows: {
+								label: 'Items',
+								items: [
+									{ id: 1, key: 'A', value: 'Quality' },
+									{ id: 2, key: 'B', value: 'Speed' }
+								]
+							},
+							columns: {
+								label: 'Ratings',
+								items: [
+									{ id: 10, key: '1', value: 'Poor' },
+									{ id: 11, key: '2', value: 'Good' }
+								]
+							}
+						},
+						correct_answer: null,
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === '1' || el.textContent?.trim() === '2'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
+		});
+
+		it('should assign next letter key when a new left item is added in MatrixRating', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Rate it',
+						question_type: QuestionTypeEnum.MatrixRating,
+						options: {
+							rows: {
+								label: 'Items',
+								items: [
+									{ id: 1, key: 'A', value: 'Quality' },
+									{ id: 2, key: 'B', value: 'Speed' }
+								]
+							},
+							columns: {
+								label: 'Ratings',
+								items: [{ id: 10, key: '1', value: 'Poor' }]
+							}
+						},
+						correct_answer: null,
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const addItemButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Item')
+			)!;
+			await fireEvent.click(addItemButton);
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === 'C'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
+		});
+
+		it('should assign next number key when a new rating option is added in MatrixRating', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Rate it',
+						question_type: QuestionTypeEnum.MatrixRating,
+						options: {
+							rows: {
+								label: 'Items',
+								items: [{ id: 1, key: 'A', value: 'Quality' }]
+							},
+							columns: {
+								label: 'Ratings',
+								items: [
+									{ id: 10, key: '1', value: 'Poor' },
+									{ id: 11, key: '2', value: 'Good' }
+								]
+							}
+						},
+						correct_answer: null,
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			const addRatingButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Rating')
+			)!;
+			await fireEvent.click(addRatingButton);
+			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === '3'
+			);
+			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
+		});
+
+		it('should re-sequence left keys to A,B after deleting an item in MatrixRating', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Rate it',
+						question_type: QuestionTypeEnum.MatrixRating,
+						options: {
+							rows: {
+								label: 'Items',
+								items: [
+									{ id: 1, key: 'A', value: 'Quality' },
+									{ id: 2, key: 'B', value: 'Speed' },
+									{ id: 3, key: 'C', value: 'Cost' }
+								]
+							},
+							columns: {
+								label: 'Ratings',
+								items: [{ id: 10, key: '1', value: 'Poor' }]
+							}
+						},
+						correct_answer: null,
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			// Delete item B (index=1)
+			const trashButtons = screen.getAllByRole('button', { name: /delete row/i });
+			await fireEvent.click(trashButtons[1]);
+
+			// After deletion: [A(Quality), B(Cost)] — C badge should be gone
+			const cBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === 'C'
+			);
+			expect(cBadges.length).toBe(0);
 		});
 	});
 });

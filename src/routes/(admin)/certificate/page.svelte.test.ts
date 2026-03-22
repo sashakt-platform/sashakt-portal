@@ -85,8 +85,6 @@ describe('CertificatePage', () => {
 				certificates: { items: [], total: 0, pages: 0 }
 			}
 		});
-		screen.logTestingPlaygroundURL();
-
 		expect(screen.queryByText('Certificate A')).not.toBeInTheDocument();
 		expect(screen.getByText(/No certificates yet/i)).toBeInTheDocument();
 	});

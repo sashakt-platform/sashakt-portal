@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import X from '@lucide/svelte/icons/x';
+	import Pencil from '@lucide/svelte/icons/pencil';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { enhance } from '$app/forms';
 
 	let {
@@ -27,6 +29,7 @@
 </script>
 
 {#if isEditing}
+	<!-- Edit mode: inline input with save/cancel -->
 	<form
 		method="POST"
 		action="?/updateTag"
@@ -65,10 +68,10 @@
 		</div>
 	</form>
 {:else}
+	<!-- Default state: tag chip with hover edit/delete icons -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<span
-		class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors
-			{hovered && (canEdit || canDelete) ? 'border-primary bg-primary/5' : 'border-border bg-muted/50'}"
+		class="border-border bg-muted/50 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors"
 		onmouseenter={() => (hovered = true)}
 		onmouseleave={() => (hovered = false)}
 	>
@@ -76,10 +79,10 @@
 		{#if hovered && canEdit}
 			<button
 				type="button"
-				class="text-primary hover:text-primary/80"
+				class="text-muted-foreground hover:text-foreground"
 				onclick={() => onEdit?.(tag.id, tag.name)}
 			>
-				<Check class="h-3.5 w-3.5" />
+				<Pencil class="h-3 w-3" />
 			</button>
 		{/if}
 		{#if hovered && canDelete}
@@ -88,7 +91,7 @@
 				class="text-muted-foreground hover:text-destructive"
 				onclick={() => onDelete?.(tag.id, tag.name)}
 			>
-				<X class="h-3.5 w-3.5" />
+				<Trash2 class="h-3 w-3" />
 			</button>
 		{/if}
 	</span>

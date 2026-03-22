@@ -76,18 +76,22 @@ export const createTestColumns = (
 	user?: User | null
 ): ColumnDef<Test>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name })
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
+		meta: { grow: true }
 	}),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
+		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] }),
+		size: 200
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
 	{
 		id: 'actions',
+		size: 60,
 		header: '',
 		enableSorting: false,
 		enableHiding: false,

@@ -26,17 +26,22 @@ export const createColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<Form>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		meta: { grow: true }
+	}),
 	{
 		accessorKey: 'fields_count',
 		header: 'Fields',
-		cell: ({ row }) => row.original.fields_count ?? 0
+		cell: ({ row }) => row.original.fields_count ?? 0,
+		size: 100
 	},
 	createSortableColumn('is_active', 'Active', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => (row.original.is_active ? 'Yes' : 'No')
+		cell: ({ row }) => (row.original.is_active ? 'Yes' : 'No'),
+		size: 100
 	}),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
 	createActionsColumn<Form>('Form', '/forms', permissions)
 ];

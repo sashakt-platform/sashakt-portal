@@ -25,10 +25,13 @@ export const createColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<EntityType>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		meta: { grow: true }
+	}),
 	createSortableColumn('description', 'Description', currentSortBy, currentSortOrder, handleSort),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
 	createActionsColumn<EntityType>('Entity', '/entity', {
 		...permissions,

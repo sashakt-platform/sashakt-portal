@@ -27,7 +27,7 @@ export const createQuestionSelectionColumns = (
 		currentSortBy,
 		currentSortOrder,
 		handleSort,
-		{ size: 80 }
+		{ meta: { grow: true } }
 	),
 	{
 		id: 'answers',

@@ -31,7 +31,8 @@ export const createQuestionColumns = (
 ): ColumnDef<Question>[] => [
 	...(enableSelection ? [createSelectionColumn<Question>()] : []),
 	createSortableColumn('question_text', 'Questions', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.question_text })
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.question_text }),
+		meta: { grow: true }
 	}),
 	{
 		id: 'answers',
@@ -44,10 +45,12 @@ export const createQuestionColumns = (
 	{
 		accessorKey: 'question_type',
 		header: 'Question Type',
-		cell: ({ row }) => (row.original as any).question_type || ''
+		cell: ({ row }) => (row.original as any).question_type || '',
+		size: 140
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
 	createActionsColumn<Question>('Question', '/questionbank/single-question', {
 		...permissions,

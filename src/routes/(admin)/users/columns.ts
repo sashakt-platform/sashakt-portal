@@ -24,9 +24,17 @@ export const createColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<User>[] => [
-	createSortableColumn('full_name', 'Name', currentSortBy, currentSortOrder, handleSort),
-	createSortableColumn('email', 'Email', currentSortBy, currentSortOrder, handleSort),
-	createSortableColumn('phone', 'Phone', currentSortBy, currentSortOrder, handleSort),
-	createSortableColumn('role_label', 'Role', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('full_name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		meta: { grow: true }
+	}),
+	createSortableColumn('email', 'Email', currentSortBy, currentSortOrder, handleSort, {
+		size: 220
+	}),
+	createSortableColumn('phone', 'Phone', currentSortBy, currentSortOrder, handleSort, {
+		size: 150
+	}),
+	createSortableColumn('role_label', 'Role', currentSortBy, currentSortOrder, handleSort, {
+		size: 140
+	}),
 	createActionsColumn<User>('User', '/users', permissions)
 ];

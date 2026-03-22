@@ -93,6 +93,21 @@
 		}
 	});
 
+	// Determine which column should grow to fill remaining space
+	const growColumnId = $derived.by(() => {
+		const explicit = columns.find((col: any) => col.meta?.grow);
+		if (explicit) return (explicit as any).id || (explicit as any).accessorKey;
+		// Fallback: first column without explicit size that isn't select/actions
+		const fallback = columns.find(
+			(col: any) => col.size === undefined && col.id !== 'select' && col.id !== 'actions'
+		);
+		return fallback ? (fallback as any).id || (fallback as any).accessorKey : null;
+	});
+
+	function isGrowColumn(columnId: string): boolean {
+		return columnId === growColumnId;
+	}
+
 	// create table
 	const table = $derived(
 		createSvelteTable({
@@ -152,7 +167,10 @@
 				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
 					<Table.Row class="bg-primary-foreground">
 						{#each headerGroup.headers as header (header.id)}
-							<Table.Head colspan={header.colSpan}>
+							<Table.Head
+								colspan={header.colSpan}
+								class={isGrowColumn(header.column.id) ? 'w-full' : ''}
+							>
 								{#if !header.isPlaceholder}
 									<FlexRender
 										content={header.column.columnDef.header}
@@ -173,9 +191,9 @@
 					>
 						{#each row.getVisibleCells() as cell (cell.id)}
 							<Table.Cell
-								class={expandable && expandColumnId && cell.column.id === expandColumnId
+								class="{isGrowColumn(cell.column.id) ? 'w-full' : ''} {expandable && expandColumnId && cell.column.id === expandColumnId
 									? 'cursor-pointer'
-									: ''}
+									: ''}"
 								onclick={expandable &&
 								expandColumnId &&
 								cell.column.id === expandColumnId &&

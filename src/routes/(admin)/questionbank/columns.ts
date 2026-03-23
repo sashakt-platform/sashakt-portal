@@ -7,7 +7,6 @@ import {
 import { formatDate } from '$lib/utils';
 import Eye from '@lucide/svelte/icons/eye';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
-import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 
 export interface Question {
@@ -30,24 +29,31 @@ export const createQuestionColumns = (
 	}
 ): ColumnDef<Question>[] => [
 	...(enableSelection ? [createSelectionColumn<Question>()] : []),
-	createSortableColumn('question_text', 'Name', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.question_text })
+	createSortableColumn('question_text', 'Questions', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.question_text }),
+		meta: { grow: true }
 	}),
 	{
 		id: 'answers',
 		header: 'Answers',
 		cell: ({ row }) => {
-			return renderComponent(Eye, { class: 'text-gray-400' });
+			return renderComponent(Eye, { class: 'text-gray-400 mx-auto' });
 		},
-		size: 80
+		size: 80,
+		meta: { align: 'center' as const }
 	},
 	{
-		accessorKey: 'tags',
-		header: 'Tags',
-		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
+		accessorKey: 'question_type',
+		header: 'Question Type',
+		cell: ({ row }) => (row.original as any).question_type || '',
+		size: 140
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
-	createActionsColumn<Question>('Question', '/questionbank/single-question', permissions)
+	createActionsColumn<Question>('Question', '/questionbank/single-question', {
+		...permissions,
+		editInline: true
+	})
 ];

@@ -6,6 +6,7 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { tagSchema, type TagFormSchema, tagTypeSchema, type TagTypeFormSchema } from './schema';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import { resolve } from '$app/paths';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 
@@ -112,7 +113,7 @@
 		class="sticky right-0 bottom-0 left-0 mt-2 flex w-full border-t-4 bg-white p-3 shadow-md sm:mt-4 sm:p-4"
 	>
 		<div class="flex w-full justify-between gap-2">
-			<a href="/tags/">
+			<a href={resolve('/tags/')}>
 				<Button variant="outline" class="border-primary text-primary border-1 text-sm sm:text-base"
 					>Cancel</Button
 				>

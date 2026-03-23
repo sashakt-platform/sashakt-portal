@@ -6,9 +6,11 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import Search from '@lucide/svelte/icons/search';
 
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -45,35 +47,43 @@
 
 <ListingPageLayout
 	title="Users"
-	subtitle="Manage users"
+	subtitle=""
 	infoLabel="Help: User management"
 	infoDescription="This panel displays all users in the system. You can edit or delete a user by clicking the three dots next to their entry."
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
-			<a href="/users/add/new"><Button class="font-bold"><Plus />Add User</Button></a>
+			<a href={resolve('/users/add/new')}><Button class="font-semibold"><Plus />Add User</Button></a
+			>
 		{/if}
 	{/snippet}
 
 	{#snippet filters()}
-		<Input
-			placeholder="Search users..."
-			value={search}
-			oninput={(event) => {
-				const url = new URL(page.url);
-				clearTimeout(searchTimeout);
-				searchTimeout = setTimeout(() => {
-					if (event.target?.value) {
-						url.searchParams.set('search', event.target.value);
-					} else {
-						url.searchParams.delete('search');
-					}
-					url.searchParams.set('page', '1');
-					goto(url, { keepFocus: true, invalidateAll: true });
-				}, 300);
-			}}
-			class="max-w-sm"
-		/>
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+			<div class="relative lg:w-80">
+				<Search
+					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+				/>
+				<Input
+					class="rounded-full pl-9"
+					placeholder="Search users..."
+					value={search}
+					oninput={(event) => {
+						const url = new URL(page.url);
+						clearTimeout(searchTimeout);
+						searchTimeout = setTimeout(() => {
+							if (event.target?.value) {
+								url.searchParams.set('search', event.target.value);
+							} else {
+								url.searchParams.delete('search');
+							}
+							url.searchParams.set('page', '1');
+							goto(url, { keepFocus: true, invalidateAll: true });
+						}, 300);
+					}}
+				/>
+			</div>
+		</div>
 	{/snippet}
 
 	{#snippet content()}

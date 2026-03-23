@@ -50,7 +50,9 @@
 					{/if}
 				</div>
 			</div>
-			<Label class="my-auto align-middle text-sm font-extralight">{subtitle}</Label>
+			{#if subtitle}
+				<Label class="my-auto align-middle text-sm font-extralight">{subtitle}</Label>
+			{/if}
 		</div>
 		{#if headerActions}
 			<div class="my-auto flex flex-wrap gap-3 sm:ml-auto sm:p-4">
@@ -58,6 +60,7 @@
 			</div>
 		{/if}
 	</div>
+	<hr class="border-gray-200" />
 
 	<!-- Empty State -->
 	{#if showEmptyState && emptyState}

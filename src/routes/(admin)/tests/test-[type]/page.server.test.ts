@@ -295,7 +295,10 @@ describe('Test Management Listing — load()', () => {
 			mockSuccessfulFetch();
 			const result = await load({
 				params: { type: 'session' },
-				url: makeUrl('/tests/test-session', 'page=3&size=10&search=quiz&sortBy=name&sortOrder=desc'),
+				url: makeUrl(
+					'/tests/test-session',
+					'page=3&size=10&search=quiz&sortBy=name&sortOrder=desc'
+				),
 				cookies: mockCookies
 			} as any);
 

@@ -16,6 +16,7 @@
 	import { MarksLevel, OmrMode } from './schema';
 	import * as Select from '$lib/components/ui/select';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
+	import { resolve } from '$app/paths';
 
 	interface CertificateToken {
 		token: string;
@@ -502,7 +503,7 @@
 					</Select.Root>
 
 					<a
-						href="/forms/add/new"
+						href={resolve('/forms/add/new')}
 						target="_blank"
 						class="text-primary text-sm whitespace-nowrap hover:underline"
 					>

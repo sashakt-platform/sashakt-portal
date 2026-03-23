@@ -53,15 +53,13 @@
 
 {#snippet myBadge(children: Filter)}
 	<Badge
-		variant="default"
-		style="background-color:#3587B4"
-		class="m-1 flex items-center gap-1 rounded-sm "
+		variant="outline"
+		class="border-primary/20 bg-secondary text-primary m-1 flex items-center gap-1 rounded-full border font-semibold"
 	>
 		{children.name}
 		<button
-			class="ml-2 text-white hover:text-gray-400 focus:outline-none"
+			class="text-primary/50 hover:text-primary ml-1 focus:outline-none"
 			type="button"
-			style="margin-left:auto;"
 			onclick={(e) => {
 				e.stopPropagation();
 				const url = new URL(page.url);
@@ -113,7 +111,7 @@
 			<Button
 				{...props}
 				variant="outline"
-				class="h-10 w-full justify-start"
+				class="h-10 w-full justify-start rounded-full bg-white"
 				role="combobox"
 				aria-expanded={open}
 			>
@@ -135,7 +133,11 @@
 								{@render myBadge(items[1])}
 							{/if}
 						</span>
-						<span class="shrink-0 whitespace-nowrap">+ {items?.length - 2}</span>
+						<Badge
+							variant="outline"
+							class="border-primary/20 bg-secondary text-primary shrink-0 rounded-full border font-semibold"
+							>+{items?.length - 2}</Badge
+						>
 					{/if}
 				{:else if !items || items.length === 0}
 					{placeholder}

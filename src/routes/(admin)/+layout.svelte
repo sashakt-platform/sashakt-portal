@@ -2,6 +2,7 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
@@ -20,8 +21,11 @@
 	<AppSidebar {data} />
 	<main class="flex h-screen w-full flex-col overflow-x-hidden">
 		<div class="shadow-lg">
-			<div class="my-4">
+			<div class="my-4 flex items-center justify-between">
 				<Sidebar.Trigger class="mx-2 w-14 rounded-none border-r-2 sm:mx-4" />
+				<div class="mx-4 flex-1">
+					<Breadcrumbs />
+				</div>
 			</div>
 			<hr class="w-full" />
 		</div>

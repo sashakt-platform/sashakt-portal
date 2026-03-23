@@ -47,6 +47,7 @@
 	let subjectiveAnswer: string = $state('');
 	let numberAnswer: number | null = $state(null);
 	let matrixSelections: Record<string, number[]> = $state({});
+	let matrixRatingSelections: Record<string, string> = $state({});
 
 	function resetSelections() {
 		selectedSingleChoice = '';
@@ -54,6 +55,7 @@
 		subjectiveAnswer = '';
 		numberAnswer = null;
 		matrixSelections = {};
+		matrixRatingSelections = {};
 	}
 </script>
 
@@ -173,6 +175,63 @@
 				{/each}
 			{:else if questionType === QuestionTypeEnum.NumericalInteger || questionType === QuestionTypeEnum.NumericalDecimal}
 				<Input type="number" class="w-full" bind:value={numberAnswer} inputmode="numeric" />
+			{:else if questionType === QuestionTypeEnum.MatrixRating}
+				{#if matrixRows.length > 0 && matrixColumns.length > 0}
+					<div class="overflow-x-auto">
+						<table class="w-full border-collapse text-sm">
+							<thead>
+								<tr>
+									<th
+										class="border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
+									>
+										{matrix?.rowLabel || 'Item'}
+									</th>
+									{#each matrixColumns as col (col.id)}
+										<th
+											class="border border-gray-200 bg-gray-50 px-4 py-3 text-center text-sm font-semibold text-gray-700"
+										>
+											{col.value || col.key}
+										</th>
+									{/each}
+								</tr>
+							</thead>
+							<tbody>
+								{#each matrixRows as row (row.id)}
+									<tr>
+										<td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800">
+											{row.value}
+										</td>
+										{#each matrixColumns as col (col.id)}
+											<td class="border border-gray-200 px-4 py-3 text-center">
+												<button
+													type="button"
+													role="radio"
+													aria-checked={matrixRatingSelections[row.key] === String(col.id)}
+													class="mx-auto flex size-4 items-center justify-center rounded-full border transition-colors
+														{matrixRatingSelections[row.key] === String(col.id)
+															? 'border-primary'
+															: 'border-gray-400 hover:border-gray-500'}"
+													onclick={() => {
+														matrixRatingSelections = {
+															...matrixRatingSelections,
+															[row.key]: String(col.id)
+														};
+													}}
+												>
+													{#if matrixRatingSelections[row.key] === String(col.id)}
+														<div class="bg-primary size-2 rounded-full"></div>
+													{/if}
+												</button>
+											</td>
+										{/each}
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				{:else}
+					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>
+				{/if}
 			{:else if questionType === QuestionTypeEnum.MatrixMatch}
 				{#if matrixRows.length > 0 && matrixColumns.length > 0}
 					<div class="mb-5 grid grid-cols-2 gap-6 border-b border-gray-200 pb-5">

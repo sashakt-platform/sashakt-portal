@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Info from '@lucide/svelte/icons/info';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -23,6 +25,10 @@
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
+	import MediaManager from '$lib/components/MediaManager.svelte';
+	import type { TMedia } from '$lib/types/media';
+	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	const {
 		data
@@ -32,10 +38,11 @@
 			tagForm: SuperValidated<Infer<TagFormSchema>>;
 			tagTypes: [];
 			user: User;
+			questionData?: any;
 		};
 	} = $props();
 
-	const questionData: Partial<Infer<FormSchema>> | null = data?.questionData || null;
+	const questionData: any = data?.questionData || null;
 
 	const {
 		form: formData,
@@ -45,6 +52,50 @@
 		applyAction: 'never',
 		validators: zod4Client(questionSchema),
 		dataType: 'json',
+		onResult: async ({ result }) => {
+			const hasStaged =
+				stagedImageFile ||
+				stagedExternalUrl.trim() ||
+				Object.values(stagedOptionFiles).some((f) => f) ||
+				Object.values(stagedOptionUrls).some((u) => u?.trim());
+
+			if (result.type === 'success' && result.data?.newQuestionId) {
+				const newId = result.data.newQuestionId;
+				let uploadOk = true;
+				if (hasStaged) {
+					isSaving = true;
+					try {
+						uploadOk = await uploadStagedMedia(newId, result.data.newQuestionData);
+					} finally {
+						isSaving = false;
+					}
+				}
+				if (uploadOk) {
+					toast.success('Question saved successfully');
+					goto('/questionbank');
+				} else {
+					// Question was created but media failed — redirect to edit page so user can retry
+					toast.error('Question saved but some media failed to upload. Redirecting to edit page.');
+					goto(`/questionbank/single-question/edit/${newId}`);
+				}
+			} else if (result.type === 'redirect' && questionId) {
+				let uploadOk = true;
+				if (hasStaged) {
+					isSaving = true;
+					try {
+						uploadOk = await uploadStagedMedia(questionId);
+					} finally {
+						isSaving = false;
+					}
+				}
+				if (uploadOk) {
+					goto(result.location);
+				} else {
+					// Question was saved but media failed — stay on page so user can retry
+					toast.error('Question saved but some media failed to upload.');
+				}
+			}
+		},
 		onSubmit: () => {
 			if ($formData.question_type === QuestionTypeEnum.Subjective) {
 				$formData.options = [];
@@ -54,7 +105,13 @@
 				$formData.question_type === QuestionTypeEnum.MultiChoice
 			) {
 				$formData.options = totalOptions.map((option) => {
-					return { id: option.id, key: option.key, value: option.value };
+					const media = optionMediaMap[option.id];
+					return {
+						id: option.id,
+						key: option.key,
+						value: option.value,
+						...(media ? { media } : {})
+					};
 				});
 				$formData.correct_answer = totalOptions
 					.filter((option) => option.correct_answer)
@@ -73,11 +130,17 @@
 				$formData.options = {
 					rows: {
 						label: matrixRowLabel,
-						items: matrixLeftItems.map(({ id, key, value }) => ({ id, key, value }))
+						items: matrixLeftItems.map(({ id, key, value }) => {
+							const media = optionMediaMap[id];
+							return { id, key, value, ...(media ? { media } : {}) };
+						})
 					},
 					columns: {
 						label: matrixColLabel,
-						items: matrixRightItems.map(({ id, key, value }) => ({ id, key, value }))
+						items: matrixRightItems.map(({ id, key, value }) => {
+							const media = optionMediaMap[id];
+							return { id, key, value, ...(media ? { media } : {}) };
+						})
 					}
 				};
 				$formData.correct_answer = matrixMatches;
@@ -156,11 +219,15 @@
 	let matrixColLabel = $state(existingMatrixOptions?.columns.label ?? 'Answers');
 	let matrixLeftItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.rows.items ??
-			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String.fromCharCode(65 + i), value: '' }))
+			Array.from({ length: 4 }, (_, i) => ({
+				id: i + 1,
+				key: String.fromCharCode(65 + i),
+				value: ''
+			}))
 	);
 	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.columns.items ??
-			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
+			Array.from({ length: 4 }, (_, i) => ({ id: 5000 + i + 1, key: String(i + 1), value: '' }))
 	);
 	let matrixMatches = $state<Record<string, number[]>>(
 		questionData?.correct_answer &&
@@ -173,6 +240,232 @@
 	let openTagDialog: boolean = $state(false);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
+	// Media state
+	let questionMedia = $state<TMedia | null>(questionData?.media ?? null);
+	let optionMediaMap = $state<Record<number, TMedia | null>>({});
+	let optionMediaVisible = $state<Record<number, boolean>>({});
+
+	// Auto-expand options that have existing media
+	if (questionData?.options) {
+		if (Array.isArray(questionData.options)) {
+			for (const opt of questionData.options as any[]) {
+				if (opt.media?.image || opt.media?.external_media) {
+					optionMediaVisible[opt.id] = true;
+				}
+			}
+		} else if (
+			questionData.options &&
+			typeof questionData.options === 'object' &&
+			'rows' in (questionData.options as any)
+		) {
+			const matrixOpts = questionData.options as any;
+			for (const item of [
+				...(matrixOpts.rows?.items ?? []),
+				...(matrixOpts.columns?.items ?? [])
+			]) {
+				if (item.media?.image || item.media?.external_media) {
+					optionMediaVisible[item.id] = true;
+				}
+			}
+		}
+	}
+	let questionMediaVisible = $state(
+		!!(questionData?.media?.image || questionData?.media?.external_media)
+	);
+
+	// Loading state for media operations
+	let isSaving = $state(false);
+
+	// Staged media for new questions (uploaded after question creation)
+	let stagedImageFile = $state<File | null>(null);
+	let stagedExternalUrl = $state('');
+	let stagedOptionFiles = $state<Record<number, File | null>>({});
+	let stagedOptionUrls = $state<Record<number, string>>({});
+
+	// Initialize option media from question data
+	if (questionData?.options) {
+		if (Array.isArray(questionData.options)) {
+			for (const opt of questionData.options as any[]) {
+				if (opt.media) optionMediaMap[opt.id] = opt.media;
+			}
+		} else if (
+			questionData.options &&
+			typeof questionData.options === 'object' &&
+			'rows' in (questionData.options as any)
+		) {
+			const matrixOpts = questionData.options as any;
+			for (const item of matrixOpts.rows?.items ?? []) {
+				if (item.media) optionMediaMap[item.id] = item.media;
+			}
+			for (const item of matrixOpts.columns?.items ?? []) {
+				if (item.media) optionMediaMap[item.id] = item.media;
+			}
+		}
+	}
+
+	const questionId = $derived(questionData?.id ?? null);
+
+	async function refreshQuestion() {
+		if (!questionId) return;
+		try {
+			const res = await fetch(`/api/questions/${questionId}`);
+			if (!res.ok) return;
+
+			const freshData = await res.json();
+			questionMedia = freshData.media ?? null;
+			optionMediaMap = {};
+			const opts = freshData.options;
+			if (Array.isArray(opts)) {
+				for (const opt of opts) {
+					if (opt.media) optionMediaMap[opt.id] = opt.media;
+				}
+			} else if (opts && typeof opts === 'object' && 'rows' in opts) {
+				for (const item of opts.rows?.items ?? []) {
+					if (item.media) optionMediaMap[item.id] = item.media;
+				}
+				for (const item of opts.columns?.items ?? []) {
+					if (item.media) optionMediaMap[item.id] = item.media;
+				}
+			}
+		} catch {
+			// Silently fail — media will show stale data until page reload
+		}
+	}
+
+	async function uploadStagedMedia(newQuestionId: number, newQuestionData?: any): Promise<boolean> {
+		const basePath = `/api/media/questions/${newQuestionId}`;
+		const errors: string[] = [];
+
+		// Upload question-level media
+		if (stagedImageFile) {
+			try {
+				const formData = new FormData();
+				formData.append('file', stagedImageFile);
+				const res = await fetch(`${basePath}/image`, {
+					method: 'POST',
+					body: formData
+				});
+				if (!res.ok) {
+					const errData = await res.json();
+					errors.push(errData.detail || 'Failed to upload image');
+				}
+			} catch {
+				errors.push('Failed to upload image');
+			}
+		}
+
+		if (stagedExternalUrl.trim()) {
+			try {
+				const res = await fetch(
+					`${basePath}/external?url=${encodeURIComponent(stagedExternalUrl.trim())}`,
+					{ method: 'POST' }
+				);
+				if (!res.ok) {
+					const errData = await res.json();
+					errors.push(errData.detail || 'Failed to add external media');
+				}
+			} catch {
+				errors.push('Failed to add external media');
+			}
+		}
+
+		// Upload option-level media
+		const hasOptionMedia =
+			Object.values(stagedOptionFiles).some((f) => f) ||
+			Object.values(stagedOptionUrls).some((u) => u?.trim());
+
+		if (!hasOptionMedia) {
+			for (const err of errors) toast.error(err);
+			return errors.length === 0;
+		}
+
+		// Resolve client-side option id → backend option id
+		// For existing questions, client IDs = backend IDs (loaded from server)
+		// For new questions, map by key using the returned question data
+		function resolveBackendOptionId(clientId: number): number | undefined {
+			if (!newQuestionData) {
+				// Existing question — client IDs are already backend IDs
+				return clientId;
+			}
+
+			// New question — map via key
+			const clientIdToKey: Record<number, string> = {};
+			for (const opt of totalOptions) {
+				clientIdToKey[opt.id] = opt.key;
+			}
+			for (const item of matrixLeftItems) {
+				clientIdToKey[item.id] = `row-${item.key}`;
+			}
+			for (const item of matrixRightItems) {
+				clientIdToKey[item.id] = `col-${item.key}`;
+			}
+
+			const key = clientIdToKey[clientId];
+			if (!key) return undefined;
+
+			const opts = newQuestionData.options;
+			if (Array.isArray(opts)) {
+				return opts.find((o: any) => o.key === key)?.id;
+			} else if (opts?.rows && opts?.columns) {
+				const prefix = key.startsWith('row-') ? 'row-' : 'col-';
+				const rawKey = key.slice(prefix.length);
+				const items = prefix === 'row-' ? opts.rows.items : opts.columns.items;
+				return items?.find((i: any) => i.key === rawKey)?.id;
+			}
+			return undefined;
+		}
+
+		for (const [clientIdStr, file] of Object.entries(stagedOptionFiles)) {
+			if (!file) continue;
+			const backendId = resolveBackendOptionId(Number(clientIdStr));
+			if (!backendId) continue;
+
+			try {
+				const formData = new FormData();
+				formData.append('file', file);
+				const res = await fetch(`${basePath}/options/${backendId}/image`, {
+					method: 'POST',
+					body: formData
+				});
+				if (!res.ok) {
+					errors.push('Failed to upload option image');
+				}
+			} catch {
+				errors.push('Failed to upload option image');
+			}
+		}
+
+		for (const [clientIdStr, url] of Object.entries(stagedOptionUrls)) {
+			if (!url?.trim()) continue;
+			const backendId = resolveBackendOptionId(Number(clientIdStr));
+			if (!backendId) continue;
+
+			try {
+				const res = await fetch(
+					`${basePath}/options/${backendId}/external?url=${encodeURIComponent(url.trim())}`,
+					{ method: 'POST' }
+				);
+				if (!res.ok) {
+					errors.push('Failed to add option external media');
+				}
+			} catch {
+				errors.push('Failed to add option external media');
+			}
+		}
+
+		for (const err of errors) toast.error(err);
+		return errors.length === 0;
+	}
+
+	async function deleteMedia(path: string) {
+		const res = await fetch(path, { method: 'DELETE' });
+		if (!res.ok) {
+			const errData = await res.json().catch(() => ({}));
+			toast.error(errData.detail || 'Failed to delete media');
+			return;
+		}
+		await refreshQuestion();
+	}
 	function nextId(items: { id: number }[]): number {
 		return Math.max(0, ...items.map((i) => i.id)) + 1;
 	}
@@ -255,10 +548,22 @@
 					canDelete ? 'cursor-pointer group-hover:opacity-100' : 'cursor-default'
 				]}
 			>
-				<Trash_2
-					size={16}
-					class="text-muted-foreground hover:text-destructive"
-				/>
+				<Trash_2 size={16} class="text-muted-foreground hover:text-destructive" />
+			</button>
+		{/snippet}
+		{#snippet matrixImageButton(itemId: number)}
+			<button
+				type="button"
+				onclick={() => (optionMediaVisible[itemId] = !optionMediaVisible[itemId])}
+				aria-label="Toggle media"
+				class={[
+					'shrink-0',
+					optionMediaMap[itemId]?.image || optionMediaMap[itemId]?.external_media
+						? 'text-primary'
+						: 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary'
+				]}
+			>
+				<ImageIcon size={16} />
 			</button>
 		{/snippet}
 		{#snippet snippetHeading(title: string)}
@@ -307,6 +612,39 @@
 							bind:value={$formData.question_text}
 							placeholder="Enter your Question..."
 						/>
+						<div class="flex items-center gap-2">
+							<button
+								type="button"
+								class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {questionMediaVisible
+									? 'bg-primary/10'
+									: ''}"
+								onclick={() => (questionMediaVisible = !questionMediaVisible)}
+							>
+								<ImageIcon size={16} />
+								{questionMediaVisible
+									? 'Hide media'
+									: questionMedia?.image || questionMedia?.external_media
+										? 'Show media'
+										: 'Add media'}
+							</button>
+							{#if !questionMediaVisible && (questionMedia?.image || questionMedia?.external_media)}
+								<span class="text-xs text-gray-400">(media attached)</span>
+							{/if}
+						</div>
+						{#if questionMediaVisible || stagedImageFile || stagedExternalUrl.trim()}
+							<MediaManager
+								media={questionMedia}
+								onStagedFileChange={(f) => (stagedImageFile = f)}
+								onStagedUrlChange={(u) => (stagedExternalUrl = u)}
+								onDeleteImage={questionId
+									? () => deleteMedia(`/api/media/questions/${questionId}/image`)
+									: undefined}
+								onDeleteExternal={questionId
+									? () => deleteMedia(`/api/media/questions/${questionId}/external`)
+									: undefined}
+							/>
+						{/if}
+
 						<div class="flex flex-col gap-4">
 							<div class="flex flex-row items-center gap-2">
 								<Checkbox bind:checked={$formData.is_mandatory} />
@@ -419,14 +757,54 @@
 													bind:value={totalOptions[index].value}
 												/>
 											</div>
-											<div class="flex flex-row gap-2">
-												<Checkbox
-													disabled={!totalOptions[index].value.trim()}
-													checked={totalOptions[index].correct_answer}
-													onCheckedChange={(checked: boolean) =>
-														(totalOptions[index].correct_answer = checked)}
-												/><Label class="text-sm ">Set as correct answer</Label>
+											<div class="flex flex-row items-center gap-4">
+												<div class="flex flex-row items-center gap-2">
+													<Checkbox
+														disabled={!totalOptions[index].value.trim()}
+														checked={totalOptions[index].correct_answer}
+														onCheckedChange={(checked: boolean) =>
+															(totalOptions[index].correct_answer = checked)}
+													/><Label class="text-sm">Set as correct answer</Label>
+												</div>
+												<button
+													type="button"
+													class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {optionMediaVisible[
+														id
+													]
+														? 'bg-primary/10'
+														: ''}"
+													onclick={() => (optionMediaVisible[id] = !optionMediaVisible[id])}
+												>
+													<ImageIcon size={14} />
+													{optionMediaVisible[id]
+														? 'Hide media'
+														: optionMediaMap[id]?.image || optionMediaMap[id]?.external_media
+															? 'Show media'
+															: 'Add media'}
+												</button>
+												{#if !optionMediaVisible[id] && (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media)}
+													<span class="text-xs text-gray-400">(media attached)</span>
+												{/if}
 											</div>
+											{#if optionMediaVisible[id] || stagedOptionFiles[id] || stagedOptionUrls[id]?.trim()}
+												<MediaManager
+													media={optionMediaMap[id] ?? null}
+													onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
+													onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
+													onDeleteImage={questionId
+														? () =>
+																deleteMedia(
+																	`/api/media/questions/${questionId}/options/${id}/image`
+																)
+														: undefined}
+													onDeleteExternal={questionId
+														? () =>
+																deleteMedia(
+																	`/api/media/questions/${questionId}/options/${id}/external`
+																)
+														: undefined}
+												/>
+											{/if}
 										</div>
 										<div
 											class={[
@@ -496,30 +874,52 @@
 										}}
 									>
 										{#each matrixLeftItems as item, index (item.id)}
-											<div class="group flex flex-row items-center gap-2">
-												<div
-													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
-												>
-													{item.key}
+											<div class="group flex flex-col gap-1">
+												<div class="flex flex-row items-center gap-2">
+													<div
+														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
+													>
+														{item.key}
+													</div>
+													<div class="flex flex-1 flex-row rounded-sm border border-black">
+														<span use:dragHandle aria-label="drag handle">
+															<GripVertical
+																class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+															/>
+														</span>
+														<Input class="border-0" bind:value={matrixLeftItems[index].value} />
+													</div>
+													{@render matrixImageButton(item.id)}
+													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+														if (matrixLeftItems.length > 1) {
+															const deletedId = String(matrixLeftItems[index].id);
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({ ...item, key: String.fromCharCode(65 + i) }));
+															const { [deletedId]: _, ...rest } = matrixMatches;
+															matrixMatches = rest;
+														}
+													})}
 												</div>
-												<div class="flex flex-1 flex-row rounded-sm border border-black">
-													<span use:dragHandle aria-label="drag handle">
-														<GripVertical
-															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-														/>
-													</span>
-													<Input class="border-0" bind:value={matrixLeftItems[index].value} />
-												</div>
-												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-													if (matrixLeftItems.length > 1) {
-														const deletedId = String(matrixLeftItems[index].id);
-														matrixLeftItems = matrixLeftItems
-															.filter((_, i) => i !== index)
-															.map((item, i) => ({ ...item, key: String.fromCharCode(65 + i) }));
-														const { [deletedId]: _, ...rest } = matrixMatches;
-														matrixMatches = rest;
-													}
-												})}
+												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
+													<MediaManager
+														media={optionMediaMap[item.id] ?? null}
+														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+														onDeleteImage={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/image`
+																	)
+															: undefined}
+														onDeleteExternal={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/external`
+																	)
+															: undefined}
+													/>
+												{/if}
 											</div>
 										{/each}
 									</div>
@@ -550,37 +950,59 @@
 										}}
 									>
 										{#each matrixRightItems as item, index (item.id)}
-											<div class="group flex flex-row items-center gap-2">
-												<div
-													class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
-												>
-													{item.key}
+											<div class="group flex flex-col gap-1">
+												<div class="flex flex-row items-center gap-2">
+													<div
+														class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
+													>
+														{item.key}
+													</div>
+													<div class="flex flex-1 flex-row rounded-sm border border-black">
+														<span use:dragHandle aria-label="drag handle">
+															<GripVertical
+																class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+															/>
+														</span>
+														<Input class="border-0" bind:value={matrixRightItems[index].value} />
+													</div>
+													{@render matrixImageButton(item.id)}
+													{@render matrixTrashButton(matrixRightItems.length > 1, () => {
+														if (matrixRightItems.length > 1) {
+															const removedId = matrixRightItems[index].id;
+															matrixRightItems = matrixRightItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({
+																	...item,
+																	key: String(i + 1)
+																}));
+															matrixMatches = Object.fromEntries(
+																Object.entries(matrixMatches).map(([k, ids]) => [
+																	k,
+																	ids.filter((id) => id !== removedId)
+																])
+															);
+														}
+													})}
 												</div>
-												<div class="flex flex-1 flex-row rounded-sm border border-black">
-													<span use:dragHandle aria-label="drag handle">
-														<GripVertical
-															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-														/>
-													</span>
-													<Input class="border-0" bind:value={matrixRightItems[index].value} />
-												</div>
-												{@render matrixTrashButton(matrixRightItems.length > 1, () => {
-													if (matrixRightItems.length > 1) {
-														const removedId = matrixRightItems[index].id;
-														matrixRightItems = matrixRightItems
-															.filter((_, i) => i !== index)
-															.map((item, i) => ({
-																...item,
-																key: String(i + 1)
-															}));
-														matrixMatches = Object.fromEntries(
-															Object.entries(matrixMatches).map(([k, ids]) => [
-																k,
-																ids.filter((id) => id !== removedId)
-															])
-														);
-													}
-												})}
+												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
+													<MediaManager
+														media={optionMediaMap[item.id] ?? null}
+														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+														onDeleteImage={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/image`
+																	)
+															: undefined}
+														onDeleteExternal={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/external`
+																	)
+															: undefined}
+													/>
+												{/if}
 											</div>
 										{/each}
 									</div>
@@ -852,13 +1274,24 @@
 							colLabel: matrixColLabel,
 							rows: matrixLeftItems,
 							columns: matrixRightItems
-						}
+						},
+						media: questionMedia,
+						optionMediaMap
 					}}
 				/>
 
-				<Button class="bg-primary text-sm sm:text-base" disabled={isDisabled} onclick={submit}
-					>Save</Button
+				<Button
+					class="bg-primary text-sm sm:text-base"
+					disabled={isDisabled || isSaving}
+					onclick={submit}
 				>
+					{#if isSaving}
+						<Loader2 size={16} class="mr-1 animate-spin" />
+						Uploading media...
+					{:else}
+						Save
+					{/if}
+				</Button>
 			</div>
 		</div>
 	</div>

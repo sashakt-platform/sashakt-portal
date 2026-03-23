@@ -52,9 +52,7 @@
 	const selectedFileSize = $derived(
 		$logoFile?.[0] ? `${($logoFile[0].size / 1024).toFixed(1)} KB` : null
 	);
-	const previewUrl = $derived(
-		browser && $logoFile?.[0] ? URL.createObjectURL($logoFile[0]) : null
-	);
+	const previewUrl = $derived(browser && $logoFile?.[0] ? URL.createObjectURL($logoFile[0]) : null);
 
 	function clearFileSelection(e: MouseEvent) {
 		e.stopPropagation();

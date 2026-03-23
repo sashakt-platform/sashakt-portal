@@ -227,7 +227,7 @@
 	);
 	let matrixRightItems = $state<{ id: number; key: string; value: string }[]>(
 		existingMatrixOptions?.columns.items ??
-			Array.from({ length: 4 }, (_, i) => ({ id: i + 1, key: String(i + 1), value: '' }))
+			Array.from({ length: 4 }, (_, i) => ({ id: 5000 + i + 1, key: String(i + 1), value: '' }))
 	);
 	let matrixMatches = $state<Record<string, number[]>>(
 		questionData?.correct_answer &&
@@ -551,6 +551,21 @@
 				<Trash_2 size={16} class="text-muted-foreground hover:text-destructive" />
 			</button>
 		{/snippet}
+		{#snippet matrixImageButton(itemId: number)}
+			<button
+				type="button"
+				onclick={() => (optionMediaVisible[itemId] = !optionMediaVisible[itemId])}
+				aria-label="Toggle media"
+				class={[
+					'shrink-0',
+					optionMediaMap[itemId]?.image || optionMediaMap[itemId]?.external_media
+						? 'text-primary'
+						: 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary'
+				]}
+			>
+				<ImageIcon size={16} />
+			</button>
+		{/snippet}
 		{#snippet snippetHeading(title: string)}
 			<div class="bg-primary-foreground flex flex-row gap-3 rounded-sm px-4 py-3 align-middle">
 				<Label class="text-md my-auto font-bold">{title}</Label><Info
@@ -859,30 +874,33 @@
 										}}
 									>
 										{#each matrixLeftItems as item, index (item.id)}
-											<div class="group flex flex-row items-center gap-2">
-												<div
-													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
-												>
-													{item.key}
+											<div class="group flex flex-col gap-1">
+												<div class="flex flex-row items-center gap-2">
+													<div
+														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
+													>
+														{item.key}
+													</div>
+													<div class="flex flex-1 flex-row rounded-sm border border-black">
+														<span use:dragHandle aria-label="drag handle">
+															<GripVertical
+																class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+															/>
+														</span>
+														<Input class="border-0" bind:value={matrixLeftItems[index].value} />
+													</div>
+													{@render matrixImageButton(item.id)}
+													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+														if (matrixLeftItems.length > 1) {
+															const deletedId = String(matrixLeftItems[index].id);
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({ ...item, key: String.fromCharCode(65 + i) }));
+															const { [deletedId]: _, ...rest } = matrixMatches;
+															matrixMatches = rest;
+														}
+													})}
 												</div>
-												<div class="flex flex-1 flex-row rounded-sm border border-black">
-													<span use:dragHandle aria-label="drag handle">
-														<GripVertical
-															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-														/>
-													</span>
-													<Input class="border-0" bind:value={matrixLeftItems[index].value} />
-												</div>
-												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-													if (matrixLeftItems.length > 1) {
-														const deletedId = String(matrixLeftItems[index].id);
-														matrixLeftItems = matrixLeftItems
-															.filter((_, i) => i !== index)
-															.map((item, i) => ({ ...item, key: String.fromCharCode(65 + i) }));
-														const { [deletedId]: _, ...rest } = matrixMatches;
-														matrixMatches = rest;
-													}
-												})}
 												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
 													<MediaManager
 														media={optionMediaMap[item.id] ?? null}
@@ -932,37 +950,40 @@
 										}}
 									>
 										{#each matrixRightItems as item, index (item.id)}
-											<div class="group flex flex-row items-center gap-2">
-												<div
-													class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
-												>
-													{item.key}
+											<div class="group flex flex-col gap-1">
+												<div class="flex flex-row items-center gap-2">
+													<div
+														class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
+													>
+														{item.key}
+													</div>
+													<div class="flex flex-1 flex-row rounded-sm border border-black">
+														<span use:dragHandle aria-label="drag handle">
+															<GripVertical
+																class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+															/>
+														</span>
+														<Input class="border-0" bind:value={matrixRightItems[index].value} />
+													</div>
+													{@render matrixImageButton(item.id)}
+													{@render matrixTrashButton(matrixRightItems.length > 1, () => {
+														if (matrixRightItems.length > 1) {
+															const removedId = matrixRightItems[index].id;
+															matrixRightItems = matrixRightItems
+																.filter((_, i) => i !== index)
+																.map((item, i) => ({
+																	...item,
+																	key: String(i + 1)
+																}));
+															matrixMatches = Object.fromEntries(
+																Object.entries(matrixMatches).map(([k, ids]) => [
+																	k,
+																	ids.filter((id) => id !== removedId)
+																])
+															);
+														}
+													})}
 												</div>
-												<div class="flex flex-1 flex-row rounded-sm border border-black">
-													<span use:dragHandle aria-label="drag handle">
-														<GripVertical
-															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-														/>
-													</span>
-													<Input class="border-0" bind:value={matrixRightItems[index].value} />
-												</div>
-												{@render matrixTrashButton(matrixRightItems.length > 1, () => {
-													if (matrixRightItems.length > 1) {
-														const removedId = matrixRightItems[index].id;
-														matrixRightItems = matrixRightItems
-															.filter((_, i) => i !== index)
-															.map((item, i) => ({
-																...item,
-																key: String(i + 1)
-															}));
-														matrixMatches = Object.fromEntries(
-															Object.entries(matrixMatches).map(([k, ids]) => [
-																k,
-																ids.filter((id) => id !== removedId)
-															])
-														);
-													}
-												})}
 												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
 													<MediaManager
 														media={optionMediaMap[item.id] ?? null}

@@ -140,6 +140,11 @@ export const actions: Actions = {
 			return fail(400);
 		}
 
+		if (!Number.isFinite(tag_type_id)) {
+			setFlash({ type: 'error', message: 'Tag type is required.' }, cookies);
+			return fail(400);
+		}
+
 		const response = await fetch(`${BACKEND_URL}/tag/`, {
 			method: 'POST',
 			headers: {

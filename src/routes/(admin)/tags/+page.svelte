@@ -4,6 +4,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
@@ -49,6 +50,7 @@
 
 	// Search
 	let searchTimeout: ReturnType<typeof setTimeout>;
+	$effect(() => () => clearTimeout(searchTimeout));
 
 	function handleSearch(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -61,7 +63,7 @@
 				url.searchParams.delete('search');
 			}
 			url.searchParams.set('page', '1');
-			goto(url, { keepFocus: true, invalidateAll: true });
+			goto(resolve(url.pathname + url.search), { keepFocus: true, invalidateAll: true });
 		}, 300);
 	}
 
@@ -72,7 +74,7 @@
 		url.searchParams.set('sort_by', columnId);
 		url.searchParams.set('sort_order', newOrder);
 		url.searchParams.set('page', '1');
-		goto(url, { replaceState: false });
+		goto(resolve(url.pathname + url.search), { replaceState: false });
 	}
 
 	// Tag type actions

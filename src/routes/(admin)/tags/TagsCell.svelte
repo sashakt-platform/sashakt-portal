@@ -51,9 +51,11 @@
 			method="POST"
 			action="?/createTag"
 			use:enhance={() => {
-				return async ({ update }) => {
-					addingTag = false;
+				return async ({ result, update }) => {
 					await update();
+					if (result.type !== 'failure') {
+						addingTag = false;
+					}
 				};
 			}}
 			class="inline-flex"

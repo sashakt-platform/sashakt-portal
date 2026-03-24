@@ -34,9 +34,11 @@
 		method="POST"
 		action="?/updateTag"
 		use:enhance={() => {
-			return async ({ update }) => {
-				onCancelEdit?.();
+			return async ({ result, update }) => {
 				await update();
+				if (result.type !== 'failure') {
+					onCancelEdit?.();
+				}
 			};
 		}}
 		class="inline-flex"

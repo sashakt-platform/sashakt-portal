@@ -18,19 +18,12 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const sortOrder = url.searchParams.get('sort_order') || 'asc';
 	const search = url.searchParams.get('search') || '';
 
-	let tagTypes: { items: Record<string, unknown>[]; total: number; pages: number } = {
-		items: [],
-		total: 0,
-		pages: 0
-	};
-
 	// build query string
 	const tagTypesQueryParams = new URLSearchParams({
 		page: page.toString(),
 		size: size.toString(),
 		...(search && { name: search }),
-		...(sortBy && { sort_by: sortBy }),
-		...(sortOrder && { sort_order: sortOrder })
+		...(sortBy && { sort_by: sortBy, sort_order: sortOrder })
 	});
 
 	const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype/?${tagTypesQueryParams}`, {
@@ -43,7 +36,8 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		error(tagTypesResponse.status, `Failed to fetch tag types: ${errorText}`);
 	}
 
-	tagTypes = await tagTypesResponse.json();
+	const tagTypes: { items: Record<string, unknown>[]; total: number; pages: number } =
+		await tagTypesResponse.json();
 
 	return {
 		tagTypes,

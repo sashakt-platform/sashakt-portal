@@ -2,7 +2,6 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import type { PageServerLoad, Actions } from './$types';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { redirect } from 'sveltekit-flash-message/server';
 import { error, fail } from '@sveltejs/kit';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
@@ -97,7 +96,7 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		redirect('/tags', { type: 'success', message: 'Tag Type created successfully!' }, cookies);
+		setFlash({ type: 'success', message: 'Tag Type created successfully!' }, cookies);
 	},
 
 	updateTagType: async ({ request, cookies }) => {
@@ -130,7 +129,7 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		redirect('/tags', { type: 'success', message: 'Tag Type updated successfully!' }, cookies);
+		setFlash({ type: 'success', message: 'Tag Type updated successfully!' }, cookies);
 	},
 
 	createTag: async ({ request, cookies }) => {
@@ -162,7 +161,7 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		redirect('/tags', { type: 'success', message: 'Tag created successfully!' }, cookies);
+		setFlash({ type: 'success', message: 'Tag created successfully!' }, cookies);
 	},
 
 	updateTag: async ({ request, cookies }) => {
@@ -194,7 +193,7 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		redirect('/tags', { type: 'success', message: 'Tag updated successfully!' }, cookies);
+		setFlash({ type: 'success', message: 'Tag updated successfully!' }, cookies);
 	},
 
 	deleteTag: async ({ request, cookies }) => {
@@ -224,7 +223,7 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		redirect('/tags', { type: 'success', message: 'Tag deleted successfully!' }, cookies);
+		setFlash({ type: 'success', message: 'Tag deleted successfully!' }, cookies);
 	},
 
 	deleteTagType: async ({ request, cookies }) => {
@@ -254,6 +253,6 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		redirect('/tags', { type: 'success', message: 'Tag Type deleted successfully!' }, cookies);
+		setFlash({ type: 'success', message: 'Tag Type deleted successfully!' }, cookies);
 	}
 };

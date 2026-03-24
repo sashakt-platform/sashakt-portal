@@ -73,11 +73,11 @@
 				}
 				if (uploadOk) {
 					toast.success('Question saved successfully');
-					goto('/questionbank');
+					await goto('/questionbank');
 				} else {
 					// Question was created but media failed — redirect to edit page so user can retry
 					toast.error('Question saved but some media failed to upload. Redirecting to edit page.');
-					goto(`/questionbank/single-question/edit/${newId}`);
+					await goto(`/questionbank/single-question/edit/${newId}`);
 				}
 			} else if (result.type === 'redirect' && questionId) {
 				let uploadOk = true;
@@ -90,7 +90,7 @@
 					}
 				}
 				if (uploadOk) {
-					goto(result.location);
+					await goto(result.location);
 				} else {
 					// Question was saved but media failed — stay on page so user can retry
 					toast.error('Question saved but some media failed to upload.');
@@ -561,7 +561,7 @@
 					'shrink-0',
 					optionMediaMap[itemId]?.image || optionMediaMap[itemId]?.external_media
 						? 'text-primary'
-						: 'opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary'
+						: 'text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100'
 				]}
 			>
 				<ImageIcon size={16} />

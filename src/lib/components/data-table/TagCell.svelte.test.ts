@@ -7,7 +7,7 @@ describe('TagCell', () => {
 	describe('Rendering', () => {
 		it('should render nothing when tags is empty', () => {
 			const { container } = render(TagCell, { props: { tags: [] } });
-			expect(container.querySelector('span')).not.toBeInTheDocument();
+			expect(container.querySelector('[data-slot="badge"]')).not.toBeInTheDocument();
 		});
 
 		it('should render a single tag name', () => {
@@ -30,14 +30,17 @@ describe('TagCell', () => {
 			expect(screen.getByText('Math (Subject)')).toBeInTheDocument();
 		});
 
-		it('should render multiple tags separated by commas', () => {
+		it('should render first 2 tags as individual badges', () => {
 			render(TagCell, {
 				props: {
 					tags: [{ name: 'Math' }, { name: 'Science' }, { name: 'English' }]
 				}
 			});
 
-			expect(screen.getByText('Math, Science, English')).toBeInTheDocument();
+			expect(screen.getByText('Math')).toBeInTheDocument();
+			expect(screen.getByText('Science')).toBeInTheDocument();
+			expect(screen.queryByText('English')).not.toBeInTheDocument();
+			expect(screen.getByText('+1')).toBeInTheDocument();
 		});
 
 		it('should render mix of tags with and without tag_type', () => {
@@ -51,12 +54,57 @@ describe('TagCell', () => {
 				}
 			});
 
-			expect(screen.getByText('Math (Subject), Easy, Grade 5 (Level)')).toBeInTheDocument();
+			expect(screen.getByText('Math (Subject)')).toBeInTheDocument();
+			expect(screen.getByText('Easy')).toBeInTheDocument();
+			expect(screen.queryByText('Grade 5 (Level)')).not.toBeInTheDocument();
+			expect(screen.getByText('+1')).toBeInTheDocument();
+		});
+
+		it('should not show overflow badge when 2 or fewer tags', () => {
+			const { container } = render(TagCell, {
+				props: {
+					tags: [{ name: 'Math' }, { name: 'Science' }]
+				}
+			});
+
+			expect(screen.getByText('Math')).toBeInTheDocument();
+			expect(screen.getByText('Science')).toBeInTheDocument();
+			const badges = container.querySelectorAll('[data-slot="badge"]');
+			expect(badges).toHaveLength(2);
+		});
+
+		it('should show correct overflow count with many tags', () => {
+			render(TagCell, {
+				props: {
+					tags: [
+						{ name: 'Math' },
+						{ name: 'Science' },
+						{ name: 'English' },
+						{ name: 'History' },
+						{ name: 'Geography' }
+					]
+				}
+			});
+
+			expect(screen.getByText('Math')).toBeInTheDocument();
+			expect(screen.getByText('Science')).toBeInTheDocument();
+			expect(screen.getByText('+3')).toBeInTheDocument();
 		});
 	});
 
-	describe('Truncation', () => {
-		it('should apply truncate class to the span', () => {
+	describe('Badge rendering', () => {
+		it('should render tags as badge elements', () => {
+			const { container } = render(TagCell, {
+				props: {
+					tags: [{ name: 'Math' }]
+				}
+			});
+
+			const badge = container.querySelector('[data-slot="badge"]');
+			expect(badge).toBeInTheDocument();
+		});
+
+		it('should apply truncate class to tag text', () => {
 			render(TagCell, {
 				props: {
 					tags: [{ name: 'Math' }]
@@ -65,7 +113,6 @@ describe('TagCell', () => {
 
 			const span = screen.getByText('Math');
 			expect(span).toHaveClass('truncate');
-			expect(span).toHaveClass('block');
 		});
 	});
 

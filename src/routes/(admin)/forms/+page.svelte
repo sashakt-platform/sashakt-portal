@@ -6,9 +6,12 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import Search from '@lucide/svelte/icons/search';
 
 	let { data } = $props();
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -39,44 +42,80 @@
 			canDelete: canDelete(data.user, 'form')
 		})
 	);
+
+	const noFormsCreatedYet = $derived(totalItems === 0 && !search);
 </script>
 
 <ListingPageLayout
 	title="Forms"
-	subtitle="Create and manage dynamic forms for candidate profiles"
+	subtitle=""
+	showEmptyState={noFormsCreatedYet}
 	infoLabel="Help: Forms"
 	infoDescription="This panel displays all forms in the system. Forms are used to collect candidate information before tests. You can create, edit, or delete forms by using the actions."
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'form')}
-			<a href="/forms/add/new">
-				<Button class="font-bold">
-					<Plus />Add Form
+			<a href={resolve('/forms/add/new')}>
+				<Button class="font-semibold">
+					<Plus />Create Form
 				</Button>
 			</a>
 		{/if}
 	{/snippet}
 
+	{#snippet emptyState()}
+		{#if noFormsCreatedYet}
+			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
+				<div
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+				>
+					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
+						<FileText class="text-primary h-7 w-7" />
+					</div>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No forms yet</h2>
+					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
+						Create your first form to get started. Forms let you create questions that test takers
+						must answer before starting the test.
+					</p>
+					{#if canCreate(data.user, 'form')}
+						<div class="mt-6">
+							<a href={resolve('/forms/add/new')}
+								><Button class="font-semibold"><Plus />Create Form</Button></a
+							>
+						</div>
+					{/if}
+				</div>
+			</div>
+		{/if}
+	{/snippet}
+
 	{#snippet filters()}
-		<Input
-			placeholder="Search forms..."
-			value={search}
-			oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
-				const value = event.currentTarget.value;
-				const url = new URL(page.url);
-				clearTimeout(searchTimeout);
-				searchTimeout = setTimeout(() => {
-					if (value) {
-						url.searchParams.set('search', value);
-					} else {
-						url.searchParams.delete('search');
-					}
-					url.searchParams.set('page', '1');
-					goto(url, { keepFocus: true, invalidateAll: true });
-				}, 300);
-			}}
-			class="max-w-sm"
-		/>
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+			<div class="relative lg:w-80">
+				<Search
+					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+				/>
+				<Input
+					class="rounded-full pl-9"
+					placeholder="Search forms..."
+					value={search}
+					oninput={(event: Event & { currentTarget: HTMLInputElement }) => {
+						const value = event.currentTarget.value;
+						const url = new URL(page.url);
+						clearTimeout(searchTimeout);
+						searchTimeout = setTimeout(() => {
+							if (value) {
+								url.searchParams.set('search', value);
+							} else {
+								url.searchParams.delete('search');
+							}
+							url.searchParams.set('page', '1');
+							goto(url, { keepFocus: true, invalidateAll: true });
+						}, 300);
+					}}
+				/>
+			</div>
+		</div>
 	{/snippet}
 
 	{#snippet content()}

@@ -23,14 +23,18 @@ export const createTagsColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<Tag>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		meta: { grow: true }
+	}),
 	{
 		accessorKey: 'tag_type',
 		header: 'Type',
-		cell: ({ row }) => row.original.tag_type?.name || ''
+		cell: ({ row }) => row.original.tag_type?.name || '',
+		size: 150
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
 	createActionsColumn<Tag>('Tag', '/tags/tag', permissions)
 ];

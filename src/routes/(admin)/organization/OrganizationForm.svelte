@@ -10,6 +10,7 @@
 	import type { PageData } from './$types';
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/stores';
+	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
 	import { editOrganizationSchema, type EditOrganizationSchema } from './schema';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
@@ -191,7 +192,7 @@
 		class="sticky right-0 bottom-0 left-0 mt-2 flex w-full border-t-4 bg-white p-3 shadow-md sm:mt-4 sm:p-4"
 	>
 		<div class="flex w-full justify-between gap-2">
-			<a href="/dashboard">
+			<a href={resolve('/dashboard')}>
 				<Button variant="outline" class="border-primary text-primary border-1 text-sm sm:text-base"
 					>Cancel</Button
 				>

@@ -195,8 +195,8 @@ describe('Test Create/Update Page — load()', () => {
 				url: makeUrl('/tests/test-session/new')
 			} as any);
 
-			const testFetches = mockFetch.mock.calls.filter(([url]) =>
-				url.includes('/test/') && !url.includes('/questions/')
+			const testFetches = mockFetch.mock.calls.filter(
+				([url]) => url.includes('/test/') && !url.includes('/questions/')
 			);
 			expect(testFetches).toHaveLength(0);
 		});

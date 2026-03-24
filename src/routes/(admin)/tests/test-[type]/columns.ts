@@ -12,6 +12,7 @@ import {
 	getUserDistrict,
 	type User
 } from '$lib/utils/permissions.js';
+import { resolve } from '$app/paths';
 
 export interface Test {
 	id: string;
@@ -76,18 +77,22 @@ export const createTestColumns = (
 	user?: User | null
 ): ColumnDef<Test>[] => [
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name })
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
+		meta: { grow: true }
 	}),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] })
+		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] }),
+		size: 200
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date)
+		cell: ({ row }) => formatDate(row.original.modified_date),
+		size: 140
 	}),
 	{
 		id: 'actions',
+		size: 240,
 		header: '',
 		enableSorting: false,
 		enableHiding: false,
@@ -100,7 +105,7 @@ export const createTestColumns = (
 
 			customActions.push({
 				label: 'Make a Copy',
-				href: `${baseUrl}/${test.id}?/clone`,
+				href: resolve(`${baseUrl}/${test.id}?/clone`),
 				icon: 'copy',
 				method: 'POST'
 			});
@@ -109,8 +114,9 @@ export const createTestColumns = (
 			if (isTemplate) {
 				customActions.push({
 					label: 'Make a Test',
-					href: `/tests/test-session/convert/?template_id=${test.id}`,
-					icon: 'file-plus'
+					href: resolve(`/tests/test-session/convert/?template_id=${test.id}`),
+					icon: 'file-plus',
+					inline: true
 				});
 			} else {
 				// Add session-specific actions
@@ -132,7 +138,8 @@ export const createTestColumns = (
 								console.error('Failed to download QR code:', error);
 							}
 						},
-						icon: 'qr-code'
+						icon: 'qr-code',
+						inline: true
 					});
 				}
 			}
@@ -153,12 +160,13 @@ export const createTestColumns = (
 			return renderComponent(DataTableActions, {
 				id: test.id,
 				entityName: isTemplate ? 'Test Template' : 'Test Session',
-				editUrl: `${baseUrl}/${test.id}/`,
-				deleteUrl: `${baseUrl}/${test.id}?/delete`,
+				editUrl: resolve(`${baseUrl}/${test.id}/`),
+				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,
 				onDelete: () => onDelete(test.id),
 				canEdit: (permissions?.canEdit ?? true) && !isRestricted,
-				canDelete: (permissions?.canDelete ?? true) && !isRestricted
+				canDelete: (permissions?.canDelete ?? true) && !isRestricted,
+				editInline: true
 			});
 		}
 	}

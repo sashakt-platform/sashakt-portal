@@ -44,7 +44,7 @@
 </script>
 
 {#if selectedCount > 0}
-	<div class="bg-muted/50 flex items-center justify-between rounded-lg border p-3">
+	<div class="bg-muted/50 flex h-10 items-center justify-between rounded-lg border px-3">
 		<div class="flex items-center gap-4">
 			<span class="text-sm font-medium">
 				{selectedCount} item{selectedCount !== 1 ? 's' : ''} selected

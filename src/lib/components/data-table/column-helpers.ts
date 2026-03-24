@@ -2,6 +2,7 @@ import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import { DataTableActions, DataTableSortButton } from './index.js';
 import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+import { resolve } from '$app/paths';
 
 /**
  *  Function to create a sortable column with the given configuration
@@ -36,26 +37,45 @@ export const createActionsColumn = <T extends { id: string | number }>(
 	options?: {
 		canEdit?: boolean;
 		canDelete?: boolean;
-		customActions?: (
-			row: T
-		) => { label: string; href?: string; action?: () => void; icon?: string; method?: string }[];
+		editInline?: boolean;
+		deleteInline?: boolean;
+		customActions?: (row: T) => {
+			label: string;
+			href?: string;
+			action?: () => void;
+			icon?: string;
+			method?: string;
+			inline?: boolean;
+		}[];
 	}
-): ColumnDef<T> => ({
-	id: 'actions',
-	enableSorting: false,
-	enableHiding: false,
-	cell: ({ row }) => {
-		return renderComponent(DataTableActions, {
-			id: row.original.id,
-			entityName,
-			editUrl: `${baseUrl}/edit/${row.original.id}`,
-			deleteUrl: `${baseUrl}/delete/${row.original.id}?/delete`,
-			canEdit: options?.canEdit ?? true,
-			canDelete: options?.canDelete ?? true,
-			customActions: options?.customActions?.(row.original) ?? []
-		});
+): ColumnDef<T> => {
+	let size = 60;
+	if (options?.editInline && options?.deleteInline) {
+		size = 240;
+	} else if (options?.editInline || options?.deleteInline) {
+		size = 160;
 	}
-});
+
+	return {
+		id: 'actions',
+		enableSorting: false,
+		enableHiding: false,
+		size,
+		cell: ({ row }) => {
+			return renderComponent(DataTableActions, {
+				id: row.original.id,
+				entityName,
+				editUrl: resolve(`${baseUrl}/edit/${row.original.id}`),
+				deleteUrl: resolve(`${baseUrl}/delete/${row.original.id}?/delete`),
+				canEdit: options?.canEdit ?? true,
+				canDelete: options?.canDelete ?? true,
+				editInline: options?.editInline ?? false,
+				deleteInline: options?.deleteInline ?? false,
+				customActions: options?.customActions?.(row.original) ?? []
+			});
+		}
+	};
+};
 
 /**
  * Function to create a selection column with checkboxes

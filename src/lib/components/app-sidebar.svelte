@@ -1,53 +1,49 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
-	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
-	import FileQuestion from '@lucide/svelte/icons/file-question';
+	import ChartColumnIncreasing from '@lucide/svelte/icons/chart-column-increasing';
+	import FileWarning from '@lucide/svelte/icons/file-warning';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
-	import ChevronUp from '@lucide/svelte/icons/chevron-up';
+	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 	import User from '@lucide/svelte/icons/user';
-	import Tags from '@lucide/svelte/icons/tags';
+	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
 	import Building from '@lucide/svelte/icons/building-2';
-	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
+	import Settings from '@lucide/svelte/icons/settings';
+	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	// Menu items.
 	const menu_items = {
 		dashboard: {
 			title: 'Dashboard',
 			url: '/dashboard',
-			icon: LayoutGrid
+			icon: ChartColumnIncreasing
 		},
 		question: {
 			title: 'Question Bank',
 			url: '/questionbank',
-			icon: FileQuestion
+			icon: FileWarning
 		},
-		tests: {
-			title: 'Test Management',
-			url: '/tests',
-			icon: ClipboardList,
-			submenu: {
-				test_sessions: {
-					title: 'Test Sessions',
-					url: '/tests/test-session'
-				},
-				test_template: {
-					title: 'Test Template',
-					url: '/tests/test-template'
-				}
-			}
+		test_template: {
+			title: 'Test Templates',
+			url: '/tests/test-template',
+			icon: ClipboardList
+		},
+		test_session: {
+			title: 'Test Sessions',
+			url: '/tests/test-session',
+			icon: ClipboardCheck
 		},
 		tags: {
-			title: 'Tags',
+			title: 'Tag Management',
 			url: '/tags',
-			icon: Tags
+			icon: MessageSquareCode
 		},
 		forms: {
 			title: 'Forms',
@@ -94,13 +90,13 @@
 </script>
 
 {#snippet sidebaritems(item: any)}
-	<Sidebar.MenuItem class="text-secondary-foreground m-1">
+	<Sidebar.MenuItem class="m-1">
 		<Sidebar.MenuButton
 			isActive={currentitem == item.title}
 			onclick={() => handleMenuClick(item.title)}
 		>
 			{#snippet child({ props })}
-				<a href={item.url} {...props}>
+				<a href={resolve(item.url)} {...props}>
 					<item.icon />
 					<span>{item.title}</span>
 				</a>
@@ -109,8 +105,8 @@
 	</Sidebar.MenuItem>
 {/snippet}
 
-<Sidebar.Root class="bg-white p-3">
-	<Sidebar.Header class="items-center py-4">
+<Sidebar.Root>
+	<Sidebar.Header class="flex-row items-center justify-between py-4">
 		{#if data.organization?.logo}
 			<img
 				src={data.organization.logo}
@@ -119,11 +115,17 @@
 			/>
 		{:else}
 			<h4
-				class="text-primary w-full scroll-m-20 pl-3 text-xl font-extrabold tracking-tighter uppercase"
+				class="w-full scroll-m-20 pl-3 text-xl font-extrabold tracking-tighter text-white uppercase"
 			>
 				Sashakt
 			</h4>
 		{/if}
+		<button
+			onclick={() => sidebar.toggle()}
+			class="flex h-8 w-8 items-center justify-center rounded-md border border-white/30 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+		>
+			<ChevronsLeft class="h-5 w-5" />
+		</button>
 	</Sidebar.Header>
 	<Sidebar.Content>
 		<Sidebar.Group>
@@ -135,59 +137,13 @@
 						{@render sidebaritems(menu_items.question)}
 					{/if}
 
-					<!---- Collapsible menu for Tests ---->
-					{#if canRead(data.user, 'test') || canRead(data.user, 'test-template')}
-						<Collapsible.Root class="group/collapsible m-1">
-							<Sidebar.MenuItem>
-								<Collapsible.Trigger>
-									<Sidebar.MenuButton
-										onclick={() => (currentitem = menu_items.tests.submenu.test_sessions.title)}
-									>
-										{#snippet child({ props })}
-											<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
-												<ClipboardList />
-												<span>{menu_items.tests.title}</span>
-												<ChevronRight
-													class="ml-auto items-end transition-transform group-data-[state=open]/collapsible:rotate-90"
-												/>
-											</a>
-										{/snippet}
-									</Sidebar.MenuButton>
-								</Collapsible.Trigger>
-								<Collapsible.Content>
-									<Sidebar.MenuSub>
-										{#if canRead(data.user, 'test')}
-											<Sidebar.MenuButton
-												isActive={currentitem == menu_items.tests.submenu.test_sessions.title}
-												onclick={() =>
-													handleMenuClick(menu_items.tests.submenu.test_sessions.title)}
-											>
-												{#snippet child({ props })}
-													<a href={menu_items.tests.submenu.test_sessions.url} {...props}>
-														<span>{menu_items.tests.submenu.test_sessions.title}</span>
-													</a>
-												{/snippet}
-											</Sidebar.MenuButton>
-										{/if}
-										{#if canRead(data.user, 'test-template')}
-											<Sidebar.MenuButton
-												isActive={currentitem == menu_items.tests.submenu.test_template.title}
-												onclick={() =>
-													handleMenuClick(menu_items.tests.submenu.test_template.title)}
-											>
-												{#snippet child({ props })}
-													<a href={menu_items.tests.submenu.test_template.url} {...props}>
-														<span>{menu_items.tests.submenu.test_template.title}</span>
-													</a>
-												{/snippet}
-											</Sidebar.MenuButton>
-										{/if}
-									</Sidebar.MenuSub>
-								</Collapsible.Content>
-							</Sidebar.MenuItem>
-						</Collapsible.Root>
+					{#if canRead(data.user, 'test-template')}
+						{@render sidebaritems(menu_items.test_template)}
 					{/if}
-					<!---- Collapsible menu for Tests ---->
+
+					{#if canRead(data.user, 'test')}
+						{@render sidebaritems(menu_items.test_session)}
+					{/if}
 
 					{#if canRead(data.user, 'tag')}
 						{@render sidebaritems(menu_items.tags)}
@@ -211,9 +167,22 @@
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
-	<Sidebar.Footer class="border-t-primary">
+	<Sidebar.Footer>
 		<Sidebar.Menu>
-			<Sidebar.MenuItem>
+			<!-- <Sidebar.MenuItem class="m-1"> -->
+			<!-- 	<Sidebar.MenuButton -->
+			<!-- 		isActive={currentitem == 'Settings'} -->
+			<!-- 		onclick={() => handleMenuClick('Settings')} -->
+			<!-- 	> -->
+			<!-- 		{#snippet child({ props })} -->
+			<!-- 			<a href={resolve('/organization')} {...props}> -->
+			<!-- 				<Settings /> -->
+			<!-- 				<span>Settings</span> -->
+			<!-- 			</a> -->
+			<!-- 		{/snippet} -->
+			<!-- 	</Sidebar.MenuButton> -->
+			<!-- </Sidebar.MenuItem> -->
+			<Sidebar.MenuItem class="m-1">
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>
 						{#snippet child({ props })}
@@ -221,8 +190,8 @@
 								{...props}
 								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 							>
-								{data.user && data.user.full_name}
-								<ChevronUp class="ml-auto" />
+								<User />
+								<span>{data.user && data.user.full_name}</span>
 							</Sidebar.MenuButton>
 						{/snippet}
 					</DropdownMenu.Trigger>
@@ -232,19 +201,21 @@
 						class="w-(--bits-dropdown-menu-anchor-width)"
 					>
 						{#if hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)}
-							<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/organization')}>
+							<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/organization'))}>
 								<Building class="mr-2 size-4" />
 								<span>My Organization</span>
 							</DropdownMenu.Item>
 							<DropdownMenu.Separator />
 						{/if}
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/profile')}>
+						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/profile'))}>
 							<span>My Profile</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/profile/password')}>
+						<DropdownMenu.Item
+							onSelect={() => handleDropdownNavigate(resolve('/profile/password'))}
+						>
 							<span>Change Password</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate('/logout')}>
+						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/logout'))}>
 							<span>Sign out</span>
 						</DropdownMenu.Item>
 					</DropdownMenu.Content>

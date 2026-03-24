@@ -86,24 +86,24 @@ describe('Test Management Listing Page', () => {
 
 	// ────────────────────────────────────────────────────────────────────────
 	describe('Page title', () => {
-		it('should show "Test templates" title for template mode', () => {
+		it('should show "Test Templates" title for template mode', () => {
 			render(TestListingPage, { data: baseData(true) });
-			expect(screen.getByText('Test templates')).toBeInTheDocument();
+			expect(screen.getByText('Test Templates')).toBeInTheDocument();
 		});
 
-		it('should show "Test sessions" title for session mode', () => {
+		it('should show "Test Sessions" title for session mode', () => {
 			render(TestListingPage, { data: baseData(false) });
-			expect(screen.getByText('Test sessions')).toBeInTheDocument();
+			expect(screen.getByText('Test Sessions')).toBeInTheDocument();
 		});
 
-		it('should show template subtitle for template mode', () => {
+		it('should not show subtitle for template mode', () => {
 			render(TestListingPage, { data: baseData(true) });
-			expect(screen.getByText('Manage test templates')).toBeInTheDocument();
+			expect(screen.queryByText('Manage test templates')).not.toBeInTheDocument();
 		});
 
-		it('should show session subtitle for session mode', () => {
+		it('should not show subtitle for session mode', () => {
 			render(TestListingPage, { data: baseData(false) });
-			expect(screen.getByText('Manage test sessions')).toBeInTheDocument();
+			expect(screen.queryByText('Manage test sessions')).not.toBeInTheDocument();
 		});
 	});
 
@@ -116,7 +116,7 @@ describe('Test Management Listing Page', () => {
 
 		it('should show template empty state text for template mode', () => {
 			render(TestListingPage, { data: baseData(true, []) });
-			expect(screen.getByText('Create your first test template')).toBeInTheDocument();
+			expect(screen.getByText('No test templates yet')).toBeInTheDocument();
 		});
 
 		it('should not show empty state when items are present', () => {
@@ -128,32 +128,33 @@ describe('Test Management Listing Page', () => {
 
 	// ────────────────────────────────────────────────────────────────────────
 	describe('Create button', () => {
-		it('should show "Create a test template" button when user has permission and items exist', () => {
+		it('should show "Create Test Template" button when user has permission and items exist', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
 			const items = [{ id: '1', name: 'Template A' }];
 			render(TestListingPage, { data: baseData(true, items) });
-			expect(screen.getByText('Create a test template')).toBeInTheDocument();
+			expect(screen.getByText('Create Test Template')).toBeInTheDocument();
 		});
 
-		it('should show "Create a test session" button when user has permission and items exist', () => {
+		it('should show "Create Manually" button when user has permission and session items exist', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
 			const items = [{ id: '1', name: 'Session A' }];
 			render(TestListingPage, { data: baseData(false, items) });
-			expect(screen.getByText('Create a test session')).toBeInTheDocument();
+			expect(screen.getByText('Create Manually')).toBeInTheDocument();
 		});
 
 		it('should not show create button when user lacks permission', () => {
 			vi.mocked(canCreate).mockReturnValue(false);
 			const items = [{ id: '1', name: 'Session A' }];
 			render(TestListingPage, { data: baseData(false, items) });
-			expect(screen.queryByText('Create a test session')).not.toBeInTheDocument();
+			expect(screen.queryByText('Create Manually')).not.toBeInTheDocument();
 		});
 
-		it('should not show create button when in empty state (no items)', () => {
+		it('should show empty state CTAs when no items exist', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
 			render(TestListingPage, { data: baseData(false, []) });
-			// In empty state the header button is hidden; the empty state box has its own CTA
-			expect(screen.queryByText('Create a test session')).not.toBeInTheDocument();
+			// In empty state, the empty state box shows its own CTAs
+			expect(screen.getByText('Build from Scratch')).toBeInTheDocument();
+			expect(screen.getByText('Build from Template')).toBeInTheDocument();
 		});
 	});
 

@@ -49,7 +49,7 @@
 
 <ListingPageLayout
 	title={entityTypeName}
-	subtitle={entityTypeDescription}
+	subtitle=""
 	infoLabel="Help: Record management"
 	infoDescription={`This panel displays all ${entityTypeName} records. You can edit or delete an existing record by clicking the three dots next to their entry.`}
 >
@@ -58,7 +58,7 @@
 		>
 		{#if canCreate(data.user, 'entity')}
 			<a href={resolve(`/entity/view/${data.entityTypeId}/add/new`)}
-				><Button class="font-bold"><Plus />{`Add ${entityTypeName} Record`}</Button></a
+				><Button class="font-semibold"><Plus />{`Add ${entityTypeName} Record`}</Button></a
 			>
 		{/if}
 	{/snippet}

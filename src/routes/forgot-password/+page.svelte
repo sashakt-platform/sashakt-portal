@@ -6,6 +6,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { forgotPasswordSchema } from './schema';
+	import { resolve } from '$app/paths';
 	import type { PageData } from './$types.js';
 
 	let { data }: { data: PageData } = $props();
@@ -18,7 +19,7 @@
 	let emailSent = $derived(!!$message);
 </script>
 
-<div class="flex h-screen items-center justify-center bg-[rgba(240,249,255,1)]">
+<div class="bg-accent flex h-screen items-center justify-center">
 	<div class="w-full max-w-md px-4">
 		<div class="mb-4 text-center">
 			{#if data.organizationData?.logo}
@@ -67,9 +68,11 @@
 						<Button
 							variant="default"
 							class="mt-4 w-full py-5"
-							href={data.organizationData?.shortcode
-								? `/login?organization=${data.organizationData.shortcode}`
-								: '/login'}>Back to Login</Button
+							href={resolve(
+								data.organizationData?.shortcode
+									? `/login?organization=${data.organizationData.shortcode}`
+									: '/login'
+							)}>Back to Login</Button
 						>
 					</div>
 				{:else}
@@ -93,10 +96,12 @@
 					</form>
 					<div class="mt-4 text-right">
 						<a
-							href={data.organizationData?.shortcode
-								? `/login?organization=${data.organizationData.shortcode}`
-								: '/login'}
-							class="text-sm text-gray-500 hover:text-blue-600 hover:underline focus:outline-none"
+							href={resolve(
+								data.organizationData?.shortcode
+									? `/login?organization=${data.organizationData.shortcode}`
+									: '/login'
+							)}
+							class="hover:text-primary text-sm text-gray-500 hover:underline focus:outline-none"
 						>
 							Back to Login
 						</a>

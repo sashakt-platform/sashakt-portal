@@ -3,7 +3,7 @@ import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import type { PageServerLoad, Actions } from './$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { redirect } from 'sveltekit-flash-message/server';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
@@ -39,11 +39,12 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		headers: { Authorization: `Bearer ${token}` }
 	});
 
-	if (tagTypesResponse.ok) {
-		tagTypes = await tagTypesResponse.json();
-	} else {
-		console.error('Failed to fetch tag types:', await tagTypesResponse.text());
+	if (!tagTypesResponse.ok) {
+		const errorText = await tagTypesResponse.text();
+		error(tagTypesResponse.status, `Failed to fetch tag types: ${errorText}`);
 	}
+
+	tagTypes = await tagTypesResponse.json();
 
 	return {
 		tagTypes,
@@ -51,6 +52,20 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		params: { page, size, search, sortBy, sortOrder }
 	};
 };
+
+async function getErrorMessage(response: Response, fallback: string): Promise<string> {
+	try {
+		const text = await response.text();
+		try {
+			const json = JSON.parse(text);
+			return json.detail || json.message || fallback;
+		} catch {
+			return text || fallback;
+		}
+	} catch {
+		return response.statusText || fallback;
+	}
+}
 
 export const actions: Actions = {
 	createTagType: async ({ request, cookies }) => {
@@ -77,12 +92,9 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash(
-				{ type: 'error', message: errorMessage.detail || 'Failed to create Tag Type.' },
-				cookies
-			);
-			return fail(500);
+			const message = await getErrorMessage(response, 'Failed to create Tag Type.');
+			setFlash({ type: 'error', message }, cookies);
+			return fail(response.status);
 		}
 
 		redirect('/tags', { type: 'success', message: 'Tag Type created successfully!' }, cookies);
@@ -113,12 +125,9 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash(
-				{ type: 'error', message: errorMessage.detail || 'Failed to update Tag Type.' },
-				cookies
-			);
-			return fail(500);
+			const message = await getErrorMessage(response, 'Failed to update Tag Type.');
+			setFlash({ type: 'error', message }, cookies);
+			return fail(response.status);
 		}
 
 		redirect('/tags', { type: 'success', message: 'Tag Type updated successfully!' }, cookies);
@@ -148,9 +157,9 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash({ type: 'error', message: errorMessage.detail || 'Failed to create Tag.' }, cookies);
-			return fail(500);
+			const message = await getErrorMessage(response, 'Failed to create Tag.');
+			setFlash({ type: 'error', message }, cookies);
+			return fail(response.status);
 		}
 
 		redirect('/tags', { type: 'success', message: 'Tag created successfully!' }, cookies);
@@ -180,9 +189,9 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash({ type: 'error', message: errorMessage.detail || 'Failed to update Tag.' }, cookies);
-			return fail(500);
+			const message = await getErrorMessage(response, 'Failed to update Tag.');
+			setFlash({ type: 'error', message }, cookies);
+			return fail(response.status);
 		}
 
 		redirect('/tags', { type: 'success', message: 'Tag updated successfully!' }, cookies);
@@ -210,9 +219,9 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash({ type: 'error', message: errorMessage.detail || 'Failed to delete Tag.' }, cookies);
-			return fail(500);
+			const message = await getErrorMessage(response, 'Failed to delete Tag.');
+			setFlash({ type: 'error', message }, cookies);
+			return fail(response.status);
 		}
 
 		redirect('/tags', { type: 'success', message: 'Tag deleted successfully!' }, cookies);
@@ -240,12 +249,9 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash(
-				{ type: 'error', message: errorMessage.detail || 'Failed to delete Tag Type.' },
-				cookies
-			);
-			return fail(500);
+			const message = await getErrorMessage(response, 'Failed to delete Tag Type.');
+			setFlash({ type: 'error', message }, cookies);
+			return fail(response.status);
 		}
 
 		redirect('/tags', { type: 'success', message: 'Tag Type deleted successfully!' }, cookies);

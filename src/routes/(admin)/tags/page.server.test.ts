@@ -70,17 +70,15 @@ describe('load function', () => {
 		expect(result.params.size).toBe(5);
 	});
 
-	it('returns empty tagTypes when API fails', async () => {
+	it('throws error when API fails', async () => {
 		(global.fetch as any).mockResolvedValueOnce({
 			ok: false,
-			text: async () => 'Error fetching tag types'
+			status: 502,
+			text: async () => 'Bad Gateway'
 		});
 
 		const url = new URL('http://test.com/?search=hello');
-		const result = await load({ cookies: {}, url });
-
-		expect(result.tagTypes.items).toEqual([]);
-		expect(result.params.search).toBe('hello');
+		await expect(load({ cookies: {}, url })).rejects.toThrow();
 	});
 
 	it('uses default pagination when no query params are given', async () => {
@@ -130,15 +128,18 @@ describe('actions', () => {
 	});
 
 	describe('createTagType', () => {
-		it('creates tag type and redirects on success', async () => {
+		it('creates tag type and sets success flash on success', async () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-			await expect(
-				actions.createTagType({
-					request: mockRequest({ name: 'Difficulty', description: 'How hard' }),
-					cookies: {}
-				})
-			).rejects.toEqual({ status: 303, location: '/tags' });
+			await actions.createTagType({
+				request: mockRequest({ name: 'Difficulty', description: 'How hard' }),
+				cookies: {}
+			});
+
+			expect(setFlashMock).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				expect.anything()
+			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
 			expect(fetchCall[0]).toBe('http://fake-backend.com/tagtype/');
@@ -159,10 +160,11 @@ describe('actions', () => {
 			expect(setFlashMock).toHaveBeenCalled();
 		});
 
-		it('returns fail(500) when API fails', async () => {
+		it('returns fail with upstream status when API fails', async () => {
 			(global.fetch as any).mockResolvedValueOnce({
 				ok: false,
-				json: async () => ({ detail: 'Server error' })
+				status: 422,
+				text: async () => JSON.stringify({ detail: 'Server error' })
 			});
 
 			const result = await actions.createTagType({
@@ -170,24 +172,27 @@ describe('actions', () => {
 				cookies: {}
 			});
 
-			expect(result?.status).toBe(500);
+			expect(result?.status).toBe(422);
 			expect(setFlashMock).toHaveBeenCalledWith(
-				expect.objectContaining({ type: 'error' }),
+				expect.objectContaining({ type: 'error', message: 'Server error' }),
 				expect.anything()
 			);
 		});
 	});
 
 	describe('updateTagType', () => {
-		it('updates tag type and redirects on success', async () => {
+		it('updates tag type and sets success flash on success', async () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-			await expect(
-				actions.updateTagType({
-					request: mockRequest({ id: '5', name: 'Updated', description: 'New desc' }),
-					cookies: {}
-				})
-			).rejects.toEqual({ status: 303, location: '/tags' });
+			await actions.updateTagType({
+				request: mockRequest({ id: '5', name: 'Updated', description: 'New desc' }),
+				cookies: {}
+			});
+
+			expect(setFlashMock).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				expect.anything()
+			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
 			expect(fetchCall[0]).toBe('http://fake-backend.com/tagtype/5');
@@ -205,15 +210,18 @@ describe('actions', () => {
 	});
 
 	describe('createTag', () => {
-		it('creates tag and redirects on success', async () => {
+		it('creates tag and sets success flash on success', async () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-			await expect(
-				actions.createTag({
-					request: mockRequest({ name: 'Delhi', tag_type_id: '1' }),
-					cookies: {}
-				})
-			).rejects.toEqual({ status: 303, location: '/tags' });
+			await actions.createTag({
+				request: mockRequest({ name: 'Delhi', tag_type_id: '1' }),
+				cookies: {}
+			});
+
+			expect(setFlashMock).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				expect.anything()
+			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
 			expect(fetchCall[0]).toBe('http://fake-backend.com/tag/');
@@ -234,15 +242,18 @@ describe('actions', () => {
 	});
 
 	describe('updateTag', () => {
-		it('updates tag and redirects on success', async () => {
+		it('updates tag and sets success flash on success', async () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-			await expect(
-				actions.updateTag({
-					request: mockRequest({ id: '10', name: 'Mumbai' }),
-					cookies: {}
-				})
-			).rejects.toEqual({ status: 303, location: '/tags' });
+			await actions.updateTag({
+				request: mockRequest({ id: '10', name: 'Mumbai' }),
+				cookies: {}
+			});
+
+			expect(setFlashMock).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				expect.anything()
+			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
 			expect(fetchCall[0]).toBe('http://fake-backend.com/tag/10');
@@ -262,15 +273,18 @@ describe('actions', () => {
 	});
 
 	describe('deleteTag', () => {
-		it('deletes tag and redirects on success', async () => {
+		it('deletes tag and sets success flash on success', async () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true });
 
-			await expect(
-				actions.deleteTag({
-					request: mockRequest({ id: '10' }),
-					cookies: {}
-				})
-			).rejects.toEqual({ status: 303, location: '/tags' });
+			await actions.deleteTag({
+				request: mockRequest({ id: '10' }),
+				cookies: {}
+			});
+
+			expect(setFlashMock).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				expect.anything()
+			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
 			expect(fetchCall[0]).toBe('http://fake-backend.com/tag/10');
@@ -286,10 +300,11 @@ describe('actions', () => {
 			expect(result?.status).toBe(400);
 		});
 
-		it('returns fail(500) when API fails', async () => {
+		it('returns fail with upstream status when API fails', async () => {
 			(global.fetch as any).mockResolvedValueOnce({
 				ok: false,
-				json: async () => ({ detail: 'Not found' })
+				status: 404,
+				text: async () => JSON.stringify({ detail: 'Not found' })
 			});
 
 			const result = await actions.deleteTag({
@@ -297,20 +312,23 @@ describe('actions', () => {
 				cookies: {}
 			});
 
-			expect(result?.status).toBe(500);
+			expect(result?.status).toBe(404);
 		});
 	});
 
 	describe('deleteTagType', () => {
-		it('deletes tag type and redirects on success', async () => {
+		it('deletes tag type and sets success flash on success', async () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true });
 
-			await expect(
-				actions.deleteTagType({
-					request: mockRequest({ id: '5' }),
-					cookies: {}
-				})
-			).rejects.toEqual({ status: 303, location: '/tags' });
+			await actions.deleteTagType({
+				request: mockRequest({ id: '5' }),
+				cookies: {}
+			});
+
+			expect(setFlashMock).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				expect.anything()
+			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
 			expect(fetchCall[0]).toBe('http://fake-backend.com/tagtype/5');

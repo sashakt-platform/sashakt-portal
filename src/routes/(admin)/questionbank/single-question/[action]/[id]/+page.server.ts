@@ -172,26 +172,43 @@ export const actions: Actions = {
 				// Continue without media — it may get lost but the save should still work
 			}
 
+			// Strip url from image media (only gcs_path is needed for backend)
+			function stripMediaUrl(media: any): any {
+				if (!media) return undefined;
+				const result: any = {};
+				if (media.image) {
+					const { url, ...imageWithoutUrl } = media.image;
+					result.image = imageWithoutUrl;
+				}
+				if (media.external_media) {
+					result.external_media = media.external_media;
+				}
+				return Object.keys(result).length > 0 ? result : undefined;
+			}
+
 			// Merge existing media back into options (superValidate strips unknown fields)
 			let options = form.data.options;
 			if (existingQuestion?.options && options) {
 				if (Array.isArray(options) && Array.isArray(existingQuestion.options)) {
 					options = options.map((opt: any) => {
 						const existing = existingQuestion.options.find((e: any) => e.id === opt.id);
-						return existing?.media ? { ...opt, media: existing.media } : opt;
+						const media = stripMediaUrl(existing?.media);
+						return media ? { ...opt, media } : opt;
 					});
 				} else if (typeof options === 'object' && 'rows' in options) {
 					const existingOpts = existingQuestion.options;
 					if (existingOpts?.rows?.items) {
 						options.rows.items = options.rows.items.map((item: any) => {
 							const existing = existingOpts.rows.items.find((e: any) => e.id === item.id);
-							return existing?.media ? { ...item, media: existing.media } : item;
+							const media = stripMediaUrl(existing?.media);
+							return media ? { ...item, media } : item;
 						});
 					}
 					if (existingOpts?.columns?.items) {
 						options.columns.items = options.columns.items.map((item: any) => {
 							const existing = existingOpts.columns.items.find((e: any) => e.id === item.id);
-							return existing?.media ? { ...item, media: existing.media } : item;
+							const media = stripMediaUrl(existing?.media);
+							return media ? { ...item, media } : item;
 						});
 					}
 				}
@@ -200,7 +217,7 @@ export const actions: Actions = {
 			const revisionData = {
 				...form.data,
 				options,
-				...(existingQuestion?.media ? { media: existingQuestion.media } : {})
+				...(existingQuestion?.media ? { media: stripMediaUrl(existingQuestion.media) } : {})
 			};
 
 			const response = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions`, {

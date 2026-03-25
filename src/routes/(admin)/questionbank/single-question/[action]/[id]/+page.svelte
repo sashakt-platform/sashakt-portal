@@ -110,7 +110,7 @@
 					hasContent(option.value, option.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
 				);
 				$formData.options = optionsWithContent.map((option) => {
-					const media = optionMediaMap[option.id];
+					const media = stripMediaUrl(optionMediaMap[option.id]);
 					return {
 						id: option.id,
 						key: option.key,
@@ -143,14 +143,14 @@
 					rows: {
 						label: matrixRowLabel,
 						items: rowsWithContent.map(({ id, key, value }) => {
-							const media = optionMediaMap[id];
+							const media = stripMediaUrl(optionMediaMap[id]);
 							return { id, key, value, ...(media ? { media } : {}) };
 						})
 					},
 					columns: {
 						label: matrixColLabel,
 						items: colsWithContent.map(({ id, key, value }) => {
-							const media = optionMediaMap[id];
+							const media = stripMediaUrl(optionMediaMap[id]);
 							return { id, key, value, ...(media ? { media } : {}) };
 						})
 					}
@@ -511,6 +511,20 @@
 		if (stagedFiles[itemId]) return true;
 		if (stagedUrls[itemId]?.trim()) return true;
 		return false;
+	}
+
+	// Strip url from image media before sending to backend (only gcs_path is needed)
+	function stripMediaUrl(media: TMedia | null | undefined): TMedia | undefined {
+		if (!media) return undefined;
+		const result: TMedia = {};
+		if (media.image) {
+			const { url, ...imageWithoutUrl } = media.image;
+			result.image = imageWithoutUrl;
+		}
+		if (media.external_media) {
+			result.external_media = media.external_media;
+		}
+		return Object.keys(result).length > 0 ? result : undefined;
 	}
 
 	const questionHasContent = $derived(

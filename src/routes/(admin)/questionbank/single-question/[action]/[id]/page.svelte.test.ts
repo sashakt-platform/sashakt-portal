@@ -2353,7 +2353,10 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 							},
 							columns: {
 								label: 'Col B',
-								items: [{ id: 10, key: '1', value: 'Option 1' }]
+								items: [
+									{ id: 10, key: '1', value: 'Option 1' },
+									{ id: 11, key: '2', value: 'Option 2' }
+								]
 							}
 						},
 						correct_answer: { '1': [10], '2': [10], '3': [10] },

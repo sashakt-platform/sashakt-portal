@@ -23,7 +23,9 @@ export enum QuestionTypeEnum {
 	NumericalInteger = 'numerical-integer',
 	NumericalDecimal = 'numerical-decimal',
 	MatrixMatch = 'matrix-match',
-	MatrixRating = 'matrix-rating'
+	MatrixRating = 'matrix-rating',
+	MatrixString = 'matrix-string',
+	MatrixNumber = 'matrix-number'
 }
 
 export const questionSchema = z.object({

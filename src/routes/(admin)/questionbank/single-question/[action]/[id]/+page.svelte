@@ -341,6 +341,10 @@
 												Matrix Match
 											{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
 												Matrix Rating
+											{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
+												Matrix String
+											{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
+												Matrix Number
 											{:else}
 												Single/Multiple Choice
 											{/if}
@@ -354,6 +358,8 @@
 										<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
 										<Select.Item value={QuestionTypeEnum.MatrixMatch}>Matrix Match</Select.Item>
 										<Select.Item value={QuestionTypeEnum.MatrixRating}>Matrix Rating</Select.Item>
+										<Select.Item value={QuestionTypeEnum.MatrixString}>Matrix String</Select.Item>
+										<Select.Item value={QuestionTypeEnum.MatrixNumber}>Matrix Number</Select.Item>
 									</Select.Content>
 								</Select.Root>
 							</div>

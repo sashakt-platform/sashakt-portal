@@ -163,9 +163,7 @@
 								id={uid}
 								checked={selectedMultiChoices[opt.key] || false}
 								onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
-								class={selectedMultiChoices[opt.key]
-									? 'text-primary! border-white! bg-white!'
-									: ''}
+								class={selectedMultiChoices[opt.key] ? 'text-primary! border-white! bg-white!' : ''}
 							/>
 						</Label>
 						{#if optionMediaMap[opt.id]}
@@ -209,8 +207,8 @@
 													aria-checked={matrixRatingSelections[row.key] === String(col.id)}
 													class="mx-auto flex size-4 items-center justify-center rounded-full border transition-colors
 														{matrixRatingSelections[row.key] === String(col.id)
-															? 'border-primary'
-															: 'border-gray-400 hover:border-gray-500'}"
+														? 'border-primary'
+														: 'border-gray-400 hover:border-gray-500'}"
 													onclick={() => {
 														matrixRatingSelections = {
 															...matrixRatingSelections,
@@ -239,12 +237,17 @@
 							<p class="mb-2 text-sm font-semibold text-gray-700">
 								{matrix?.rowLabel}
 							</p>
-							<div class="flex flex-col gap-2">
+							<div class="flex flex-col gap-3">
 								{#each matrixRows as row (row.id)}
-									<p class="text-sm text-gray-800">
-										<span class="font-semibold">{row.key}.</span>
-										<span class="ml-1">{row.value}</span>
-									</p>
+									<div>
+										<p class="text-sm text-gray-800">
+											<span class="font-semibold">{row.key}.</span>
+											<span class="ml-1">{row.value}</span>
+										</p>
+										{#if optionMediaMap[row.id]}
+											<MediaDisplay media={optionMediaMap[row.id]} />
+										{/if}
+									</div>
 								{/each}
 							</div>
 						</div>
@@ -252,12 +255,17 @@
 							<p class="mb-2 text-sm font-semibold text-gray-700">
 								{matrix?.colLabel}
 							</p>
-							<div class="flex flex-col gap-2">
+							<div class="flex flex-col gap-3">
 								{#each matrixColumns as col (col.id)}
-									<p class="text-sm text-gray-800">
-										<span class="font-semibold">{col.key}.</span>
-										<span class="ml-1">{col.value}</span>
-									</p>
+									<div>
+										<p class="text-sm text-gray-800">
+											<span class="font-semibold">{col.key}.</span>
+											<span class="ml-1">{col.value}</span>
+										</p>
+										{#if optionMediaMap[col.id]}
+											<MediaDisplay media={optionMediaMap[col.id]} />
+										{/if}
+									</div>
 								{/each}
 							</div>
 						</div>

@@ -480,8 +480,31 @@
 		}
 	});
 
+	// Helper to check if an item has content (text or media)
+	function hasContent(
+		text: string,
+		itemId: number,
+		mediaMap: Record<number, TMedia | null>,
+		stagedFiles: Record<number, File | null>,
+		stagedUrls: Record<number, string>
+	): boolean {
+		if (text.trim()) return true;
+		if (mediaMap[itemId]?.image || mediaMap[itemId]?.external_media) return true;
+		if (stagedFiles[itemId]) return true;
+		if (stagedUrls[itemId]?.trim()) return true;
+		return false;
+	}
+
+	const questionHasContent = $derived(
+		!!$formData?.question_text?.trim() ||
+			!!questionMedia?.image ||
+			!!questionMedia?.external_media ||
+			!!stagedImageFile ||
+			!!stagedExternalUrl.trim()
+	);
+
 	const isDisabled = $derived.by(() => {
-		if (!$formData?.question_text?.trim()) return true;
+		if (!questionHasContent) return true;
 
 		const type = $formData.question_type;
 		if (type === QuestionTypeEnum.Subjective) {
@@ -498,25 +521,29 @@
 		}
 
 		if (type === QuestionTypeEnum.MatrixMatch) {
-			return (
-				matrixLeftItems.some((i) => !i.value.trim()) ||
-				matrixRightItems.some((i) => !i.value.trim()) ||
-				matrixLeftItems.some((i) => !matrixMatches[String(i.id)]?.length)
+			const leftHasContent = matrixLeftItems.every((i) =>
+				hasContent(i.value, i.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
 			);
+			const rightHasContent = matrixRightItems.every((i) =>
+				hasContent(i.value, i.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
+			);
+			const allMatched = matrixLeftItems.every((i) => matrixMatches[String(i.id)]?.length);
+			return !leftHasContent || !rightHasContent || !allMatched;
 		}
 
 		if (type === QuestionTypeEnum.MatrixRating) {
+			// Matrix Rating doesn't support media - require text values
 			return (
 				matrixLeftItems.some((i) => !i.value.trim()) ||
 				matrixRightItems.some((i) => !i.value.trim())
 			);
 		}
 
-		// Single/Multi choice: need ≥2 filled options and at least one marked correct
-		return (
-			totalOptions.filter((option) => option.value.trim() !== '').length < 2 ||
-			!totalOptions.some((option) => option.correct_answer)
+		// Single/Multi choice: need ≥2 options with content and at least one marked correct
+		const optionsWithContent = totalOptions.filter((option) =>
+			hasContent(option.value, option.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
 		);
+		return optionsWithContent.length < 2 || !totalOptions.some((option) => option.correct_answer);
 	});
 
 	// for State admins, auto-assign their state when creating a new question
@@ -761,7 +788,13 @@
 											<div class="flex flex-row items-center gap-4">
 												<div class="flex flex-row items-center gap-2">
 													<Checkbox
-														disabled={!totalOptions[index].value.trim()}
+														disabled={!hasContent(
+															totalOptions[index].value,
+															id,
+															optionMediaMap,
+															stagedOptionFiles,
+															stagedOptionUrls
+														)}
 														checked={totalOptions[index].correct_answer}
 														onCheckedChange={(checked: boolean) =>
 															(totalOptions[index].correct_answer = checked)}

@@ -27,7 +27,7 @@ export enum QuestionTypeEnum {
 }
 
 export const questionSchema = z.object({
-	question_text: z.string().min(1, { error: 'Question text is required' }),
+	question_text: z.string().default(''),
 	instructions: z.string().nullable().optional(),
 	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
 	options: z.union([z.array(optionSchema), matrixMatchOptionsSchema]).default([]),

@@ -105,7 +105,11 @@
 				$formData.question_type === QuestionTypeEnum.SingleChoice ||
 				$formData.question_type === QuestionTypeEnum.MultiChoice
 			) {
-				$formData.options = totalOptions.map((option) => {
+				// Only include options that have content (text, existing media, or staged media)
+				const optionsWithContent = totalOptions.filter((option) =>
+					hasContent(option.value, option.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
+				);
+				$formData.options = optionsWithContent.map((option) => {
 					const media = optionMediaMap[option.id];
 					return {
 						id: option.id,
@@ -114,7 +118,7 @@
 						...(media ? { media } : {})
 					};
 				});
-				$formData.correct_answer = totalOptions
+				$formData.correct_answer = optionsWithContent
 					.filter((option) => option.correct_answer)
 					.map((option) => option.id);
 
@@ -128,17 +132,24 @@
 			) {
 				$formData.options = [];
 			} else if ($formData.question_type === QuestionTypeEnum.MatrixMatch) {
+				// Only include items that have content (text, existing media, or staged media)
+				const rowsWithContent = matrixLeftItems.filter((item) =>
+					hasContent(item.value, item.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
+				);
+				const colsWithContent = matrixRightItems.filter((item) =>
+					hasContent(item.value, item.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
+				);
 				$formData.options = {
 					rows: {
 						label: matrixRowLabel,
-						items: matrixLeftItems.map(({ id, key, value }) => {
+						items: rowsWithContent.map(({ id, key, value }) => {
 							const media = optionMediaMap[id];
 							return { id, key, value, ...(media ? { media } : {}) };
 						})
 					},
 					columns: {
 						label: matrixColLabel,
-						items: matrixRightItems.map(({ id, key, value }) => {
+						items: colsWithContent.map(({ id, key, value }) => {
 							const media = optionMediaMap[id];
 							return { id, key, value, ...(media ? { media } : {}) };
 						})
@@ -389,30 +400,37 @@
 				return clientId;
 			}
 
-			// New question — map via key
-			const clientIdToKey: Record<number, string> = {};
-			for (const opt of totalOptions) {
-				clientIdToKey[opt.id] = opt.key;
-			}
-			for (const item of matrixLeftItems) {
-				clientIdToKey[item.id] = `row-${item.key}`;
-			}
-			for (const item of matrixRightItems) {
-				clientIdToKey[item.id] = `col-${item.key}`;
-			}
-
-			const key = clientIdToKey[clientId];
-			if (!key) return undefined;
-
 			const opts = newQuestionData.options;
+
+			// For flat options (single/multi choice)
 			if (Array.isArray(opts)) {
+				const clientIdToKey: Record<number, string> = {};
+				for (const opt of totalOptions) {
+					clientIdToKey[opt.id] = opt.key;
+				}
+				const key = clientIdToKey[clientId];
+				if (!key) return undefined;
 				return opts.find((o: any) => o.key === key)?.id;
-			} else if (opts?.rows && opts?.columns) {
+			}
+
+			// For matrix options (matrix match/rating)
+			if (opts?.rows && opts?.columns) {
+				const clientIdToKey: Record<number, string> = {};
+				for (const item of matrixLeftItems) {
+					clientIdToKey[item.id] = `row-${item.key}`;
+				}
+				for (const item of matrixRightItems) {
+					clientIdToKey[item.id] = `col-${item.key}`;
+				}
+				const key = clientIdToKey[clientId];
+				if (!key) return undefined;
+
 				const prefix = key.startsWith('row-') ? 'row-' : 'col-';
 				const rawKey = key.slice(prefix.length);
 				const items = prefix === 'row-' ? opts.rows.items : opts.columns.items;
 				return items?.find((i: any) => i.key === rawKey)?.id;
 			}
+
 			return undefined;
 		}
 

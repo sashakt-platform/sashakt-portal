@@ -527,16 +527,11 @@
 		return Object.keys(result).length > 0 ? result : undefined;
 	}
 
-	const questionHasContent = $derived(
-		!!$formData?.question_text?.trim() ||
-			!!questionMedia?.image ||
-			!!questionMedia?.external_media ||
-			!!stagedImageFile ||
-			!!stagedExternalUrl.trim()
-	);
+	// Question text is required (media is optional supplement)
+	const questionHasText = $derived(!!$formData?.question_text?.trim());
 
 	const isDisabled = $derived.by(() => {
-		if (!questionHasContent) return true;
+		if (!questionHasText) return true;
 
 		const type = $formData.question_type;
 		if (type === QuestionTypeEnum.Subjective) {
@@ -553,22 +548,24 @@
 		}
 
 		if (type === QuestionTypeEnum.MatrixMatch) {
-			const leftHasContent = matrixLeftItems.every((i) =>
+			// Filter to items that have content (text or media)
+			const leftWithContent = matrixLeftItems.filter((i) =>
 				hasContent(i.value, i.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
 			);
-			const rightHasContent = matrixRightItems.every((i) =>
+			const rightWithContent = matrixRightItems.filter((i) =>
 				hasContent(i.value, i.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
 			);
-			const allMatched = matrixLeftItems.every((i) => matrixMatches[String(i.id)]?.length);
-			return !leftHasContent || !rightHasContent || !allMatched;
+			// Need at least 2 items on each side, and all content items must have matches
+			const allMatched = leftWithContent.every((i) => matrixMatches[String(i.id)]?.length);
+			return leftWithContent.length < 2 || rightWithContent.length < 2 || !allMatched;
 		}
 
 		if (type === QuestionTypeEnum.MatrixRating) {
-			// Matrix Rating doesn't support media - require text values
-			return (
-				matrixLeftItems.some((i) => !i.value.trim()) ||
-				matrixRightItems.some((i) => !i.value.trim())
-			);
+			// Matrix Rating doesn't support media - filter to items with text
+			const leftWithText = matrixLeftItems.filter((i) => i.value.trim());
+			const rightWithText = matrixRightItems.filter((i) => i.value.trim());
+			// Need at least 2 items on each side
+			return leftWithText.length < 2 || rightWithText.length < 2;
 		}
 
 		// Single/Multi choice: need ≥2 options with content and at least one marked correct

@@ -209,8 +209,8 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
-			<div class="relative lg:w-80">
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+			<div class="relative shrink-0 lg:w-80">
 				<Search
 					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
 				/>
@@ -234,7 +234,7 @@
 				/>
 			</div>
 
-			<div class="flex flex-1 flex-wrap justify-end gap-4">
+			<div class="flex flex-1 flex-wrap items-start justify-end gap-2">
 				{#if !isStateAdmin(data.user)}
 					<div>
 						<StateSelection bind:states={filteredStates} filteration={true} />
@@ -252,11 +252,11 @@
 				{/if}
 
 				<div>
-					<TagsSelection bind:tags={filteredTags} filteration={true} />
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
 
 				<div>
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+					<TagsSelection bind:tags={filteredTags} filteration={true} />
 				</div>
 			</div>
 		</div>

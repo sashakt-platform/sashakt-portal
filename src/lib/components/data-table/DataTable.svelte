@@ -186,7 +186,7 @@
 </script>
 
 <div>
-	<div class="overflow-x-auto rounded-md border">
+	<div class="overflow-x-auto rounded-2xl border">
 		<Table.Root>
 			<Table.Header>
 				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}

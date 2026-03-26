@@ -27,7 +27,7 @@
 				id: 'delete',
 				label: 'Delete',
 				icon: Trash2,
-				variant: 'destructive' as const
+				variant: 'ghost' as const
 			}
 		],
 		onAction,
@@ -44,22 +44,27 @@
 </script>
 
 {#if selectedCount > 0}
-	<div class="bg-muted/50 flex h-10 items-center justify-between rounded-lg border px-3">
-		<div class="flex items-center gap-4">
-			<span class="text-sm font-medium">
-				{selectedCount} item{selectedCount !== 1 ? 's' : ''} selected
+	<div class="bg-accent flex h-10 items-center justify-between rounded-2xl border px-3">
+		<div class="flex items-center gap-1">
+			<span class="text-primary text-sm font-medium">
+				{selectedCount}
+				{selectedCount !== 1 ? 'questions' : 'question'} selected
 			</span>
+			<span class="text-muted-foreground mx-1">|</span>
 			<div class="flex items-center gap-2">
 				{#each actions as action}
 					<Button
 						size="sm"
-						variant={action.variant || 'default'}
+						variant={action.variant || 'ghost'}
+						class={action.variant === 'ghost' || !action.variant
+							? 'text-destructive hover:text-destructive hover:bg-destructive/10'
+							: ''}
 						disabled={action.disabled}
 						onclick={() => handleAction(action.id)}
 					>
 						{#if action.icon}
 							{@const Icon = action.icon}
-							<Icon class="mr-2 h-4 w-4" />
+							<Icon class="mr-1 h-4 w-4" />
 						{/if}
 						{action.label}
 					</Button>

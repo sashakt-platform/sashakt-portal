@@ -17,6 +17,7 @@
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 
 	// Menu items.
 	const menu_items = {
@@ -67,14 +68,17 @@
 		}
 	};
 
-	let currentitem = $state(menu_items.dashboard.title);
 	let { data } = $props();
 	const sidebar = useSidebar();
 
-	// Helper function to close mobile sidebar when menu item is clicked
-	// also for normal navigation
-	function handleMenuClick(itemTitle: string) {
-		currentitem = itemTitle;
+	const currentitem = $derived.by(() => {
+		const path = page.url.pathname;
+		const items = Object.values(menu_items);
+		const match = items.find((item) => path === item.url || path.startsWith(item.url + '/'));
+		return match?.title ?? menu_items.dashboard.title;
+	});
+
+	function handleMenuClick() {
 		if (sidebar.isMobile) {
 			sidebar.setOpenMobile(false);
 		}
@@ -91,10 +95,7 @@
 
 {#snippet sidebaritems(item: any)}
 	<Sidebar.MenuItem class="m-1">
-		<Sidebar.MenuButton
-			isActive={currentitem == item.title}
-			onclick={() => handleMenuClick(item.title)}
-		>
+		<Sidebar.MenuButton isActive={currentitem == item.title} onclick={() => handleMenuClick()}>
 			{#snippet child({ props })}
 				<a href={resolve(item.url)} {...props}>
 					<item.icon />

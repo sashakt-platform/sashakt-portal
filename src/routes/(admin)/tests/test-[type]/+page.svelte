@@ -50,37 +50,14 @@
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
-	let noTestCreatedYet = $state(true);
-
-	$effect(() => {
-		// check if there are any meaningful search/filter parameters (exclude pagination params)
-		const meaningfulParams = [
-			'search',
-			'name',
-			'tag_ids',
-			'tag_type_ids',
-			'state_ids',
-			'sortBy',
-			'sortOrder'
-		];
-		const hasFilters = meaningfulParams.some((param) => {
-			const value = page.url.searchParams.get(param);
-			return value && value.trim() !== '';
-		});
-
-		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
-		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
-		const hasTagtypeFilters = page.url.searchParams.getAll('tag_type_ids').length > 0;
-		const hasDistrictFilters = page.url.searchParams.getAll('district_ids').length > 0;
-
-		noTestCreatedYet =
-			totalItems === 0 &&
-			!hasFilters &&
-			!hasTagFilters &&
-			!hasStateFilters &&
-			!hasTagtypeFilters &&
-			!hasDistrictFilters;
-	});
+	const hasActiveFilters = $derived(
+		search ||
+			page.url.searchParams.getAll('tag_ids').length > 0 ||
+			page.url.searchParams.getAll('state_ids').length > 0 ||
+			page.url.searchParams.getAll('tag_type_ids').length > 0 ||
+			page.url.searchParams.getAll('district_ids').length > 0
+	);
+	const noTestCreatedYet = $derived(totalItems === 0 && !hasActiveFilters);
 
 	// handle sorting
 	function handleSort(columnId: string) {

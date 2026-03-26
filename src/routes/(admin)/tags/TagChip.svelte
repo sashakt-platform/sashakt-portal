@@ -73,7 +73,7 @@
 	<!-- Default state: tag chip with hover edit/delete icons -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<span
-		class="border-border bg-muted/50 inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition-colors"
+		class="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full border border-transparent px-3 py-1 text-xs font-normal transition-colors"
 		onmouseenter={() => (hovered = true)}
 		onmouseleave={() => (hovered = false)}
 	>

@@ -37,7 +37,10 @@ export const createTagManagementColumns = (
 				onEdit: callbacks.onEditTagType,
 				onDelete: callbacks.onDeleteTagType
 			}),
-		size: 600
+		meta: {
+			cellClassName: 'whitespace-normal align-top border-r w-2/5',
+			headerClassName: 'border-r w-2/5'
+		}
 	}),
 	{
 		id: 'tags',
@@ -56,6 +59,6 @@ export const createTagManagementColumns = (
 				onCancelEdit: callbacks.onCancelEditTag,
 				onDeleteTag: callbacks.onDeleteTag
 			}),
-		meta: { grow: true }
+		meta: { grow: true, cellClassName: 'whitespace-normal align-top' }
 	}
 ];

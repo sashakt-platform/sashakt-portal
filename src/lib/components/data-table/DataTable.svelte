@@ -115,7 +115,11 @@
 	} as const;
 
 	function getHeaderClasses(column: any): string {
-		return isGrowColumn(column.id) ? 'w-full' : '';
+		const parts: string[] = [];
+		if (isGrowColumn(column.id)) parts.push('w-full');
+		const headerClassName = column.columnDef.meta?.headerClassName;
+		if (headerClassName) parts.push(headerClassName);
+		return parts.join(' ');
 	}
 
 	function getCellClasses(column: any, extraClass: string = ''): string {
@@ -123,6 +127,8 @@
 		if (isGrowColumn(column.id)) parts.push('w-full');
 		const align = column.columnDef.meta?.align;
 		if (align) parts.push(alignmentClasses[align]);
+		const cellClassName = column.columnDef.meta?.cellClassName;
+		if (cellClassName) parts.push(cellClassName);
 		if (extraClass) parts.push(extraClass);
 		return parts.join(' ');
 	}

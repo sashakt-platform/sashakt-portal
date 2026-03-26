@@ -124,7 +124,7 @@
 
 	function getCellClasses(column: any, extraClass: string = ''): string {
 		const parts: string[] = [];
-		if (isGrowColumn(column.id)) parts.push('w-full');
+		if (isGrowColumn(column.id)) parts.push('w-full max-w-0 overflow-hidden text-ellipsis');
 		const align = column.columnDef.meta?.align;
 		if (align) parts.push(alignmentClasses[align]);
 		const cellClassName = column.columnDef.meta?.cellClassName;

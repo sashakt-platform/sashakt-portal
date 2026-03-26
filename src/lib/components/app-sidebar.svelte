@@ -100,7 +100,7 @@
 		<Sidebar.Group>
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
-					{#each menu_items as item}
+					{#each menu_items as item (item.url)}
 						{#if !item.entity || canRead(data.user, item.entity)}
 							{@render sidebaritems(item)}
 						{/if}

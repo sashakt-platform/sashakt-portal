@@ -48,7 +48,7 @@
 		<div class="flex items-center gap-1">
 			<span class="text-primary text-sm font-medium">
 				{selectedCount}
-				{selectedCount !== 1 ? 'questions' : 'question'} selected
+				{selectedCount !== 1 ? 'items' : 'item'} selected
 			</span>
 			<span class="text-muted-foreground mx-1">|</span>
 			<div class="flex items-center gap-2">

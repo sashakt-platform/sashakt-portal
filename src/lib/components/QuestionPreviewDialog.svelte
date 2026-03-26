@@ -115,7 +115,7 @@
 			{:else if data.questionType === QuestionTypeEnum.SingleChoice}
 				{#if validOptions.length > 0}
 					<RadioGroup.Root bind:value={selectedSingleChoice}>
-						{#each validOptions as opt (opt.id)}
+						{#each validOptions as opt (opt.key)}
 							{@const uid = `${previewId}-${opt.key}`}
 							<div>
 								<Label
@@ -144,7 +144,7 @@
 					<p class="text-sm text-gray-400 italic">Add options to see them in preview...</p>
 				{/if}
 			{:else if data.questionType === QuestionTypeEnum.MultiChoice && validOptions.length > 0}
-				{#each validOptions as opt (opt.id)}
+				{#each validOptions as opt (opt.key)}
 					{@const uid = `${previewId}-${opt.key}`}
 					<div class="mb-2">
 						<Label

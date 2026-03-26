@@ -31,7 +31,7 @@
 	bind:items={tagTypes}
 	itemName="tag_type"
 	bind:itemList={tagTypeList}
-	label="tag type"
+	label="Tag Type"
 	onSearch={loadTagTypes}
 	{isLoading}
 	{...rest}

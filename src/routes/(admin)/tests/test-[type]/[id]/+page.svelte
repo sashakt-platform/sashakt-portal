@@ -157,8 +157,7 @@
 		<Button href="./" variant="outline" class="text-primary border-primary border-1">Cancel</Button>
 		<Button
 			class="bg-primary mx-4 "
-			disabled={(currentScreen === typeOfScreen.primary &&
-				($formData.name.trim() === '' || $formData.description.trim() === '')) ||
+			disabled={(currentScreen === typeOfScreen.primary && $formData.name.trim() === '') ||
 				(currentScreen === typeOfScreen.configuration &&
 					$formData.random_questions &&
 					$formData.no_of_random_questions <= 0) ||

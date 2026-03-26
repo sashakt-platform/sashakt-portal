@@ -230,10 +230,10 @@
 					</div>
 				{/if}
 
+				<div class="h-auto w-px bg-gray-300"></div>
 				<div>
 					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
-
 				<div>
 					<TagsSelection bind:tags={filteredTags} filteration={true} tagTypes={filteredTagtypes} />
 				</div>

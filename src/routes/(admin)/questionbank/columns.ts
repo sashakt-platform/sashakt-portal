@@ -4,9 +4,9 @@ import {
 	createActionsColumn,
 	createSelectionColumn
 } from '$lib/components/data-table/column-helpers';
-import { formatDate } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
+import DateCell from '$lib/components/data-table/DateCell.svelte';
 import QuestionPreviewCell from './QuestionPreviewCell.svelte';
 
 export interface Question {
@@ -49,8 +49,8 @@ export const createQuestionColumns = (
 		size: 140
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date),
-		size: 140
+		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
+		size: 160
 	}),
 	createActionsColumn<Question>('Question', '/questionbank/single-question', {
 		...permissions,

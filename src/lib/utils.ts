@@ -24,14 +24,24 @@ export type WithoutChildrenOrChild<T> = Omit<T, 'children' | 'child'>;
  *
  * @returns Formatted date string (e.g., "Jan 15, 25, 3:45 PM")
  */
-export const formatDate = (dateString: string): string => {
-	return new Date(dateString).toLocaleDateString('en-US', {
-		year: '2-digit',
-		month: 'short',
+export const formatDatePart = (dateString: string): string => {
+	return new Date(dateString).toLocaleDateString('en-GB', {
 		day: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric'
+		month: 'short',
+		year: 'numeric'
 	});
+};
+
+export const formatTimePart = (dateString: string): string => {
+	return new Date(dateString).toLocaleTimeString('en-US', {
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: true
+	});
+};
+
+export const formatDate = (dateString: string): string => {
+	return `${formatDatePart(dateString)} ${formatTimePart(dateString)}`;
 };
 
 /**

@@ -25,7 +25,7 @@
 	onclick={() => (open = true)}
 	title="Preview question"
 >
-	<Eye class="mx-auto h-4 w-4" />
+	<Eye class="h-4 w-4" />
 </button>
 
 <QuestionPreviewDialog bind:open data={previewData} previewId="listing-{question.id}" />

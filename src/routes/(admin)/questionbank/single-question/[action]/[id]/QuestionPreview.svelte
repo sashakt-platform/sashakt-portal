@@ -8,8 +8,13 @@
 	import Eye from '@lucide/svelte/icons/eye';
 	import { QuestionTypeEnum } from './schema';
 	import { Input } from '$lib/components/ui/input';
+	import MediaDisplay from '$lib/components/MediaDisplay.svelte';
+	import type { TMedia } from '$lib/types/media';
 
 	const { data } = $props();
+
+	const media = $derived(data?.media as TMedia | null | undefined);
+	const optionMediaMap = $derived((data?.optionMediaMap ?? {}) as Record<number, TMedia | null>);
 
 	let openPreviewDialog: boolean = $state(false);
 
@@ -101,6 +106,7 @@
 				{#if instructions.trim()}
 					<p class="text-muted-foreground mt-2 text-sm">{instructions}</p>
 				{/if}
+				<MediaDisplay {media} />
 			</div>
 
 			{#if questionType === QuestionTypeEnum.Subjective}
@@ -114,20 +120,27 @@
 					<RadioGroup.Root bind:value={selectedSingleChoice}>
 						{#each validOptions as opt}
 							{@const uid = `preview-${opt.key}`}
-							<Label
-								for={uid}
-								class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedSingleChoice ===
-								opt.key
-									? 'bg-primary text-muted *:border-muted *:text-muted'
-									: ''}"
-							>
-								<span>{opt.key}. {opt.value}</span>
-								<RadioGroup.Item
-									value={opt.key}
-									id={uid}
-									class={selectedSingleChoice === opt.key ? 'border-white [&_svg]:fill-white' : ''}
-								/>
-							</Label>
+							<div>
+								<Label
+									for={uid}
+									class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedSingleChoice ===
+									opt.key
+										? 'bg-primary text-muted *:border-muted *:text-muted'
+										: ''}"
+								>
+									<span>{opt.key}. {opt.value}</span>
+									<RadioGroup.Item
+										value={opt.key}
+										id={uid}
+										class={selectedSingleChoice === opt.key
+											? 'border-white [&_svg]:fill-white'
+											: ''}
+									/>
+								</Label>
+								{#if optionMediaMap[opt.id]}
+									<MediaDisplay media={optionMediaMap[opt.id]} />
+								{/if}
+							</div>
 						{/each}
 					</RadioGroup.Root>
 				{:else}
@@ -136,10 +149,10 @@
 			{:else if questionType === QuestionTypeEnum.MultiChoice && validOptions.length > 0}
 				{#each validOptions as opt}
 					{@const uid = `preview-${opt.key}`}
-					<div class="flex flex-row items-start space-x-3">
+					<div class="mb-2">
 						<Label
 							for={uid}
-							class="mb-2 flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedMultiChoices[
+							class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedMultiChoices[
 								opt.key
 							]
 								? 'bg-primary text-muted *:border-muted *:text-muted'
@@ -153,6 +166,9 @@
 								class={selectedMultiChoices[opt.key] ? 'text-primary! border-white! bg-white!' : ''}
 							/>
 						</Label>
+						{#if optionMediaMap[opt.id]}
+							<MediaDisplay media={optionMediaMap[opt.id]} />
+						{/if}
 					</div>
 				{/each}
 			{:else if questionType === QuestionTypeEnum.NumericalInteger || questionType === QuestionTypeEnum.NumericalDecimal}
@@ -191,8 +207,8 @@
 													aria-checked={matrixRatingSelections[row.key] === String(col.id)}
 													class="mx-auto flex size-4 items-center justify-center rounded-full border transition-colors
 														{matrixRatingSelections[row.key] === String(col.id)
-															? 'border-primary'
-															: 'border-gray-400 hover:border-gray-500'}"
+														? 'border-primary'
+														: 'border-gray-400 hover:border-gray-500'}"
 													onclick={() => {
 														matrixRatingSelections = {
 															...matrixRatingSelections,
@@ -221,12 +237,17 @@
 							<p class="mb-2 text-sm font-semibold text-gray-700">
 								{matrix?.rowLabel}
 							</p>
-							<div class="flex flex-col gap-2">
+							<div class="flex flex-col gap-3">
 								{#each matrixRows as row (row.id)}
-									<p class="text-sm text-gray-800">
-										<span class="font-semibold">{row.key}.</span>
-										<span class="ml-1">{row.value}</span>
-									</p>
+									<div>
+										<p class="text-sm text-gray-800">
+											<span class="font-semibold">{row.key}.</span>
+											<span class="ml-1">{row.value}</span>
+										</p>
+										{#if optionMediaMap[row.id]}
+											<MediaDisplay media={optionMediaMap[row.id]} />
+										{/if}
+									</div>
 								{/each}
 							</div>
 						</div>
@@ -234,12 +255,17 @@
 							<p class="mb-2 text-sm font-semibold text-gray-700">
 								{matrix?.colLabel}
 							</p>
-							<div class="flex flex-col gap-2">
+							<div class="flex flex-col gap-3">
 								{#each matrixColumns as col (col.id)}
-									<p class="text-sm text-gray-800">
-										<span class="font-semibold">{col.key}.</span>
-										<span class="ml-1">{col.value}</span>
-									</p>
+									<div>
+										<p class="text-sm text-gray-800">
+											<span class="font-semibold">{col.key}.</span>
+											<span class="ml-1">{col.value}</span>
+										</p>
+										{#if optionMediaMap[col.id]}
+											<MediaDisplay media={optionMediaMap[col.id]} />
+										{/if}
+									</div>
 								{/each}
 							</div>
 						</div>

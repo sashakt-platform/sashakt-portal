@@ -140,29 +140,6 @@
 			clearTableSelection = false;
 		}, 0);
 	};
-
-	// render expanded row content
-	const expandedRowContent = (question: any) => {
-		return `
-			<div class="flex h-fit flex-col">
-				${question.options
-					.map(
-						(option: any) => `
-					<div class="my-auto flex">
-						<span class="bg-primary-foreground m-2 rounded-sm p-3">${option.key}</span>
-						<p class="my-auto">${option.value}</p>
-						${
-							question.correct_answer.includes(option.id)
-								? '<svg class="text-primary my-auto ml-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
-								: ''
-						}
-					</div>
-				`
-					)
-					.join('')}
-			</div>
-		`;
-	};
 </script>
 
 <DeleteDialog
@@ -324,9 +301,6 @@
 			{totalPages}
 			{currentPage}
 			{pageSize}
-			expandable={true}
-			expandColumnId="answers"
-			renderExpandedRow={expandedRowContent}
 			emptyStateMessage="No questions found matching your criteria."
 			{enableSelection}
 			onSelectionChange={handleSelectionChange}

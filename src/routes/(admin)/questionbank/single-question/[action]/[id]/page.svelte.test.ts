@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import SingleQuestionPage from './+page.svelte';
-import { QuestionTypeEnum } from './schema';
+import { QuestionTypeEnum } from '$lib/types/question';
 
 vi.mock('sveltekit-superforms/adapters', () => ({
 	zod4Client: vi.fn((schema: unknown) => schema)

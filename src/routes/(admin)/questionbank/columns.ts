@@ -5,9 +5,9 @@ import {
 	createSelectionColumn
 } from '$lib/components/data-table/column-helpers';
 import { formatDate } from '$lib/utils';
-import Eye from '@lucide/svelte/icons/eye';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
+import QuestionPreviewCell from './QuestionPreviewCell.svelte';
 
 export interface Question {
 	id: string;
@@ -37,7 +37,7 @@ export const createQuestionColumns = (
 		id: 'answers',
 		header: 'Answers',
 		cell: ({ row }) => {
-			return renderComponent(Eye, { class: 'text-gray-400 mx-auto' });
+			return renderComponent(QuestionPreviewCell, { question: row.original });
 		},
 		size: 80,
 		meta: { align: 'center' as const }

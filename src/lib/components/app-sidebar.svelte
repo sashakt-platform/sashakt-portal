@@ -19,63 +19,31 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 
-	// Menu items.
-	const menu_items = {
-		dashboard: {
-			title: 'Dashboard',
-			url: '/dashboard',
-			icon: ChartColumnIncreasing
-		},
-		question: {
-			title: 'Question Bank',
-			url: '/questionbank',
-			icon: FileWarning
-		},
-		test_template: {
+	// Menu items
+	const menu_items = [
+		{ title: 'Dashboard', url: '/dashboard', icon: ChartColumnIncreasing },
+		{ title: 'Question Bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
+		{
 			title: 'Test Templates',
 			url: '/tests/test-template',
-			icon: ClipboardList
+			icon: ClipboardList,
+			entity: 'test-template'
 		},
-		test_session: {
-			title: 'Test Sessions',
-			url: '/tests/test-session',
-			icon: ClipboardCheck
-		},
-		tags: {
-			title: 'Tag Management',
-			url: '/tags',
-			icon: MessageSquareCode
-		},
-		forms: {
-			title: 'Forms',
-			url: '/forms',
-			icon: FileText
-		},
-		certificate: {
-			title: 'Certificates',
-			url: '/certificate',
-			icon: ShieldCheck
-		},
-		entity: {
-			title: 'Entities',
-			url: '/entity',
-			icon: Boxes
-		},
-		user: {
-			title: 'Users',
-			url: '/users',
-			icon: User
-		}
-	};
+		{ title: 'Test Sessions', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
+		{ title: 'Tag Management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
+		{ title: 'Certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
+		{ title: 'Forms', url: '/forms', icon: FileText, entity: 'form' },
+		{ title: 'Entities', url: '/entity', icon: Boxes, entity: 'entity' },
+		{ title: 'Users', url: '/users', icon: User, entity: 'user' }
+	];
 
 	let { data } = $props();
 	const sidebar = useSidebar();
 
 	const currentitem = $derived.by(() => {
 		const path = page.url.pathname;
-		const items = Object.values(menu_items);
-		const match = items.find((item) => path === item.url || path.startsWith(item.url + '/'));
-		return match?.title ?? menu_items.dashboard.title;
+		const match = menu_items.find((item) => path === item.url || path.startsWith(item.url + '/'));
+		return match?.title ?? menu_items[0].title;
 	});
 
 	function handleMenuClick() {
@@ -132,38 +100,11 @@
 		<Sidebar.Group>
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
-					{@render sidebaritems(menu_items.dashboard)}
-
-					{#if canRead(data.user, 'question')}
-						{@render sidebaritems(menu_items.question)}
-					{/if}
-
-					{#if canRead(data.user, 'test-template')}
-						{@render sidebaritems(menu_items.test_template)}
-					{/if}
-
-					{#if canRead(data.user, 'test')}
-						{@render sidebaritems(menu_items.test_session)}
-					{/if}
-
-					{#if canRead(data.user, 'tag')}
-						{@render sidebaritems(menu_items.tags)}
-					{/if}
-					{#if canRead(data.user, 'certificate')}
-						{@render sidebaritems(menu_items.certificate)}
-					{/if}
-
-					{#if canRead(data.user, 'form')}
-						{@render sidebaritems(menu_items.forms)}
-					{/if}
-
-					{#if canRead(data.user, 'entity')}
-						{@render sidebaritems(menu_items.entity)}
-					{/if}
-
-					{#if canRead(data.user, 'user')}
-						{@render sidebaritems(menu_items.user)}
-					{/if}
+					{#each menu_items as item}
+						{#if !item.entity || canRead(data.user, item.entity)}
+							{@render sidebaritems(item)}
+						{/if}
+					{/each}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>

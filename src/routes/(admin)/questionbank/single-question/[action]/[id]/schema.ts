@@ -19,10 +19,7 @@ export const matrixMatchOptionsSchema = z.object({
 });
 
 export const matrixInputOptionsSchema = z.object({
-	rows: z.object({
-		label: z.string(),
-		items: z.array(optionSchema).default([])
-	}),
+	rows: matrixColumnSchema,
 	columns: z.object({
 		label: z.string(),
 		input_type: z.enum(['text', 'number'])

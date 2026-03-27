@@ -14,7 +14,12 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { questionSchema, type FormSchema, type TagFormSchema } from './schema';
+	import {
+		questionSchema,
+		matrixInputOptionsSchema,
+		type FormSchema,
+		type TagFormSchema
+	} from './schema';
 	import { QuestionTypeEnum } from '$lib/types/question';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
@@ -218,14 +223,12 @@
 	}
 
 	if ($formData.question_type === QuestionTypeEnum.MatrixInput) {
-		const opts = $formData.options;
-		if (opts && !Array.isArray(opts) && 'columns' in opts) {
-			const columns = (opts as { columns: { input_type?: string } }).columns;
-			if (columns.input_type === 'text') {
-				$formData.question_type = QuestionTypeEnum.MatrixString;
-			} else if (columns.input_type === 'number') {
-				$formData.question_type = QuestionTypeEnum.MatrixNumber;
-			}
+		const parsed = matrixInputOptionsSchema.safeParse($formData.options);
+		if (parsed.success) {
+			$formData.question_type =
+				parsed.data.columns.input_type === 'text'
+					? QuestionTypeEnum.MatrixString
+					: QuestionTypeEnum.MatrixNumber;
 		}
 	}
 

@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { marksSchema } from '$lib/schemas/marks';
 
+import { QuestionTypeEnum } from '$lib/types/question';
+
 export const optionSchema = z.object({
 	id: z.number().int(),
 	key: z.string(),
@@ -16,20 +18,8 @@ export const matrixMatchOptionsSchema = z.object({
 	columns: matrixColumnSchema
 });
 
-export enum QuestionTypeEnum {
-	SingleChoice = 'single-choice',
-	MultiChoice = 'multi-choice',
-	Subjective = 'subjective',
-	NumericalInteger = 'numerical-integer',
-	NumericalDecimal = 'numerical-decimal',
-	MatrixMatch = 'matrix-match',
-	MatrixRating = 'matrix-rating',
-	MatrixString = 'matrix-string',
-	MatrixNumber = 'matrix-number'
-}
-
 export const questionSchema = z.object({
-	question_text: z.string().min(1, { error: 'Question text is required' }),
+	question_text: z.string().min(1, { message: 'Question text is required' }),
 	instructions: z.string().nullable().optional(),
 	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
 	options: z.union([z.array(optionSchema), matrixMatchOptionsSchema]).default([]),

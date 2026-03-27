@@ -115,14 +115,22 @@
 	} as const;
 
 	function getHeaderClasses(column: any): string {
-		return isGrowColumn(column.id) ? 'w-full' : '';
+		const parts: string[] = [];
+		if (isGrowColumn(column.id)) parts.push('w-1/3');
+		const align = column.columnDef.meta?.align;
+		if (align) parts.push(alignmentClasses[align]);
+		const headerClassName = column.columnDef.meta?.headerClassName;
+		if (headerClassName) parts.push(headerClassName);
+		return parts.join(' ');
 	}
 
 	function getCellClasses(column: any, extraClass: string = ''): string {
 		const parts: string[] = [];
-		if (isGrowColumn(column.id)) parts.push('w-full');
+		if (isGrowColumn(column.id)) parts.push('w-1/3 max-w-0 overflow-hidden text-ellipsis');
 		const align = column.columnDef.meta?.align;
 		if (align) parts.push(alignmentClasses[align]);
+		const cellClassName = column.columnDef.meta?.cellClassName;
+		if (cellClassName) parts.push(cellClassName);
 		if (extraClass) parts.push(extraClass);
 		return parts.join(' ');
 	}
@@ -180,7 +188,7 @@
 </script>
 
 <div>
-	<div class="overflow-x-auto rounded-md border">
+	<div class="overflow-x-auto rounded-2xl border">
 		<Table.Root>
 			<Table.Header>
 				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}

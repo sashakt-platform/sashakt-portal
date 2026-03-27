@@ -147,16 +147,86 @@ export const actions: Actions = {
 				);
 				return fail(500, { form });
 			}
+
+			const newQuestion = await response.json();
+			if (newQuestion?.id) {
+				return { form, newQuestionId: newQuestion.id, newQuestionData: newQuestion };
+			}
 		}
 
 		if (params.id !== 'new') {
+			// Fetch existing question to preserve media on the revision
+			let existingQuestion: any = null;
+			try {
+				const existingRes = await fetch(`${BACKEND_URL}/questions/${params.id}/`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`
+					}
+				});
+				if (existingRes.ok) {
+					existingQuestion = await existingRes.json();
+				}
+			} catch {
+				// Continue without media — it may get lost but the save should still work
+			}
+
+			// Strip url from image media (only gcs_path is needed for backend)
+			function stripMediaUrl(media: any): any {
+				if (!media) return undefined;
+				const result: any = {};
+				if (media.image) {
+					const { url, ...imageWithoutUrl } = media.image;
+					result.image = imageWithoutUrl;
+				}
+				if (media.external_media) {
+					result.external_media = media.external_media;
+				}
+				return Object.keys(result).length > 0 ? result : undefined;
+			}
+
+			// Merge existing media back into options (superValidate strips unknown fields)
+			let options = form.data.options;
+			if (existingQuestion?.options && options) {
+				if (Array.isArray(options) && Array.isArray(existingQuestion.options)) {
+					options = options.map((opt: any) => {
+						const existing = existingQuestion.options.find((e: any) => e.id === opt.id);
+						const media = stripMediaUrl(existing?.media);
+						return media ? { ...opt, media } : opt;
+					});
+				} else if (typeof options === 'object' && 'rows' in options) {
+					const existingOpts = existingQuestion.options;
+					if (existingOpts?.rows?.items) {
+						options.rows.items = options.rows.items.map((item: any) => {
+							const existing = existingOpts.rows.items.find((e: any) => e.id === item.id);
+							const media = stripMediaUrl(existing?.media);
+							return media ? { ...item, media } : item;
+						});
+					}
+					if (existingOpts?.columns?.items) {
+						options.columns.items = options.columns.items.map((item: any) => {
+							const existing = existingOpts.columns.items.find((e: any) => e.id === item.id);
+							const media = stripMediaUrl(existing?.media);
+							return media ? { ...item, media } : item;
+						});
+					}
+				}
+			}
+
+			const revisionData = {
+				...form.data,
+				options,
+				...(existingQuestion?.media ? { media: stripMediaUrl(existingQuestion.media) } : {})
+			};
+
 			const response = await fetch(`${BACKEND_URL}/questions/${params.id}/revisions`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify(form.data)
+				body: JSON.stringify(revisionData)
 			});
 
 			if (!response.ok) {

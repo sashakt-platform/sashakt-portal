@@ -1,7 +1,8 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { createSortableColumn } from '$lib/components/data-table/column-helpers';
-import { formatDate, downloadQRCode } from '$lib/utils';
+import { downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
+import DateCell from '$lib/components/data-table/DateCell.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
@@ -87,8 +88,8 @@ export const createTestColumns = (
 		size: 200
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date),
-		size: 140
+		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
+		size: 160
 	}),
 	{
 		id: 'actions',

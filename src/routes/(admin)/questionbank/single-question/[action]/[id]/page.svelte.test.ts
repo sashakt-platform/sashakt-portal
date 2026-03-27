@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import SingleQuestionPage from './+page.svelte';
-import { QuestionTypeEnum } from './schema';
+import { QuestionTypeEnum } from '$lib/types/question';
 
 vi.mock('sveltekit-superforms/adapters', () => ({
 	zod4Client: vi.fn((schema: unknown) => schema)
@@ -80,9 +80,12 @@ describe('Single Question Page - Create Mode', () => {
 			const questionInput = screen.getByPlaceholderText('Enter your Question...');
 			await fireEvent.input(questionInput, { target: { value: 'What is Svelte?' } });
 
-			const inputs = screen.getAllByRole('textbox');
-			await fireEvent.input(inputs[1], { target: { value: 'A framework' } });
-			await fireEvent.input(inputs[2], { target: { value: 'A library' } });
+			// Find answer option inputs by their name attribute (A, B, C, D)
+			const optionInputs = screen
+				.getAllByRole('textbox')
+				.filter((el) => /^[A-Z]$/.test(el.getAttribute('name') || ''));
+			await fireEvent.input(optionInputs[0], { target: { value: 'A framework' } });
+			await fireEvent.input(optionInputs[1], { target: { value: 'A library' } });
 
 			const checkboxes = screen.getAllByRole('checkbox');
 			await fireEvent.click(checkboxes[1]);
@@ -2012,6 +2015,145 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 	});
 });
 
+describe('Single Question Page - Media', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('Add media button', () => {
+		it('should show "Add media" buttons in create mode', () => {
+			render(SingleQuestionPage, { data: baseData as any });
+			const mediaButtons = screen.getAllByText('Add media');
+			// Question-level + 4 default options
+			expect(mediaButtons.length).toBe(5);
+		});
+
+		it('should toggle question-level media manager when clicked', async () => {
+			render(SingleQuestionPage, { data: baseData as any });
+
+			// First "Add media" is the question-level one
+			const addMediaButtons = screen.getAllByText('Add media');
+			await fireEvent.click(addMediaButtons[0]);
+
+			expect(screen.getByText('Hide media')).toBeInTheDocument();
+			expect(screen.getByText('Image')).toBeInTheDocument();
+			expect(screen.getByText('External Media')).toBeInTheDocument();
+		});
+
+		it('should hide media manager when "Hide media" is clicked', async () => {
+			render(SingleQuestionPage, { data: baseData as any });
+
+			const addMediaButtons = screen.getAllByText('Add media');
+			await fireEvent.click(addMediaButtons[0]);
+
+			const hideMediaBtn = screen.getByText('Hide media');
+			await fireEvent.click(hideMediaBtn);
+
+			// Should go back to 5 "Add media" buttons
+			expect(screen.getAllByText('Add media').length).toBe(5);
+		});
+	});
+
+	describe('Media in edit mode', () => {
+		const questionDataWithMedia = {
+			id: 42,
+			question_text: 'Question with media',
+			question_type: QuestionTypeEnum.SingleChoice,
+			options: [
+				{
+					id: 1,
+					key: 'A',
+					value: 'Option A',
+					media: {
+						image: {
+							gcs_path: 'org_1/q_42_opt_1.png',
+							content_type: 'image/png',
+							size_bytes: 5120,
+							uploaded_at: '2026-03-16T00:00:00Z'
+						}
+					}
+				},
+				{ id: 2, key: 'B', value: 'Option B' }
+			],
+			correct_answer: [1],
+			is_mandatory: false,
+			is_active: true,
+			marking_scheme: { correct: 1, wrong: 0, skipped: 0 },
+			media: {
+				image: {
+					gcs_path: 'org_1/q_42.png',
+					content_type: 'image/jpeg',
+					size_bytes: 73279,
+					uploaded_at: '2026-03-16T00:00:00Z'
+				}
+			}
+		};
+
+		it('should auto-expand media panels when media exists', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: questionDataWithMedia } as any
+			});
+			// Both question-level and option A should auto-expand
+			const hideButtons = screen.getAllByText('Hide media');
+			expect(hideButtons.length).toBe(2);
+		});
+
+		it('should display existing question-level media info', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: questionDataWithMedia } as any
+			});
+			expect(screen.getByText(/image\/jpeg/)).toBeInTheDocument();
+		});
+
+		it('should display existing option-level media info', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: questionDataWithMedia } as any
+			});
+			expect(screen.getByText(/image\/png/)).toBeInTheDocument();
+		});
+
+		it('should show "Add media" for options without media', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: questionDataWithMedia } as any
+			});
+			// Option B has no media — its button says "Add media"
+			const addMediaButtons = screen.getAllByText('Add media');
+			expect(addMediaButtons.length).toBeGreaterThanOrEqual(1);
+		});
+	});
+
+	describe('Media manager UI', () => {
+		it('should show upload area when media panel is open', async () => {
+			render(SingleQuestionPage, { data: baseData as any });
+
+			const addMediaButtons = screen.getAllByText('Add media');
+			await fireEvent.click(addMediaButtons[0]);
+
+			expect(screen.getByText('Click to upload image')).toBeInTheDocument();
+		});
+
+		it('should show external media URL input when media panel is open', async () => {
+			render(SingleQuestionPage, { data: baseData as any });
+
+			const addMediaButtons = screen.getAllByText('Add media');
+			await fireEvent.click(addMediaButtons[0]);
+
+			expect(
+				screen.getByPlaceholderText('Paste YouTube, Vimeo, Spotify, or SoundCloud URL...')
+			).toBeInTheDocument();
+		});
+
+		it('should show file format and size hint', async () => {
+			render(SingleQuestionPage, { data: baseData as any });
+
+			const addMediaButtons = screen.getAllByText('Add media');
+			await fireEvent.click(addMediaButtons[0]);
+
+			expect(screen.getByText(/PNG, JPG, WebP, GIF/)).toBeInTheDocument();
+		});
+	});
+});
+
 describe('Single Question Page - Matrix Key Scheme', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -2211,7 +2353,10 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 							},
 							columns: {
 								label: 'Col B',
-								items: [{ id: 10, key: '1', value: 'Option 1' }]
+								items: [
+									{ id: 10, key: '1', value: 'Option 1' },
+									{ id: 11, key: '2', value: 'Option 2' }
+								]
 							}
 						},
 						correct_answer: { '1': [10], '2': [10], '3': [10] },

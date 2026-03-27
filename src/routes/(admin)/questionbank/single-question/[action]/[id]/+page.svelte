@@ -169,6 +169,24 @@
 					}
 				};
 				$formData.correct_answer = [];
+			} else if (
+				$formData.question_type === QuestionTypeEnum.MatrixString ||
+				$formData.question_type === QuestionTypeEnum.MatrixNumber
+			) {
+				const inputType =
+					$formData.question_type === QuestionTypeEnum.MatrixString ? 'text' : 'number';
+				$formData.options = {
+					rows: {
+						label: matrixRowLabel,
+						items: matrixLeftItems.map(({ id, key, value }) => ({ id, key, value }))
+					},
+					columns: {
+						label: matrixColLabel,
+						input_type: inputType
+					}
+				};
+				$formData.correct_answer = [];
+				$formData.question_type = QuestionTypeEnum.MatrixInput;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -197,6 +215,18 @@
 			wrong: 0,
 			skipped: 0
 		};
+	}
+
+	if ($formData.question_type === QuestionTypeEnum.MatrixInput) {
+		const opts = $formData.options;
+		if (opts && !Array.isArray(opts) && 'columns' in opts) {
+			const columns = (opts as { columns: { input_type?: string } }).columns;
+			if (columns.input_type === 'text') {
+				$formData.question_type = QuestionTypeEnum.MatrixString;
+			} else if (columns.input_type === 'number') {
+				$formData.question_type = QuestionTypeEnum.MatrixNumber;
+			}
+		}
 	}
 
 	const isMatrixOptions = (
@@ -567,6 +597,10 @@
 			const rightWithText = matrixRightItems.filter((i) => i.value.trim());
 			// Need at least 2 items on each side
 			return leftWithText.length < 2 || rightWithText.length < 2;
+		}
+
+		if (type === QuestionTypeEnum.MatrixString || type === QuestionTypeEnum.MatrixNumber) {
+			return matrixLeftItems.some((i) => !i.value.trim()) || !matrixColLabel.trim();
 		}
 
 		// Single/Multi choice: need ≥2 options with content and at least one marked correct
@@ -1216,6 +1250,61 @@
 											value: ''
 										});
 									})}
+								</div>
+							</div>
+						</div>
+					{:else if $formData.question_type === QuestionTypeEnum.MatrixString || $formData.question_type === QuestionTypeEnum.MatrixNumber}
+						<div class="flex flex-col gap-4">
+							{@render snippetHeading(
+								$formData.question_type === QuestionTypeEnum.MatrixString
+									? 'String Input Matrix'
+									: 'Number Input Matrix'
+							)}
+							<div class="flex gap-4">
+								<div class="flex flex-1 flex-col gap-2">
+									<Input bind:value={matrixRowLabel} class="font-semibold" />
+									<p class="text-xs font-medium text-gray-500">Questions</p>
+									<div class="flex flex-col gap-2">
+										{#each matrixLeftItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<Input
+													class="flex-1 border border-black"
+													bind:value={matrixLeftItems[index].value}
+												/>
+												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+													if (matrixLeftItems.length > 1) {
+														matrixLeftItems = matrixLeftItems
+															.filter((_, i) => i !== index)
+															.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
+													}
+												})}
+											</div>
+										{/each}
+									</div>
+									{@render matrixAddButton('Add Question', () => {
+										matrixLeftItems.push({
+											id: nextId(matrixLeftItems),
+											key: String.fromCharCode(65 + matrixLeftItems.length),
+											value: ''
+										});
+									})}
+								</div>
+								<div class="flex flex-1 flex-col gap-2">
+									<Input
+										bind:value={matrixColLabel}
+										class="font-semibold"
+										placeholder="Answer column label"
+									/>
+									<p class="text-xs font-medium text-gray-500">
+										Answer column ({$formData.question_type === QuestionTypeEnum.MatrixString
+											? 'text'
+											: 'number'} input)
+									</p>
 								</div>
 							</div>
 						</div>

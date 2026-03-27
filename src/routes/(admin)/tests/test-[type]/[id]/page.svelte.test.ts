@@ -195,12 +195,12 @@ describe('Test Create/Update Page', () => {
 			expect(btn).toBeDisabled();
 		});
 
-		it('is disabled when description is empty', () => {
+		it('is not disabled when description is empty', () => {
 			setupSuperFormMock({ name: 'Some name', description: '' });
 			render(TestCreatePage, { data: baseData() });
 
 			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).toBeDisabled();
+			expect(btn).not.toBeDisabled();
 		});
 
 		it('is disabled when both name and description are empty', () => {

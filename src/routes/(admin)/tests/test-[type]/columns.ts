@@ -6,7 +6,6 @@ import DateCell from '$lib/components/data-table/DateCell.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
-import DateCell from '$lib/components/data-table/DateCell.svelte';
 import {
 	isStateAdmin,
 	hasAssignedDistricts,

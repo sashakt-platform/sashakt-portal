@@ -4,10 +4,10 @@ import {
 	createActionsColumn,
 	createSelectionColumn
 } from '$lib/components/data-table/column-helpers';
-import { formatDate } from '$lib/utils';
-import Eye from '@lucide/svelte/icons/eye';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
+import DateCell from '$lib/components/data-table/DateCell.svelte';
+import QuestionPreviewCell from './QuestionPreviewCell.svelte';
 
 export interface Question {
 	id: string;
@@ -37,7 +37,7 @@ export const createQuestionColumns = (
 		id: 'answers',
 		header: 'Answers',
 		cell: ({ row }) => {
-			return renderComponent(Eye, { class: 'text-gray-400 mx-auto' });
+			return renderComponent(QuestionPreviewCell, { question: row.original });
 		},
 		size: 80,
 		meta: { align: 'center' as const }
@@ -49,8 +49,8 @@ export const createQuestionColumns = (
 		size: 140
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => formatDate(row.original.modified_date),
-		size: 140
+		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
+		size: 160
 	}),
 	createActionsColumn<Question>('Question', '/questionbank/single-question', {
 		...permissions,

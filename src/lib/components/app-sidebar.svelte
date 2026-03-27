@@ -17,64 +17,36 @@
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 
-	// Menu items.
-	const menu_items = {
-		dashboard: {
-			title: 'Dashboard',
-			url: '/dashboard',
-			icon: ChartColumnIncreasing
-		},
-		question: {
-			title: 'Question Bank',
-			url: '/questionbank',
-			icon: FileWarning
-		},
-		test_template: {
+	// Menu items
+	const menu_items = [
+		{ title: 'Dashboard', url: '/dashboard', icon: ChartColumnIncreasing },
+		{ title: 'Question Bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
+		{
 			title: 'Test Templates',
 			url: '/tests/test-template',
-			icon: ClipboardList
+			icon: ClipboardList,
+			entity: 'test-template'
 		},
-		test_session: {
-			title: 'Test Sessions',
-			url: '/tests/test-session',
-			icon: ClipboardCheck
-		},
-		tags: {
-			title: 'Tag Management',
-			url: '/tags',
-			icon: MessageSquareCode
-		},
-		forms: {
-			title: 'Forms',
-			url: '/forms',
-			icon: FileText
-		},
-		certificate: {
-			title: 'Certificates',
-			url: '/certificate',
-			icon: ShieldCheck
-		},
-		entity: {
-			title: 'Entities',
-			url: '/entity',
-			icon: Boxes
-		},
-		user: {
-			title: 'Users',
-			url: '/users',
-			icon: User
-		}
-	};
+		{ title: 'Test Sessions', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
+		{ title: 'Tag Management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
+		{ title: 'Certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
+		{ title: 'Forms', url: '/forms', icon: FileText, entity: 'form' },
+		{ title: 'Entities', url: '/entity', icon: Boxes, entity: 'entity' },
+		{ title: 'Users', url: '/users', icon: User, entity: 'user' }
+	];
 
-	let currentitem = $state(menu_items.dashboard.title);
 	let { data } = $props();
 	const sidebar = useSidebar();
 
-	// Helper function to close mobile sidebar when menu item is clicked
-	// also for normal navigation
-	function handleMenuClick(itemTitle: string) {
-		currentitem = itemTitle;
+	const currentitem = $derived.by(() => {
+		const path = page.url.pathname;
+		const match = menu_items.find((item) => path === item.url || path.startsWith(item.url + '/'));
+		return match?.title ?? menu_items[0].title;
+	});
+
+	function handleMenuClick() {
 		if (sidebar.isMobile) {
 			sidebar.setOpenMobile(false);
 		}
@@ -91,10 +63,7 @@
 
 {#snippet sidebaritems(item: any)}
 	<Sidebar.MenuItem class="m-1">
-		<Sidebar.MenuButton
-			isActive={currentitem == item.title}
-			onclick={() => handleMenuClick(item.title)}
-		>
+		<Sidebar.MenuButton isActive={currentitem == item.title} onclick={() => handleMenuClick()}>
 			{#snippet child({ props })}
 				<a href={resolve(item.url)} {...props}>
 					<item.icon />
@@ -131,38 +100,11 @@
 		<Sidebar.Group>
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
-					{@render sidebaritems(menu_items.dashboard)}
-
-					{#if canRead(data.user, 'question')}
-						{@render sidebaritems(menu_items.question)}
-					{/if}
-
-					{#if canRead(data.user, 'test-template')}
-						{@render sidebaritems(menu_items.test_template)}
-					{/if}
-
-					{#if canRead(data.user, 'test')}
-						{@render sidebaritems(menu_items.test_session)}
-					{/if}
-
-					{#if canRead(data.user, 'tag')}
-						{@render sidebaritems(menu_items.tags)}
-					{/if}
-					{#if canRead(data.user, 'certificate')}
-						{@render sidebaritems(menu_items.certificate)}
-					{/if}
-
-					{#if canRead(data.user, 'form')}
-						{@render sidebaritems(menu_items.forms)}
-					{/if}
-
-					{#if canRead(data.user, 'entity')}
-						{@render sidebaritems(menu_items.entity)}
-					{/if}
-
-					{#if canRead(data.user, 'user')}
-						{@render sidebaritems(menu_items.user)}
-					{/if}
+					{#each menu_items as item (item.url)}
+						{#if !item.entity || canRead(data.user, item.entity)}
+							{@render sidebaritems(item)}
+						{/if}
+					{/each}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>

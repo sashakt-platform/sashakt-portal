@@ -50,37 +50,14 @@
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
-	let noTestCreatedYet = $state(true);
-
-	$effect(() => {
-		// check if there are any meaningful search/filter parameters (exclude pagination params)
-		const meaningfulParams = [
-			'search',
-			'name',
-			'tag_ids',
-			'tag_type_ids',
-			'state_ids',
-			'sortBy',
-			'sortOrder'
-		];
-		const hasFilters = meaningfulParams.some((param) => {
-			const value = page.url.searchParams.get(param);
-			return value && value.trim() !== '';
-		});
-
-		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
-		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
-		const hasTagtypeFilters = page.url.searchParams.getAll('tag_type_ids').length > 0;
-		const hasDistrictFilters = page.url.searchParams.getAll('district_ids').length > 0;
-
-		noTestCreatedYet =
-			totalItems === 0 &&
-			!hasFilters &&
-			!hasTagFilters &&
-			!hasStateFilters &&
-			!hasTagtypeFilters &&
-			!hasDistrictFilters;
-	});
+	const hasActiveFilters = $derived(
+		search ||
+			page.url.searchParams.getAll('tag_ids').length > 0 ||
+			page.url.searchParams.getAll('state_ids').length > 0 ||
+			page.url.searchParams.getAll('tag_type_ids').length > 0 ||
+			page.url.searchParams.getAll('district_ids').length > 0
+	);
+	const noTestCreatedYet = $derived(totalItems === 0 && !hasActiveFilters);
 
 	// handle sorting
 	function handleSort(columnId: string) {
@@ -232,8 +209,8 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
-			<div class="relative lg:w-80">
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+			<div class="relative shrink-0 lg:w-80">
 				<Search
 					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
 				/>
@@ -257,7 +234,7 @@
 				/>
 			</div>
 
-			<div class="flex flex-1 flex-wrap justify-end gap-4">
+			<div class="flex flex-1 flex-wrap items-start justify-end gap-2">
 				{#if !isStateAdmin(data.user)}
 					<div>
 						<StateSelection bind:states={filteredStates} filteration={true} />
@@ -275,11 +252,11 @@
 				{/if}
 
 				<div>
-					<TagsSelection bind:tags={filteredTags} filteration={true} />
+					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>
 
 				<div>
-					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
+					<TagsSelection bind:tags={filteredTags} filteration={true} />
 				</div>
 			</div>
 		</div>

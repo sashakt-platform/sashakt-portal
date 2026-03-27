@@ -46,36 +46,13 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
-	let noQuestionCreatedYet = $state(true);
-
-	$effect(() => {
-		// check if there are any meaningful search/filter parameters (exclude pagination params)
-		const meaningfulParams = [
-			'search',
-			'name',
-			'tag_ids',
-			'state_ids',
-			'tag_type_ids',
-			'sortBy',
-			'sortOrder'
-		];
-		const hasFilters = meaningfulParams.some((param) => {
-			const value = page.url.searchParams.get(param);
-			// Only consider it a filter if the parameter has a non-empty value
-			return value && value.trim() !== '';
-		});
-
-		// also check if there are multiple tag_ids or state_ids
-		const hasTagFilters = page.url.searchParams.getAll('tag_ids').length > 0;
-		const hasStateFilters = page.url.searchParams.getAll('state_ids').length > 0;
-		const hasTagtypeFilters = page.url.searchParams.getAll('tag_type_ids').length > 0;
-
-		const result =
-			totalItems === 0 && !hasFilters && !hasTagFilters && !hasStateFilters && !hasTagtypeFilters;
-
-		// update the state
-		noQuestionCreatedYet = result;
-	});
+	const hasActiveFilters = $derived(
+		search ||
+			page.url.searchParams.getAll('tag_ids').length > 0 ||
+			page.url.searchParams.getAll('state_ids').length > 0 ||
+			page.url.searchParams.getAll('tag_type_ids').length > 0
+	);
+	const noQuestionCreatedYet = $derived(totalItems === 0 && !hasActiveFilters);
 
 	// handle sorting
 	const handleSort = (columnId: string) => {
@@ -139,29 +116,6 @@
 		setTimeout(() => {
 			clearTableSelection = false;
 		}, 0);
-	};
-
-	// render expanded row content
-	const expandedRowContent = (question: any) => {
-		return `
-			<div class="flex h-fit flex-col">
-				${question.options
-					.map(
-						(option: any) => `
-					<div class="my-auto flex">
-						<span class="bg-primary-foreground m-2 rounded-sm p-3">${option.key}</span>
-						<p class="my-auto">${option.value}</p>
-						${
-							question.correct_answer.includes(option.id)
-								? '<svg class="text-primary my-auto ml-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
-								: ''
-						}
-					</div>
-				`
-					)
-					.join('')}
-			</div>
-		`;
 	};
 </script>
 
@@ -273,8 +227,8 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<div class="flex flex-col gap-4 lg:flex-row lg:items-center">
-			<div class="relative lg:w-80">
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+			<div class="relative shrink-0 lg:w-80">
 				<Search
 					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
 				/>
@@ -298,7 +252,7 @@
 				/>
 			</div>
 
-			<div class="flex flex-1 flex-wrap justify-end gap-4">
+			<div class="flex flex-1 flex-wrap items-start justify-end gap-2">
 				{#if !isStateAdmin(data.user)}
 					<div>
 						<StateSelection bind:states={filteredStates} filteration={true} />
@@ -324,9 +278,6 @@
 			{totalPages}
 			{currentPage}
 			{pageSize}
-			expandable={true}
-			expandColumnId="answers"
-			renderExpandedRow={expandedRowContent}
 			emptyStateMessage="No questions found matching your criteria."
 			{enableSelection}
 			onSelectionChange={handleSelectionChange}

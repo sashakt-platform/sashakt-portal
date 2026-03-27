@@ -14,7 +14,8 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { questionSchema, type FormSchema, type TagFormSchema, QuestionTypeEnum } from './schema';
+	import { questionSchema, type FormSchema, type TagFormSchema } from './schema';
+	import { QuestionTypeEnum } from '$lib/types/question';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';

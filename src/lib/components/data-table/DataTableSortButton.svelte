@@ -21,7 +21,7 @@
 
 <Button
 	{variant}
-	class="-ml-3 text-xs font-semibold tracking-wide uppercase"
+	class="-ml-3 text-xs font-bold tracking-wide uppercase"
 	onclick={() => handleSort(columnId)}
 	{...restProps}
 >

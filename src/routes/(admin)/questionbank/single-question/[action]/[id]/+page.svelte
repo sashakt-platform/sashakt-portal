@@ -1435,7 +1435,13 @@
 							rowLabel: matrixRowLabel,
 							colLabel: matrixColLabel,
 							rows: matrixLeftItems,
-							columns: matrixRightItems
+							columns: matrixRightItems,
+							inputType:
+								$formData.question_type === QuestionTypeEnum.MatrixString
+									? 'text'
+									: $formData.question_type === QuestionTypeEnum.MatrixNumber
+										? 'number'
+										: undefined
 						},
 						media: questionMedia,
 						optionMediaMap

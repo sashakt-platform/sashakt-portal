@@ -4,6 +4,7 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { enhance } from '$app/forms';
+	import TagChip from '$lib/components/ui/tag-chip/TagChip.svelte';
 
 	let {
 		tag,
@@ -72,12 +73,11 @@
 {:else}
 	<!-- Default state: tag chip with hover edit/delete icons -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<span
-		class="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full border border-transparent px-3 py-1 text-xs font-normal transition-colors"
+	<TagChip
+		name={tag.name}
 		onmouseenter={() => (hovered = true)}
 		onmouseleave={() => (hovered = false)}
 	>
-		<span>{tag.name}</span>
 		{#if hovered && canEdit}
 			<button
 				type="button"
@@ -96,5 +96,5 @@
 				<Trash2 class="h-3 w-3" />
 			</button>
 		{/if}
-	</span>
+	</TagChip>
 {/if}

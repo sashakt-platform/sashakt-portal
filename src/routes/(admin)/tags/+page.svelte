@@ -2,15 +2,14 @@
 	import { DataTable } from '$lib/components/data-table';
 	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import SearchInput from '$lib/components/SearchInput.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import Plus from '@lucide/svelte/icons/plus';
 	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
-	import Search from '@lucide/svelte/icons/search';
 	import TagTypeDialog from './TagTypeDialog.svelte';
 	import TagDeleteDialog from './TagDeleteDialog.svelte';
 	import { createTagManagementColumns } from './columns';
@@ -47,25 +46,6 @@
 	let deleteElementName = $state('');
 	let deleteElementId: number | string | null = $state(null);
 	let deleteElementType: 'tag' | 'tag type' = $state('tag');
-
-	// Search
-	let searchTimeout: ReturnType<typeof setTimeout>;
-	$effect(() => () => clearTimeout(searchTimeout));
-
-	function handleSearch(event: Event) {
-		const target = event.target as HTMLInputElement;
-		const url = new URL(page.url);
-		clearTimeout(searchTimeout);
-		searchTimeout = setTimeout(() => {
-			if (target.value) {
-				url.searchParams.set('search', target.value);
-			} else {
-				url.searchParams.delete('search');
-			}
-			url.searchParams.set('page', '1');
-			goto(resolve(url.pathname + url.search), { keepFocus: true, invalidateAll: true });
-		}, 300);
-	}
 
 	// Sorting
 	function handleSort(columnId: string) {
@@ -189,15 +169,7 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<div class="relative lg:w-80">
-			<Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-			<Input
-				class="rounded-full pl-9"
-				placeholder="Search tag types or tags..."
-				value={searchValue}
-				oninput={handleSearch}
-			/>
-		</div>
+		<SearchInput placeholder="Search tag types or tags..." value={searchValue} useResolve />
 	{/snippet}
 
 	{#snippet content()}

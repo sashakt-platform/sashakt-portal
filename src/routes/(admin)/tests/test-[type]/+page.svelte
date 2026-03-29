@@ -230,7 +230,8 @@
 					</div>
 				{/if}
 
-				<div class="h-auto w-px bg-gray-300"></div>
+				<div class="mx-4 w-px self-stretch bg-gray-300"></div>
+
 				<div>
 					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />
 				</div>

@@ -338,8 +338,8 @@ describe('Test Create/Update Page', () => {
 			setupSuperFormMock({ name: 'Test', description: 'Desc' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
-			await fireEvent.click(screen.getByText('Continue'));
+			await fireEvent.click(screen.getByText('Next'));
+			await fireEvent.click(screen.getByText('Next'));
 
 			expect(mockSubmit).not.toHaveBeenCalled();
 		});

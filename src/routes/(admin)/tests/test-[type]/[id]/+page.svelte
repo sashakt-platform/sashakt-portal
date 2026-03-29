@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Primary from './Primary.svelte';
@@ -21,10 +22,15 @@
 			form: SuperValidated<Infer<FormSchema>>;
 			user: any;
 			test_taker_url: string;
+			testData: Partial<Infer<FormSchema>> | null;
+			questions: any;
+			selectedQuestions: any;
+			questionParams: any;
 		};
 	} = $props();
 
 	const testData: Partial<Infer<FormSchema>> | null = data?.testData || null;
+	const isEditing = $derived(!!testData);
 
 	const {
 		form: formData,
@@ -76,68 +82,113 @@
 				count: t.count
 			})) || [];
 	}
+
+	const pageTitle = $derived.by(() => {
+		if ($formData.is_template) {
+			return isEditing ? 'Edit Test Template' : 'Create Test Template';
+		}
+		return isEditing ? 'Edit Test Session' : 'Create Test Session';
+	});
+
+	const isNextDisabled = $derived(
+		(currentScreen === typeOfScreen.primary && $formData.name.trim() === '') ||
+			(currentScreen === typeOfScreen.configuration &&
+				$formData.random_questions &&
+				$formData.no_of_random_questions <= 0) ||
+			$formData.no_of_random_questions > $formData.question_revision_ids.length
+	);
+
+	function handlePrevious() {
+		if (currentScreen > typeOfScreen.primary) {
+			currentScreen--;
+		}
+	}
+
+	function handleNext() {
+		if (currentScreen === typeOfScreen.configuration) {
+			submit();
+		} else {
+			currentScreen++;
+		}
+	}
+
+	const steps = [
+		{ number: 1, label: 'Primary Details', mode: typeOfScreen.primary },
+		{ number: 2, label: 'Select Questions', mode: typeOfScreen.questions },
+		{ number: 3, label: 'Test Configuration', mode: typeOfScreen.configuration }
+	];
 </script>
 
-<form method="POST" action="?/save" use:enhance class="pb-48 md:pb-28">
-	<div class="flex border-b-2 py-2">
-		<div class="mx-auto flex items-center">
-			{#snippet headerNumbers(
-				number: number,
-				text: string,
-				shortText: string,
-				mode: number,
-				isCompleted: boolean = false
-			)}
-				{@const isActive = mode === currentScreen}
+<form method="POST" action="?/save" use:enhance class="pb-10">
+	<!-- Page Header -->
+	<div class="bg-gray-0 border-b px-6 py-4">
+		<div class="flex items-start justify-between">
+			<!-- Left: Back arrow, title, stepper -->
+			<div class="flex items-start gap-3">
+				<a href="./" class="text-muted-foreground hover:text-foreground mt-1 transition-colors">
+					<ArrowLeft class="h-5 w-5" />
+				</a>
+				<div>
+					<h1 class="text-xl font-semibold">{pageTitle}</h1>
+					<!-- Stepper -->
+					<div class="mt-3 flex items-center gap-1 sm:gap-2">
+						{#each steps as step, i}
+							{@const isActive = step.mode === currentScreen}
+							{@const isCompleted = step.mode < currentScreen}
+							{#if i > 0}
+								<ChevronRight class="text-muted-foreground h-4 w-4 shrink-0" />
+							{/if}
+							<button
+								type="button"
+								class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors {isCompleted
+									? 'cursor-pointer'
+									: ''}"
+								onclick={() => {
+									if (isCompleted) currentScreen = step.mode;
+								}}
+								disabled={!isCompleted && !isActive}
+							>
+								<span
+									class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-medium {isActive
+										? 'bg-primary text-white'
+										: isCompleted
+											? 'bg-primary/10 text-primary'
+											: 'bg-muted text-muted-foreground'}"
+								>
+									{step.number}
+								</span>
+								<span
+									class="hidden font-medium sm:inline {isActive
+										? 'text-foreground'
+										: isCompleted
+											? 'text-primary'
+											: 'text-muted-foreground'}"
+								>
+									{step.label}
+								</span>
+							</button>
+						{/each}
+					</div>
+				</div>
+			</div>
+			<!-- Right: Navigation buttons -->
+			<div class="flex shrink-0 items-center gap-3">
 				<Button
-					variant="ghost"
-					class={[
-						'justify-left px-2 sm:px-4',
-						isActive
-							? 'border-primary text-primary border-1 font-bold'
-							: isCompleted
-								? 'text-primary'
-								: '',
-						'mx-1 sm:mx-4'
-					]}
-					onclick={() => {
-						if (isCompleted) {
-							currentScreen = mode;
-						}
-					}}
-					><span
-						class={[
-							isActive
-								? 'bg-primary text-white'
-								: isCompleted
-									? 'text-primary border-primary border-1'
-									: 'border-1 border-gray-600 text-gray-500',
-							'mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full sm:mr-2'
-						]}>{number}</span
-					><span class="hidden sm:inline">{text}</span><span class="sm:hidden">{shortText}</span
-					></Button
+					variant="outline"
+					class="border-primary text-primary"
+					disabled={currentScreen === typeOfScreen.primary}
+					onclick={handlePrevious}
 				>
-			{/snippet}
-			{@render headerNumbers(
-				1,
-				'Primary Details',
-				'Details',
-				typeOfScreen.primary,
-				$formData.name.trim() != '' && $formData.description.trim() != ''
-			)}
-			<ChevronRight class="my-auto w-3 shrink-0 sm:w-4" />
-			{@render headerNumbers(2, 'Select Questions', 'Questions', typeOfScreen.questions, false)}
-			<ChevronRight class="my-auto w-3 shrink-0 sm:w-4" />
-			{@render headerNumbers(
-				3,
-				'Configuration Settings',
-				'Config',
-				typeOfScreen.configuration,
-				false
-			)}
+					Previous
+				</Button>
+				<Button class="bg-primary" disabled={isNextDisabled} onclick={handleNext}>
+					{currentScreen === typeOfScreen.configuration ? 'Save' : 'Next'}
+				</Button>
+			</div>
 		</div>
 	</div>
 
+	<!-- Content -->
 	{#if currentScreen === typeOfScreen.primary}
 		<Primary {formData} user={data.user} />
 	{:else if currentScreen === typeOfScreen.questions}
@@ -151,25 +202,18 @@
 		<Configuration {formData} />
 	{/if}
 
-	<div
-		class="fixed right-0 bottom-0 left-0 z-40 flex justify-between gap-4 border-t bg-white px-4 py-3 md:left-[var(--sidebar-width)]"
-	>
-		<Button href="./" variant="outline" class="text-primary border-primary border-1">Cancel</Button>
+	<!-- Bottom Navigation -->
+	<div class="mx-4 mt-6 flex items-center justify-end gap-3 sm:mx-8 md:mx-10">
 		<Button
-			class="bg-primary mx-4 "
-			disabled={(currentScreen === typeOfScreen.primary && $formData.name.trim() === '') ||
-				(currentScreen === typeOfScreen.configuration &&
-					$formData.random_questions &&
-					$formData.no_of_random_questions <= 0) ||
-				$formData.no_of_random_questions > $formData.question_revision_ids.length}
-			onclick={() => {
-				if (currentScreen === typeOfScreen.configuration) {
-					submit();
-				} else {
-					currentScreen++;
-				}
-			}}
-			>{currentScreen != typeOfScreen.configuration ? 'Continue' : 'Save'}
+			variant="outline"
+			class="border-primary text-primary"
+			disabled={currentScreen === typeOfScreen.primary}
+			onclick={handlePrevious}
+		>
+			Previous
+		</Button>
+		<Button class="bg-primary" disabled={isNextDisabled} onclick={handleNext}>
+			{currentScreen === typeOfScreen.configuration ? 'Save' : 'Next'}
 		</Button>
 	</div>
 </form>

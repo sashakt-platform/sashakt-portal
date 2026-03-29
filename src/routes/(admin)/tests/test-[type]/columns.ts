@@ -77,10 +77,17 @@ export const createTestColumns = (
 	},
 	user?: User | null
 ): ColumnDef<Test>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
-		meta: { grow: true }
-	}),
+	createSortableColumn(
+		'name',
+		isTemplate ? 'Test Template' : 'Test Session',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
+			meta: { grow: true }
+		}
+	),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',

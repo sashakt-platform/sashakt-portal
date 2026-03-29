@@ -7,11 +7,10 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Upload from '@lucide/svelte/icons/upload';
 	import FileSpreadsheet from '@lucide/svelte/icons/file-spreadsheet';
-	import Search from '@lucide/svelte/icons/search';
+	import SearchInput from '$lib/components/SearchInput.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -28,7 +27,6 @@
 	let filteredStates: Filter[] = $state([]);
 
 	let filteredTagtypes: Filter[] = $state([]);
-	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	// batch selection state
 	let selectedQuestions: Question[] = $state([]);
@@ -228,29 +226,7 @@
 
 	{#snippet filters()}
 		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
-			<div class="relative shrink-0 lg:w-80">
-				<Search
-					class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
-				/>
-				<Input
-					class="rounded-full pl-9"
-					placeholder="Search questions"
-					value={search}
-					oninput={(event) => {
-						const url = new URL(page.url);
-						clearTimeout(searchTimeout);
-						searchTimeout = setTimeout(() => {
-							if (event.target?.value) {
-								url.searchParams.set('search', event.target.value);
-							} else {
-								url.searchParams.delete('search');
-							}
-							url.searchParams.set('page', '1');
-							goto(url, { keepFocus: true, invalidateAll: true });
-						}, 300);
-					}}
-				/>
-			</div>
+			<SearchInput placeholder="Search questions" value={search} />
 
 			<div class="flex flex-1 flex-wrap items-start justify-end gap-2">
 				{#if !isStateAdmin(data.user)}

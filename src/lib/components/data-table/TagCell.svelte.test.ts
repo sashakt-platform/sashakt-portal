@@ -7,7 +7,7 @@ describe('TagCell', () => {
 	describe('Rendering', () => {
 		it('should render nothing when tags is empty', () => {
 			const { container } = render(TagCell, { props: { tags: [] } });
-			expect(container.querySelector('[data-slot="badge"]')).not.toBeInTheDocument();
+			expect(container.querySelector('[data-slot="tag-chip"]')).not.toBeInTheDocument();
 		});
 
 		it('should render a single tag name', () => {
@@ -69,8 +69,8 @@ describe('TagCell', () => {
 
 			expect(screen.getByText('Math')).toBeInTheDocument();
 			expect(screen.getByText('Science')).toBeInTheDocument();
-			const badges = container.querySelectorAll('[data-slot="badge"]');
-			expect(badges).toHaveLength(2);
+			const tagChips = container.querySelectorAll('[data-slot="tag-chip"]');
+			expect(tagChips).toHaveLength(2);
 		});
 
 		it('should show correct overflow count with many tags', () => {
@@ -93,15 +93,15 @@ describe('TagCell', () => {
 	});
 
 	describe('Badge rendering', () => {
-		it('should render tags as badge elements', () => {
+		it('should render tags as tag-chip elements', () => {
 			const { container } = render(TagCell, {
 				props: {
 					tags: [{ name: 'Math' }]
 				}
 			});
 
-			const badge = container.querySelector('[data-slot="badge"]');
-			expect(badge).toBeInTheDocument();
+			const tagChip = container.querySelector('[data-slot="tag-chip"]');
+			expect(tagChip).toBeInTheDocument();
 		});
 
 		it('should apply truncate class to tag text', () => {

@@ -87,14 +87,7 @@
 		{#if hasInlineActions}
 			{#if canEdit && editInline}
 				<a href={editUrl}>
-					<Button
-						variant="ghost"
-						size="sm"
-						class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
-					>
-						<Pencil class="h-4 w-4" />
-						Edit
-					</Button>
+					<Button variant="outline" size="sm" class="font-semibold">Edit</Button>
 				</a>
 			{/if}
 
@@ -114,12 +107,7 @@
 				{@const IconComponent = getIcon(action.icon)}
 				{#if action.href && action.method === 'POST'}
 					<form action={action.href} method="POST" class="inline">
-						<Button
-							type="submit"
-							variant="ghost"
-							size="sm"
-							class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
-						>
+						<Button type="submit" variant="secondary" size="sm" class="font-semibold">
 							{#if IconComponent}
 								<IconComponent class="h-4 w-4" />
 							{/if}
@@ -128,11 +116,7 @@
 					</form>
 				{:else if action.href}
 					<a href={action.href}>
-						<Button
-							variant="ghost"
-							size="sm"
-							class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
-						>
+						<Button variant="secondary" size="sm" class="font-semibold">
 							{#if IconComponent}
 								<IconComponent class="h-4 w-4" />
 							{/if}
@@ -140,12 +124,7 @@
 						</Button>
 					</a>
 				{:else if action.action}
-					<Button
-						variant="ghost"
-						size="sm"
-						class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
-						onclick={action.action}
-					>
+					<Button variant="secondary" size="sm" class="font-semibold" onclick={action.action}>
 						{#if IconComponent}
 							<IconComponent class="h-4 w-4" />
 						{/if}

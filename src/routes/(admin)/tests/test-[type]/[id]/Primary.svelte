@@ -40,105 +40,101 @@
 	});
 </script>
 
-<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
-	<div class="rounded-2xl border border-gray-300 bg-white">
-		<!-- Section Header -->
-		<div class="flex items-center gap-4 border-b border-gray-100 px-6 py-5 sm:px-8">
-			<div class="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-				<ClipboardList class="text-primary h-5 w-5" />
-			</div>
-			<div>
-				<h2 class="text-base font-semibold text-gray-900">Primary Details</h2>
-				<p class="text-sm text-gray-500">
-					Basic information about the {$formData.is_template ? 'test template' : 'test session'}
-				</p>
+<!-- Section Header -->
+<div class="flex items-center gap-4 border-b border-gray-100 px-6 py-5 sm:px-8">
+	<div class="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+		<ClipboardList class="text-primary h-5 w-5" />
+	</div>
+	<div>
+		<h2 class="text-base font-semibold text-gray-900">Primary Details</h2>
+		<p class="text-sm text-gray-500">
+			Basic information about the {$formData.is_template ? 'test template' : 'test session'}
+		</p>
+	</div>
+</div>
+
+<!-- Two-Column Layout -->
+<div class="flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:gap-0">
+	<!-- Left Column: Name + Description -->
+	<div class="flex flex-1 flex-col gap-6 lg:pr-8">
+		<div>
+			<Label for="template-name" class="text-sm font-medium text-gray-700">
+				{$formData.is_template ? 'Template Name' : 'Test Name'}
+				<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
+			</Label>
+			<Input
+				type="text"
+				id="template-name"
+				placeholder="E.g., Sashakt Governance Assessment"
+				class="mt-2"
+				name="name"
+				bind:value={$formData.name}
+			/>
+		</div>
+
+		<div>
+			<Label for="description" class="text-sm font-medium text-gray-700">
+				Description
+				<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
+			</Label>
+			<Textarea
+				id="description"
+				placeholder="Brief description of this {$formData.is_template
+					? 'test template'
+					: 'test session'}..."
+				class="mt-2 min-h-[120px]"
+				name="description"
+				bind:value={$formData.description}
+			/>
+		</div>
+	</div>
+
+	<!-- Vertical Divider -->
+	<div class="hidden lg:block lg:w-px lg:self-stretch lg:bg-gray-200"></div>
+
+	<!-- Right Column: Tag Types, Tags, State, District, Status -->
+	<div class="flex w-full flex-col gap-5 lg:w-72 lg:pl-8 xl:w-80">
+		<div>
+			<Label class="text-sm font-medium text-gray-700">Tag Types</Label>
+			<div class="mt-2">
+				<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 			</div>
 		</div>
 
-		<!-- Two-Column Layout -->
-		<div class="flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:gap-0">
-			<!-- Left Column: Name + Description -->
-			<div class="flex flex-1 flex-col gap-6 lg:pr-8">
-				<div>
-					<Label for="template-name" class="text-sm font-medium text-gray-700">
-						{$formData.is_template ? 'Template Name' : 'Test Name'}
-						<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
-					</Label>
-					<Input
-						type="text"
-						id="template-name"
-						placeholder="E.g., Sashakt Governance Assessment"
-						class="mt-2"
-						name="name"
-						bind:value={$formData.name}
-					/>
-				</div>
+		<div>
+			<Label class="text-sm font-medium text-gray-700">Tags</Label>
+			<div class="mt-2">
+				<TagsSelection bind:tags={$formData.tag_ids} />
+			</div>
+		</div>
 
-				<div>
-					<Label for="description" class="text-sm font-medium text-gray-700">
-						Description
-						<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
-					</Label>
-					<Textarea
-						id="description"
-						placeholder="Brief description of this {$formData.is_template
-							? 'test template'
-							: 'test session'}..."
-						class="mt-2 min-h-[120px]"
-						name="description"
-						bind:value={$formData.description}
-					/>
+		{#if !isStateAdmin(user)}
+			<div>
+				<Label class="text-sm font-medium text-gray-700">State</Label>
+				<div class="mt-2">
+					<StateSelection bind:states={$formData.state_ids} />
 				</div>
 			</div>
+		{/if}
 
-			<!-- Vertical Divider -->
-			<div class="hidden lg:block lg:w-px lg:self-stretch lg:bg-gray-200"></div>
-
-			<!-- Right Column: Tag Types, Tags, State, District, Status -->
-			<div class="flex w-full flex-col gap-5 lg:w-72 lg:pl-8 xl:w-80">
-				<div>
-					<Label class="text-sm font-medium text-gray-700">Tag Types</Label>
-					<div class="mt-2">
-						<TagTypeSelection bind:tagTypes={selectedTagTypes} />
-					</div>
+		{#if !hasAssignedDistricts(user)}
+			<div>
+				<Label class="text-sm font-medium text-gray-700">District</Label>
+				<div class="mt-2">
+					<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
 				</div>
+			</div>
+		{/if}
 
-				<div>
-					<Label class="text-sm font-medium text-gray-700">Tags</Label>
-					<div class="mt-2">
-						<TagsSelection bind:tags={$formData.tag_ids} />
-					</div>
-				</div>
-
-				{#if !isStateAdmin(user)}
-					<div>
-						<Label class="text-sm font-medium text-gray-700">State</Label>
-						<div class="mt-2">
-							<StateSelection bind:states={$formData.state_ids} />
-						</div>
-					</div>
-				{/if}
-
-				{#if !hasAssignedDistricts(user)}
-					<div>
-						<Label class="text-sm font-medium text-gray-700">District</Label>
-						<div class="mt-2">
-							<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
-						</div>
-					</div>
-				{/if}
-
-				<div class="flex items-center justify-between pt-2">
-					<Label class="text-sm font-medium text-gray-700">
-						{$formData.is_template ? 'Template Status' : 'Test Status'}
-					</Label>
-					<div class="flex items-center gap-2">
-						<span class="text-sm text-gray-500">
-							{$formData.is_active ? 'Active' : 'Inactive'}
-						</span>
-						<Switch id="is-active" bind:checked={$formData.is_active} />
-					</div>
-				</div>
+		<div class="flex items-center justify-between pt-2">
+			<Label class="text-sm font-medium text-gray-700">
+				{$formData.is_template ? 'Template Status' : 'Test Status'}
+			</Label>
+			<div class="flex items-center gap-2">
+				<span class="text-sm text-gray-500">
+					{$formData.is_active ? 'Active' : 'Inactive'}
+				</span>
+				<Switch id="is-active" bind:checked={$formData.is_active} />
 			</div>
 		</div>
 	</div>

@@ -189,15 +189,21 @@
 	</div>
 
 	<!-- Content -->
-	{#if currentScreen === typeOfScreen.primary}
-		<Primary {formData} user={data.user} />
-	{:else if currentScreen === typeOfScreen.questions}
-		<QuestionList
-			{formData}
-			questions={data.questions}
-			questionParams={data.questionParams}
-			user={data.user}
-		/>
+	{#if currentScreen === typeOfScreen.primary || currentScreen === typeOfScreen.questions}
+		<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
+			<div class="bg-gray-0 rounded-2xl border border-gray-300">
+				{#if currentScreen === typeOfScreen.primary}
+					<Primary {formData} user={data.user} />
+				{:else if currentScreen === typeOfScreen.questions}
+					<QuestionList
+						{formData}
+						questions={data.questions}
+						questionParams={data.questionParams}
+						user={data.user}
+					/>
+				{/if}
+			</div>
+		</div>
 	{:else if currentScreen === typeOfScreen.configuration}
 		<Configuration {formData} />
 	{/if}

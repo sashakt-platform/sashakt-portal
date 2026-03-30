@@ -6,14 +6,19 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ url }) => {
 	const token = getSessionTokenCookie();
 	const search = url.searchParams.get('search') || '';
+	const tagTypeIds = url.searchParams.getAll('tag_type_ids');
+	const tagTypeParams = tagTypeIds.map((id) => `&tag_type_ids=${id}`).join('');
 
 	try {
-		const response = await fetch(`${BACKEND_URL}/tag/?name=${encodeURIComponent(search)}`, {
-			method: 'GET',
-			headers: {
-				Authorization: `Bearer ${token}`
+		const response = await fetch(
+			`${BACKEND_URL}/tag/?name=${encodeURIComponent(search)}${tagTypeParams}`,
+			{
+				method: 'GET',
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			}
-		});
+		);
 
 		if (response.ok) {
 			const rawTags = await response.json();

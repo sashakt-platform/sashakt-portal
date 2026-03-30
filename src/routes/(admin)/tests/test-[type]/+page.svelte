@@ -235,7 +235,7 @@
 				</div>
 
 				<div>
-					<TagsSelection bind:tags={filteredTags} filteration={true} />
+					<TagsSelection bind:tags={filteredTags} filteration={true} tagTypes={filteredTagtypes} />
 				</div>
 			</div>
 		</div>

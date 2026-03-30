@@ -178,8 +178,6 @@
 				$formData.question_type === QuestionTypeEnum.MatrixString ||
 				$formData.question_type === QuestionTypeEnum.MatrixNumber
 			) {
-				const inputType =
-					$formData.question_type === QuestionTypeEnum.MatrixString ? 'text' : 'number';
 				$formData.options = {
 					rows: {
 						label: matrixRowLabel,
@@ -187,7 +185,7 @@
 					},
 					columns: {
 						label: matrixColLabel,
-						input_type: inputType
+						input_type: matrixInputType!
 					}
 				};
 				$formData.correct_answer = [];
@@ -231,6 +229,14 @@
 					: QuestionTypeEnum.MatrixNumber;
 		}
 	}
+
+	const matrixInputType = $derived<'text' | 'number' | undefined>(
+		$formData.question_type === QuestionTypeEnum.MatrixString
+			? 'text'
+			: $formData.question_type === QuestionTypeEnum.MatrixNumber
+				? 'number'
+				: undefined
+	);
 
 	const isMatrixOptions = (
 		opts: unknown
@@ -1436,12 +1442,7 @@
 							colLabel: matrixColLabel,
 							rows: matrixLeftItems,
 							columns: matrixRightItems,
-							inputType:
-								$formData.question_type === QuestionTypeEnum.MatrixString
-									? 'text'
-									: $formData.question_type === QuestionTypeEnum.MatrixNumber
-										? 'number'
-										: undefined
+							inputType: matrixInputType
 						},
 						media: questionMedia,
 						optionMediaMap

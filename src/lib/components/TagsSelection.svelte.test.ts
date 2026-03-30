@@ -225,11 +225,11 @@ describe('TagsSelection', () => {
 			});
 			await tick();
 
-			let firstUrl = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+			const firstUrl = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
 			expect(firstUrl).not.toContain('tag_type_ids');
 
-			let firstResponse = await (global.fetch as ReturnType<typeof vi.fn>).mock.results[0].value;
-			let firstData = await firstResponse.json();
+			const firstResponse = await (global.fetch as ReturnType<typeof vi.fn>).mock.results[0].value;
+			const firstData = await firstResponse.json();
 			expect(firstData.items).toEqual(allTags);
 			expect(firstData.items).toHaveLength(5);
 
@@ -237,12 +237,12 @@ describe('TagsSelection', () => {
 			await rerender({ tagTypes: [{ id: '1', name: 'Difficulty' }] });
 			await tick();
 
-			let lastUrl = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.at(-1)![0] as string;
+			const lastUrl = (global.fetch as ReturnType<typeof vi.fn>).mock.calls.at(-1)![0] as string;
 			expect(lastUrl).toContain('tag_type_ids=1');
 
-			let lastResponse = await (global.fetch as ReturnType<typeof vi.fn>).mock.results.at(-1)!
+			const lastResponse = await (global.fetch as ReturnType<typeof vi.fn>).mock.results.at(-1)!
 				.value;
-			let lastData = await lastResponse.json();
+			const lastData = await lastResponse.json();
 			expect(lastData.items).toEqual(difficultyTags);
 			expect(lastData.items).toHaveLength(2);
 		});

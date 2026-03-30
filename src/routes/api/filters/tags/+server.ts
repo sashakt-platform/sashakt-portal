@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url }) => {
 				items:
 					rawTags.items?.map((tag: { name: string; tag_type?: { name: string } }) => ({
 						...tag,
-						name: tag.tag_type?.name ? `${tag.name} - (${tag.tag_type.name})` : tag.name
+						name: tag.name
 					})) || []
 			};
 			return json(tags);

@@ -44,6 +44,20 @@
 		}
 	});
 
+	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
+	const totalQuestionCount = $derived(
+		isSectionedTest
+			? ($formData.question_sets || []).reduce(
+					(total, questionSet) =>
+						total +
+						(questionSet.question_revisions?.length ||
+							questionSet.question_revision_ids?.length ||
+							0),
+					0
+				)
+			: $formData.question_revision_ids.length
+	);
+
 	if (testData) {
 		$formData.state_ids =
 			testData?.states?.map((state: Filter) => ({
@@ -64,6 +78,34 @@
 			})) || [];
 		$formData.question_revision_ids =
 			testData?.question_revisions?.map((q: { id: number }) => q.id) || [];
+
+		$formData.question_sets =
+			testData?.question_sets?.map(
+				(questionSet: {
+					id?: number | null;
+					title: string;
+					description?: string | null;
+					max_questions_allowed_to_attempt: number;
+					display_order: number;
+					marking_scheme?: Infer<FormSchema>['marking_scheme'] | null;
+					question_revision_ids?: number[];
+					question_revisions?: Array<{ id: number; question_text: string; tags?: Array<{ name: string }> }>;
+				}) => ({
+					id: questionSet.id ?? null,
+					title: questionSet.title,
+					description: questionSet.description ?? null,
+					max_questions_allowed_to_attempt: questionSet.max_questions_allowed_to_attempt,
+					display_order: questionSet.display_order,
+					marking_scheme: questionSet.marking_scheme ?? null,
+					question_revision_ids:
+						(questionSet.question_revision_ids?.length
+							? questionSet.question_revision_ids
+							: null) ||
+						questionSet.question_revisions?.map((question) => question.id) ||
+						[],
+					question_revisions: questionSet.question_revisions || []
+				})
+			) || [];
 
 		$formData.random_tag_count =
 			(
@@ -162,7 +204,7 @@
 				(currentScreen === typeOfScreen.configuration &&
 					$formData.random_questions &&
 					$formData.no_of_random_questions <= 0) ||
-				$formData.no_of_random_questions > $formData.question_revision_ids.length}
+				$formData.no_of_random_questions > totalQuestionCount}
 			onclick={() => {
 				if (currentScreen === typeOfScreen.configuration) {
 					submit();

@@ -11,6 +11,7 @@
 	import { goto } from '$app/navigation';
 	import type { Filter } from '$lib/types/filters';
 	import type { User } from '$lib/utils/permissions.js';
+	import SectionedQuestionSets from './SectionedQuestionSets.svelte';
 
 	let {
 		formData,
@@ -20,9 +21,27 @@
 	}: { formData: any; questions: any; questionParams: any; user?: User | null } = $props();
 	let dialogOpen = $state(false);
 	let questionSelectionMode: 'manual' | 'tagBased' = $state('manual');
+	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
+	const sectionedQuestionCount = $derived(
+		($formData.question_sets || []).reduce(
+			(sum, questionSet) =>
+				sum +
+				(questionSet.question_revisions?.length || questionSet.question_revision_ids?.length || 0),
+			0
+		)
+	);
+	const sectionCount = $derived(($formData.question_sets || []).length);
+	const totalAttemptLimit = $derived(
+		($formData.question_sets || []).reduce(
+			(sum, questionSet) => sum + Number(questionSet.max_questions_allowed_to_attempt ?? 0),
+			0
+		)
+	);
 
 	let totalSelectedCount = $derived(
-		$formData.question_revision_ids.length > 0
+		isSectionedTest
+			? sectionedQuestionCount
+			: $formData.question_revision_ids.length > 0
 			? $formData.question_revision_ids.length
 			: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
@@ -52,49 +71,53 @@
 	};
 </script>
 
-<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
+{#if !isSectionedTest}
+	<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
+{/if}
 
 <div class="mx-auto flex h-dvh">
 	<div class="mx-auto w-full p-4 sm:p-8 md:p-12 lg:p-20">
-		<div
-			class="mb-6 flex h-fit flex-col gap-4 rounded-lg bg-white p-4 shadow-lg sm:mb-8 sm:flex-row sm:items-center"
-		>
-			<div class="flex items-center gap-3">
-				<div class="flex h-full w-fit shrink-0">
-					<TestPaper />
-				</div>
-				<p class="text-base font-semibold sm:text-lg">Selection</p>
-			</div>
-			<RadioGroup.Root
-				bind:value={questionSelectionMode}
-				class="flex w-full flex-col gap-4 sm:mx-auto sm:flex-row sm:justify-center sm:gap-8"
+		{#if !isSectionedTest}
+			<div
+				class="mb-6 flex h-fit flex-col gap-4 rounded-lg bg-white p-4 shadow-lg sm:mb-8 sm:flex-row sm:items-center"
 			>
-				<div class="flex w-fit items-center space-x-2">
-					<RadioGroup.Item
-						id="manual"
-						value="manual"
-						onclick={() => ($formData.random_tag_count = [])}
-					/>
-					<Label for="manual"
-						><p class="font-bold">Manual</p>
-						<p class="text-sm font-extralight">Select from the Question Bank</p></Label
-					>
-				</div>
-				<div class="flex w-fit flex-row items-center gap-4">
-					<div class="flex w-fit flex-row items-center space-x-2">
-						<RadioGroup.Item
-							id="tagBased"
-							value="tagBased"
-							onclick={() => (($formData.question_revision_ids = []), setDefaultTagsRandom())}
-						/>
-						<Label for="tagBased"
-							><p class="font-bold">Random</p>
-							<p class="text-sm font-extralight">Based on the Tags</p>
-						</Label>
+				<div class="flex items-center gap-3">
+					<div class="flex h-full w-fit shrink-0">
+						<TestPaper />
 					</div>
+					<p class="text-base font-semibold sm:text-lg">Selection</p>
 				</div>
-			</RadioGroup.Root>
-		</div>
+				<RadioGroup.Root
+					bind:value={questionSelectionMode}
+					class="flex w-full flex-col gap-4 sm:mx-auto sm:flex-row sm:justify-center sm:gap-8"
+				>
+					<div class="flex w-fit items-center space-x-2">
+						<RadioGroup.Item
+							id="manual"
+							value="manual"
+							onclick={() => ($formData.random_tag_count = [])}
+						/>
+						<Label for="manual"
+							><p class="font-bold">Manual</p>
+							<p class="text-sm font-extralight">Select from the Question Bank</p></Label
+						>
+					</div>
+					<div class="flex w-fit flex-row items-center gap-4">
+						<div class="flex w-fit flex-row items-center space-x-2">
+							<RadioGroup.Item
+								id="tagBased"
+								value="tagBased"
+								onclick={() => (($formData.question_revision_ids = []), setDefaultTagsRandom())}
+							/>
+							<Label for="tagBased"
+								><p class="font-bold">Random</p>
+								<p class="text-sm font-extralight">Based on the Tags</p>
+							</Label>
+						</div>
+					</div>
+				</RadioGroup.Root>
+			</div>
+		{/if}
 		<div
 			class="mb-2 flex min-h-1/6 flex-col gap-4 rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg sm:flex-row sm:items-center"
 		>
@@ -106,23 +129,33 @@
 					<div class="flex">
 						<p class="font-bold">{$formData.name}</p>
 					</div>
-					<div class="flex flex-wrap items-center gap-2 text-sm sm:flex-row">
-						<span
-							class="bg-secondary my-2 rounded-sm p-1 px-2 text-xs font-bold sm:my-4 sm:mr-4 sm:text-sm"
-							>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
-						>
-						<span class="text-gray-500"
-							>{totalSelectedCount}
-							{totalSelectedCount === 1 ? 'question' : 'questions'}
-						</span>
+						<div class="flex flex-wrap items-center gap-2 text-sm sm:flex-row">
+							<span
+								class="bg-secondary my-2 rounded-sm p-1 px-2 text-xs font-bold sm:my-4 sm:mr-4 sm:text-sm"
+								>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
+							>
+								{#if isSectionedTest}
+									<span class="text-gray-500">
+										{sectionedQuestionCount} {sectionedQuestionCount === 1 ? 'question' : 'questions'}
+										across {sectionCount} {sectionCount === 1 ? 'section' : 'sections'}
+									</span>
+									{#if totalAttemptLimit < sectionedQuestionCount}
+										<span class="text-gray-500">&bull; Answer up to {totalAttemptLimit}</span>
+									{/if}
+								{:else}
+								<span class="text-gray-500"
+									>{totalSelectedCount}
+									{totalSelectedCount === 1 ? 'question' : 'questions'}
+								</span>
+							{/if}
+						</div>
 					</div>
-				</div>
-				{#if questionSelectionMode == 'tagBased'}
+				{#if !isSectionedTest && questionSelectionMode == 'tagBased'}
 					<div class="my-auto flex w-full flex-col justify-center align-middle md:w-1/2">
 						<TagsSelection bind:tags={$formData.random_tag_count} />
 					</div>
 				{/if}
-				{#if $formData.question_revision_ids.length != 0}
+				{#if !isSectionedTest && $formData.question_revision_ids.length != 0}
 					<div class="my-auto flex md:ml-auto">
 						<Button class="w-full sm:w-auto" onclick={() => (dialogOpen = true)}
 							>Select More Questions</Button
@@ -135,7 +168,12 @@
 		<div
 			class="my-auto flex h-full justify-center rounded-t-sm rounded-b-xl border bg-white p-4 pb-48 shadow-lg md:pb-28"
 		>
-			{#if questionSelectionMode == 'manual'}
+			{#if isSectionedTest}
+				<SectionedQuestionSets
+					questionSets={$formData.question_sets || []}
+					isTemplate={$formData.is_template}
+				/>
+			{:else if questionSelectionMode == 'manual'}
 				{#if $formData.question_revision_ids.length == 0}
 					<div class="my-auto text-center">
 						<p class="text-lg font-bold">Shortlist your Questions</p>

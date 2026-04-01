@@ -1,6 +1,7 @@
 <script lang="ts">
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import RichText from '$lib/components/RichText.svelte';
 
 	type QuestionRevision = {
 		id: number;
@@ -38,9 +39,9 @@
 			<div
 				class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
 			>
-				<p class="w-4/6">
-					{question.question_text}
-				</p>
+				<div class="w-4/6">
+					<RichText content={question.question_text} class="[&_p]:m-0" />
+				</div>
 				<span class="w-2/6">
 					{#if question.tags && question.tags.length > 0}
 						<p>

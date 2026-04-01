@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import TestCreatePage from './+page.svelte';
 import { superForm } from 'sveltekit-superforms';
 
@@ -51,6 +51,7 @@ const defaultFormValues = {
 	random_questions: false,
 	no_of_random_questions: 0,
 	question_revision_ids: [],
+	question_sets: [],
 	random_tag_count: [],
 	state_ids: [],
 	district_ids: [],
@@ -395,6 +396,41 @@ describe('Test Create/Update Page', () => {
 				expect.anything(),
 				expect.objectContaining({ applyAction: 'never' })
 			);
+		});
+
+		it('maps backend question_sets into form state for sectioned tests', () => {
+			const formStore = setupSuperFormMock();
+			const testData = {
+				id: '42',
+				name: 'Existing Test',
+				description: 'Existing Description',
+				question_revisions: [{ id: 101 }],
+				question_sets: [
+					{
+						id: 10,
+						title: 'Physics',
+						description: 'Mechanics',
+						display_order: 1,
+						max_questions_allowed_to_attempt: 1,
+						marking_scheme: { correct: 4, wrong: -1, skipped: 0 },
+						question_revisions: [{ id: 101, question_text: 'What is force?', tags: [] }]
+					}
+				],
+				states: [],
+				districts: [],
+				tags: [],
+				random_tag_counts: []
+			};
+
+			render(TestCreatePage, { data: baseData({ testData }) });
+
+			expect(get(formStore).question_sets).toEqual([
+				expect.objectContaining({
+					id: 10,
+					title: 'Physics',
+					question_revision_ids: [101]
+				})
+			]);
 		});
 	});
 });

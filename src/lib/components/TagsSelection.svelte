@@ -29,20 +29,15 @@
 		}
 	}
 
-	// Re-fetch tags when tagTypes changes
+	// Re-fetch tags and clear selection when tagTypes changes
 	$effect(() => {
-		const _typeIds = JSON.stringify(tagTypeIds);
-		loadTags();
-	});
-
-	// Clear selected tags when tag types change (skip initial mount)
-	$effect(() => {
-		const _typeIds = JSON.stringify(tagTypeIds);
+		tagTypeIds;
 		if (isInitialMount) {
 			isInitialMount = false;
-			return;
+		} else {
+			tags = [];
 		}
-		tags = [];
+		loadTags();
 	});
 </script>
 

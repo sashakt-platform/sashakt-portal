@@ -8,7 +8,6 @@
 	import MediaDisplay from '$lib/components/MediaDisplay.svelte';
 	import type { TMedia } from '$lib/types/media';
 	import { QuestionTypeEnum } from '$lib/types/question';
-	import RichText from '$lib/components/RichText.svelte';
 
 	export type MatrixItem = { id: number; key: string; value: string };
 
@@ -90,19 +89,19 @@
 			</div>
 			<div class="mb-4">
 				{#if data.questionText.trim()}
-					<div class="flex items-start gap-1">
-						<RichText content={data.questionText} class="text-base/normal min-w-0 flex-1 font-medium text-gray-900 [&_p]:m-0" />
+					<p class="text-base/normal font-medium text-gray-900">
+						{data.questionText}
 						{#if data.isMandatory}
-							<span class="mt-0.5 shrink-0 text-red-500">*</span>
+							<span class="ml-1 text-red-500">*</span>
 						{/if}
-					</div>
+					</p>
 				{:else}
 					<p class="text-base leading-relaxed text-gray-400 italic">
 						Enter your question to see preview...
 					</p>
 				{/if}
 				{#if data.instructions}
-					<RichText content={data.instructions} class="text-muted-foreground mt-2 text-sm [&_p]:m-0" />
+					<p class="text-muted-foreground mt-2 text-sm">{data.instructions}</p>
 				{/if}
 				<MediaDisplay {media} />
 			</div>
@@ -126,10 +125,7 @@
 										? 'bg-primary text-muted *:border-muted *:text-muted'
 										: ''}"
 								>
-									<div class="flex min-w-0 flex-1 gap-1">
-										<span class="shrink-0">{opt.key}.</span>
-										<RichText content={opt.value} class="min-w-0 flex-1 [&_p]:m-0" />
-									</div>
+									<span>{opt.key}. {opt.value}</span>
 									<RadioGroup.Item
 										value={opt.key}
 										id={uid}
@@ -159,10 +155,7 @@
 								? 'bg-primary text-muted *:border-muted *:text-muted'
 								: ''}"
 						>
-							<div class="flex min-w-0 flex-1 gap-1">
-								<span class="shrink-0">{opt.key}.</span>
-								<RichText content={opt.value} class="min-w-0 flex-1 [&_p]:m-0" />
-							</div>
+							<span>{opt.key}. {opt.value}</span>
 							<Checkbox
 								id={uid}
 								checked={selectedMultiChoices[opt.key] || false}
@@ -201,7 +194,7 @@
 								{#each matrixRows as row (row.id)}
 									<tr>
 										<td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800">
-											<RichText content={row.value} class="[&_p]:m-0" />
+											{row.value}
 										</td>
 										{#each matrixColumns as col (col.id)}
 											<td class="border border-gray-200 px-4 py-3 text-center">
@@ -246,9 +239,7 @@
 									<div>
 										<p class="text-sm text-gray-800">
 											<span class="font-semibold">{row.key}.</span>
-											<span class="ml-1 inline-block">
-												<RichText content={row.value} as="span" class="[&_p]:m-0 [&_p]:inline" />
-											</span>
+											<span class="ml-1">{row.value}</span>
 										</p>
 										{#if optionMediaMap[row.id]}
 											<MediaDisplay media={optionMediaMap[row.id]} />
@@ -266,9 +257,7 @@
 									<div>
 										<p class="text-sm text-gray-800">
 											<span class="font-semibold">{col.key}.</span>
-											<span class="ml-1 inline-block">
-												<RichText content={col.value} as="span" class="[&_p]:m-0 [&_p]:inline" />
-											</span>
+											<span class="ml-1">{col.value}</span>
 										</p>
 										{#if optionMediaMap[col.id]}
 											<MediaDisplay media={optionMediaMap[col.id]} />

@@ -44,20 +44,6 @@
 		}
 	});
 
-	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
-	const totalQuestionCount = $derived(
-		isSectionedTest
-			? ($formData.question_sets || []).reduce(
-					(total, questionSet) =>
-						total +
-						(questionSet.question_revisions?.length ||
-							questionSet.question_revision_ids?.length ||
-							0),
-					0
-				)
-			: $formData.question_revision_ids.length
-	);
-
 	if (testData) {
 		$formData.state_ids =
 			testData?.states?.map((state: Filter) => ({
@@ -204,7 +190,7 @@
 				(currentScreen === typeOfScreen.configuration &&
 					$formData.random_questions &&
 					$formData.no_of_random_questions <= 0) ||
-				$formData.no_of_random_questions > totalQuestionCount}
+				$formData.no_of_random_questions > $formData.question_revision_ids.length}
 			onclick={() => {
 				if (currentScreen === typeOfScreen.configuration) {
 					submit();

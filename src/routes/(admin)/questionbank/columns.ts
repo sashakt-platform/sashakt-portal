@@ -7,7 +7,7 @@ import {
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
-import QuestionPreviewCell from './QuestionPreviewCell.svelte';
+import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
 
 export interface Question {
 	id: string;

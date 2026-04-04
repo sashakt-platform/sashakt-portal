@@ -35,10 +35,16 @@
 		questions.items?.map((question: any) => ({
 			id: question.latest_question_revision_id,
 			question_text: question.question_text,
+			question_type: question.question_type,
 			tags: question.tags,
 			options: question.options || [],
 			correct_answer: question.correct_answer || [],
-			latest_question_revision_id: question.latest_question_revision_id
+			latest_question_revision_id: question.latest_question_revision_id,
+			instructions: question.instructions,
+			marking_scheme: question.marking_scheme,
+			is_mandatory: question.is_mandatory,
+			media: question.media,
+			matrix: question.matrix
 		})) || []
 	);
 

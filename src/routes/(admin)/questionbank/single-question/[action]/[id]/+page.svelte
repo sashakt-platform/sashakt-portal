@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import ImageIcon from '@lucide/svelte/icons/image';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
@@ -26,7 +25,6 @@
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 	import { resolve } from '$app/paths';
 	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
-	import MediaManager from '$lib/components/MediaManager.svelte';
 	import type { TMedia } from '$lib/types/media';
 	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
@@ -289,35 +287,6 @@
 	// Media state
 	let questionMedia = $state<TMedia | null>(questionData?.media ?? null);
 	let optionMediaMap = $state<Record<number, TMedia | null>>({});
-	let optionMediaVisible = $state<Record<number, boolean>>({});
-
-	// Auto-expand options that have existing media
-	if (questionData?.options) {
-		if (Array.isArray(questionData.options)) {
-			for (const opt of questionData.options as any[]) {
-				if (opt.media?.image || opt.media?.external_media) {
-					optionMediaVisible[opt.id] = true;
-				}
-			}
-		} else if (
-			questionData.options &&
-			typeof questionData.options === 'object' &&
-			'rows' in (questionData.options as any)
-		) {
-			const matrixOpts = questionData.options as any;
-			for (const item of [
-				...(matrixOpts.rows?.items ?? []),
-				...(matrixOpts.columns?.items ?? [])
-			]) {
-				if (item.media?.image || item.media?.external_media) {
-					optionMediaVisible[item.id] = true;
-				}
-			}
-		}
-	}
-	let questionMediaVisible = $state(
-		!!(questionData?.media?.image || questionData?.media?.external_media)
-	);
 
 	// Loading state for media operations
 	let isSaving = $state(false);
@@ -646,21 +615,6 @@
 				<Trash_2 size={16} class="text-muted-foreground hover:text-destructive" />
 			</button>
 		{/snippet}
-		{#snippet matrixImageButton(itemId: number)}
-			<button
-				type="button"
-				onclick={() => (optionMediaVisible[itemId] = !optionMediaVisible[itemId])}
-				aria-label="Toggle media"
-				class={[
-					'shrink-0',
-					optionMediaMap[itemId]?.image || optionMediaMap[itemId]?.external_media
-						? 'text-primary'
-						: 'text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100'
-				]}
-			>
-				<ImageIcon size={16} />
-			</button>
-		{/snippet}
 		<!-- HEADER -->
 		<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
 			<div class="flex items-center gap-3">
@@ -822,7 +776,7 @@
 								</div>
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.SingleChoice || $formData.question_type === QuestionTypeEnum.MultiChoice}
-							<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
+							<div class="flex flex-col gap-6 overflow-y-scroll scroll-auto">
 								<div
 									use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
 									onconsider={({ detail }) => (totalOptions = detail.items)}
@@ -834,7 +788,7 @@
 									}}
 								>
 									{#each totalOptions as { id, key }, index (id)}
-										<div class="group flex flex-row gap-4">
+										<div class="group flex flex-row gap-4 pb-4">
 											<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
 												<p
 													class="flex h-full w-full items-center justify-center text-xl font-semibold"
@@ -855,7 +809,7 @@
 														bind:value={totalOptions[index].value}
 													/>
 												</div>
-												<div class="flex flex-row items-center gap-4">
+												<div class="flex flex-row items-center justify-between">
 													<div class="flex flex-row items-center gap-2">
 														<Checkbox
 															disabled={!hasContent(
@@ -870,28 +824,7 @@
 																(totalOptions[index].correct_answer = checked)}
 														/><Label class="text-sm">Set as correct answer</Label>
 													</div>
-													<button
-														type="button"
-														class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {optionMediaVisible[
-															id
-														]
-															? 'bg-primary/10'
-															: ''}"
-														onclick={() => (optionMediaVisible[id] = !optionMediaVisible[id])}
-													>
-														<ImageIcon size={14} />
-														{optionMediaVisible[id]
-															? 'Hide media'
-															: optionMediaMap[id]?.image || optionMediaMap[id]?.external_media
-																? 'Show media'
-																: 'Add media'}
-													</button>
-													{#if !optionMediaVisible[id] && (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media)}
-														<span class="text-xs text-gray-400">(media attached)</span>
-													{/if}
-												</div>
-												{#if optionMediaVisible[id] || stagedOptionFiles[id] || stagedOptionUrls[id]?.trim()}
-													<MediaManager
+													<AttachmentInput
 														media={optionMediaMap[id] ?? null}
 														onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
 														onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
@@ -908,7 +841,7 @@
 																	)
 															: undefined}
 													/>
-												{/if}
+												</div>
 											</div>
 											<div
 												class={[
@@ -992,7 +925,7 @@
 															</span>
 															<Input class="border-0" bind:value={matrixLeftItems[index].value} />
 														</div>
-														{@render matrixImageButton(item.id)}
+
 														{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
 															if (matrixLeftItems.length > 1) {
 																const deletedId = String(matrixLeftItems[index].id);
@@ -1007,25 +940,23 @@
 															}
 														})}
 													</div>
-													{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
-														<MediaManager
-															media={optionMediaMap[item.id] ?? null}
-															onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
-															onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
-															onDeleteImage={questionId
-																? () =>
-																		deleteMedia(
-																			`/api/media/questions/${questionId}/options/${item.id}/image`
-																		)
-																: undefined}
-															onDeleteExternal={questionId
-																? () =>
-																		deleteMedia(
-																			`/api/media/questions/${questionId}/options/${item.id}/external`
-																		)
-																: undefined}
-														/>
-													{/if}
+													<AttachmentInput
+														media={optionMediaMap[item.id] ?? null}
+														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+														onDeleteImage={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/image`
+																	)
+															: undefined}
+														onDeleteExternal={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/external`
+																	)
+															: undefined}
+													/>
 												</div>
 											{/each}
 										</div>
@@ -1071,7 +1002,7 @@
 															</span>
 															<Input class="border-0" bind:value={matrixRightItems[index].value} />
 														</div>
-														{@render matrixImageButton(item.id)}
+
 														{@render matrixTrashButton(matrixRightItems.length > 1, () => {
 															if (matrixRightItems.length > 1) {
 																const removedId = matrixRightItems[index].id;
@@ -1090,25 +1021,23 @@
 															}
 														})}
 													</div>
-													{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
-														<MediaManager
-															media={optionMediaMap[item.id] ?? null}
-															onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
-															onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
-															onDeleteImage={questionId
-																? () =>
-																		deleteMedia(
-																			`/api/media/questions/${questionId}/options/${item.id}/image`
-																		)
-																: undefined}
-															onDeleteExternal={questionId
-																? () =>
-																		deleteMedia(
-																			`/api/media/questions/${questionId}/options/${item.id}/external`
-																		)
-																: undefined}
-														/>
-													{/if}
+													<AttachmentInput
+														media={optionMediaMap[item.id] ?? null}
+														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+														onDeleteImage={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/image`
+																	)
+															: undefined}
+														onDeleteExternal={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${item.id}/external`
+																	)
+															: undefined}
+													/>
 												</div>
 											{/each}
 										</div>

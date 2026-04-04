@@ -23,8 +23,7 @@
 	import { QuestionTypeEnum } from '$lib/types/question';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Tag from './Tag.svelte';
+	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import QuestionRevision from './QuestionRevision.svelte';
 	import QuestionPreview from './QuestionPreview.svelte';
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
@@ -288,7 +287,7 @@
 			: {}
 	);
 
-	let openTagDialog: boolean = $state(false);
+	let selectedTagTypes = $state<{ id: string; name: string }[]>([]);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
 	// Media state
@@ -1373,25 +1372,16 @@
 
 			<!-- RIGHT COLUMN: Sidebar -->
 			<div class="flex flex-col gap-6 lg:w-1/3">
+				<!-- Tag Types -->
+				<div class="flex flex-col gap-2">
+					<Label class="font-semibold">Tag Types</Label>
+					<TagTypeSelection bind:tagTypes={selectedTagTypes} />
+				</div>
+
 				<!-- Tags -->
 				<div class="flex flex-col gap-2">
 					<Label class="font-semibold">Tags</Label>
-					<TagsSelection bind:tags={$formData.tag_ids} />
-					<Dialog.Root bind:open={openTagDialog}>
-						<Label
-							onclick={() => (openTagDialog = true)}
-							class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
-							><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
-						>
-						<Dialog.Content
-							class="max-h-[90vh] p-4 px-0 sm:h-[70%] sm:max-w-[90%] md:max-w-[70%] lg:max-w-[45%]"
-						>
-							<Dialog.Header class="m-0 h-fit border-b-2 py-4">
-								<Dialog.Title class="px-8">Create new tag</Dialog.Title>
-							</Dialog.Header>
-							<Tag tagTypes={data.tagTypes} form={data.tagForm} bind:open={openTagDialog} />
-						</Dialog.Content>
-					</Dialog.Root>
+					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>
 
 				<!-- State -->

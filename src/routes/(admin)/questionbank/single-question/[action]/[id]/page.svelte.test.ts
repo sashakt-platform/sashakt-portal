@@ -2662,7 +2662,7 @@ describe('Single Question Page - Matrix String Question Type', () => {
 				data: { ...baseData, questionData: matrixStringQuestionData } as any
 			});
 
-			expect(screen.getByText('String Input Matrix')).toBeInTheDocument();
+			expect(screen.getByText('Text Input Matrix')).toBeInTheDocument();
 		});
 
 		it('should display prefilled row items when editing matrix-input question', () => {

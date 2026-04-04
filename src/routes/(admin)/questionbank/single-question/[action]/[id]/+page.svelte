@@ -780,7 +780,7 @@
 											{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
 												Matrix Rating
 											{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
-												Matrix String
+												Matrix Text
 											{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
 												Matrix Number
 											{:else}
@@ -796,7 +796,7 @@
 										<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
 										<Select.Item value={QuestionTypeEnum.MatrixMatch}>Matrix Match</Select.Item>
 										<Select.Item value={QuestionTypeEnum.MatrixRating}>Matrix Rating</Select.Item>
-										<Select.Item value={QuestionTypeEnum.MatrixString}>Matrix String</Select.Item>
+										<Select.Item value={QuestionTypeEnum.MatrixString}>Matrix Text</Select.Item>
 										<Select.Item value={QuestionTypeEnum.MatrixNumber}>Matrix Number</Select.Item>
 									</Select.Content>
 								</Select.Root>
@@ -1266,7 +1266,7 @@
 						<div class="flex flex-col gap-4">
 							{@render snippetHeading(
 								$formData.question_type === QuestionTypeEnum.MatrixString
-									? 'String Input Matrix'
+									? 'Text Input Matrix'
 									: 'Number Input Matrix'
 							)}
 							<div class="flex gap-4">

@@ -2654,7 +2654,7 @@ describe('Single Question Page - Matrix String Question Type', () => {
 				data: { ...baseData, questionData: matrixStringQuestionData } as any
 			});
 
-			expect(screen.getByText('Matrix String')).toBeInTheDocument();
+			expect(screen.getByText('Matrix Text')).toBeInTheDocument();
 		});
 
 		it('should render "String Input Matrix" heading for matrix-input with text type', () => {

@@ -5,6 +5,7 @@ import {
 	createSortableColumn
 } from '$lib/components/data-table/column-helpers';
 import Eye from '@lucide/svelte/icons/eye';
+import TagCell from '$lib/components/data-table/TagCell.svelte';
 
 export interface QuestionForSelection {
 	id: number;
@@ -41,13 +42,7 @@ export const createQuestionSelectionColumns = (
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => {
-			const tags = row.original.tags;
-			if (tags && tags.length > 0) {
-				return tags.map((tag) => tag.name).join(', ');
-			}
-			return '';
-		},
+		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] }),
 		size: 200
 	}
 ];

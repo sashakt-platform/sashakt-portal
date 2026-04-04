@@ -177,9 +177,6 @@
 						/>
 					</div>
 
-					<!-- Vertical Divider -->
-					<div class="hidden h-8 w-px bg-gray-200 sm:block"></div>
-
 					<!-- Filter Dropdowns -->
 					<div class="flex flex-1 flex-col gap-3 sm:flex-row">
 						{#if !isStateAdmin(user)}
@@ -187,6 +184,8 @@
 								<StateSelection bind:states filteration={true} />
 							</div>
 						{/if}
+						<!-- Vertical Divider -->
+						<div class="hidden h-8 w-px bg-gray-200 sm:block"></div>
 						<div class="flex-1">
 							<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 						</div>

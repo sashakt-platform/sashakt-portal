@@ -45,7 +45,7 @@
 					>Commonly Used</span
 				>
 				<div class="grid grid-cols-3 gap-3">
-					{#each commonTypes as { label, icon: Icon, type }}
+					{#each commonTypes as { label, icon: Icon, type } (type)}
 						<button
 							type="button"
 							class="hover:bg-muted flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
@@ -64,7 +64,7 @@
 					>Advanced</span
 				>
 				<div class="grid grid-cols-3 gap-3">
-					{#each advancedTypes as { label, icon: Icon, type }}
+					{#each advancedTypes as { label, icon: Icon, type } (type)}
 						<button
 							type="button"
 							class="hover:bg-muted flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"

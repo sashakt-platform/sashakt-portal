@@ -18,11 +18,19 @@ export const matrixMatchOptionsSchema = z.object({
 	columns: matrixColumnSchema
 });
 
+export const matrixInputOptionsSchema = z.object({
+	rows: matrixColumnSchema,
+	columns: z.object({
+		label: z.string(),
+		input_type: z.enum(['text', 'number'])
+	})
+});
+
 export const questionSchema = z.object({
 	question_text: z.string().min(1, { message: 'Question text is required' }),
 	instructions: z.string().nullable().optional(),
 	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
-	options: z.union([z.array(optionSchema), matrixMatchOptionsSchema]).default([]),
+	options: z.union([z.array(optionSchema), matrixInputOptionsSchema, matrixMatchOptionsSchema]).default([]),
 	correct_answer: z
 		.union([z.array(z.number()), z.number(), z.record(z.string(), z.array(z.number()))])
 		.default([]),

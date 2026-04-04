@@ -2610,3 +2610,367 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 		});
 	});
 });
+
+describe('Single Question Page - Matrix String Question Type', () => {
+	const matrixStringQuestionData = {
+		question_text: 'Answer the following',
+		question_type: QuestionTypeEnum.MatrixInput,
+		options: {
+			rows: {
+				label: 'Questions',
+				items: [
+					{ id: 1, key: 'A', value: 'Name the capital of France' },
+					{ id: 2, key: 'B', value: 'Name the capital of Germany' }
+				]
+			},
+			columns: {
+				label: 'Your Answer',
+				input_type: 'text'
+			}
+		},
+		correct_answer: [],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('QuestionTypeEnum', () => {
+		it('should have MatrixInput value in QuestionTypeEnum', () => {
+			expect(QuestionTypeEnum.MatrixInput).toBe('matrix-input');
+		});
+
+		it('should have MatrixString value in QuestionTypeEnum', () => {
+			expect(QuestionTypeEnum.MatrixString).toBe('matrix-string');
+		});
+	});
+
+	describe('Edit mode load conversion', () => {
+		it('should show "Matrix String" in dropdown when question_type is matrix-input with text input_type', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+
+			expect(screen.getByText('Matrix Text')).toBeInTheDocument();
+		});
+
+		it('should render "String Input Matrix" heading for matrix-input with text type', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+
+			expect(screen.getByText('Text Input Matrix')).toBeInTheDocument();
+		});
+
+		it('should display prefilled row items when editing matrix-input question', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+
+			expect(screen.getByDisplayValue('Name the capital of France')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Name the capital of Germany')).toBeInTheDocument();
+		});
+
+		it('should display prefilled row label when editing matrix-input question', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Questions')).toBeInTheDocument();
+		});
+
+		it('should display prefilled column label when editing matrix-input question', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Your Answer')).toBeInTheDocument();
+		});
+	});
+
+	describe('Matrix String UI Rendering', () => {
+		it('should render "Questions" label for rows section', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+			expect(screen.getByText('Questions')).toBeInTheDocument();
+		});
+
+		it('should render "Add Question" button', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+			const buttons = Array.from(container.querySelectorAll('button'));
+			expect(buttons.find((btn) => btn.textContent?.includes('Add Question'))).toBeDefined();
+		});
+
+		it('should show default row and column labels in create mode for MatrixString type', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'New matrix string question',
+						question_type: QuestionTypeEnum.MatrixString,
+						options: [],
+						correct_answer: [],
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+			expect(screen.getByDisplayValue('Questions')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Answers')).toBeInTheDocument();
+		});
+	});
+
+	describe('Matrix String Save Button State', () => {
+		it('should enable Save when all rows have values and column label is set', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
+
+		it('should disable Save when a row value is empty', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						...matrixStringQuestionData,
+						question_text: 'Q?',
+						options: {
+							rows: {
+								label: 'Questions',
+								items: [
+									{ id: 1, key: 'A', value: 'Filled row' },
+									{ id: 2, key: 'B', value: '' }
+								]
+							},
+							columns: { label: 'Answer', input_type: 'text' }
+						}
+					}
+				} as any
+			});
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeDisabled();
+		});
+
+		it('should disable Save when question text is empty', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: { ...matrixStringQuestionData, question_text: '' }
+				} as any
+			});
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeDisabled();
+		});
+	});
+
+	describe('Matrix String Row Management', () => {
+		it('should add a new row when "Add Question" is clicked', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+
+			const buttons = Array.from(container.querySelectorAll('button'));
+			const addButton = buttons.find((btn) => btn.textContent?.includes('Add Question'));
+			expect(addButton).toBeDefined();
+
+			const initialInputs = screen.getAllByRole('textbox');
+			await fireEvent.click(addButton!);
+
+			const updatedInputs = screen.getAllByRole('textbox');
+			expect(updatedInputs.length).toBe(initialInputs.length + 1);
+		});
+
+		it('should remove a row when delete is clicked with multiple rows', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+
+			const initialInputs = screen.getAllByRole('textbox');
+			const deleteButtons = screen.getAllByRole('button', { name: /delete row/i });
+			expect(deleteButtons.length).toBeGreaterThan(0);
+
+			await fireEvent.click(deleteButtons[0]);
+
+			const updatedInputs = screen.getAllByRole('textbox');
+			expect(updatedInputs.length).toBe(initialInputs.length - 1);
+		});
+
+		it('should assign sequential letter keys to new rows', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixStringQuestionData } as any
+			});
+
+			const buttons = Array.from(container.querySelectorAll('button'));
+			const addButton = buttons.find((btn) => btn.textContent?.includes('Add Question'));
+			await fireEvent.click(addButton!);
+
+			const cBadges = Array.from(container.querySelectorAll('div')).filter(
+				(el) => el.textContent?.trim() === 'C'
+			);
+			expect(cBadges.length).toBeGreaterThan(0);
+		});
+	});
+});
+
+describe('Single Question Page - Matrix Number Question Type', () => {
+	const matrixNumberQuestionData = {
+		question_text: 'Calculate the following',
+		question_type: QuestionTypeEnum.MatrixInput,
+		options: {
+			rows: {
+				label: 'Equations',
+				items: [
+					{ id: 1, key: 'A', value: '2 + 2' },
+					{ id: 2, key: 'B', value: '3 + 3' }
+				]
+			},
+			columns: {
+				label: 'Result',
+				input_type: 'number'
+			}
+		},
+		correct_answer: [],
+		is_mandatory: false,
+		is_active: true,
+		marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+	};
+
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	describe('QuestionTypeEnum', () => {
+		it('should have MatrixNumber value in QuestionTypeEnum', () => {
+			expect(QuestionTypeEnum.MatrixNumber).toBe('matrix-number');
+		});
+	});
+
+	describe('Edit mode load conversion', () => {
+		it('should show "Matrix Number" in dropdown when question_type is matrix-input with number input_type', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			expect(screen.getByText('Matrix Number')).toBeInTheDocument();
+		});
+
+		it('should render "Number Input Matrix" heading for matrix-input with number type', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			expect(screen.getByText('Number Input Matrix')).toBeInTheDocument();
+		});
+
+		it('should display prefilled row items when editing number matrix question', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('2 + 2')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('3 + 3')).toBeInTheDocument();
+		});
+
+		it('should display prefilled column label for number matrix', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Result')).toBeInTheDocument();
+		});
+
+		it('should display prefilled row label for number matrix', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			expect(screen.getByDisplayValue('Equations')).toBeInTheDocument();
+		});
+	});
+
+	describe('Matrix Number UI Rendering', () => {
+		it('should render "Add Question" button for number matrix', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			const buttons = Array.from(container.querySelectorAll('button'));
+			expect(buttons.find((btn) => btn.textContent?.includes('Add Question'))).toBeDefined();
+		});
+
+		it('should not render "Add Answer" button for number matrix (no columns items)', () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			const buttons = Array.from(container.querySelectorAll('button'));
+			expect(buttons.find((btn) => btn.textContent?.includes('Add Answer'))).toBeUndefined();
+		});
+	});
+
+	describe('Matrix Number Save Button State', () => {
+		it('should enable Save when all rows have values', () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeEnabled();
+		});
+
+		it('should disable Save when a row value is empty', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						...matrixNumberQuestionData,
+						question_text: 'Q?',
+						options: {
+							rows: {
+								label: 'Equations',
+								items: [
+									{ id: 1, key: 'A', value: '2 + 2' },
+									{ id: 2, key: 'B', value: '' }
+								]
+							},
+							columns: { label: 'Result', input_type: 'number' }
+						}
+					}
+				} as any
+			});
+			const saveButton = screen.getByRole('button', { name: /Save/i });
+			expect(saveButton).toBeDisabled();
+		});
+	});
+
+	describe('Matrix Number Row Management', () => {
+		it('should add a new row when "Add Question" is clicked', async () => {
+			const { container } = render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+
+			const buttons = Array.from(container.querySelectorAll('button'));
+			const addButton = buttons.find((btn) => btn.textContent?.includes('Add Question'));
+			expect(addButton).toBeDefined();
+
+			const initialInputs = screen.getAllByRole('textbox');
+			await fireEvent.click(addButton!);
+
+			const updatedInputs = screen.getAllByRole('textbox');
+			expect(updatedInputs.length).toBe(initialInputs.length + 1);
+		});
+
+		it('should remove a row when delete is clicked with multiple rows', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: matrixNumberQuestionData } as any
+			});
+
+			const initialInputs = screen.getAllByRole('textbox');
+			const deleteButtons = screen.getAllByRole('button', { name: /delete row/i });
+
+			await fireEvent.click(deleteButtons[0]);
+
+			const updatedInputs = screen.getAllByRole('textbox');
+			expect(updatedInputs.length).toBe(initialInputs.length - 1);
+		});
+	});
+});

@@ -14,7 +14,12 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import { questionSchema, type FormSchema, type TagFormSchema } from './schema';
+	import {
+		questionSchema,
+		matrixInputOptionsSchema,
+		type FormSchema,
+		type TagFormSchema
+	} from './schema';
 	import { QuestionTypeEnum } from '$lib/types/question';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
@@ -169,6 +174,22 @@
 					}
 				};
 				$formData.correct_answer = [];
+			} else if (
+				$formData.question_type === QuestionTypeEnum.MatrixString ||
+				$formData.question_type === QuestionTypeEnum.MatrixNumber
+			) {
+				$formData.options = {
+					rows: {
+						label: matrixRowLabel,
+						items: matrixLeftItems.map(({ id, key, value }) => ({ id, key, value }))
+					},
+					columns: {
+						label: matrixColLabel,
+						input_type: matrixInputType!
+					}
+				};
+				$formData.correct_answer = [];
+				$formData.question_type = QuestionTypeEnum.MatrixInput;
 			}
 			$formData.organization_id = data.user.organization_id;
 		}
@@ -198,6 +219,24 @@
 			skipped: 0
 		};
 	}
+
+	if ($formData.question_type === QuestionTypeEnum.MatrixInput) {
+		const parsed = matrixInputOptionsSchema.safeParse($formData.options);
+		if (parsed.success) {
+			$formData.question_type =
+				parsed.data.columns.input_type === 'text'
+					? QuestionTypeEnum.MatrixString
+					: QuestionTypeEnum.MatrixNumber;
+		}
+	}
+
+	const matrixInputType = $derived<'text' | 'number' | undefined>(
+		$formData.question_type === QuestionTypeEnum.MatrixString
+			? 'text'
+			: $formData.question_type === QuestionTypeEnum.MatrixNumber
+				? 'number'
+				: undefined
+	);
 
 	const isMatrixOptions = (
 		opts: unknown
@@ -569,6 +608,10 @@
 			return leftWithText.length < 2 || rightWithText.length < 2;
 		}
 
+		if (type === QuestionTypeEnum.MatrixString || type === QuestionTypeEnum.MatrixNumber) {
+			return matrixLeftItems.some((i) => !i.value.trim()) || !matrixColLabel.trim();
+		}
+
 		// Single/Multi choice: need ≥2 options with content and at least one marked correct
 		const optionsWithContent = totalOptions.filter((option) =>
 			hasContent(option.value, option.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
@@ -736,6 +779,10 @@
 												Matrix Match
 											{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
 												Matrix Rating
+											{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
+												Matrix Text
+											{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
+												Matrix Number
 											{:else}
 												Single/Multiple Choice
 											{/if}
@@ -749,6 +796,8 @@
 										<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
 										<Select.Item value={QuestionTypeEnum.MatrixMatch}>Matrix Match</Select.Item>
 										<Select.Item value={QuestionTypeEnum.MatrixRating}>Matrix Rating</Select.Item>
+										<Select.Item value={QuestionTypeEnum.MatrixString}>Matrix Text</Select.Item>
+										<Select.Item value={QuestionTypeEnum.MatrixNumber}>Matrix Number</Select.Item>
 									</Select.Content>
 								</Select.Root>
 							</div>
@@ -1213,6 +1262,61 @@
 								</div>
 							</div>
 						</div>
+					{:else if $formData.question_type === QuestionTypeEnum.MatrixString || $formData.question_type === QuestionTypeEnum.MatrixNumber}
+						<div class="flex flex-col gap-4">
+							{@render snippetHeading(
+								$formData.question_type === QuestionTypeEnum.MatrixString
+									? 'Text Input Matrix'
+									: 'Number Input Matrix'
+							)}
+							<div class="flex gap-4">
+								<div class="flex flex-1 flex-col gap-2">
+									<Input bind:value={matrixRowLabel} class="font-semibold" />
+									<p class="text-xs font-medium text-gray-500">Questions</p>
+									<div class="flex flex-col gap-2">
+										{#each matrixLeftItems as item, index (item.id)}
+											<div class="group flex flex-row items-center gap-2">
+												<div
+													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
+												>
+													{item.key}
+												</div>
+												<Input
+													class="flex-1 border border-black"
+													bind:value={matrixLeftItems[index].value}
+												/>
+												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+													if (matrixLeftItems.length > 1) {
+														matrixLeftItems = matrixLeftItems
+															.filter((_, i) => i !== index)
+															.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
+													}
+												})}
+											</div>
+										{/each}
+									</div>
+									{@render matrixAddButton('Add Question', () => {
+										matrixLeftItems.push({
+											id: nextId(matrixLeftItems),
+											key: String.fromCharCode(65 + matrixLeftItems.length),
+											value: ''
+										});
+									})}
+								</div>
+								<div class="flex flex-1 flex-col gap-2">
+									<Input
+										bind:value={matrixColLabel}
+										class="font-semibold"
+										placeholder="Answer column label"
+									/>
+									<p class="text-xs font-medium text-gray-500">
+										Answer column ({$formData.question_type === QuestionTypeEnum.MatrixString
+											? 'text'
+											: 'number'} input)
+									</p>
+								</div>
+							</div>
+						</div>
 					{:else}
 						<div class="flex flex-col gap-2">
 							{@render snippetHeading('Correct Answer')}
@@ -1337,7 +1441,8 @@
 							rowLabel: matrixRowLabel,
 							colLabel: matrixColLabel,
 							rows: matrixLeftItems,
-							columns: matrixRightItems
+							columns: matrixRightItems,
+							inputType: matrixInputType
 						},
 						media: questionMedia,
 						optionMediaMap

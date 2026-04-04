@@ -703,3 +703,261 @@ describe('Question_preview', () => {
 		});
 	});
 });
+
+describe('QuestionPreview - Matrix String', () => {
+	const matrixStringData = createData({
+		question_text: 'Answer the following',
+		question_type: 'matrix-string',
+		options: [],
+		matrix: {
+			rowLabel: 'Questions',
+			colLabel: 'Your Answer',
+			inputType: 'text',
+			rows: [
+				{ id: 1, key: 'A', value: 'Name the capital of France' },
+				{ id: 2, key: 'B', value: 'Name the capital of Germany' }
+			],
+			columns: []
+		}
+	});
+
+	it('renders row label and column label headers', async () => {
+		render(QuestionPreview, { props: { data: matrixStringData } });
+		await openDialog();
+		expect(screen.getByText('Questions')).toBeInTheDocument();
+		expect(screen.getByText('Your Answer')).toBeInTheDocument();
+	});
+
+	it('renders a row for each question item', async () => {
+		render(QuestionPreview, { props: { data: matrixStringData } });
+		await openDialog();
+		expect(screen.getByText('Name the capital of France')).toBeInTheDocument();
+		expect(screen.getByText('Name the capital of Germany')).toBeInTheDocument();
+	});
+
+	it('renders text inputs for each row', async () => {
+		render(QuestionPreview, { props: { data: matrixStringData } });
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		expect(inputs).toHaveLength(2);
+		inputs.forEach((input) => expect(input).toHaveAttribute('type', 'text'));
+	});
+
+	it('allows typing into answer inputs', async () => {
+		render(QuestionPreview, { props: { data: matrixStringData } });
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		await fireEvent.input(inputs[0], { target: { value: 'Paris' } });
+		expect(inputs[0]).toHaveValue('Paris');
+	});
+
+	it('each row input is independent', async () => {
+		render(QuestionPreview, { props: { data: matrixStringData } });
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		await fireEvent.input(inputs[0], { target: { value: 'Paris' } });
+		await fireEvent.input(inputs[1], { target: { value: 'Berlin' } });
+		expect(inputs[0]).toHaveValue('Paris');
+		expect(inputs[1]).toHaveValue('Berlin');
+	});
+
+	it('shows empty state when no rows exist', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createData({
+					question_type: 'matrix-string',
+					options: [],
+					matrix: { rowLabel: 'Q', colLabel: 'A', inputType: 'text', rows: [], columns: [] }
+				})
+			}
+		});
+		await openDialog();
+		expect(screen.getByText('Add items to see them in preview...')).toBeInTheDocument();
+	});
+
+	it('uses default labels when rowLabel/colLabel are absent', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createData({
+					question_type: 'matrix-string',
+					options: [],
+					matrix: { rows: [{ id: 1, key: 'A', value: 'Q1' }], columns: [], inputType: 'text' }
+				})
+			}
+		});
+		await openDialog();
+		expect(screen.getByText('Questions')).toBeInTheDocument();
+		expect(screen.getByText('Answer')).toBeInTheDocument();
+	});
+
+	it('filters out rows with empty values', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createData({
+					question_type: 'matrix-string',
+					options: [],
+					matrix: {
+						rowLabel: 'Questions',
+						colLabel: 'Answer',
+						inputType: 'text',
+						rows: [
+							{ id: 1, key: 'A', value: 'Valid question' },
+							{ id: 2, key: 'B', value: '' }
+						],
+						columns: []
+					}
+				})
+			}
+		});
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		expect(inputs).toHaveLength(1);
+		expect(screen.getByText('Valid question')).toBeInTheDocument();
+	});
+
+	it('clears answers when dialog is closed and reopened', async () => {
+		render(QuestionPreview, { props: { data: matrixStringData } });
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		await fireEvent.input(inputs[0], { target: { value: 'Paris' } });
+		expect(inputs[0]).toHaveValue('Paris');
+		await fireEvent.keyDown(document, { key: 'Escape' });
+		await openDialog();
+		const freshInputs = screen.getAllByPlaceholderText('Enter answer...');
+		expect(freshInputs[0]).toHaveValue('');
+	});
+});
+
+describe('QuestionPreview - Matrix Number', () => {
+	const matrixNumberData = createData({
+		question_text: 'Calculate the following',
+		question_type: 'matrix-number',
+		options: [],
+		matrix: {
+			rowLabel: 'Equations',
+			colLabel: 'Result',
+			inputType: 'number',
+			rows: [
+				{ id: 1, key: 'A', value: '2 + 2' },
+				{ id: 2, key: 'B', value: '3 + 3' }
+			],
+			columns: []
+		}
+	});
+
+	it('renders row label and column label headers', async () => {
+		render(QuestionPreview, { props: { data: matrixNumberData } });
+		await openDialog();
+		expect(screen.getByText('Equations')).toBeInTheDocument();
+		expect(screen.getByText('Result')).toBeInTheDocument();
+	});
+
+	it('renders a row for each equation', async () => {
+		render(QuestionPreview, { props: { data: matrixNumberData } });
+		await openDialog();
+		expect(screen.getByText('2 + 2')).toBeInTheDocument();
+		expect(screen.getByText('3 + 3')).toBeInTheDocument();
+	});
+
+	it('renders number inputs for each row', async () => {
+		render(QuestionPreview, { props: { data: matrixNumberData } });
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		expect(inputs).toHaveLength(2);
+		inputs.forEach((input) => expect(input).toHaveAttribute('type', 'number'));
+	});
+
+	it('allows typing numeric answers', async () => {
+		render(QuestionPreview, { props: { data: matrixNumberData } });
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		await fireEvent.input(inputs[0], { target: { value: '4' } });
+		expect(inputs[0]).toHaveValue(4);
+	});
+
+	it('each row input is independent', async () => {
+		render(QuestionPreview, { props: { data: matrixNumberData } });
+		await openDialog();
+		const inputs = screen.getAllByPlaceholderText('Enter answer...');
+		await fireEvent.input(inputs[0], { target: { value: '4' } });
+		await fireEvent.input(inputs[1], { target: { value: '6' } });
+		expect(inputs[0]).toHaveValue(4);
+		expect(inputs[1]).toHaveValue(6);
+	});
+
+	it('shows empty state when no rows exist', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createData({
+					question_type: 'matrix-number',
+					options: [],
+					matrix: { rowLabel: 'Q', colLabel: 'R', inputType: 'number', rows: [], columns: [] }
+				})
+			}
+		});
+		await openDialog();
+		expect(screen.getByText('Add items to see them in preview...')).toBeInTheDocument();
+	});
+});
+
+describe('QuestionPreview - Matrix Input (backend type)', () => {
+	it('renders text inputs when inputType is text', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createData({
+					question_type: 'matrix-input',
+					options: [],
+					matrix: {
+						rowLabel: 'Questions',
+						colLabel: 'Answer',
+						inputType: 'text',
+						rows: [{ id: 1, key: 'A', value: 'What is Svelte?' }],
+						columns: []
+					}
+				})
+			}
+		});
+		await openDialog();
+		const input = screen.getByPlaceholderText('Enter answer...');
+		expect(input).toHaveAttribute('type', 'text');
+	});
+
+	it('renders number inputs when inputType is number', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createData({
+					question_type: 'matrix-input',
+					options: [],
+					matrix: {
+						rowLabel: 'Questions',
+						colLabel: 'Answer',
+						inputType: 'number',
+						rows: [{ id: 1, key: 'A', value: '2 + 2' }],
+						columns: []
+					}
+				})
+			}
+		});
+		await openDialog();
+		const input = screen.getByPlaceholderText('Enter answer...');
+		expect(input).toHaveAttribute('type', 'number');
+	});
+
+	it('defaults to text input when inputType is not provided', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createData({
+					question_type: 'matrix-input',
+					options: [],
+					matrix: {
+						rows: [{ id: 1, key: 'A', value: 'Some question' }],
+						columns: []
+					}
+				})
+			}
+		});
+		await openDialog();
+		const input = screen.getByPlaceholderText('Enter answer...');
+		expect(input).toHaveAttribute('type', 'text');
+	});
+});

@@ -50,10 +50,3 @@ export const questionSchema = z.object({
 
 export type FormSchema = typeof questionSchema;
 
-export const tagSchema = z.object({
-	description: z.string().nullable().optional(),
-	name: z.string().min(1, { error: 'Tag name is required' }),
-	tag_type_id: z.number().nullable().default(null).optional()
-});
-
-export type TagFormSchema = typeof tagSchema;

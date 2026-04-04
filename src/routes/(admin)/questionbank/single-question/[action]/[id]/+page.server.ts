@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { questionSchema, tagSchema } from './schema.js';
+import { questionSchema } from './schema.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
@@ -89,11 +89,9 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	}
 
 	const form = await superValidate(zod4(questionSchema));
-	const tagForm = await superValidate(zod4(tagSchema));
 
 	return {
 		form,
-		tagForm,
 		questionData,
 		tagTypes,
 		questionRevisions
@@ -294,32 +292,6 @@ export const actions: Actions = {
 		redirect('/questionbank', { type: 'success', message: 'Question saved successfully' }, cookies);
 	},
 
-	tagSave: async ({ request, cookies }) => {
-		const token = getSessionTokenCookie();
-		const tagForm = await superValidate(request, zod4(tagSchema));
-		if (!tagForm.valid) {
-			setFlash({ type: 'error', message: `Tag Details not Valid` }, cookies);
-			return fail(400, { tagForm });
-		}
-		const response = await fetch(`${BACKEND_URL}/tag/`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`
-			},
-			body: JSON.stringify(tagForm.data)
-		});
-
-		if (!response.ok) {
-			const errorMessage = await response.json();
-			setFlash(
-				{ type: 'error', message: `Tag not Saved: ${errorMessage.detail || response.statusText}` },
-				cookies
-			);
-			return fail(500, { tagForm });
-		}
-		setFlash({ type: 'success', message: 'Tag saved successfully' }, cookies);
-	},
 	delete: async ({ params, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_QUESTION);

@@ -14,12 +14,7 @@
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
-	import {
-		questionSchema,
-		matrixInputOptionsSchema,
-		type FormSchema,
-		type TagFormSchema
-	} from './schema';
+	import { questionSchema, matrixInputOptionsSchema, type FormSchema } from './schema';
 	import { QuestionTypeEnum } from '$lib/types/question';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
@@ -40,7 +35,6 @@
 	}: {
 		data: {
 			form: SuperValidated<Infer<FormSchema>>;
-			tagForm: SuperValidated<Infer<TagFormSchema>>;
 			tagTypes: [];
 			user: User;
 			questionData?: any;

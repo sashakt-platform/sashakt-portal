@@ -50,12 +50,12 @@ describe('Single Question Page - Create Mode', () => {
 	describe('Basic Rendering', () => {
 		it('should render create view heading', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Create a Question')).toBeInTheDocument();
+			expect(screen.getByText('Create Question')).toBeInTheDocument();
 		});
 
 		it('should render question textarea', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByPlaceholderText('Enter your Question...')).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Enter your question here...')).toBeInTheDocument();
 		});
 
 		it('should render at least 4 answer inputs', () => {
@@ -77,7 +77,7 @@ describe('Single Question Page - Create Mode', () => {
 		it('should enable Save button when valid question and answers are provided', async () => {
 			render(SingleQuestionPage, { data: baseData });
 
-			const questionInput = screen.getByPlaceholderText('Enter your Question...');
+			const questionInput = screen.getByPlaceholderText('Enter your question here...');
 			await fireEvent.input(questionInput, { target: { value: 'What is Svelte?' } });
 
 			// Find answer option inputs by their name attribute (A, B, C, D)
@@ -88,7 +88,7 @@ describe('Single Question Page - Create Mode', () => {
 			await fireEvent.input(optionInputs[1], { target: { value: 'A library' } });
 
 			const checkboxes = screen.getAllByRole('checkbox');
-			await fireEvent.click(checkboxes[1]);
+			await fireEvent.click(checkboxes[0]);
 
 			const saveButton = screen.getByRole('button', { name: /Save/i });
 			expect(saveButton).toBeEnabled();
@@ -122,20 +122,21 @@ describe('Single Question Page - Create Mode', () => {
 	});
 
 	describe('Form Controls', () => {
-		it('should toggle mandatory checkbox', async () => {
+		it('should toggle mandatory switch', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const mandatoryCheckbox = screen.getAllByRole('checkbox')[0];
-			expect(mandatoryCheckbox).not.toBeChecked();
+			const mandatorySwitch = screen.getAllByRole('switch')[0];
+			expect(mandatorySwitch).not.toBeChecked();
 
-			await fireEvent.click(mandatoryCheckbox);
-			expect(mandatoryCheckbox).toBeChecked();
+			await fireEvent.click(mandatorySwitch);
+			expect(mandatorySwitch).toBeChecked();
 		});
 
 		it('should toggle Is Active switch', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const isActiveSwitch = screen.getByLabelText('Is Active?');
+			const switches = screen.getAllByRole('switch');
+			const isActiveSwitch = switches[1];
 			expect(isActiveSwitch).not.toBeChecked();
 
 			await fireEvent.click(isActiveSwitch);
@@ -145,7 +146,7 @@ describe('Single Question Page - Create Mode', () => {
 		it('should fill additional instructions textarea', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const instructions = screen.getByPlaceholderText('');
+			const instructions = screen.getByPlaceholderText('E.g., time limit, reference material...');
 			await fireEvent.input(instructions, { target: { value: 'Some instructions' } });
 			expect(instructions).toHaveValue('Some instructions');
 		});
@@ -223,17 +224,18 @@ describe('Single Question Page - Edit Mode', () => {
 			expect(screen.getByDisplayValue('No')).toBeInTheDocument();
 		});
 
-		it('should show mandatory checkbox as checked', () => {
+		it('should show mandatory switch as checked', () => {
 			render(SingleQuestionPage, { data: { ...baseData, questionData: editQuestionData } as any });
 
-			const mandatoryCheckbox = screen.getAllByRole('checkbox')[0];
-			expect(mandatoryCheckbox).toBeChecked();
+			const mandatorySwitch = screen.getAllByRole('switch')[0];
+			expect(mandatorySwitch).toBeChecked();
 		});
 
 		it('should show Is Active switch as checked', () => {
 			render(SingleQuestionPage, { data: { ...baseData, questionData: editQuestionData } as any });
 
-			const isActiveSwitch = screen.getByLabelText('Is Active?');
+			const switches = screen.getAllByRole('switch');
+			const isActiveSwitch = switches[1];
 			expect(isActiveSwitch).toBeChecked();
 		});
 
@@ -272,10 +274,10 @@ describe('Single Question Page - Edit Mode', () => {
 			render(SingleQuestionPage, { data: { ...baseData, questionData: editQuestionData } as any });
 
 			const checkboxes = screen.getAllByRole('checkbox');
-			expect(checkboxes[1]).toBeChecked();
+			expect(checkboxes[0]).toBeChecked();
 
-			await fireEvent.click(checkboxes[1]);
-			expect(checkboxes[1]).not.toBeChecked();
+			await fireEvent.click(checkboxes[0]);
+			expect(checkboxes[0]).not.toBeChecked();
 		});
 
 		it('should edit marking scheme', async () => {
@@ -336,13 +338,13 @@ describe('Single Question Page - Question Type Selection', () => {
 
 		it('should show Single Choice as default selected type', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Single/Multiple Choice')).toBeInTheDocument();
+			expect(screen.getAllByText('Single/Multiple Choice').length).toBeGreaterThan(0);
 		});
 
 		it('should show answer options for Single Choice type', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			expect(screen.getByText('Answer')).toBeInTheDocument();
+			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
 			expect(screen.getByRole('button', { name: /Add Answer/i })).toBeInTheDocument();
 		});
 	});
@@ -588,14 +590,14 @@ describe('Single Question Page - Wrong and Skipped Marks', () => {
 		vi.clearAllMocks();
 	});
 
-	it('should render "Marks for wrong answer" field', () => {
+	it('should render "Incorrect" marks field', () => {
 		render(SingleQuestionPage, { data: baseData as any });
-		expect(screen.getByText('Marks for wrong answer')).toBeInTheDocument();
+		expect(screen.getByText('Incorrect')).toBeInTheDocument();
 	});
 
-	it('should render "Marks for skipped answer" field', () => {
+	it('should render "No answer" marks field', () => {
 		render(SingleQuestionPage, { data: baseData as any });
-		expect(screen.getByText('Marks for skipped answer')).toBeInTheDocument();
+		expect(screen.getByText('No answer')).toBeInTheDocument();
 	});
 
 	it('should update wrong marks input value', async () => {
@@ -795,15 +797,14 @@ describe('Single Question Page - Multi Choice Question Type', () => {
 				data: { ...baseData, questionData: multiChoiceQuestionData } as any
 			});
 
-			expect(screen.getByText('Answer')).toBeInTheDocument();
+			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
 		});
 
-		it('should hide Answer Settings section for multi choice questions', () => {
+		it('should hide subjective answer settings for multi choice questions', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceQuestionData } as any
 			});
 
-			expect(screen.queryByText('Answer Settings')).not.toBeInTheDocument();
 			expect(screen.queryByText('Maximum character limit')).not.toBeInTheDocument();
 		});
 
@@ -1033,29 +1034,28 @@ describe('Single Question Page - Numerical Integer Question Type', () => {
 	});
 
 	describe('Numerical Integer UI', () => {
-		it('should show Correct Answer section', () => {
+		it('should show Answer Settings section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
-			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
+			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
 		});
 
-		it('should hide Answer section and Add Answer button', () => {
+		it('should hide Add Answer button', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
-			expect(screen.queryByText('Answer')).not.toBeInTheDocument();
 			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
 		});
 
-		it('should hide Answer Settings section', () => {
+		it('should hide subjective answer settings for numerical questions', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
-			expect(screen.queryByText('Answer Settings')).not.toBeInTheDocument();
+			expect(screen.queryByText('Maximum character limit')).not.toBeInTheDocument();
 		});
 
 		it('should render number input with step="any"', () => {
@@ -1142,20 +1142,19 @@ describe('Single Question Page - Numerical Decimal Question Type', () => {
 	});
 
 	describe('Numerical Decimal UI', () => {
-		it('should show Correct Answer section', () => {
+		it('should show Answer Settings section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: numericalDecimalData } as any
 			});
 
-			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
+			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
 		});
 
-		it('should hide Answer section and Add Answer button', () => {
+		it('should hide Add Answer button', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: numericalDecimalData } as any
 			});
 
-			expect(screen.queryByText('Answer')).not.toBeInTheDocument();
 			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
 		});
 
@@ -1323,11 +1322,11 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 	});
 
 	describe('Matrix Rating UI Rendering', () => {
-		it('should render "Rating Matrix" heading for matrix rating type', () => {
+		it('should render "Items to Rate" label for matrix rating type', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
-			expect(screen.getByText('Rating Matrix')).toBeInTheDocument();
+			expect(screen.getByText('Items to Rate')).toBeInTheDocument();
 		});
 
 		it('should render "Items to Rate" label', () => {
@@ -1595,11 +1594,11 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 	});
 
 	describe('Matrix Match UI Rendering', () => {
-		it('should render "Match The Following" heading for matrix match type', () => {
+		it('should render Correct Answers section for matrix match type', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
-			expect(screen.getByText('Match The Following')).toBeInTheDocument();
+			expect(screen.getByText('Correct Answers')).toBeInTheDocument();
 		});
 
 		it('should render Correct Answers section', () => {
@@ -1936,7 +1935,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 	});
 
 	describe('Matrix Match Default State (Create Mode)', () => {
-		it('should render "Match The Following" when matrix-match type is set via form default', () => {
+		it('should render Correct Answers section when matrix-match type is set via form default', () => {
 			render(SingleQuestionPage, {
 				data: {
 					...baseData,
@@ -1968,7 +1967,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 					}
 				} as any
 			});
-			expect(screen.getByText('Match The Following')).toBeInTheDocument();
+			expect(screen.getByText('Correct Answers')).toBeInTheDocument();
 		});
 
 		it('should show default "Column A" placeholder in left label input', () => {
@@ -2020,37 +2019,31 @@ describe('Single Question Page - Media', () => {
 		vi.clearAllMocks();
 	});
 
-	describe('Add media button', () => {
-		it('should show "Add media" buttons in create mode', () => {
+	describe('Add attachment button', () => {
+		it('should show "Add attachment" buttons in create mode', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			const mediaButtons = screen.getAllByText('Add media');
+			const attachmentButtons = screen.getAllByText('Add attachment');
 			// Question-level + 4 default options
-			expect(mediaButtons.length).toBe(5);
+			expect(attachmentButtons.length).toBe(5);
 		});
 
-		it('should toggle question-level media manager when clicked', async () => {
+		it('should show attachment dropdown when clicked', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			// First "Add media" is the question-level one
-			const addMediaButtons = screen.getAllByText('Add media');
-			await fireEvent.click(addMediaButtons[0]);
+			// First "Add attachment" is the question-level one
+			const addAttachmentButtons = screen.getAllByText('Add attachment');
+			await fireEvent.click(addAttachmentButtons[0]);
 
-			expect(screen.getByText('Hide media')).toBeInTheDocument();
 			expect(screen.getByText('Image')).toBeInTheDocument();
-			expect(screen.getByText('External Media')).toBeInTheDocument();
+			expect(screen.getByText('Video')).toBeInTheDocument();
+			expect(screen.getByText('Audio')).toBeInTheDocument();
 		});
 
-		it('should hide media manager when "Hide media" is clicked', async () => {
+		it('should show all attachment buttons when no attachment is selected', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const addMediaButtons = screen.getAllByText('Add media');
-			await fireEvent.click(addMediaButtons[0]);
-
-			const hideMediaBtn = screen.getByText('Hide media');
-			await fireEvent.click(hideMediaBtn);
-
-			// Should go back to 5 "Add media" buttons
-			expect(screen.getAllByText('Add media').length).toBe(5);
+			// Should have 5 "Add attachment" buttons
+			expect(screen.getAllByText('Add attachment').length).toBe(5);
 		});
 	});
 
@@ -2089,13 +2082,13 @@ describe('Single Question Page - Media', () => {
 			}
 		};
 
-		it('should auto-expand media panels when media exists', () => {
+		it('should display existing media when media exists', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: questionDataWithMedia } as any
 			});
-			// Both question-level and option A should auto-expand
-			const hideButtons = screen.getAllByText('Hide media');
-			expect(hideButtons.length).toBe(2);
+			// Both question-level and option A should show their media info
+			expect(screen.getByText(/image\/jpeg/)).toBeInTheDocument();
+			expect(screen.getByText(/image\/png/)).toBeInTheDocument();
 		});
 
 		it('should display existing question-level media info', () => {
@@ -2112,44 +2105,42 @@ describe('Single Question Page - Media', () => {
 			expect(screen.getByText(/image\/png/)).toBeInTheDocument();
 		});
 
-		it('should show "Add media" for options without media', () => {
+		it('should show "Add attachment" for options without media', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: questionDataWithMedia } as any
 			});
-			// Option B has no media — its button says "Add media"
-			const addMediaButtons = screen.getAllByText('Add media');
-			expect(addMediaButtons.length).toBeGreaterThanOrEqual(1);
+			// Option B has no media — its button says "Add attachment"
+			const addAttachmentButtons = screen.getAllByText('Add attachment');
+			expect(addAttachmentButtons.length).toBeGreaterThanOrEqual(1);
 		});
 	});
 
-	describe('Media manager UI', () => {
-		it('should show upload area when media panel is open', async () => {
+	describe('Attachment input UI', () => {
+		it('should show Image option in dropdown when attachment button is clicked', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const addMediaButtons = screen.getAllByText('Add media');
-			await fireEvent.click(addMediaButtons[0]);
+			const addAttachmentButtons = screen.getAllByText('Add attachment');
+			await fireEvent.click(addAttachmentButtons[0]);
 
-			expect(screen.getByText('Click to upload image')).toBeInTheDocument();
+			expect(screen.getByText('Image')).toBeInTheDocument();
 		});
 
-		it('should show external media URL input when media panel is open', async () => {
+		it('should show Video option in dropdown when attachment button is clicked', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const addMediaButtons = screen.getAllByText('Add media');
-			await fireEvent.click(addMediaButtons[0]);
+			const addAttachmentButtons = screen.getAllByText('Add attachment');
+			await fireEvent.click(addAttachmentButtons[0]);
 
-			expect(
-				screen.getByPlaceholderText('Paste YouTube, Vimeo, Spotify, or SoundCloud URL...')
-			).toBeInTheDocument();
+			expect(screen.getByText('Video')).toBeInTheDocument();
 		});
 
-		it('should show file format and size hint', async () => {
+		it('should show Audio option in dropdown when attachment button is clicked', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const addMediaButtons = screen.getAllByText('Add media');
-			await fireEvent.click(addMediaButtons[0]);
+			const addAttachmentButtons = screen.getAllByText('Add attachment');
+			await fireEvent.click(addAttachmentButtons[0]);
 
-			expect(screen.getByText(/PNG, JPG, WebP, GIF/)).toBeInTheDocument();
+			expect(screen.getByText('Audio')).toBeInTheDocument();
 		});
 	});
 });
@@ -2657,12 +2648,12 @@ describe('Single Question Page - Matrix String Question Type', () => {
 			expect(screen.getByText('Matrix Text')).toBeInTheDocument();
 		});
 
-		it('should render "String Input Matrix" heading for matrix-input with text type', () => {
+		it('should render Matrix Text type label for matrix-input with text type', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixStringQuestionData } as any
 			});
 
-			expect(screen.getByText('Text Input Matrix')).toBeInTheDocument();
+			expect(screen.getByText('Matrix Text')).toBeInTheDocument();
 		});
 
 		it('should display prefilled row items when editing matrix-input question', () => {
@@ -2860,11 +2851,11 @@ describe('Single Question Page - Matrix Number Question Type', () => {
 			expect(screen.getByText('Matrix Number')).toBeInTheDocument();
 		});
 
-		it('should render "Number Input Matrix" heading for matrix-input with number type', () => {
+		it('should render Matrix Number type label for matrix-input with number type', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixNumberQuestionData } as any
 			});
-			expect(screen.getByText('Number Input Matrix')).toBeInTheDocument();
+			expect(screen.getByText('Matrix Number')).toBeInTheDocument();
 		});
 
 		it('should display prefilled row items when editing number matrix question', () => {

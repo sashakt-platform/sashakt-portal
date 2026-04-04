@@ -125,29 +125,6 @@
 		}
 	};
 
-	// render expanded row content for question options
-	const renderExpandedRow = (row: QuestionForSelection) => {
-		return `
-			<div class="p-4">
-				${row.options
-					?.map(
-						(option) => `
-					<div class="flex items-center my-2">
-						<span class="bg-primary-foreground rounded-sm p-2 mr-3">${option.key}</span>
-						<span class="mr-4">${option.value}</span>
-						${
-							row.correct_answer?.includes(option.id)
-								? '<svg class="text-primary my-auto ml-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
-								: ''
-						}
-					</div>
-				`
-					)
-					.join('')}
-			</div>
-		`;
-	};
-
 	// handle selection confirmation
 	const handleSelectionConfirm = () => {
 		open = false;
@@ -212,9 +189,6 @@
 							currentPage={questionParams?.questionPage || 1}
 							pageSize={questionParams?.questionSize || DEFAULT_PAGE_SIZE}
 							paramPrefix="question"
-							expandable={true}
-							{renderExpandedRow}
-							expandColumnId="answers"
 							emptyStateMessage="No questions found."
 							enableSelection={true}
 							onSelectionChange={handleSelectionChange}

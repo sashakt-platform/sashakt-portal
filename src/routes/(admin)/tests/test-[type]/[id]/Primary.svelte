@@ -56,7 +56,7 @@
 <!-- Two-Column Layout -->
 <div class="flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:gap-0">
 	<!-- Left Column: Name + Description -->
-	<div class="flex flex-1 flex-col gap-6 lg:pr-8">
+	<div class="flex w-full flex-1 flex-col gap-6 lg:w-3/5 lg:pr-8">
 		<div>
 			<Label for="template-name" class="text-sm font-medium text-gray-700">
 				{$formData.is_template ? 'Template Name' : 'Test Name'}
@@ -93,7 +93,7 @@
 	<div class="hidden lg:block lg:w-px lg:self-stretch lg:bg-gray-200"></div>
 
 	<!-- Right Column: Tag Types, Tags, State, District, Status -->
-	<div class="flex w-full flex-col gap-5 lg:w-72 lg:pl-8 xl:w-80">
+	<div class="flex w-full flex-col gap-5 lg:w-2/5 lg:pl-8">
 		<div>
 			<Label class="text-sm font-medium text-gray-700">Tag Types</Label>
 			<div class="mt-2">
@@ -104,7 +104,11 @@
 		<div>
 			<Label class="text-sm font-medium text-gray-700">Tags</Label>
 			<div class="mt-2">
-				<TagsSelection bind:tags={$formData.tag_ids} />
+				<TagsSelection
+					bind:tags={$formData.tag_ids}
+					filteration={true}
+					tagTypes={selectedTagTypes}
+				/>
 			</div>
 		</div>
 

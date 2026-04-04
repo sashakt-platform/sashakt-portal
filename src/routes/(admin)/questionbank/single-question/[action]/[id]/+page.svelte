@@ -16,7 +16,7 @@
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { questionSchema, matrixInputOptionsSchema, type FormSchema } from './schema';
 	import { QuestionTypeEnum } from '$lib/types/question';
-	import * as Select from '$lib/components/ui/select/index.js';
+	import ChooseQuestionType from './ChooseQuestionType.svelte';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import QuestionRevision from './QuestionRevision.svelte';
@@ -282,6 +282,7 @@
 	);
 
 	let selectedTagTypes = $state<{ id: string; name: string }[]>([]);
+	let openQuestionTypeDialog = $state(!questionData);
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
 	// Media state
@@ -712,64 +713,46 @@
 			<div class="flex flex-col gap-6 lg:w-2/3">
 				<!-- Card 1: QUESTION TYPE -->
 				<div class="rounded-lg border">
-					<div class="bg-muted rounded-t-lg px-4 py-3">
+					<button
+						type="button"
+						class="bg-muted hover:bg-muted/80 flex w-full items-center justify-between rounded-t-lg px-4 py-3 transition-colors"
+						onclick={() => (openQuestionTypeDialog = true)}
+					>
 						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
 							>Question Type</span
 						>
-					</div>
+						<span class="text-muted-foreground text-xs">
+							{#if $formData.question_type === QuestionTypeEnum.Subjective}
+								Subjective
+							{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger || $formData.question_type === QuestionTypeEnum.NumericalDecimal}
+								Numerical
+							{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
+								Matrix Match
+							{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
+								Matrix Rating
+							{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
+								Matrix Text
+							{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
+								Matrix Number
+							{:else}
+								Single/Multiple Choice
+							{/if}
+						</span>
+					</button>
+					<ChooseQuestionType
+						bind:open={openQuestionTypeDialog}
+						onSelect={(type) => {
+							$formData.question_type = type;
+							$formData.correct_answer = [];
+							totalOptions = Array.from({ length: 4 }, (_, i) => ({
+								id: i + 1,
+								key: String.fromCharCode(65 + i),
+								value: '',
+								correct_answer: false
+							}));
+						}}
+					/>
 					<div class="flex flex-col gap-6 p-6">
-						<!-- Question Type Selector (temporary - replaced by dialog in Step 3) -->
-						<div class="flex flex-row items-center gap-2">
-							<Label class="text-muted-foreground text-sm">Question Type</Label>
-							<Select.Root
-								type="single"
-								value={$formData.question_type === QuestionTypeEnum.MultiChoice
-									? QuestionTypeEnum.SingleChoice
-									: $formData.question_type}
-								onValueChange={(value) => {
-									$formData.question_type = value as QuestionTypeEnum;
-									$formData.correct_answer = [];
-									totalOptions = Array.from({ length: 4 }, (_, i) => ({
-										id: i + 1,
-										key: String.fromCharCode(65 + i),
-										value: '',
-										correct_answer: false
-									}));
-								}}
-							>
-								<Select.Trigger class="w-48 border-gray-300">
-									<span>
-										{#if $formData.question_type === QuestionTypeEnum.Subjective}
-											Subjective
-										{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger || $formData.question_type === QuestionTypeEnum.NumericalDecimal}
-											Numerical
-										{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
-											Matrix Match
-										{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
-											Matrix Rating
-										{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
-											Matrix Text
-										{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
-											Matrix Number
-										{:else}
-											Single/Multiple Choice
-										{/if}
-									</span>
-								</Select.Trigger>
-								<Select.Content>
-									<Select.Item value={QuestionTypeEnum.SingleChoice}
-										>Single/Multiple Choice</Select.Item
-									>
-									<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
-									<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
-									<Select.Item value={QuestionTypeEnum.MatrixMatch}>Matrix Match</Select.Item>
-									<Select.Item value={QuestionTypeEnum.MatrixRating}>Matrix Rating</Select.Item>
-									<Select.Item value={QuestionTypeEnum.MatrixString}>Matrix Text</Select.Item>
-									<Select.Item value={QuestionTypeEnum.MatrixNumber}>Matrix Number</Select.Item>
-								</Select.Content>
-							</Select.Root>
-						</div>
-
 						<!-- Question Text -->
 						<div class="flex flex-col gap-2">
 							<Label class="font-semibold">Question</Label>
@@ -1294,8 +1277,6 @@
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.MatrixString || $formData.question_type === QuestionTypeEnum.MatrixNumber}
 							<div class="flex flex-col gap-4">
-								$formData.question_type === QuestionTypeEnum.MatrixString ? 'Text Input Matrix' :
-								'Number Input Matrix' )}
 								<div class="flex gap-4">
 									<div class="flex flex-1 flex-col gap-2">
 										<Input bind:value={matrixRowLabel} class="font-semibold" />

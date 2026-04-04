@@ -119,13 +119,17 @@
 				</div>
 			{:else}
 				<div class="mb-4 flex items-center justify-between">
-					<p class="text-sm text-gray-500">
-						{totalSelectedCount}
-						{totalSelectedCount === 1 ? 'question' : 'questions'} selected
+					<p class="text-primary text-sm font-semibold">
+						✓ {totalSelectedCount}
+						{totalSelectedCount === 1 ? 'question' : 'questions'} added
 					</p>
-					<Button variant="outline" onclick={() => (dialogOpen = true)}>
-						Select More Questions
-					</Button>
+					<button
+						type="button"
+						class="text-primary hover:text-primary/80 flex items-center gap-1 text-sm font-semibold hover:cursor-pointer"
+						onclick={() => (dialogOpen = true)}
+					>
+						+ Add more questions
+					</button>
 				</div>
 				<SelectedQuestionsList
 					selectedQuestions={$formData.question_revisions || []}

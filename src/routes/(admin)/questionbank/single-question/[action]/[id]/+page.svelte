@@ -17,6 +17,7 @@
 	import { questionSchema, matrixInputOptionsSchema, type FormSchema } from './schema';
 	import { QuestionTypeEnum } from '$lib/types/question';
 	import ChooseQuestionType from './ChooseQuestionType.svelte';
+	import AttachmentInput from './AttachmentInput.svelte';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import QuestionRevision from './QuestionRevision.svelte';
@@ -761,38 +762,17 @@
 								bind:value={$formData.question_text}
 								placeholder="Enter your question here..."
 							/>
-							<div class="flex items-center gap-2">
-								<button
-									type="button"
-									class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {questionMediaVisible
-										? 'bg-primary/10'
-										: ''}"
-									onclick={() => (questionMediaVisible = !questionMediaVisible)}
-								>
-									<ImageIcon size={16} />
-									{questionMediaVisible
-										? 'Hide media'
-										: questionMedia?.image || questionMedia?.external_media
-											? 'Show media'
-											: 'Add media'}
-								</button>
-								{#if !questionMediaVisible && (questionMedia?.image || questionMedia?.external_media)}
-									<span class="text-xs text-gray-400">(media attached)</span>
-								{/if}
-							</div>
-							{#if questionMediaVisible || stagedImageFile || stagedExternalUrl.trim()}
-								<MediaManager
-									media={questionMedia}
-									onStagedFileChange={(f) => (stagedImageFile = f)}
-									onStagedUrlChange={(u) => (stagedExternalUrl = u)}
-									onDeleteImage={questionId
-										? () => deleteMedia(`/api/media/questions/${questionId}/image`)
-										: undefined}
-									onDeleteExternal={questionId
-										? () => deleteMedia(`/api/media/questions/${questionId}/external`)
-										: undefined}
-								/>
-							{/if}
+							<AttachmentInput
+								media={questionMedia}
+								onStagedFileChange={(f) => (stagedImageFile = f)}
+								onStagedUrlChange={(u) => (stagedExternalUrl = u)}
+								onDeleteImage={questionId
+									? () => deleteMedia(`/api/media/questions/${questionId}/image`)
+									: undefined}
+								onDeleteExternal={questionId
+									? () => deleteMedia(`/api/media/questions/${questionId}/external`)
+									: undefined}
+							/>
 						</div>
 
 						<!-- Additional Instructions -->

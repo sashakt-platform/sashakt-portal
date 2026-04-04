@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Info from '@lucide/svelte/icons/info';
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import Label from '$lib/components/ui/label/label.svelte';
@@ -26,7 +26,6 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import Tag from './Tag.svelte';
 	import QuestionRevision from './QuestionRevision.svelte';
-	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 	import QuestionPreview from './QuestionPreview.svelte';
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
@@ -667,768 +666,20 @@
 				<ImageIcon size={16} />
 			</button>
 		{/snippet}
-		{#snippet snippetHeading(title: string)}
-			<div class="bg-primary-foreground flex flex-row gap-3 rounded-sm px-4 py-3 align-middle">
-				<Label class="text-md my-auto font-bold">{title}</Label><Info
-					class="my-auto w-4 align-middle text-xs text-gray-600"
-				/>
+		<!-- HEADER -->
+		<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
+			<div class="flex items-center gap-3">
+				<a href={resolve('/questionbank')} class="hover:bg-muted rounded-lg border p-2">
+					<ArrowLeft size={20} />
+				</a>
+				<h2 class="text-2xl font-bold tracking-tight">
+					{questionData ? 'Edit Question' : 'Create Question'}
+				</h2>
 			</div>
-		{/snippet}
-		<div class="mx-4 flex flex-col gap-4 sm:mx-6 md:mx-10 md:flex-row">
-			<div class="my-auto flex flex-col">
-				<div class="flex w-full items-center align-middle">
-					<div class="flex flex-row">
-						<h2
-							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
-						>
-							{questionData ? 'Edit Question' : 'Create a Question'}
-						</h2>
-						<TooltipInfo
-							label="Help: Question Form"
-							description="Here you can add a new question by providing the question text, possible answers, marking scheme, tags, and states. Make sure to mark the correct answer(s) before saving."
-						/>
-					</div>
-				</div>
-				<Label class="my-auto align-middle text-sm font-extralight">
-					<!-- {questionData ? 'Edit Existing Question' : 'Add questions with tags and details'} -->
-				</Label>
-			</div>
-			<div
-				class={[
-					'text-primary my-auto flex cursor-pointer flex-row gap-2 p-2 font-bold md:ml-auto md:p-4'
-				]}
-			>
+			<div class="flex items-center gap-2">
 				{#if questionData}
 					<QuestionRevision {data} />
 				{/if}
-			</div>
-		</div>
-		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-8 md:p-9">
-			<div class="flex flex-col gap-6 lg:flex-row lg:gap-0">
-				<div class="flex w-full flex-col gap-4 lg:w-3/5 lg:pr-8">
-					<div class="flex flex-col gap-2">
-						{@render snippetHeading('Question')}
-						<Textarea
-							name="questionText"
-							bind:value={$formData.question_text}
-							placeholder="Enter your Question..."
-						/>
-						<div class="flex items-center gap-2">
-							<button
-								type="button"
-								class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {questionMediaVisible
-									? 'bg-primary/10'
-									: ''}"
-								onclick={() => (questionMediaVisible = !questionMediaVisible)}
-							>
-								<ImageIcon size={16} />
-								{questionMediaVisible
-									? 'Hide media'
-									: questionMedia?.image || questionMedia?.external_media
-										? 'Show media'
-										: 'Add media'}
-							</button>
-							{#if !questionMediaVisible && (questionMedia?.image || questionMedia?.external_media)}
-								<span class="text-xs text-gray-400">(media attached)</span>
-							{/if}
-						</div>
-						{#if questionMediaVisible || stagedImageFile || stagedExternalUrl.trim()}
-							<MediaManager
-								media={questionMedia}
-								onStagedFileChange={(f) => (stagedImageFile = f)}
-								onStagedUrlChange={(u) => (stagedExternalUrl = u)}
-								onDeleteImage={questionId
-									? () => deleteMedia(`/api/media/questions/${questionId}/image`)
-									: undefined}
-								onDeleteExternal={questionId
-									? () => deleteMedia(`/api/media/questions/${questionId}/external`)
-									: undefined}
-							/>
-						{/if}
-
-						<div class="flex flex-col gap-4">
-							<div class="flex flex-row items-center gap-2">
-								<Checkbox bind:checked={$formData.is_mandatory} />
-								<Label class="text-sm">Set as mandatory</Label>
-							</div>
-							<div class="flex flex-row items-center gap-2">
-								<Label class="text-sm text-gray-600">Question Type</Label>
-								<Select.Root
-									type="single"
-									value={$formData.question_type === QuestionTypeEnum.MultiChoice
-										? QuestionTypeEnum.SingleChoice
-										: $formData.question_type}
-									onValueChange={(value) => {
-										$formData.question_type = value as QuestionTypeEnum;
-										$formData.correct_answer = [];
-										totalOptions = Array.from({ length: 4 }, (_, i) => ({
-											id: i + 1,
-											key: String.fromCharCode(65 + i),
-											value: '',
-											correct_answer: false
-										}));
-									}}
-								>
-									<Select.Trigger class="w-48 border-gray-300">
-										<span>
-											{#if $formData.question_type === QuestionTypeEnum.Subjective}
-												Subjective
-											{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger || $formData.question_type === QuestionTypeEnum.NumericalDecimal}
-												Numerical
-											{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
-												Matrix Match
-											{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
-												Matrix Rating
-											{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
-												Matrix Text
-											{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
-												Matrix Number
-											{:else}
-												Single/Multiple Choice
-											{/if}
-										</span>
-									</Select.Trigger>
-									<Select.Content>
-										<Select.Item value={QuestionTypeEnum.SingleChoice}
-											>Single/Multiple Choice</Select.Item
-										>
-										<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
-										<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
-										<Select.Item value={QuestionTypeEnum.MatrixMatch}>Matrix Match</Select.Item>
-										<Select.Item value={QuestionTypeEnum.MatrixRating}>Matrix Rating</Select.Item>
-										<Select.Item value={QuestionTypeEnum.MatrixString}>Matrix Text</Select.Item>
-										<Select.Item value={QuestionTypeEnum.MatrixNumber}>Matrix Number</Select.Item>
-									</Select.Content>
-								</Select.Root>
-							</div>
-						</div>
-					</div>
-					{#if $formData.question_type === QuestionTypeEnum.Subjective}
-						<div class="flex flex-col gap-2">
-							{@render snippetHeading('Answer Settings')}
-							<div class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
-								<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-									<Label for="subjective-limit" class="text-sm font-medium sm:w-48">
-										Maximum character limit
-									</Label>
-									<div class="flex items-center gap-2">
-										<Input
-											id="subjective-limit"
-											type="number"
-											min="1"
-											max="10000"
-											placeholder="e.g., 500"
-											class="w-32"
-											bind:value={$formData.subjective_answer_limit}
-										/>
-										<span class="text-sm text-gray-500">characters</span>
-									</div>
-								</div>
-								<p class="text-xs text-gray-500">
-									Leave empty for unlimited. Recommended: 200-1000 characters for short answers,
-									1000-5000 for essays.
-								</p>
-							</div>
-						</div>
-					{:else if $formData.question_type === QuestionTypeEnum.SingleChoice || $formData.question_type === QuestionTypeEnum.MultiChoice}
-						<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
-							{@render snippetHeading('Answer')}
-
-							<div
-								use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
-								onconsider={({ detail }) => (totalOptions = detail.items)}
-								onfinalize={({ detail }) => {
-									totalOptions = detail.items.map((opt, i) => ({
-										...opt,
-										key: String.fromCharCode(65 + i)
-									}));
-								}}
-							>
-								{#each totalOptions as { id, key }, index (id)}
-									<div class="group flex flex-row gap-4">
-										<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
-											<p
-												class="flex h-full w-full items-center justify-center text-xl font-semibold"
-											>
-												{key}
-											</p>
-										</div>
-										<div class="flex w-full flex-col gap-2">
-											<div class="flex flex-row rounded-sm border-1 border-black">
-												<span use:dragHandle aria-label="drag handle">
-													<GripVertical class="my-auto h-full cursor-grab rounded-sm bg-gray-100" />
-												</span>
-												<Input
-													class=" border-0"
-													name={key}
-													bind:value={totalOptions[index].value}
-												/>
-											</div>
-											<div class="flex flex-row items-center gap-4">
-												<div class="flex flex-row items-center gap-2">
-													<Checkbox
-														disabled={!hasContent(
-															totalOptions[index].value,
-															id,
-															optionMediaMap,
-															stagedOptionFiles,
-															stagedOptionUrls
-														)}
-														checked={totalOptions[index].correct_answer}
-														onCheckedChange={(checked: boolean) =>
-															(totalOptions[index].correct_answer = checked)}
-													/><Label class="text-sm">Set as correct answer</Label>
-												</div>
-												<button
-													type="button"
-													class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {optionMediaVisible[
-														id
-													]
-														? 'bg-primary/10'
-														: ''}"
-													onclick={() => (optionMediaVisible[id] = !optionMediaVisible[id])}
-												>
-													<ImageIcon size={14} />
-													{optionMediaVisible[id]
-														? 'Hide media'
-														: optionMediaMap[id]?.image || optionMediaMap[id]?.external_media
-															? 'Show media'
-															: 'Add media'}
-												</button>
-												{#if !optionMediaVisible[id] && (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media)}
-													<span class="text-xs text-gray-400">(media attached)</span>
-												{/if}
-											</div>
-											{#if optionMediaVisible[id] || stagedOptionFiles[id] || stagedOptionUrls[id]?.trim()}
-												<MediaManager
-													media={optionMediaMap[id] ?? null}
-													onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
-													onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
-													onDeleteImage={questionId
-														? () =>
-																deleteMedia(
-																	`/api/media/questions/${questionId}/options/${id}/image`
-																)
-														: undefined}
-													onDeleteExternal={questionId
-														? () =>
-																deleteMedia(
-																	`/api/media/questions/${questionId}/options/${id}/external`
-																)
-														: undefined}
-												/>
-											{/if}
-										</div>
-										<div
-											class={[
-												'mt-2 gap-0 opacity-0',
-												totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
-											]}
-										>
-											<Trash_2
-												data-testid="trash-icon"
-												size={18}
-												class={[
-													'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
-													totalOptions.length > 1 ? 'cursor-pointer' : ''
-												]}
-												onclick={() => {
-													if (totalOptions.length > 1) {
-														totalOptions = totalOptions
-															.filter((_, i) => i !== index)
-															.map((option, i) => ({
-																...option,
-																key: String.fromCharCode(65 + i)
-															}));
-													}
-												}}
-											/>
-										</div>
-									</div>
-								{/each}
-							</div>
-
-							<div class="flex justify-end">
-								<Button
-									variant="outline"
-									class="text-primary border-primary"
-									onclick={() => {
-										totalOptions.push({
-											id: totalOptions[totalOptions.length - 1].id + 1,
-											key: String.fromCharCode(64 + totalOptions.length + 1),
-											value: '',
-											correct_answer: false
-										});
-									}}
-								>
-									<Plus />Add Answer</Button
-								>
-							</div>
-						</div>
-					{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
-						<div class="flex flex-col gap-4">
-							{@render snippetHeading('Match The Following')}
-							<div class="flex gap-4">
-								<div class="flex flex-1 flex-col gap-2">
-									<Input bind:value={matrixRowLabel} class="font-semibold" />
-									<div
-										class="flex flex-col gap-2"
-										use:dragHandleZone={{
-											items: matrixLeftItems,
-											flipDurationMs: 150,
-											type: 'matrix-left'
-										}}
-										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
-										onfinalize={({ detail }) => {
-											matrixLeftItems = detail.items.map((item, i) => ({
-												...item,
-												key: String.fromCharCode(65 + i)
-											}));
-										}}
-									>
-										{#each matrixLeftItems as item, index (item.id)}
-											<div class="group flex flex-col gap-1">
-												<div class="flex flex-row items-center gap-2">
-													<div
-														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
-													>
-														{item.key}
-													</div>
-													<div class="flex flex-1 flex-row rounded-sm border border-black">
-														<span use:dragHandle aria-label="drag handle">
-															<GripVertical
-																class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-															/>
-														</span>
-														<Input class="border-0" bind:value={matrixLeftItems[index].value} />
-													</div>
-													{@render matrixImageButton(item.id)}
-													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-														if (matrixLeftItems.length > 1) {
-															const deletedId = String(matrixLeftItems[index].id);
-															matrixLeftItems = matrixLeftItems
-																.filter((_, i) => i !== index)
-																.map((item, i) => ({ ...item, key: String.fromCharCode(65 + i) }));
-															const { [deletedId]: _, ...rest } = matrixMatches;
-															matrixMatches = rest;
-														}
-													})}
-												</div>
-												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
-													<MediaManager
-														media={optionMediaMap[item.id] ?? null}
-														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
-														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
-														onDeleteImage={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/image`
-																	)
-															: undefined}
-														onDeleteExternal={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/external`
-																	)
-															: undefined}
-													/>
-												{/if}
-											</div>
-										{/each}
-									</div>
-									{@render matrixAddButton('Add Question', () => {
-										matrixLeftItems.push({
-											id: nextId(matrixLeftItems),
-											key: String.fromCharCode(65 + matrixLeftItems.length),
-											value: ''
-										});
-									})}
-								</div>
-
-								<div class="flex flex-1 flex-col gap-2">
-									<Input bind:value={matrixColLabel} class="font-semibold" />
-									<div
-										class="flex flex-col gap-2"
-										use:dragHandleZone={{
-											items: matrixRightItems,
-											flipDurationMs: 150,
-											type: 'matrix-right'
-										}}
-										onconsider={({ detail }) => (matrixRightItems = detail.items)}
-										onfinalize={({ detail }) => {
-											matrixRightItems = detail.items.map((item, i) => ({
-												...item,
-												key: String(i + 1)
-											}));
-										}}
-									>
-										{#each matrixRightItems as item, index (item.id)}
-											<div class="group flex flex-col gap-1">
-												<div class="flex flex-row items-center gap-2">
-													<div
-														class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
-													>
-														{item.key}
-													</div>
-													<div class="flex flex-1 flex-row rounded-sm border border-black">
-														<span use:dragHandle aria-label="drag handle">
-															<GripVertical
-																class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-															/>
-														</span>
-														<Input class="border-0" bind:value={matrixRightItems[index].value} />
-													</div>
-													{@render matrixImageButton(item.id)}
-													{@render matrixTrashButton(matrixRightItems.length > 1, () => {
-														if (matrixRightItems.length > 1) {
-															const removedId = matrixRightItems[index].id;
-															matrixRightItems = matrixRightItems
-																.filter((_, i) => i !== index)
-																.map((item, i) => ({
-																	...item,
-																	key: String(i + 1)
-																}));
-															matrixMatches = Object.fromEntries(
-																Object.entries(matrixMatches).map(([k, ids]) => [
-																	k,
-																	ids.filter((id) => id !== removedId)
-																])
-															);
-														}
-													})}
-												</div>
-												{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
-													<MediaManager
-														media={optionMediaMap[item.id] ?? null}
-														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
-														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
-														onDeleteImage={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/image`
-																	)
-															: undefined}
-														onDeleteExternal={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/external`
-																	)
-															: undefined}
-													/>
-												{/if}
-											</div>
-										{/each}
-									</div>
-									{@render matrixAddButton('Add Answer', () => {
-										matrixRightItems.push({
-											id: nextId(matrixRightItems),
-											key: String(matrixRightItems.length + 1),
-											value: ''
-										});
-									})}
-								</div>
-							</div>
-
-							<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-								<p class="mb-3 text-sm font-semibold text-gray-700">Correct Answers</p>
-
-								<div class="mb-2 flex items-end gap-4 border-b border-gray-200 pb-2">
-									<span class="min-w-0 flex-1 text-xs font-medium text-gray-500"
-										>{matrixRowLabel}</span
-									>
-									<div class="flex flex-col items-center gap-1">
-										<span class="text-xs font-medium tracking-wide text-gray-500"
-											>{matrixColLabel}</span
-										>
-										<div class="flex gap-2">
-											{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}
-												<span class="w-16 truncate text-center text-xs text-gray-400"
-													>{rightColumnItem.value || rightColumnItem.key}</span
-												>
-											{/each}
-										</div>
-									</div>
-								</div>
-
-								{#each matrixLeftItems as leftItem (leftItem.key)}
-									<div
-										class="flex items-center gap-4 rounded px-1 py-2 transition-colors hover:bg-white"
-									>
-										<span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800"
-											><span class="text-muted-foreground mr-1 font-semibold">{leftItem.key}.</span
-											>{leftItem.value || leftItem.key}</span
-										>
-										<div class="flex gap-2">
-											{#each matrixRightItems as rightItem (rightItem.id)}
-												{@const checked = (matrixMatches[String(leftItem.id)] ?? []).includes(
-													rightItem.id
-												)}
-												<button
-													type="button"
-													class="w-16 rounded border py-1 text-xs font-semibold transition-all duration-150 {checked
-														? 'border-primary bg-primary text-white shadow-sm'
-														: 'hover:border-primary/60 hover:text-primary border-gray-200 bg-white text-gray-400'}"
-													onclick={() => {
-														const current = matrixMatches[String(leftItem.id)] ?? [];
-														matrixMatches = {
-															...matrixMatches,
-															[String(leftItem.id)]: checked
-																? current.filter((id) => id !== rightItem.id)
-																: [...current, rightItem.id]
-														};
-													}}
-												>
-													{rightItem.key}
-												</button>
-											{/each}
-										</div>
-									</div>
-								{/each}
-							</div>
-						</div>
-					{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
-						<div class="flex flex-col gap-4">
-							{@render snippetHeading('Rating Matrix')}
-							<div class="flex gap-4">
-								<div class="flex flex-1 flex-col gap-2">
-									<Input bind:value={matrixRowLabel} class="font-semibold" />
-									<p class="text-xs font-medium text-gray-500">Items to Rate</p>
-									<div class="flex flex-col gap-2">
-										{#each matrixLeftItems as item, index (item.id)}
-											<div class="group flex flex-row items-center gap-2">
-												<div
-													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
-												>
-													{item.key}
-												</div>
-												<Input
-													class="flex-1 border border-black"
-													bind:value={matrixLeftItems[index].value}
-												/>
-												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-													if (matrixLeftItems.length > 1) {
-														matrixLeftItems = matrixLeftItems
-															.filter((_, i) => i !== index)
-															.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
-													}
-												})}
-											</div>
-										{/each}
-									</div>
-									{@render matrixAddButton('Add Item', () => {
-										matrixLeftItems.push({
-											id: nextId(matrixLeftItems),
-											key: String.fromCharCode(65 + matrixLeftItems.length),
-											value: ''
-										});
-									})}
-								</div>
-
-								<div class="flex flex-1 flex-col gap-2">
-									<Input bind:value={matrixColLabel} class="font-semibold" />
-									<p class="text-xs font-medium text-gray-500">Rating Options</p>
-									<div class="flex flex-col gap-2">
-										{#each matrixRightItems as item, index (item.id)}
-											<div class="group flex flex-row items-center gap-2">
-												<div
-													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
-												>
-													{item.key}
-												</div>
-												<Input
-													class="flex-1 border border-black"
-													bind:value={matrixRightItems[index].value}
-												/>
-												{@render matrixTrashButton(matrixRightItems.length > 1, () => {
-													if (matrixRightItems.length > 1) {
-														matrixRightItems = matrixRightItems
-															.filter((_, i) => i !== index)
-															.map((it, i) => ({
-																...it,
-																key: String(i + 1)
-															}));
-													}
-												})}
-											</div>
-										{/each}
-									</div>
-									{@render matrixAddButton('Add Rating', () => {
-										matrixRightItems.push({
-											id: nextId(matrixRightItems),
-											key: String(matrixRightItems.length + 1),
-											value: ''
-										});
-									})}
-								</div>
-							</div>
-						</div>
-					{:else if $formData.question_type === QuestionTypeEnum.MatrixString || $formData.question_type === QuestionTypeEnum.MatrixNumber}
-						<div class="flex flex-col gap-4">
-							{@render snippetHeading(
-								$formData.question_type === QuestionTypeEnum.MatrixString
-									? 'Text Input Matrix'
-									: 'Number Input Matrix'
-							)}
-							<div class="flex gap-4">
-								<div class="flex flex-1 flex-col gap-2">
-									<Input bind:value={matrixRowLabel} class="font-semibold" />
-									<p class="text-xs font-medium text-gray-500">Questions</p>
-									<div class="flex flex-col gap-2">
-										{#each matrixLeftItems as item, index (item.id)}
-											<div class="group flex flex-row items-center gap-2">
-												<div
-													class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
-												>
-													{item.key}
-												</div>
-												<Input
-													class="flex-1 border border-black"
-													bind:value={matrixLeftItems[index].value}
-												/>
-												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-													if (matrixLeftItems.length > 1) {
-														matrixLeftItems = matrixLeftItems
-															.filter((_, i) => i !== index)
-															.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
-													}
-												})}
-											</div>
-										{/each}
-									</div>
-									{@render matrixAddButton('Add Question', () => {
-										matrixLeftItems.push({
-											id: nextId(matrixLeftItems),
-											key: String.fromCharCode(65 + matrixLeftItems.length),
-											value: ''
-										});
-									})}
-								</div>
-								<div class="flex flex-1 flex-col gap-2">
-									<Input
-										bind:value={matrixColLabel}
-										class="font-semibold"
-										placeholder="Answer column label"
-									/>
-									<p class="text-xs font-medium text-gray-500">
-										Answer column ({$formData.question_type === QuestionTypeEnum.MatrixString
-											? 'text'
-											: 'number'} input)
-									</p>
-								</div>
-							</div>
-						</div>
-					{:else}
-						<div class="flex flex-col gap-2">
-							{@render snippetHeading('Correct Answer')}
-							<Input
-								type="number"
-								step="any"
-								class="w-full"
-								bind:value={$formData.correct_answer}
-								oninput={(e) => {
-									const val = (e.target as HTMLInputElement).value;
-									$formData.question_type = val.includes('.')
-										? QuestionTypeEnum.NumericalDecimal
-										: QuestionTypeEnum.NumericalInteger;
-								}}
-							/>
-						</div>
-					{/if}
-				</div>
-				<div class="flex w-full flex-col gap-6 lg:w-2/5 lg:gap-4 lg:pl-8">
-					<div class="flex flex-col gap-2">
-						{@render snippetHeading('Tags')}
-						<TagsSelection bind:tags={$formData.tag_ids} />
-						<Dialog.Root bind:open={openTagDialog}>
-							<Label
-								onclick={() => (openTagDialog = true)}
-								class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
-								><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
-							>
-							<Dialog.Content
-								class="max-h-[90vh] p-4 px-0 sm:h-[70%] sm:max-w-[90%] md:max-w-[70%] lg:max-w-[45%]"
-							>
-								<Dialog.Header class="m-0 h-fit border-b-2 py-4">
-									<Dialog.Title class="px-8">Create new tag</Dialog.Title>
-								</Dialog.Header>
-								<Tag tagTypes={data.tagTypes} form={data.tagForm} bind:open={openTagDialog} />
-							</Dialog.Content>
-						</Dialog.Root>
-					</div>
-					<div class="flex flex-col gap-2">
-						{#if !isStateAdmin(data.user)}
-							{@render snippetHeading('States')}
-							<StateSelection bind:states={$formData.state_ids} />
-						{/if}
-						<div class="mt-6 flex items-center space-x-2 lg:mt-12">
-							<Switch id="is-active" bind:checked={$formData.is_active} />
-							<Label for="is-active">Is Active?</Label><Info
-								class="my-auto w-4 align-middle text-xs text-gray-600"
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="flex flex-col gap-6 md:flex-row md:gap-8">
-				<div class="flex w-full flex-row gap-4 md:w-1/2">
-					<div class="flex w-full flex-col gap-2">
-						{@render snippetHeading('Additional Instructions')}
-						<Textarea name="instructions" bind:value={$formData.instructions} placeholder="" />
-					</div>
-				</div>
-				<div class="flex w-full flex-row gap-4 md:w-1/2">
-					<div class="flex w-full flex-col gap-1">
-						{@render snippetHeading('Marking Scheme')}
-
-						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
-							<p class="my-auto sm:w-1/2">Marks for correct answer</p>
-							<input
-								type="number"
-								name="marking_scheme.correct"
-								bind:value={$formData.marking_scheme.correct}
-								min="1"
-								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
-							/>
-						</div>
-
-						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
-							<p class="my-auto sm:w-1/2">Marks for wrong answer</p>
-							<input
-								type="number"
-								name="marking_scheme.wrong"
-								bind:value={$formData.marking_scheme.wrong}
-								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
-							/>
-						</div>
-
-						<div class="flex flex-col gap-1 rounded-lg border border-gray-100 p-3 sm:flex-row">
-							<p class="my-auto sm:w-1/2">Marks for skipped answer</p>
-							<input
-								type="number"
-								name="marking_scheme.skipped"
-								bind:value={$formData.marking_scheme.skipped}
-								class="w-full rounded-sm border border-gray-300 p-2 sm:w-auto"
-							/>
-						</div>
-						{#if isMultiChoice && $formData.question_type !== QuestionTypeEnum.Subjective}
-							<PartialMarkingSection
-								bind:partial={$formData.marking_scheme!.partial}
-								labelClass="mt-6 mb-4"
-							/>
-						{/if}
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="sticky bottom-0 my-2 flex w-full border-t-4 bg-white p-3 sm:my-4 sm:p-4">
-		<div class="flex w-full justify-between gap-2">
-			<a href={resolve('/questionbank')}>
-				<Button variant="outline" class="text-primary border-primary border-1 text-sm sm:text-base"
-					>Cancel</Button
-				>
-			</a>
-			<div class="flex gap-2">
 				<QuestionPreview
 					data={{
 						question_text: $formData.question_text,
@@ -1448,7 +699,6 @@
 						optionMediaMap
 					}}
 				/>
-
 				<Button
 					class="bg-primary text-sm sm:text-base"
 					disabled={isDisabled || isSaving}
@@ -1461,6 +711,759 @@
 						Save
 					{/if}
 				</Button>
+			</div>
+		</div>
+		<!-- MAIN CONTENT: Two columns -->
+		<div class="mx-4 flex flex-col gap-6 sm:mx-6 md:mx-10 lg:flex-row">
+			<!-- LEFT COLUMN -->
+			<div class="flex flex-col gap-6 lg:w-2/3">
+				<!-- Card 1: QUESTION TYPE -->
+				<div class="rounded-lg border">
+					<div class="bg-muted rounded-t-lg px-4 py-3">
+						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
+							>Question Type</span
+						>
+					</div>
+					<div class="flex flex-col gap-6 p-6">
+						<!-- Question Type Selector (temporary - replaced by dialog in Step 3) -->
+						<div class="flex flex-row items-center gap-2">
+							<Label class="text-muted-foreground text-sm">Question Type</Label>
+							<Select.Root
+								type="single"
+								value={$formData.question_type === QuestionTypeEnum.MultiChoice
+									? QuestionTypeEnum.SingleChoice
+									: $formData.question_type}
+								onValueChange={(value) => {
+									$formData.question_type = value as QuestionTypeEnum;
+									$formData.correct_answer = [];
+									totalOptions = Array.from({ length: 4 }, (_, i) => ({
+										id: i + 1,
+										key: String.fromCharCode(65 + i),
+										value: '',
+										correct_answer: false
+									}));
+								}}
+							>
+								<Select.Trigger class="w-48 border-gray-300">
+									<span>
+										{#if $formData.question_type === QuestionTypeEnum.Subjective}
+											Subjective
+										{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger || $formData.question_type === QuestionTypeEnum.NumericalDecimal}
+											Numerical
+										{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
+											Matrix Match
+										{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
+											Matrix Rating
+										{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
+											Matrix Text
+										{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
+											Matrix Number
+										{:else}
+											Single/Multiple Choice
+										{/if}
+									</span>
+								</Select.Trigger>
+								<Select.Content>
+									<Select.Item value={QuestionTypeEnum.SingleChoice}
+										>Single/Multiple Choice</Select.Item
+									>
+									<Select.Item value={QuestionTypeEnum.Subjective}>Subjective</Select.Item>
+									<Select.Item value={QuestionTypeEnum.NumericalInteger}>Numerical</Select.Item>
+									<Select.Item value={QuestionTypeEnum.MatrixMatch}>Matrix Match</Select.Item>
+									<Select.Item value={QuestionTypeEnum.MatrixRating}>Matrix Rating</Select.Item>
+									<Select.Item value={QuestionTypeEnum.MatrixString}>Matrix Text</Select.Item>
+									<Select.Item value={QuestionTypeEnum.MatrixNumber}>Matrix Number</Select.Item>
+								</Select.Content>
+							</Select.Root>
+						</div>
+
+						<!-- Question Text -->
+						<div class="flex flex-col gap-2">
+							<Label class="font-semibold">Question</Label>
+							<Textarea
+								name="questionText"
+								bind:value={$formData.question_text}
+								placeholder="Enter your question here..."
+							/>
+							<div class="flex items-center gap-2">
+								<button
+									type="button"
+									class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {questionMediaVisible
+										? 'bg-primary/10'
+										: ''}"
+									onclick={() => (questionMediaVisible = !questionMediaVisible)}
+								>
+									<ImageIcon size={16} />
+									{questionMediaVisible
+										? 'Hide media'
+										: questionMedia?.image || questionMedia?.external_media
+											? 'Show media'
+											: 'Add media'}
+								</button>
+								{#if !questionMediaVisible && (questionMedia?.image || questionMedia?.external_media)}
+									<span class="text-xs text-gray-400">(media attached)</span>
+								{/if}
+							</div>
+							{#if questionMediaVisible || stagedImageFile || stagedExternalUrl.trim()}
+								<MediaManager
+									media={questionMedia}
+									onStagedFileChange={(f) => (stagedImageFile = f)}
+									onStagedUrlChange={(u) => (stagedExternalUrl = u)}
+									onDeleteImage={questionId
+										? () => deleteMedia(`/api/media/questions/${questionId}/image`)
+										: undefined}
+									onDeleteExternal={questionId
+										? () => deleteMedia(`/api/media/questions/${questionId}/external`)
+										: undefined}
+								/>
+							{/if}
+						</div>
+
+						<!-- Additional Instructions -->
+						<div class="flex flex-col gap-2">
+							<Label class="font-semibold">Additional Instructions</Label>
+							<Textarea
+								name="instructions"
+								bind:value={$formData.instructions}
+								placeholder="E.g., time limit, reference material..."
+							/>
+						</div>
+					</div>
+				</div>
+
+				<!-- Card 2: ANSWER SETTINGS -->
+				<div class="rounded-lg border">
+					<div class="bg-muted rounded-t-lg px-4 py-3">
+						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
+							>Answer Settings</span
+						>
+					</div>
+					<div class="p-6">
+						{#if $formData.question_type === QuestionTypeEnum.Subjective}
+							<div class="flex flex-col gap-2">
+								<div class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
+									<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+										<Label for="subjective-limit" class="text-sm font-medium sm:w-48">
+											Maximum character limit
+										</Label>
+										<div class="flex items-center gap-2">
+											<Input
+												id="subjective-limit"
+												type="number"
+												min="1"
+												max="10000"
+												placeholder="e.g., 500"
+												class="w-32"
+												bind:value={$formData.subjective_answer_limit}
+											/>
+											<span class="text-sm text-gray-500">characters</span>
+										</div>
+									</div>
+									<p class="text-xs text-gray-500">
+										Leave empty for unlimited. Recommended: 200-1000 characters for short answers,
+										1000-5000 for essays.
+									</p>
+								</div>
+							</div>
+						{:else if $formData.question_type === QuestionTypeEnum.SingleChoice || $formData.question_type === QuestionTypeEnum.MultiChoice}
+							<div class="flex flex-col gap-4 overflow-y-scroll scroll-auto">
+								<div
+									use:dragHandleZone={{ items: totalOptions, flipDurationMs: 150 }}
+									onconsider={({ detail }) => (totalOptions = detail.items)}
+									onfinalize={({ detail }) => {
+										totalOptions = detail.items.map((opt, i) => ({
+											...opt,
+											key: String.fromCharCode(65 + i)
+										}));
+									}}
+								>
+									{#each totalOptions as { id, key }, index (id)}
+										<div class="group flex flex-row gap-4">
+											<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
+												<p
+													class="flex h-full w-full items-center justify-center text-xl font-semibold"
+												>
+													{key}
+												</p>
+											</div>
+											<div class="flex w-full flex-col gap-2">
+												<div class="flex flex-row rounded-sm border-1 border-black">
+													<span use:dragHandle aria-label="drag handle">
+														<GripVertical
+															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+														/>
+													</span>
+													<Input
+														class=" border-0"
+														name={key}
+														bind:value={totalOptions[index].value}
+													/>
+												</div>
+												<div class="flex flex-row items-center gap-4">
+													<div class="flex flex-row items-center gap-2">
+														<Checkbox
+															disabled={!hasContent(
+																totalOptions[index].value,
+																id,
+																optionMediaMap,
+																stagedOptionFiles,
+																stagedOptionUrls
+															)}
+															checked={totalOptions[index].correct_answer}
+															onCheckedChange={(checked: boolean) =>
+																(totalOptions[index].correct_answer = checked)}
+														/><Label class="text-sm">Set as correct answer</Label>
+													</div>
+													<button
+														type="button"
+														class="text-primary hover:bg-primary/10 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors {optionMediaVisible[
+															id
+														]
+															? 'bg-primary/10'
+															: ''}"
+														onclick={() => (optionMediaVisible[id] = !optionMediaVisible[id])}
+													>
+														<ImageIcon size={14} />
+														{optionMediaVisible[id]
+															? 'Hide media'
+															: optionMediaMap[id]?.image || optionMediaMap[id]?.external_media
+																? 'Show media'
+																: 'Add media'}
+													</button>
+													{#if !optionMediaVisible[id] && (optionMediaMap[id]?.image || optionMediaMap[id]?.external_media)}
+														<span class="text-xs text-gray-400">(media attached)</span>
+													{/if}
+												</div>
+												{#if optionMediaVisible[id] || stagedOptionFiles[id] || stagedOptionUrls[id]?.trim()}
+													<MediaManager
+														media={optionMediaMap[id] ?? null}
+														onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
+														onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
+														onDeleteImage={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${id}/image`
+																	)
+															: undefined}
+														onDeleteExternal={questionId
+															? () =>
+																	deleteMedia(
+																		`/api/media/questions/${questionId}/options/${id}/external`
+																	)
+															: undefined}
+													/>
+												{/if}
+											</div>
+											<div
+												class={[
+													'mt-2 gap-0 opacity-0',
+													totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
+												]}
+											>
+												<Trash_2
+													data-testid="trash-icon"
+													size={18}
+													class={[
+														'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
+														totalOptions.length > 1 ? 'cursor-pointer' : ''
+													]}
+													onclick={() => {
+														if (totalOptions.length > 1) {
+															totalOptions = totalOptions
+																.filter((_, i) => i !== index)
+																.map((option, i) => ({
+																	...option,
+																	key: String.fromCharCode(65 + i)
+																}));
+														}
+													}}
+												/>
+											</div>
+										</div>
+									{/each}
+								</div>
+
+								<div class="flex justify-end">
+									<Button
+										variant="outline"
+										class="text-primary border-primary"
+										onclick={() => {
+											totalOptions.push({
+												id: totalOptions[totalOptions.length - 1].id + 1,
+												key: String.fromCharCode(64 + totalOptions.length + 1),
+												value: '',
+												correct_answer: false
+											});
+										}}
+									>
+										<Plus />Add Answer</Button
+									>
+								</div>
+							</div>
+						{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
+							<div class="flex flex-col gap-4">
+								<div class="flex gap-4">
+									<div class="flex flex-1 flex-col gap-2">
+										<Input bind:value={matrixRowLabel} class="font-semibold" />
+										<div
+											class="flex flex-col gap-2"
+											use:dragHandleZone={{
+												items: matrixLeftItems,
+												flipDurationMs: 150,
+												type: 'matrix-left'
+											}}
+											onconsider={({ detail }) => (matrixLeftItems = detail.items)}
+											onfinalize={({ detail }) => {
+												matrixLeftItems = detail.items.map((item, i) => ({
+													...item,
+													key: String.fromCharCode(65 + i)
+												}));
+											}}
+										>
+											{#each matrixLeftItems as item, index (item.id)}
+												<div class="group flex flex-col gap-1">
+													<div class="flex flex-row items-center gap-2">
+														<div
+															class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
+														>
+															{item.key}
+														</div>
+														<div class="flex flex-1 flex-row rounded-sm border border-black">
+															<span use:dragHandle aria-label="drag handle">
+																<GripVertical
+																	class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+																/>
+															</span>
+															<Input class="border-0" bind:value={matrixLeftItems[index].value} />
+														</div>
+														{@render matrixImageButton(item.id)}
+														{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+															if (matrixLeftItems.length > 1) {
+																const deletedId = String(matrixLeftItems[index].id);
+																matrixLeftItems = matrixLeftItems
+																	.filter((_, i) => i !== index)
+																	.map((item, i) => ({
+																		...item,
+																		key: String.fromCharCode(65 + i)
+																	}));
+																const { [deletedId]: _, ...rest } = matrixMatches;
+																matrixMatches = rest;
+															}
+														})}
+													</div>
+													{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
+														<MediaManager
+															media={optionMediaMap[item.id] ?? null}
+															onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+															onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+															onDeleteImage={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/image`
+																		)
+																: undefined}
+															onDeleteExternal={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/external`
+																		)
+																: undefined}
+														/>
+													{/if}
+												</div>
+											{/each}
+										</div>
+										{@render matrixAddButton('Add Question', () => {
+											matrixLeftItems.push({
+												id: nextId(matrixLeftItems),
+												key: String.fromCharCode(65 + matrixLeftItems.length),
+												value: ''
+											});
+										})}
+									</div>
+
+									<div class="flex flex-1 flex-col gap-2">
+										<Input bind:value={matrixColLabel} class="font-semibold" />
+										<div
+											class="flex flex-col gap-2"
+											use:dragHandleZone={{
+												items: matrixRightItems,
+												flipDurationMs: 150,
+												type: 'matrix-right'
+											}}
+											onconsider={({ detail }) => (matrixRightItems = detail.items)}
+											onfinalize={({ detail }) => {
+												matrixRightItems = detail.items.map((item, i) => ({
+													...item,
+													key: String(i + 1)
+												}));
+											}}
+										>
+											{#each matrixRightItems as item, index (item.id)}
+												<div class="group flex flex-col gap-1">
+													<div class="flex flex-row items-center gap-2">
+														<div
+															class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
+														>
+															{item.key}
+														</div>
+														<div class="flex flex-1 flex-row rounded-sm border border-black">
+															<span use:dragHandle aria-label="drag handle">
+																<GripVertical
+																	class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
+																/>
+															</span>
+															<Input class="border-0" bind:value={matrixRightItems[index].value} />
+														</div>
+														{@render matrixImageButton(item.id)}
+														{@render matrixTrashButton(matrixRightItems.length > 1, () => {
+															if (matrixRightItems.length > 1) {
+																const removedId = matrixRightItems[index].id;
+																matrixRightItems = matrixRightItems
+																	.filter((_, i) => i !== index)
+																	.map((item, i) => ({
+																		...item,
+																		key: String(i + 1)
+																	}));
+																matrixMatches = Object.fromEntries(
+																	Object.entries(matrixMatches).map(([k, ids]) => [
+																		k,
+																		ids.filter((id) => id !== removedId)
+																	])
+																);
+															}
+														})}
+													</div>
+													{#if optionMediaVisible[item.id] || stagedOptionFiles[item.id] || stagedOptionUrls[item.id]?.trim()}
+														<MediaManager
+															media={optionMediaMap[item.id] ?? null}
+															onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+															onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+															onDeleteImage={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/image`
+																		)
+																: undefined}
+															onDeleteExternal={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/external`
+																		)
+																: undefined}
+														/>
+													{/if}
+												</div>
+											{/each}
+										</div>
+										{@render matrixAddButton('Add Answer', () => {
+											matrixRightItems.push({
+												id: nextId(matrixRightItems),
+												key: String(matrixRightItems.length + 1),
+												value: ''
+											});
+										})}
+									</div>
+								</div>
+
+								<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+									<p class="mb-3 text-sm font-semibold text-gray-700">Correct Answers</p>
+
+									<div class="mb-2 flex items-end gap-4 border-b border-gray-200 pb-2">
+										<span class="min-w-0 flex-1 text-xs font-medium text-gray-500"
+											>{matrixRowLabel}</span
+										>
+										<div class="flex flex-col items-center gap-1">
+											<span class="text-xs font-medium tracking-wide text-gray-500"
+												>{matrixColLabel}</span
+											>
+											<div class="flex gap-2">
+												{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}
+													<span class="w-16 truncate text-center text-xs text-gray-400"
+														>{rightColumnItem.value || rightColumnItem.key}</span
+													>
+												{/each}
+											</div>
+										</div>
+									</div>
+
+									{#each matrixLeftItems as leftItem (leftItem.key)}
+										<div
+											class="flex items-center gap-4 rounded px-1 py-2 transition-colors hover:bg-white"
+										>
+											<span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800"
+												><span class="text-muted-foreground mr-1 font-semibold"
+													>{leftItem.key}.</span
+												>{leftItem.value || leftItem.key}</span
+											>
+											<div class="flex gap-2">
+												{#each matrixRightItems as rightItem (rightItem.id)}
+													{@const checked = (matrixMatches[String(leftItem.id)] ?? []).includes(
+														rightItem.id
+													)}
+													<button
+														type="button"
+														class="w-16 rounded border py-1 text-xs font-semibold transition-all duration-150 {checked
+															? 'border-primary bg-primary text-white shadow-sm'
+															: 'hover:border-primary/60 hover:text-primary border-gray-200 bg-white text-gray-400'}"
+														onclick={() => {
+															const current = matrixMatches[String(leftItem.id)] ?? [];
+															matrixMatches = {
+																...matrixMatches,
+																[String(leftItem.id)]: checked
+																	? current.filter((id) => id !== rightItem.id)
+																	: [...current, rightItem.id]
+															};
+														}}
+													>
+														{rightItem.key}
+													</button>
+												{/each}
+											</div>
+										</div>
+									{/each}
+								</div>
+							</div>
+						{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
+							<div class="flex flex-col gap-4">
+								<div class="flex gap-4">
+									<div class="flex flex-1 flex-col gap-2">
+										<Input bind:value={matrixRowLabel} class="font-semibold" />
+										<p class="text-xs font-medium text-gray-500">Items to Rate</p>
+										<div class="flex flex-col gap-2">
+											{#each matrixLeftItems as item, index (item.id)}
+												<div class="group flex flex-row items-center gap-2">
+													<div
+														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
+													>
+														{item.key}
+													</div>
+													<Input
+														class="flex-1 border border-black"
+														bind:value={matrixLeftItems[index].value}
+													/>
+													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+														if (matrixLeftItems.length > 1) {
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
+														}
+													})}
+												</div>
+											{/each}
+										</div>
+										{@render matrixAddButton('Add Item', () => {
+											matrixLeftItems.push({
+												id: nextId(matrixLeftItems),
+												key: String.fromCharCode(65 + matrixLeftItems.length),
+												value: ''
+											});
+										})}
+									</div>
+
+									<div class="flex flex-1 flex-col gap-2">
+										<Input bind:value={matrixColLabel} class="font-semibold" />
+										<p class="text-xs font-medium text-gray-500">Rating Options</p>
+										<div class="flex flex-col gap-2">
+											{#each matrixRightItems as item, index (item.id)}
+												<div class="group flex flex-row items-center gap-2">
+													<div
+														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
+													>
+														{item.key}
+													</div>
+													<Input
+														class="flex-1 border border-black"
+														bind:value={matrixRightItems[index].value}
+													/>
+													{@render matrixTrashButton(matrixRightItems.length > 1, () => {
+														if (matrixRightItems.length > 1) {
+															matrixRightItems = matrixRightItems
+																.filter((_, i) => i !== index)
+																.map((it, i) => ({
+																	...it,
+																	key: String(i + 1)
+																}));
+														}
+													})}
+												</div>
+											{/each}
+										</div>
+										{@render matrixAddButton('Add Rating', () => {
+											matrixRightItems.push({
+												id: nextId(matrixRightItems),
+												key: String(matrixRightItems.length + 1),
+												value: ''
+											});
+										})}
+									</div>
+								</div>
+							</div>
+						{:else if $formData.question_type === QuestionTypeEnum.MatrixString || $formData.question_type === QuestionTypeEnum.MatrixNumber}
+							<div class="flex flex-col gap-4">
+								$formData.question_type === QuestionTypeEnum.MatrixString ? 'Text Input Matrix' :
+								'Number Input Matrix' )}
+								<div class="flex gap-4">
+									<div class="flex flex-1 flex-col gap-2">
+										<Input bind:value={matrixRowLabel} class="font-semibold" />
+										<p class="text-xs font-medium text-gray-500">Questions</p>
+										<div class="flex flex-col gap-2">
+											{#each matrixLeftItems as item, index (item.id)}
+												<div class="group flex flex-row items-center gap-2">
+													<div
+														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
+													>
+														{item.key}
+													</div>
+													<Input
+														class="flex-1 border border-black"
+														bind:value={matrixLeftItems[index].value}
+													/>
+													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+														if (matrixLeftItems.length > 1) {
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
+														}
+													})}
+												</div>
+											{/each}
+										</div>
+										{@render matrixAddButton('Add Question', () => {
+											matrixLeftItems.push({
+												id: nextId(matrixLeftItems),
+												key: String.fromCharCode(65 + matrixLeftItems.length),
+												value: ''
+											});
+										})}
+									</div>
+									<div class="flex flex-1 flex-col gap-2">
+										<Input
+											bind:value={matrixColLabel}
+											class="font-semibold"
+											placeholder="Answer column label"
+										/>
+										<p class="text-xs font-medium text-gray-500">
+											Answer column ({$formData.question_type === QuestionTypeEnum.MatrixString
+												? 'text'
+												: 'number'} input)
+										</p>
+									</div>
+								</div>
+							</div>
+						{:else}
+							<div class="flex flex-col gap-2">
+								<Input
+									type="number"
+									step="any"
+									class="w-full"
+									bind:value={$formData.correct_answer}
+									oninput={(e) => {
+										const val = (e.target as HTMLInputElement).value;
+										$formData.question_type = val.includes('.')
+											? QuestionTypeEnum.NumericalDecimal
+											: QuestionTypeEnum.NumericalInteger;
+									}}
+								/>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+
+			<!-- RIGHT COLUMN: Sidebar -->
+			<div class="flex flex-col gap-6 lg:w-1/3">
+				<!-- Tags -->
+				<div class="flex flex-col gap-2">
+					<Label class="font-semibold">Tags</Label>
+					<TagsSelection bind:tags={$formData.tag_ids} />
+					<Dialog.Root bind:open={openTagDialog}>
+						<Label
+							onclick={() => (openTagDialog = true)}
+							class="text-primary flex cursor-pointer flex-row items-center text-xs font-bold"
+							><Plus class="mr-1 w-3 text-xs" />Create a new tag</Label
+						>
+						<Dialog.Content
+							class="max-h-[90vh] p-4 px-0 sm:h-[70%] sm:max-w-[90%] md:max-w-[70%] lg:max-w-[45%]"
+						>
+							<Dialog.Header class="m-0 h-fit border-b-2 py-4">
+								<Dialog.Title class="px-8">Create new tag</Dialog.Title>
+							</Dialog.Header>
+							<Tag tagTypes={data.tagTypes} form={data.tagForm} bind:open={openTagDialog} />
+						</Dialog.Content>
+					</Dialog.Root>
+				</div>
+
+				<!-- State -->
+				{#if !isStateAdmin(data.user)}
+					<div class="flex flex-col gap-2">
+						<Label class="font-semibold">State</Label>
+						<StateSelection bind:states={$formData.state_ids} />
+					</div>
+				{/if}
+
+				<hr class="border-border" />
+
+				<!-- Toggles -->
+				<div class="flex items-center justify-between">
+					<Label class="font-semibold">Set Question as Mandatory</Label>
+					<div class="flex items-center gap-2">
+						<span class="text-muted-foreground text-sm"
+							>{$formData.is_mandatory ? 'Yes' : 'No'}</span
+						>
+						<Switch bind:checked={$formData.is_mandatory} />
+					</div>
+				</div>
+				<div class="flex items-center justify-between">
+					<Label class="font-semibold">Question Status</Label>
+					<div class="flex items-center gap-2">
+						<span class="text-muted-foreground text-sm"
+							>{$formData.is_active ? 'Active' : 'Inactive'}</span
+						>
+						<Switch id="is-active" bind:checked={$formData.is_active} />
+					</div>
+				</div>
+
+				<hr class="border-border" />
+
+				<!-- Marking Scheme -->
+				<div class="flex flex-col gap-3">
+					<Label class="font-semibold">Marking scheme</Label>
+					<div class="flex gap-3">
+						<div class="flex flex-1 flex-col gap-1">
+							<span class="text-muted-foreground text-xs">Correct</span>
+							<input
+								type="number"
+								name="marking_scheme.correct"
+								bind:value={$formData.marking_scheme.correct}
+								min="1"
+								class="w-full rounded-md border border-gray-300 p-2"
+							/>
+						</div>
+						<div class="flex flex-1 flex-col gap-1">
+							<span class="text-muted-foreground text-xs">Incorrect</span>
+							<input
+								type="number"
+								name="marking_scheme.wrong"
+								bind:value={$formData.marking_scheme.wrong}
+								class="w-full rounded-md border border-gray-300 p-2"
+							/>
+						</div>
+						<div class="flex flex-1 flex-col gap-1">
+							<span class="text-muted-foreground text-xs">No answer</span>
+							<input
+								type="number"
+								name="marking_scheme.skipped"
+								bind:value={$formData.marking_scheme.skipped}
+								class="w-full rounded-md border border-gray-300 p-2"
+							/>
+						</div>
+					</div>
+
+					{#if isMultiChoice && $formData.question_type !== QuestionTypeEnum.Subjective}
+						<PartialMarkingSection bind:partial={$formData.marking_scheme!.partial} />
+					{/if}
+				</div>
 			</div>
 		</div>
 	</div>

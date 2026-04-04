@@ -30,7 +30,9 @@ export const questionSchema = z.object({
 	question_text: z.string().min(1, { message: 'Question text is required' }),
 	instructions: z.string().nullable().optional(),
 	question_type: z.enum(QuestionTypeEnum).default(QuestionTypeEnum.SingleChoice),
-	options: z.union([z.array(optionSchema), matrixInputOptionsSchema, matrixMatchOptionsSchema]).default([]),
+	options: z
+		.union([z.array(optionSchema), matrixInputOptionsSchema, matrixMatchOptionsSchema])
+		.default([]),
 	correct_answer: z
 		.union([z.array(z.number()), z.number(), z.record(z.string(), z.array(z.number()))])
 		.default([]),

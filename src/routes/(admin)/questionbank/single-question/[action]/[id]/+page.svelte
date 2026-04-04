@@ -809,7 +809,7 @@
 														bind:value={totalOptions[index].value}
 													/>
 												</div>
-												<div class="flex flex-row items-center justify-between">
+												<div class="flex flex-row items-center gap-4">
 													<div class="flex flex-row items-center gap-2">
 														<Checkbox
 															disabled={!hasContent(
@@ -824,24 +824,24 @@
 																(totalOptions[index].correct_answer = checked)}
 														/><Label class="text-sm">Set as correct answer</Label>
 													</div>
-													<AttachmentInput
-														media={optionMediaMap[id] ?? null}
-														onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
-														onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
-														onDeleteImage={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${id}/image`
-																	)
-															: undefined}
-														onDeleteExternal={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${id}/external`
-																	)
-															: undefined}
-													/>
 												</div>
+												<AttachmentInput
+													media={optionMediaMap[id] ?? null}
+													onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
+													onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
+													onDeleteImage={questionId
+														? () =>
+																deleteMedia(
+																	`/api/media/questions/${questionId}/options/${id}/image`
+																)
+														: undefined}
+													onDeleteExternal={questionId
+														? () =>
+																deleteMedia(
+																	`/api/media/questions/${questionId}/options/${id}/external`
+																)
+														: undefined}
+												/>
 											</div>
 											<div
 												class={[

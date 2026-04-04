@@ -89,7 +89,7 @@
 					value="tagBased"
 					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
 				>
-					Random from Tags
+					Auto Selection
 				</TabsTrigger>
 			</TabsList>
 		</Tabs>

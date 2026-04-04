@@ -1,10 +1,10 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import ListFilter from '@lucide/svelte/icons/list-filter';
-	import AlignLeft from '@lucide/svelte/icons/align-left';
+	import ListChecks from '@lucide/svelte/icons/list-checks';
+	import AlignJustify from '@lucide/svelte/icons/align-justify';
 	import Hash from '@lucide/svelte/icons/hash';
-	import Table from '@lucide/svelte/icons/table';
-	import Shuffle from '@lucide/svelte/icons/shuffle';
+	import Equal from '@lucide/svelte/icons/equal';
+	import Route from '@lucide/svelte/icons/route';
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import { QuestionTypeEnum } from '$lib/types/question';
 
@@ -14,15 +14,15 @@
 	}>();
 
 	const commonTypes = [
-		{ label: 'Single/Multiple Choice', icon: ListFilter, type: QuestionTypeEnum.SingleChoice },
-		{ label: 'Subjective', icon: AlignLeft, type: QuestionTypeEnum.Subjective },
+		{ label: 'Single/Multiple Choice', icon: ListChecks, type: QuestionTypeEnum.SingleChoice },
+		{ label: 'Subjective', icon: AlignJustify, type: QuestionTypeEnum.Subjective },
 		{ label: 'Numerical', icon: Hash, type: QuestionTypeEnum.NumericalInteger }
 	];
 
 	const advancedTypes = [
-		{ label: 'Matrix Text', icon: Table, type: QuestionTypeEnum.MatrixString },
-		{ label: 'Matrix Number', icon: Table, type: QuestionTypeEnum.MatrixNumber },
-		{ label: 'Matrix Match', icon: Shuffle, type: QuestionTypeEnum.MatrixMatch },
+		{ label: 'Matrix Text', icon: Equal, type: QuestionTypeEnum.MatrixString },
+		{ label: 'Matrix Number', icon: Equal, type: QuestionTypeEnum.MatrixNumber },
+		{ label: 'Matrix Match', icon: Route, type: QuestionTypeEnum.MatrixMatch },
 		{ label: 'Matrix Rating', icon: CircleDot, type: QuestionTypeEnum.MatrixRating }
 	];
 

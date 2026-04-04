@@ -6,7 +6,6 @@
 	import Music from '@lucide/svelte/icons/music';
 	import X from '@lucide/svelte/icons/x';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
-	import Button from '$lib/components/ui/button/button.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let {

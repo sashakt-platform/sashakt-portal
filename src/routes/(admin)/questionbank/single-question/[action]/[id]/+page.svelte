@@ -17,6 +17,7 @@
 	import { QuestionTypeEnum } from '$lib/types/question';
 	import ChooseQuestionType from './ChooseQuestionType.svelte';
 	import AttachmentInput from './AttachmentInput.svelte';
+	import UnsavedChangesDialog from '$lib/components/UnsavedChangesDialog.svelte';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import QuestionRevision from './QuestionRevision.svelte';
@@ -282,6 +283,19 @@
 
 	let selectedTagTypes = $state<{ id: string; name: string }[]>([]);
 	let openQuestionTypeDialog = $state(!questionData);
+	let showUnsavedDialog = $state(false);
+
+	// Track form dirty state
+	const initialFormJson = JSON.stringify($formData);
+	const isFormDirty = $derived(JSON.stringify($formData) !== initialFormJson);
+
+	function handleBack() {
+		if (isFormDirty) {
+			showUnsavedDialog = true;
+		} else {
+			goto(resolve('/questionbank'));
+		}
+	}
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
 
 	// Media state
@@ -618,9 +632,9 @@
 		<!-- HEADER -->
 		<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
 			<div class="flex items-center gap-3">
-				<a href={resolve('/questionbank')} class="hover:bg-muted rounded-lg border p-2">
+				<button type="button" class="hover:bg-muted rounded-lg border p-2" onclick={handleBack}>
 					<ArrowLeft size={20} />
-				</a>
+				</button>
 				<h2 class="text-2xl font-bold tracking-tight">
 					{questionData ? 'Edit Question' : 'Create Question'}
 				</h2>
@@ -1341,4 +1355,8 @@
 			</div>
 		</div>
 	</div>
+	<UnsavedChangesDialog
+		bind:open={showUnsavedDialog}
+		onDiscard={() => goto(resolve('/questionbank'))}
+	/>
 </form>

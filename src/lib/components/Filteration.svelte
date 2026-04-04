@@ -126,7 +126,7 @@
 							{/each}
 						</span>
 					{:else if items?.length >= 3}
-						<span class="flex min-w-0 flex-1 flex-row overflow-hidden text-start">
+						<span class="flex min-w-0 flex-row overflow-hidden text-start">
 							{#if items[0]}
 								{@render myBadge(items[0])}
 							{/if}

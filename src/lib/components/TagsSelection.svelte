@@ -44,6 +44,7 @@
 <Filteration
 	bind:items={tags}
 	itemName="tag"
+	label="Tag"
 	bind:itemList={tagList}
 	onSearch={loadTags}
 	{isLoading}

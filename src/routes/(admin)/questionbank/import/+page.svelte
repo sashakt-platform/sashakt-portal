@@ -11,7 +11,6 @@
 	import { schema } from './schema.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { resolve } from '$app/paths';
 
 	let { data } = $props();
@@ -41,78 +40,6 @@
 	}
 </script>
 
-<Dialog.Root open={$message}>
-	<Dialog.Content class="text-sm sm:max-w-[512px]">
-		<Dialog.Header>
-			<Dialog.Title class="mb-4 inline-flex items-center gap-2 text-xl font-semibold">
-				{#if $message.failed_questions}
-					<TriangleAlert color="#C7584A" size={28} />
-					Import error(s)
-				{:else}
-					<CircleCheck color="#1E8F36" size={28} />
-					File upload successful
-				{/if}
-			</Dialog.Title>
-			<Dialog.Description>
-				{$message.message}
-			</Dialog.Description>
-		</Dialog.Header>
-		<p class="text-muted-foreground mt-2 font-semibold">Upload summary</p>
-		<Table.Root class="bg-accent rounded-lg">
-			{#if $message.failed_questions}
-				<Table.Caption class="text-left">
-					Download the error report to fix the row-specific issues and re-upload the file after
-					fixing the errors.
-				</Table.Caption>
-			{/if}
-			<Table.Body>
-				<Table.Row>
-					<Table.Cell class="font-medium">Total Rows</Table.Cell>
-					<Table.Cell>
-						{$message.uploaded_questions}
-					</Table.Cell>
-				</Table.Row>
-				<Table.Row>
-					<Table.Cell class="font-medium">Validated Rows</Table.Cell>
-					<Table.Cell>
-						{$message.success_questions}
-					</Table.Cell>
-				</Table.Row>
-				<Table.Row>
-					<Table.Cell class="font-medium">Errors</Table.Cell>
-					<Table.Cell>
-						{$message.failed_questions}
-					</Table.Cell>
-				</Table.Row>
-			</Table.Body>
-		</Table.Root>
-
-		{#if $message.error_log?.startsWith('data:text/csv;base64')}
-			<div class="mt-5 flex w-full items-center">
-				<a
-					href={$message.error_log}
-					class="text-primary w-full font-medium"
-					download="error_report.csv"
-				>
-					<Button class="w-full cursor-pointer py-2 text-base font-semibold"
-						><Download />Download error report</Button
-					>
-				</a>
-			</div>
-		{:else}
-			<div class="mt-5 w-full font-semibold">
-				<div class="float-end">
-					<Dialog.Close>
-						<Button class="bg-primary-foreground text-primary mr-2">Upload more</Button>
-					</Dialog.Close>
-					<a href={resolve('/questionbank')} class="bg-primary rounded-md px-5 py-2 text-white"
-						>Go to question bank</a
-					>
-				</div>
-			</div>
-		{/if}
-	</Dialog.Content>
-</Dialog.Root>
 <div class="mx-4 sm:mx-6 md:mx-10">
 	<!-- Header -->
 	<div class="mt-6 mb-6 flex items-center gap-3 sm:mt-10">
@@ -157,7 +84,84 @@
 				ondragleave={() => (dragging = false)}
 				ondrop={handleDrop}
 			>
-				{#if $form.file}
+				{#if $message}
+					<!-- Result state (inline) -->
+					<div class="flex w-full max-w-lg flex-col items-center gap-4">
+						{#if $message.failed_questions}
+							<div
+								class="flex h-14 w-14 items-center justify-center rounded-full"
+								style="background-color: hsl(var(--error-subtle));"
+							>
+								<TriangleAlert class="text-destructive" size={28} />
+							</div>
+							<h3 class="text-xl font-bold">Import error(s)</h3>
+						{:else}
+							<div
+								class="flex h-14 w-14 items-center justify-center rounded-full"
+								style="background-color: hsl(var(--success-subtle));"
+							>
+								<CircleCheck style="color: hsl(var(--success-bold));" size={28} />
+							</div>
+							<h3 class="text-xl font-bold">File upload successful</h3>
+						{/if}
+						<p class="text-muted-foreground text-sm">{$message.message}</p>
+
+						<!-- Upload Summary table -->
+						<Table.Root class="bg-accent max-w-sm rounded-lg">
+							<Table.Header>
+								<Table.Row>
+									<Table.Head class="text-muted-foreground font-semibold" colspan={2}
+										>Upload Summary</Table.Head
+									>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								<Table.Row>
+									<Table.Cell class="font-medium">Total rows</Table.Cell>
+									<Table.Cell class="text-right">{$message.uploaded_questions}</Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.Cell class="font-medium">Validated rows</Table.Cell>
+									<Table.Cell class="text-right">{$message.success_questions}</Table.Cell>
+								</Table.Row>
+								<Table.Row>
+									<Table.Cell class="font-medium">Errors</Table.Cell>
+									<Table.Cell class="text-right">{$message.failed_questions}</Table.Cell>
+								</Table.Row>
+							</Table.Body>
+						</Table.Root>
+
+						{#if $message.error_log?.startsWith('data:text/csv;base64')}
+							<div class="mt-2 flex w-full max-w-sm items-center">
+								<a
+									href={$message.error_log}
+									class="text-primary w-full font-medium"
+									download="error_report.csv"
+								>
+									<Button class="w-full cursor-pointer py-2 text-base font-semibold">
+										<Download size={16} />
+										Download error report
+									</Button>
+								</a>
+							</div>
+						{/if}
+
+						<div class="mt-2 flex gap-3">
+							<Button
+								variant="outline"
+								class="border-primary text-primary"
+								onclick={() => {
+									$message = undefined;
+									$file = undefined;
+								}}>Upload More</Button
+							>
+							<a href={resolve('/questionbank')}>
+								<Button>Go to Question Bank</Button>
+							</a>
+						</div>
+					</div>
+				{:else if $form.file}
+					<!-- File selected state -->
 					<div class="flex w-full max-w-md flex-col items-center gap-4">
 						<div class="bg-accent flex w-full flex-row items-center gap-2 rounded-lg p-4">
 							<div class="flex-1 text-left">
@@ -193,6 +197,7 @@
 						</div>
 					</div>
 				{:else}
+					<!-- Empty upload state -->
 					<div
 						class="flex cursor-pointer flex-col items-center"
 						onclick={() =>

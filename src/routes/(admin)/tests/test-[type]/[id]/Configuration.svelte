@@ -254,7 +254,7 @@
 
 	<!-- 2. Test Rules -->
 	<ConfigureBox title="Test Rules" Icon={Settings}>
-		<div class="flex flex-col gap-6 py-4 md:py-6">
+		<div class="flex flex-col gap-6 py-4 md:py-6 lg:w-1/2">
 			<div class="flex items-center justify-between">
 				<Label class="text-sm font-medium text-gray-700">Maximum time limit for the test</Label>
 				<Input
@@ -325,7 +325,7 @@
 
 	<!-- 3. Marking Scheme -->
 	<ConfigureBox title="Marking Scheme" Icon={Settings}>
-		<div class="flex flex-col gap-4 py-4 md:py-6">
+		<div class="flex flex-col gap-4 py-4 md:py-6 lg:w-1/2">
 			<RadioGroup.Root bind:value={$formData.marks_level} class="flex flex-col gap-3">
 				<label
 					for="question_level"
@@ -365,40 +365,46 @@
 					</div>
 
 					{#if $formData.marks_level === MarksLevel.TEST}
-						<div class="mt-4 ml-7 flex flex-col gap-4">
-							<div class="grid grid-cols-3 gap-3">
-								<div class="flex flex-col gap-1">
-									<small class="text-gray-500">Correct</small>
-									<Input
-										class="w-full bg-white"
-										type="number"
-										placeholder="0"
-										name="marking_scheme.correct"
-										bind:value={$formData.marking_scheme.correct}
-									/>
-								</div>
-								<div class="flex flex-col gap-1">
-									<small class="text-gray-500">Incorrect</small>
-									<Input
-										class="w-full bg-white"
-										type="number"
-										placeholder="0"
-										name="marking_scheme.wrong"
-										bind:value={$formData.marking_scheme.wrong}
-									/>
-								</div>
-								<div class="flex flex-col gap-1">
-									<small class="text-gray-500">No answer</small>
-									<Input
-										class="w-full bg-white"
-										type="number"
-										placeholder="0"
-										name="marking_scheme.skipped"
-										bind:value={$formData.marking_scheme.skipped}
-									/>
+						<div class="flex flex-col gap-6">
+							<div class="mt-4 ml-7 flex flex-col gap-4">
+								<div class="grid grid-cols-3 gap-3">
+									<div class="flex flex-col gap-1">
+										<small class="text-gray-500">Correct</small>
+										<Input
+											class="w-full"
+											type="number"
+											placeholder="0"
+											name="marking_scheme.correct"
+											bind:value={$formData.marking_scheme.correct}
+										/>
+									</div>
+									<div class="flex flex-col gap-1">
+										<small class="text-gray-500">Incorrect</small>
+										<Input
+											class="w-full"
+											type="number"
+											placeholder="0"
+											name="marking_scheme.wrong"
+											bind:value={$formData.marking_scheme.wrong}
+										/>
+									</div>
+									<div class="flex flex-col gap-1">
+										<small class="text-gray-500">No answer</small>
+										<Input
+											class="w-full"
+											type="number"
+											placeholder="0"
+											name="marking_scheme.skipped"
+											bind:value={$formData.marking_scheme.skipped}
+										/>
+									</div>
 								</div>
 							</div>
-							<PartialMarkingSection bind:partial={$formData.marking_scheme.partial} />
+							<hr class="border-gray-300" />
+							<PartialMarkingSection
+								bind:partial={$formData.marking_scheme.partial}
+								bordered={false}
+							/>
 						</div>
 					{/if}
 				</label>

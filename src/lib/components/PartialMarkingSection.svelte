@@ -4,10 +4,12 @@
 
 	let {
 		partial = $bindable(),
-		labelClass = ''
+		labelClass = '',
+		bordered = true
 	}: {
 		partial: { correct_answers: { num_correct_selected: number; marks: number }[] } | undefined;
 		labelClass?: string;
+		bordered?: boolean;
 	} = $props();
 
 	const partialMarking = $derived(!!partial);
@@ -23,8 +25,8 @@
 
 <div
 	class={[
-		'rounded-xl border p-4',
-		partialMarking ? 'border-primary bg-primary/5' : 'border-gray-200',
+		bordered && 'rounded-xl border  p-4',
+		bordered && (partialMarking ? 'border-primary bg-primary/5' : 'border-gray-200'),
 		labelClass
 	]}
 >
@@ -37,9 +39,9 @@
 	</label>
 
 	{#if partialMarking && partial}
-		<div class="mt-4 flex flex-col gap-2" id="partial-mark-section">
+		<div class="mt-4 ml-6 flex flex-col gap-6" id="partial-mark-section">
 			{#each partial.correct_answers as answer, i (i)}
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-6">
 					<input
 						type="number"
 						name="marking_scheme.partial.correct_answers.{i}.num_correct_selected"
@@ -54,7 +56,7 @@
 								)
 							};
 						}}
-						class="w-16 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-center text-sm"
+						class="bg-gray-0 w-20 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
 					<span class="text-sm text-gray-500">Correct selected</span>
 					<span class="text-gray-400">→</span>
@@ -72,13 +74,13 @@
 								)
 							};
 						}}
-						class="w-16 rounded-md border border-gray-300 bg-white px-2 py-1.5 text-center text-sm"
+						class="bg-gray-0 w-20 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
 					<span class="text-sm text-gray-500">Marks</span>
 					<button
 						type="button"
 						data-testid="delete-partial-row"
-						class="ml-auto text-gray-400 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30"
+						class="ml-auto text-gray-500 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30"
 						disabled={partial.correct_answers.length <= 1}
 						onclick={() => {
 							partial = {

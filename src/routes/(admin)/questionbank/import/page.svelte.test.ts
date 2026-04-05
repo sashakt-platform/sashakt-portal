@@ -29,28 +29,22 @@ describe('Import Questions Page', () => {
 	describe('Basic Rendering', () => {
 		it('should render the page heading', () => {
 			render(ImportQuestions, { data: baseData });
-			expect(screen.getByText('Import questions')).toBeInTheDocument();
+			expect(screen.getByText('Bulk Upload Questions')).toBeInTheDocument();
 		});
 
-		it('should render upload area with instructions', () => {
+		it('should render upload area with drag and drop text', () => {
 			render(ImportQuestions, { data: baseData });
-			expect(screen.getByText('Click to upload Questions')).toBeInTheDocument();
+			expect(screen.getByText(/drag and drop your file here/i)).toBeInTheDocument();
+		});
+
+		it('should render template download banner', () => {
+			render(ImportQuestions, { data: baseData });
+			expect(screen.getByText('Download the template to get started')).toBeInTheDocument();
 		});
 
 		it('should render download template button', () => {
 			render(ImportQuestions, { data: baseData });
 			expect(screen.getByRole('button', { name: /download template/i })).toBeInTheDocument();
-		});
-
-		it('should render instructions section', () => {
-			render(ImportQuestions, { data: baseData });
-
-			expect(screen.getByText('Instructions')).toBeInTheDocument();
-			expect(
-				screen.getByText(
-					'Download the CSV template or upload your own with appropriate tags & details.'
-				)
-			).toBeInTheDocument();
 		});
 	});
 
@@ -73,14 +67,14 @@ describe('Import Questions Page', () => {
 	});
 
 	describe('Import Button State', () => {
-		it('should disable import button when no file is selected', () => {
+		it('should not show import button when no file is selected', () => {
 			render(ImportQuestions, { data: baseData });
 
-			const importBtn = screen.getByRole('button', { name: /import/i });
-			expect(importBtn).toBeDisabled();
+			const importBtn = screen.queryByRole('button', { name: /import/i });
+			expect(importBtn).not.toBeInTheDocument();
 		});
 
-		it('should enable import button when file is selected', () => {
+		it('should show import button when file is selected', () => {
 			const file = new File(['hello'], 'questions.csv', { type: 'text/csv' });
 			render(ImportQuestions, { data: { ...baseData, form: { file } } });
 

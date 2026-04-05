@@ -118,12 +118,6 @@ function getBottomNextButton() {
 	return buttons[buttons.length - 1].closest('button')!;
 }
 
-/** Get the bottom Previous button (the last one in the DOM). */
-function getBottomPreviousButton() {
-	const buttons = screen.getAllByText('Previous');
-	return buttons[buttons.length - 1].closest('button')!;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Test Create/Update Page', () => {

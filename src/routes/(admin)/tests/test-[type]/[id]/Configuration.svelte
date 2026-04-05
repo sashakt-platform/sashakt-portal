@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Settings from '@lucide/svelte/icons/settings';
+	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
@@ -141,8 +142,25 @@
 	</Select.Trigger>
 {/snippet}
 <div class="flex flex-col gap-4 p-6">
+	<!-- 0. Test Schedule (tests only, not templates) -->
+	{#if !$formData.is_template}
+		<ConfigureBox title="Test Schedule" Icon={Settings} defaultOpen={true}>
+			<div class="py-4 md:py-6">
+				<CalendarRange
+					rangeFromLabel="Start Time"
+					bind:rangeFromValue={$formData.start_time}
+					rangeToLabel="End Time"
+					bind:rangeToValue={$formData.end_time}
+				/>
+			</div>
+		</ConfigureBox>
+	{/if}
 	<!-- 1. Candidate Experience -->
-	<ConfigureBox title="Candidate Experience" Icon={Settings} defaultOpen={true}>
+	<ConfigureBox
+		title="Candidate Experience"
+		Icon={Settings}
+		defaultOpen={$formData.is_template ? true : false}
+	>
 		<div class="grid grid-cols-1 gap-6 py-4 md:grid-cols-2 md:gap-12 md:py-6">
 			<!-- Left: textareas -->
 			<div class="flex flex-col gap-6">
@@ -273,7 +291,6 @@
 		</div>
 	</ConfigureBox>
 
-	<!-- 2. Test Rules -->
 	{#snippet labelTestRules(label: string)}
 		<Label class="text-sm font-medium text-gray-700">{label}</Label>
 	{/snippet}
@@ -297,6 +314,7 @@
 			>
 		</div>
 	{/snippet}
+	<!-- 2. Test Rules -->
 	<ConfigureBox title="Test Rules" Icon={Settings}>
 		<div class="flex flex-col lg:flex-row lg:gap-12">
 			<div class="flex flex-col gap-6 py-4 md:py-6 lg:w-1/2">

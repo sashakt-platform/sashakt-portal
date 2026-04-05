@@ -21,7 +21,13 @@
 	}
 </script>
 
-<div class={['rounded-xl border p-4', partialMarking ? 'border-primary bg-primary/5' : 'border-gray-200', labelClass]}>
+<div
+	class={[
+		'rounded-xl border p-4',
+		partialMarking ? 'border-primary bg-primary/5' : 'border-gray-200',
+		labelClass
+	]}
+>
 	<label class="flex cursor-pointer items-start gap-3">
 		<Checkbox checked={partialMarking} onCheckedChange={togglePartialMarking} class="mt-0.5" />
 		<div>
@@ -31,7 +37,7 @@
 	</label>
 
 	{#if partialMarking && partial}
-		<div class="mt-4 flex flex-col gap-2">
+		<div class="mt-4 flex flex-col gap-2" id="partial-mark-section">
 			{#each partial.correct_answers as answer, i (i)}
 				<div class="flex items-center gap-2">
 					<input

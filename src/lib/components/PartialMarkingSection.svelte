@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import MoveRight from '@lucide/svelte/icons/move-right';
 
 	let {
 		partial = $bindable(),
@@ -59,7 +60,7 @@
 						class="bg-gray-0 w-20 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
 					<span class="text-sm text-gray-500">Correct selected</span>
-					<span class="text-gray-400">→</span>
+					<span class="font-light text-gray-500"><MoveRight /></span>
 					<input
 						type="number"
 						name="marking_scheme.partial.correct_answers.{i}.marks"

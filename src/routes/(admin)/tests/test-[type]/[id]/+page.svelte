@@ -158,11 +158,11 @@
 									{step.number}
 								</span>
 								<span
-									class="hidden font-medium sm:inline {isActive
-										? 'text-foreground'
+									class="hidden sm:inline {isActive
+										? 'text-foreground font-semibold'
 										: isCompleted
-											? 'text-primary'
-											: 'text-muted-foreground'}"
+											? 'text-foreground'
+											: 'text-muted-foreground font-light'}"
 								>
 									{step.label}
 								</span>

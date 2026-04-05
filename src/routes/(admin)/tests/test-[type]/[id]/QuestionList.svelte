@@ -81,13 +81,13 @@
 			<TabsList class="bg-muted rounded-full p-1">
 				<TabsTrigger
 					value="manual"
-					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
+					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
 				>
 					Manual Selection
 				</TabsTrigger>
 				<TabsTrigger
 					value="tagBased"
-					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
+					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
 				>
 					Auto Selection
 				</TabsTrigger>
@@ -138,48 +138,52 @@
 				/>
 			{/if}
 		{:else if questionSelectionMode === 'tagBased'}
-			{#if $formData.random_tag_count.length === 0}
-				<div class="my-auto flex flex-col items-center justify-center py-16 text-center">
-					<div class="mb-4 w-64">
-						<TagsSelection bind:tags={$formData.random_tag_count} />
-					</div>
-					<p class="text-sm text-gray-400">
-						Select tags above to enable random question selection.
-					</p>
+			<div class="flex flex-col items-center gap-4 py-8 text-center">
+				<p class="text-sm text-gray-600">
+					Select tags and specify how many questions to randomly pull from each.<br />
+					Questions will be drawn from the question bank at test creation time.
+				</p>
+				<div class="w-80">
+					<TagsSelection bind:tags={$formData.random_tag_count} />
 				</div>
-			{:else}
-				<div class="flex h-full w-full flex-col gap-4 overflow-auto">
-					<div class="flex items-start justify-between">
-						<div>
-							<p class="font-bold">Random Configuration</p>
-							<p class="text-sm text-gray-400">Enter number of questions for the selected Tags</p>
-						</div>
-						<div class="w-56">
-							<TagsSelection bind:tags={$formData.random_tag_count} />
-						</div>
+			</div>
+
+			{#if $formData.random_tag_count.length > 0}
+				<p class="text-primary mb-4 text-center text-sm font-semibold">
+					{totalSelectedCount}
+					{totalSelectedCount === 1 ? 'question' : 'questions'}
+				</p>
+
+				<div class="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border bg-gray-50">
+					<!-- Table header -->
+					<div
+						class="grid grid-cols-2 bg-gray-100 px-6 py-4 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+					>
+						<div>Tags</div>
+						<div>No. of Questions</div>
 					</div>
-					<div class="flex flex-col">
-						{#each $formData.random_tag_count as tag (tag.id)}
-							<div
-								class="flex flex-col gap-2 rounded p-2 py-3 text-sm sm:flex-row sm:items-center sm:gap-0"
+
+					<!-- Tag rows -->
+					{#each $formData.random_tag_count as tag (tag.id)}
+						<div class="grid grid-cols-2 items-center gap-4 border-t bg-white px-6 py-4">
+							<span
+								class="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700"
 							>
-								<span class="w-full font-medium sm:w-1/4">{tag.name}</span>
-								<div class="w-full sm:w-3/4">
-									<Input
-										type="number"
-										placeholder="No. of questions"
-										class="rounded border p-2 sm:ml-2"
-										bind:value={tag.count}
-									/>
-									<small class="mt-1 block text-red-400 sm:ml-2">
-										{tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)
-											? 'Enter a positive integer'
-											: ''}
-									</small>
-								</div>
+								{tag.name}
+							</span>
+							<div>
+								<Input
+									type="number"
+									placeholder="0"
+									class="w-full rounded-lg border bg-white text-center"
+									bind:value={tag.count}
+								/>
+								{#if tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)}
+									<small class="mt-1 block text-red-400">Enter a positive integer</small>
+								{/if}
 							</div>
-						{/each}
-					</div>
+						</div>
+					{/each}
 				</div>
 			{/if}
 		{/if}

@@ -1,21 +1,15 @@
 <script lang="ts">
-	import Info from '@lucide/svelte/icons/info';
-	import CircleHelp from '@lucide/svelte/icons/circle-help';
-	import Timer from '@lucide/svelte/icons/timer';
-	import ClipboardPenLine from '@lucide/svelte/icons/clipboard-pen-line';
-	import Copy from '@lucide/svelte/icons/copy';
+	import Settings from '@lucide/svelte/icons/settings';
 	import Check from '@lucide/svelte/icons/check';
+	import Copy from '@lucide/svelte/icons/copy';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import ConfigureBox from './ConfigureBox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
-	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
-	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import { MarksLevel, OmrMode } from './schema';
 	import * as Select from '$lib/components/ui/select';
-	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import { resolve } from '$app/paths';
 
 	interface CertificateToken {
@@ -51,7 +45,6 @@
 	let availableTokens = $state<CertificateToken[]>([]);
 	let copiedToken = $state<string | null>(null);
 
-	// load test languages
 	async function loadLanguages() {
 		try {
 			const response = await fetch('/api/languages');
@@ -67,7 +60,6 @@
 	async function loadForms() {
 		try {
 			const response = await fetch('/api/forms');
-
 			if (response.ok) {
 				const data = await response.json();
 				formsOptions = data.items ?? [];
@@ -81,7 +73,6 @@
 	async function loadCertificates() {
 		try {
 			const response = await fetch('/api/certificates');
-
 			if (response.ok) {
 				const data = await response.json();
 				certificatesOptions = data.items ?? [];
@@ -97,11 +88,9 @@
 			availableTokens = [];
 			return;
 		}
-
 		try {
 			const queryParams = $formData.form_id ? `?form_id=${$formData.form_id}` : '';
 			const response = await fetch(`/api/certificate-tokens${queryParams}`);
-
 			if (response.ok) {
 				const data = await response.json();
 				availableTokens = data.tokens ?? [];
@@ -125,14 +114,12 @@
 		}
 	}
 
-	// initial load effect
 	$effect(() => {
 		loadLanguages();
 		loadForms();
 		loadCertificates();
 	});
 
-	// load tokens when certificate or form changes
 	$effect(() => {
 		$formData.certificate_id;
 		$formData.form_id;
@@ -140,233 +127,53 @@
 	});
 </script>
 
-<div class="mx-auto flex h-dvh overflow-auto">
-	<div class="mx-4 mt-6 flex w-full flex-col sm:mx-6 md:mx-10 md:mt-10">
-		{#snippet headingSubheading(heading: string, subheading: string)}
-			<p class="font-bold">{heading}</p>
-			<p class="text-sm font-extralight">
-				{subheading}
-			</p>
-		{/snippet}
+{#snippet label(label: string)}
+	<Label class="mb-2 block text-sm font-semibold text-gray-800">{label}</Label>
+{/snippet}
 
-		<ConfigureBox title="Instructions" Icon={Info}>
-			<div class={['flex flex-col gap-4 py-6 md:flex-row md:gap-0 md:py-8', 'border-b-1']}>
-				<div class="w-full md:w-2/5">
-					{@render headingSubheading(
-						'Pre-test guidelines',
-						'Instructions displayed before attempting the test.'
-					)}
-				</div>
-				<div class="w-full md:w-3/5">
+{#snippet selectTrigger(text: string, isSelected: boolean)}
+	<Select.Trigger class="w-full rounded-full border-gray-300">
+		<span
+			class={['truncate', isSelected ? 'font-normal text-gray-800' : 'font-light text-gray-500']}
+		>
+			{text}
+		</span>
+	</Select.Trigger>
+{/snippet}
+<div class="flex flex-col gap-4 p-6">
+	<!-- 1. Candidate Experience -->
+	<ConfigureBox title="Candidate Experience" Icon={Settings} defaultOpen={true}>
+		<div class="grid grid-cols-1 gap-6 py-4 md:grid-cols-2 md:gap-12 md:py-6">
+			<!-- Left: textareas -->
+			<div class="flex flex-col gap-6">
+				<div>
+					{@render label('Pre-test Guidelines')}
 					<Textarea
 						name="start_instructions"
-						placeholder=""
+						placeholder="E.g., Ensure stable internet. Read each question carefully..."
+						class="min-h-25 border-gray-300 placeholder:font-light placeholder:text-gray-500"
 						bind:value={$formData.start_instructions}
 					/>
 				</div>
-			</div>
-			<div class={['flex flex-col gap-4 py-6 md:flex-row md:gap-0 md:py-8']}>
-				<div class="w-full md:w-2/5">
-					{@render headingSubheading(
-						'Completion message',
-						'Message displayed after test completion.'
-					)}
-				</div>
-				<div class="w-full md:w-3/5">
+				<div>
+					{@render label('Test Completion Message')}
 					<Textarea
 						name="completion_message"
-						placeholder=""
-						bind:value={$formData.completion_message}
-					/>
-				</div>
-			</div>
-		</ConfigureBox>
-
-		<ConfigureBox title="Timer Settings" Icon={Timer}>
-			<div class="flex flex-col gap-4 md:flex-row md:gap-0" hidden={$formData.is_template}>
-				<div class="my-auto w-full align-middle md:w-2/5">
-					{@render headingSubheading(
-						'Test Schedule',
-						'Set the date and time when the test will be available.'
-					)}
-				</div>
-				<div class="flex w-full flex-col gap-4 sm:flex-row md:w-3/5">
-					<CalendarRange
-						rangeFromLabel="Start Time"
-						bind:rangeFromValue={$formData.start_time}
-						rangeToLabel="End Time"
-						bind:rangeToValue={$formData.end_time}
+						placeholder="E.g., Thank you for completing the assessment. Your results will be shared soon."
+						class="min-h-25 border-gray-300 placeholder:font-light placeholder:text-gray-500"
 					/>
 				</div>
 			</div>
 
-			<div class="flex flex-col gap-4 md:flex-row md:gap-0">
-				<div class="w-full md:w-2/5">
-					{@render headingSubheading(
-						'Time limit',
-						'Set the maximum duration allowed to complete the test.'
-					)}
-				</div>
-				<div class="flex w-full flex-row gap-4 md:w-3/5">
-					<Input
-						placeholder="Enter in Minutes..."
-						class="w-full sm:w-1/2"
-						type="number"
-						name="time_limit"
-						bind:value={$formData.time_limit}
-					/>
-				</div>
-			</div>
-		</ConfigureBox>
-		<ConfigureBox title="Question settings" Icon={CircleHelp}>
+			<!-- Right: selects -->
 			<div class="flex flex-col gap-6">
-				<div class="flex flex-col gap-4 pt-6 md:flex-row md:pt-10">
-					<div class="w-full md:w-1/2">
-						{@render headingSubheading(
-							'Questions Per Page',
-							"Enter the number of questions to display on each page. Enter '0' to show all questions on a single page."
-						)}
-					</div>
-					<div class="flex w-full flex-row gap-4 md:w-1/2">
-						<Input
-							placeholder=""
-							type="number"
-							name="question_pagination"
-							bind:value={$formData.question_pagination}
-							class="w-full"
-						/>
-					</div>
-				</div>
-			</div>
-		</ConfigureBox>
-
-		<ConfigureBox title="Test settings" Icon={ClipboardPenLine}>
-			<div class="flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4"><Checkbox bind:checked={$formData.show_result} /></div>
-				<div class="w-full">
-					{@render headingSubheading(
-						'Show Result',
-						'Choose whether to display the test results after completion.'
-					)}
-				</div>
-			</div>
-			<div class="flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.show_question_palette} />
-				</div>
-				<div class="w-full">
-					{@render headingSubheading(
-						'Show Question Palette',
-						'Choose whether to display the Question Palette during the test.'
-					)}
-				</div>
-			</div>
-			<div class="flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.bookmark} />
-				</div>
-				<div class="w-full">
-					{@render headingSubheading(
-						'Enable Mark for Review',
-						'Allow candidates to mark questions for review during the test.'
-					)}
-				</div>
-			</div>
-
-			{#if $formData.random_tag_count.length == 0}
-				<div class="flex flex-row gap-3 align-top">
-					<div class="my-auto w-fit gap-4">
-						<Checkbox
-							bind:checked={$formData.shuffle}
-							onCheckedChange={(checked: boolean) => {
-								if (checked) {
-									$formData.random_questions = false;
-									$formData.no_of_random_questions = 0;
-								}
-							}}
-						/>
-					</div>
-					<div class="w-full">
-						{@render headingSubheading(
-							'Shuffle Questions',
-							'Choose whether to shuffle the selected questions during the test.'
-						)}
-					</div>
-				</div>
-
-				<div class="flex flex-col gap-3 align-top md:flex-row">
-					<div class="flex flex-row gap-3">
-						<div class="my-auto w-fit gap-4">
-							<Checkbox
-								bind:checked={$formData.random_questions}
-								onCheckedChange={(checked: boolean) => {
-									if (checked) {
-										$formData.shuffle = false;
-									} else {
-										$formData.no_of_random_questions = 0;
-									}
-								}}
-							/>
-						</div>
-						<div class="w-full md:w-auto">
-							{@render headingSubheading(
-								'Randomize Questions',
-								'Specify the number of random questions to assign from the previously selected questions.'
-							)}
-						</div>
-					</div>
-					<div class="my-auto flex w-full flex-col md:w-1/2">
-						<Input
-							type="number"
-							id="random_count"
-							name="no_of_random_questions"
-							placeholder=""
-							hidden={!$formData.random_questions}
-							bind:value={$formData.no_of_random_questions}
-						/>
-						{#if $formData.random_questions && $formData.no_of_random_questions <= 0}
-							<small class="mt-1 text-red-400">Enter a positive integer</small>
-						{:else if $formData.random_questions && $formData.no_of_random_questions > 0 && $formData.question_revision_ids.length < $formData.no_of_random_questions}
-							<small class="mt-1 text-red-400">
-								Number of random questions cannot exceed the total number of questions selected.
-							</small>
-						{/if}
-					</div>
-				</div>
-			{/if}
-			<div class="w-full md:w-2/5">
-				{@render headingSubheading('Feedback Setting', '')}
-			</div>
-			<div class="flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.show_feedback_on_completion} />
-				</div>
-				<div class="w-full">
-					{@render headingSubheading(
-						'Feedback on Completion',
-						'Enable to show candidate their answers and correct answers after the test is completed.'
-					)}
-				</div>
-			</div>
-
-			<div class="mt-4 flex flex-row gap-3 align-top">
-				<div class="my-auto w-fit gap-4">
-					<Checkbox bind:checked={$formData.show_feedback_immediately} />
-				</div>
-				<div class="w-full">
-					{@render headingSubheading(
-						'Immediate Feedback',
-						'Enable to show candidate correct answers immediately after each question is attempted.'
-					)}
-				</div>
-			</div>
-			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
 				<div>
-					{@render headingSubheading('Language', 'Select test language.')}
-				</div>
-				<div>
+					{@render label('Language')}
 					<Select.Root type="single" name="locale" bind:value={$formData.locale}>
-						<Select.Trigger class="w-48">{languageOptions[$formData.locale]}</Select.Trigger>
+						{@render selectTrigger(
+							languageOptions[$formData.locale] || 'Select Language',
+							!!$formData.locale
+						)}
 						<Select.Content>
 							<Select.Group>
 								{#each Object.entries(languageOptions) as [key, label] (key)}
@@ -376,200 +183,226 @@
 						</Select.Content>
 					</Select.Root>
 				</div>
-			</div>
-			<div class="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center">
+
 				<div>
-					{@render headingSubheading('OMR', 'Select OMR Mode')}
+					{@render label('Candidate Information Form')}
+					<div class="flex items-center gap-2">
+						<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
+							{@render selectTrigger(
+								formsOptions.find((f) => f.id === $formData.form_id)?.name || 'Select Form',
+								!!$formData.form_id
+							)}
+							<Select.Content>
+								<Select.Group>
+									<Select.Item value="" label="No form">No form</Select.Item>
+									{#each formsOptions as form (form.id)}
+										<Select.Item value={String(form.id)}>{form.name}</Select.Item>
+									{/each}
+								</Select.Group>
+							</Select.Content>
+						</Select.Root>
+					</div>
 				</div>
+
 				<div>
-					<Select.Root type="single" name="omr" bind:value={$formData.omr}>
-						<Select.Trigger class="w-48">
-							{$formData.omr === OmrMode.NEVER
-								? 'Never'
-								: $formData.omr === OmrMode.ALWAYS
-									? 'Always'
-									: 'Optional'}
-						</Select.Trigger>
+					{@render label('Certificate')}
+					<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
+						{@render selectTrigger(
+							certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name ||
+								'Select Certificate',
+							!!$formData.certificate_id
+						)}
 						<Select.Content>
 							<Select.Group>
-								<Select.Item value={OmrMode.NEVER} label="Never">Never</Select.Item>
-								<Select.Item value={OmrMode.ALWAYS} label="Always">Always</Select.Item>
-								<Select.Item value={OmrMode.OPTIONAL} label="Optional">Optional</Select.Item>
-							</Select.Group>
-						</Select.Content>
-					</Select.Root>
-				</div>
-			</div>
-		</ConfigureBox>
-
-		<ConfigureBox title="Marks Setting" Icon={ClipboardPenLine}>
-			<div class="flex flex-col gap-6 pt-6 md:flex-row md:gap-8 md:pt-10">
-				<RadioGroup.Root
-					bind:value={$formData.marks_level}
-					class="flex w-full flex-col gap-6 md:gap-8"
-				>
-					<div class="flex w-full items-center space-x-2">
-						<RadioGroup.Item value={MarksLevel.QUESTION} id="question_level" />
-						<Label for="question_level"
-							>{@render headingSubheading(
-								'Question Level Marking Scheme',
-								'Assign marks individually for each question in the test.'
-							)}</Label
-						>
-					</div>
-					<div class="flex w-full flex-col gap-4 md:flex-row md:items-center">
-						<div class="flex w-full flex-row items-center space-x-2 md:w-1/2">
-							<RadioGroup.Item value={MarksLevel.TEST} id="test_level" />
-							<Label for="test_level"
-								>{@render headingSubheading(
-									'Test Level Marking Scheme',
-									'Assign the same marks to all questions in the test.'
-								)}</Label
-							>
-						</div>
-						<div
-							class="grid w-full grid-cols-3 gap-3 md:w-1/2"
-							hidden={$formData.marks_level !== 'test'}
-						>
-							<div class="flex flex-col gap-1">
-								<small class="text-gray-500">Correct</small>
-								<Input
-									class="w-full"
-									type="number"
-									placeholder=""
-									name="marking_scheme.correct"
-									bind:value={$formData.marking_scheme.correct}
-								/>
-							</div>
-							<div class="flex flex-col gap-1">
-								<small class="text-gray-500">Wrong</small>
-								<Input
-									class="w-full"
-									type="number"
-									placeholder=""
-									name="marking_scheme.wrong"
-									bind:value={$formData.marking_scheme.wrong}
-								/>
-							</div>
-							<div class="flex flex-col gap-1">
-								<small class="text-gray-500">Skipped</small>
-								<Input
-									class="w-full"
-									type="number"
-									placeholder=""
-									name="marking_scheme.skipped"
-									bind:value={$formData.marking_scheme.skipped}
-								/>
-							</div>
-						</div>
-					</div>
-					<div hidden={$formData.marks_level !== 'test'} class="flex flex-col gap-3">
-						<PartialMarkingSection bind:partial={$formData.marking_scheme.partial} />
-					</div>
-				</RadioGroup.Root>
-			</div>
-		</ConfigureBox>
-		<ConfigureBox title="Candidate Profile" Icon={ClipboardPenLine}>
-			<div class="flex flex-col gap-4 md:flex-row md:items-center">
-				<div class="w-full md:w-2/5">
-					{@render headingSubheading(
-						'Form',
-						'Choose a form to collect candidate information before the test.'
-					)}
-				</div>
-
-				<div class="flex items-center gap-2">
-					<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
-						<Select.Trigger class="w-72">
-							<span class="truncate">
-								{#if $formData.form_id}
-									{formsOptions.find((f) => f.id === $formData.form_id)?.name}
-								{:else}
-									Select form
-								{/if}
-							</span>
-						</Select.Trigger>
-						<Select.Content>
-							<Select.Group>
-								<Select.Item value={null} label="No form">No form</Select.Item>
-
-								{#each formsOptions as form (form.id)}
-									<Select.Item value={form.id}>
-										{form.name}
-									</Select.Item>
+								<Select.Item value="" label="No certificate">No certificate</Select.Item>
+								{#each certificatesOptions as cert (cert.id)}
+									<Select.Item value={String(cert.id)}>{cert.name}</Select.Item>
 								{/each}
 							</Select.Group>
 						</Select.Content>
 					</Select.Root>
 
-					<a
-						href={resolve('/forms/add/new')}
-						target="_blank"
-						class="text-primary text-sm whitespace-nowrap hover:underline"
+					{#if $formData.certificate_id && availableTokens.length > 0}
+						<div class="bg-muted/50 mt-3 rounded-md border p-3">
+							<p class="mb-2 text-xs font-medium">Available Tokens</p>
+							<div class="flex flex-wrap gap-2">
+								{#each availableTokens as token (token.token)}
+									<button
+										type="button"
+										class="bg-background hover:bg-accent flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors"
+										onclick={() => copyToClipboard(token.token)}
+										title={token.label}
+									>
+										<code class="text-primary">{`{{${token.token}}}`}</code>
+										{#if copiedToken === token.token}
+											<Check class="h-3 w-3 text-green-500" />
+										{:else}
+											<Copy class="text-muted-foreground h-3 w-3" />
+										{/if}
+									</button>
+								{/each}
+							</div>
+							<p class="text-muted-foreground mt-2 text-xs">
+								Click to copy. Use these tokens in your Google Slides certificate template.
+							</p>
+						</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+	</ConfigureBox>
+
+	<!-- 2. Test Rules -->
+	<ConfigureBox title="Test Rules" Icon={Settings}>
+		<div class="flex flex-col gap-6 py-4 md:py-6">
+			<div class="flex items-center justify-between">
+				<Label class="text-sm font-medium text-gray-700">Maximum time limit for the test</Label>
+				<Input
+					placeholder="0 minutes"
+					class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
+					type="number"
+					name="time_limit"
+					bind:value={$formData.time_limit}
+				/>
+			</div>
+
+			<div class="flex items-center justify-between">
+				<Label class="text-sm font-medium text-gray-700">Shuffle question order per candidate</Label
+				>
+				<div class="bg-muted flex rounded-xl p-1">
+					<button
+						type="button"
+						class={[
+							'rounded-xl px-4 py-1.5 text-sm transition-colors',
+							$formData.shuffle
+								? 'bg-background text-primary font-semibold shadow'
+								: 'text-gray-500'
+						]}
+						onclick={() => {
+							$formData.shuffle = true;
+							$formData.random_questions = false;
+							$formData.no_of_random_questions = 0;
+						}}
 					>
-						Create new form
-					</a>
+						Yes
+					</button>
+					<button
+						type="button"
+						class={[
+							'rounded-xl px-4 py-1.5 text-sm transition-colors',
+							!$formData.shuffle
+								? 'bg-background text-primary font-semibold shadow'
+								: 'text-gray-500'
+						]}
+						onclick={() => ($formData.shuffle = false)}
+					>
+						No
+					</button>
 				</div>
 			</div>
-		</ConfigureBox>
-		<ConfigureBox title="Certificate Settings" Icon={ShieldCheck}>
-			<div class="flex flex-col gap-4 pt-6 md:flex-row md:items-center">
-				<div class="w-full md:w-2/5">
-					{@render headingSubheading(
-						'Attach Certificate',
-						'Select a certificate to issue after test completion.'
-					)}
+
+			{#if $formData.random_tag_count.length === 0}
+				<div class="flex items-center justify-between">
+					<Label class="w-1/2 text-sm font-medium text-gray-700"
+						>Select random questions per candidate</Label
+					>
+					<Input
+						placeholder="0 questions"
+						class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500 "
+						type="number"
+						name="no_of_random_questions"
+						bind:value={$formData.no_of_random_questions}
+					/>
 				</div>
-
-				<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
-					<Select.Trigger class="w-72">
-						<span class="truncate">
-							{#if $formData.certificate_id}
-								{certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name}
-							{:else}
-								Select certificate
-							{/if}
-						</span>
-					</Select.Trigger>
-					<Select.Content>
-						<Select.Group>
-							<Select.Item value={null} label="No certificate">No certificate</Select.Item>
-
-							{#each certificatesOptions as cert (cert.id)}
-								<Select.Item value={cert.id}>
-									{cert.name}
-								</Select.Item>
-							{/each}
-						</Select.Group>
-					</Select.Content>
-				</Select.Root>
-			</div>
-
-			{#if $formData.certificate_id && availableTokens.length > 0}
-				<div class="bg-muted/50 mt-4 rounded-md border p-4">
-					<p class="mb-3 text-sm font-medium">Available Tokens</p>
-					<div class="flex flex-wrap gap-2">
-						{#each availableTokens as token (token.token)}
-							<button
-								type="button"
-								class="bg-background hover:bg-accent flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors"
-								onclick={() => copyToClipboard(token.token)}
-								title={token.label}
-							>
-								<code class="text-primary">{`{{${token.token}}}`}</code>
-								{#if copiedToken === token.token}
-									<Check class="h-3 w-3 text-green-500" />
-								{:else}
-									<Copy class="text-muted-foreground h-3 w-3" />
-								{/if}
-							</button>
-						{/each}
-					</div>
-					<p class="text-muted-foreground mt-3 text-xs">
-						Click to copy. Use these tokens in your Google Slides certificate template.
-					</p>
-				</div>
+				{#if $formData.no_of_random_questions > 0 && $formData.question_revision_ids.length < $formData.no_of_random_questions}
+					<small class="text-red-400">
+						Number of random questions cannot exceed the total number of questions selected.
+					</small>
+				{/if}
 			{/if}
-		</ConfigureBox>
-	</div>
+		</div>
+	</ConfigureBox>
+
+	<!-- 3. Marking Scheme -->
+	<ConfigureBox title="Marking Scheme" Icon={Settings}>
+		<div class="flex flex-col gap-4 py-4 md:py-6">
+			<RadioGroup.Root bind:value={$formData.marks_level} class="flex flex-col gap-3">
+				<label
+					for="question_level"
+					class={[
+						'flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors',
+						$formData.marks_level === MarksLevel.QUESTION
+							? 'border-primary bg-primary/5'
+							: 'hover:bg-gray-50'
+					]}
+				>
+					<RadioGroup.Item value={MarksLevel.QUESTION} id="question_level" class="mt-0.5" />
+					<div>
+						<p class="text-sm font-semibold text-gray-800">Question Level Marking</p>
+						<p class="text-sm text-gray-500">
+							Each question has its own marks defined individually in the question bank
+						</p>
+					</div>
+				</label>
+
+				<label
+					for="test_level"
+					class={[
+						'flex cursor-pointer flex-col rounded-xl border p-4 transition-colors',
+						$formData.marks_level === MarksLevel.TEST
+							? 'border-primary bg-primary/5'
+							: 'hover:bg-gray-50'
+					]}
+				>
+					<div class="flex items-start gap-3">
+						<RadioGroup.Item value={MarksLevel.TEST} id="test_level" class="mt-0.5" />
+						<div>
+							<p class="text-sm font-semibold text-gray-800">Test Level Marking</p>
+							<p class="text-sm text-gray-500">
+								Apply uniform marks across all questions in this test
+							</p>
+						</div>
+					</div>
+
+					{#if $formData.marks_level === MarksLevel.TEST}
+						<div class="mt-4 ml-7 flex flex-col gap-4">
+							<div class="grid grid-cols-3 gap-3">
+								<div class="flex flex-col gap-1">
+									<small class="text-gray-500">Correct</small>
+									<Input
+										class="w-full bg-white"
+										type="number"
+										placeholder="0"
+										name="marking_scheme.correct"
+										bind:value={$formData.marking_scheme.correct}
+									/>
+								</div>
+								<div class="flex flex-col gap-1">
+									<small class="text-gray-500">Incorrect</small>
+									<Input
+										class="w-full bg-white"
+										type="number"
+										placeholder="0"
+										name="marking_scheme.wrong"
+										bind:value={$formData.marking_scheme.wrong}
+									/>
+								</div>
+								<div class="flex flex-col gap-1">
+									<small class="text-gray-500">No answer</small>
+									<Input
+										class="w-full bg-white"
+										type="number"
+										placeholder="0"
+										name="marking_scheme.skipped"
+										bind:value={$formData.marking_scheme.skipped}
+									/>
+								</div>
+							</div>
+							<PartialMarkingSection bind:partial={$formData.marking_scheme.partial} />
+						</div>
+					{/if}
+				</label>
+			</RadioGroup.Root>
+		</div>
+	</ConfigureBox>
 </div>

@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/table-core';
+import { toast } from 'svelte-sonner';
 import { createSortableColumn } from '$lib/components/data-table/column-helpers';
 import { downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
@@ -131,9 +132,12 @@ export const createTestColumns = (
 
 				if (test.link) {
 					customActions.push({
-						label: 'Conduct Test',
-						action: () => window.open(`${testTakerUrl}/test/${test.link}`, '_blank'),
-						icon: 'external-link'
+						label: 'Copy Test Link',
+						action: async () => {
+							await navigator.clipboard.writeText(`${testTakerUrl}/test/${test.link}`);
+							toast.success('Test Link Copied');
+						},
+						icon: 'copy-link'
 					});
 
 					customActions.push({

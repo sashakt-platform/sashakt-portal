@@ -5,10 +5,10 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import QrCode from '@lucide/svelte/icons/qr-code';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Copy from '@lucide/svelte/icons/copy';
+	import Link2 from '@lucide/svelte/icons/link-2';
 
 	interface CustomAction {
 		label: string;
@@ -67,12 +67,12 @@
 		switch (iconName) {
 			case 'file-plus':
 				return FilePlus;
-			case 'external-link':
-				return ExternalLink;
 			case 'copy':
 				return Copy;
 			case 'qr-code':
 				return QrCode;
+			case 'copy-link':
+				return Link2;
 			default:
 				return undefined;
 		}

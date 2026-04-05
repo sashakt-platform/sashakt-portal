@@ -24,17 +24,46 @@
 	const file = fileProxy(form, 'file');
 
 	let dragging = $state(false);
+	let dropError = $state('');
+	let fileInput = $state<HTMLInputElement | null>(null);
+
+	function clearFile() {
+		$file = undefined;
+		if (fileInput) fileInput.value = '';
+	}
+
+	const MAX_FILE_SIZE = 20 * 1024 * 1024;
+	const MAX_FILE_SIZE_MB = MAX_FILE_SIZE / (1024 * 1024);
+
+	function isValidCsv(file: File): boolean {
+		return file.type === 'text/csv' || file.name.endsWith('.csv');
+	}
 
 	function handleDrop(e: DragEvent) {
 		e.preventDefault();
 		dragging = false;
+		dropError = '';
 		const droppedFiles = e.dataTransfer?.files;
-		if (droppedFiles?.length) {
-			const input = document.querySelector('input[type=file]') as HTMLInputElement;
-			if (input) {
-				input.files = droppedFiles;
-				input.dispatchEvent(new Event('change', { bubbles: true }));
-			}
+		if (!droppedFiles?.length) return;
+
+		const file = droppedFiles[0];
+
+		if (!isValidCsv(file)) {
+			dropError = 'Only CSV files are supported.';
+			return;
+		}
+
+		if (file.size > MAX_FILE_SIZE) {
+			dropError = `File size exceeds ${MAX_FILE_SIZE_MB} MB limit.`;
+			return;
+		}
+
+		const dataTransfer = new DataTransfer();
+		dataTransfer.items.add(file);
+		const input = document.querySelector('input[type=file]') as HTMLInputElement;
+		if (input) {
+			input.files = dataTransfer.files;
+			input.dispatchEvent(new Event('change', { bubbles: true }));
 		}
 	}
 </script>
@@ -70,7 +99,14 @@
 
 		<!-- Upload zone -->
 		<form method="POST" enctype="multipart/form-data" use:enhance>
-			<input type="file" hidden name="file" bind:files={$file} accept=".csv" />
+			<input
+				type="file"
+				hidden
+				name="file"
+				bind:files={$file}
+				bind:this={fileInput}
+				accept=".csv"
+			/>
 
 			<div
 				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center {dragging
@@ -158,7 +194,7 @@
 									variant="destructive"
 									onclick={() => {
 										$message = undefined;
-										$file = undefined;
+										clearFile();
 									}}>Retry Upload</Button
 								>
 							</div>
@@ -169,7 +205,7 @@
 									class="border-primary text-primary"
 									onclick={() => {
 										$message = undefined;
-										$file = undefined;
+										clearFile();
 									}}>Upload More</Button
 								>
 								<a href={resolve('/questionbank')}>
@@ -195,7 +231,7 @@
 							<X
 								class="bg-muted cursor-pointer rounded-full p-1"
 								onclick={() => {
-									$file = undefined;
+									clearFile();
 								}}
 							/>
 						</div>
@@ -203,7 +239,7 @@
 							<Button
 								variant="outline"
 								onclick={() => {
-									$file = undefined;
+									clearFile();
 								}}>Discard</Button
 							>
 							<Button
@@ -234,7 +270,12 @@
 							Drag and drop your file here, or <span class="text-primary font-semibold">browse</span
 							>
 						</p>
-						<p class="text-muted-foreground mt-1 text-sm">Supports CSV (max 20 MB)</p>
+						<p class="text-muted-foreground mt-1 text-sm">
+							Supports CSV (max {MAX_FILE_SIZE_MB} MB)
+						</p>
+						{#if dropError}
+							<p class="text-destructive mt-2 text-sm">{dropError}</p>
+						{/if}
 					</div>
 				{/if}
 			</div>

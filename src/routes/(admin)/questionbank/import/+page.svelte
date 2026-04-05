@@ -1,9 +1,8 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import Download from '@lucide/svelte/icons/download';
-	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
+	import CircleX from '@lucide/svelte/icons/circle-x';
 	import Upload from '@lucide/svelte/icons/upload';
 	import X from '@lucide/svelte/icons/x';
 	import { fileProxy, superForm } from 'sveltekit-superforms';
@@ -92,9 +91,9 @@
 								class="flex h-14 w-14 items-center justify-center rounded-full"
 								style="background-color: hsl(var(--error-subtle));"
 							>
-								<TriangleAlert class="text-destructive" size={28} />
+								<CircleX class="text-destructive" size={28} />
 							</div>
-							<h3 class="text-xl font-bold">Import error(s)</h3>
+							<h3 class="text-xl font-bold">Bulk upload error</h3>
 						{:else}
 							<div
 								class="flex h-14 w-14 items-center justify-center rounded-full"
@@ -102,63 +101,82 @@
 							>
 								<CircleCheck style="color: hsl(var(--success-bold));" size={28} />
 							</div>
-							<h3 class="text-xl font-bold">File upload successful</h3>
+							<h3 class="text-xl font-bold">Bulk upload successful</h3>
 						{/if}
 						<p class="text-muted-foreground text-sm">{$message.message}</p>
 
 						<!-- Upload Summary table -->
-						<Table.Root class="bg-accent max-w-sm rounded-lg">
-							<Table.Header>
-								<Table.Row>
-									<Table.Head class="text-muted-foreground font-semibold" colspan={2}
-										>Upload Summary</Table.Head
+						<table class="w-full max-w-sm overflow-hidden rounded-lg border text-left text-sm">
+							<thead>
+								<tr class="bg-muted border-b">
+									<th
+										class="text-muted-foreground px-4 py-3 text-left text-sm font-semibold"
+										colspan="2"
 									>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								<Table.Row>
-									<Table.Cell class="font-medium">Total rows</Table.Cell>
-									<Table.Cell class="text-right">{$message.uploaded_questions}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell class="font-medium">Validated rows</Table.Cell>
-									<Table.Cell class="text-right">{$message.success_questions}</Table.Cell>
-								</Table.Row>
-								<Table.Row>
-									<Table.Cell class="font-medium">Errors</Table.Cell>
-									<Table.Cell class="text-right">{$message.failed_questions}</Table.Cell>
-								</Table.Row>
-							</Table.Body>
-						</Table.Root>
+										Upload Summary
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="border-b">
+									<td class="px-4 py-3 font-medium">Total rows</td>
+									<td class="px-4 py-3 text-right">{$message.uploaded_questions}</td>
+								</tr>
+								<tr class="border-b">
+									<td class="px-4 py-3 font-medium">Validated rows</td>
+									<td class="px-4 py-3 text-right">{$message.success_questions}</td>
+								</tr>
+								<tr>
+									<td
+										class="px-4 py-3 font-medium {$message.failed_questions
+											? 'text-destructive'
+											: ''}"
+									>
+										Errors
+									</td>
+									<td
+										class="px-4 py-3 text-right {$message.failed_questions
+											? 'text-destructive'
+											: ''}"
+									>
+										{$message.failed_questions}
+									</td>
+								</tr>
+							</tbody>
+						</table>
 
-						{#if $message.error_log?.startsWith('data:text/csv;base64')}
-							<div class="mt-2 flex w-full max-w-sm items-center">
-								<a
-									href={$message.error_log}
-									class="text-primary w-full font-medium"
-									download="error_report.csv"
+						{#if $message.failed_questions}
+							<div class="mt-2 flex gap-3">
+								{#if $message.error_log?.startsWith('data:text/csv;base64')}
+									<a href={$message.error_log} download="error_report.csv">
+										<Button variant="outline" class="border-primary text-primary cursor-pointer">
+											Download Error Report
+										</Button>
+									</a>
+								{/if}
+								<Button
+									variant="destructive"
+									onclick={() => {
+										$message = undefined;
+										$file = undefined;
+									}}>Retry Upload</Button
 								>
-									<Button class="w-full cursor-pointer py-2 text-base font-semibold">
-										<Download size={16} />
-										Download error report
-									</Button>
+							</div>
+						{:else}
+							<div class="mt-2 flex gap-3">
+								<Button
+									variant="outline"
+									class="border-primary text-primary"
+									onclick={() => {
+										$message = undefined;
+										$file = undefined;
+									}}>Upload More</Button
+								>
+								<a href={resolve('/questionbank')}>
+									<Button>Go to Question Bank</Button>
 								</a>
 							</div>
 						{/if}
-
-						<div class="mt-2 flex gap-3">
-							<Button
-								variant="outline"
-								class="border-primary text-primary"
-								onclick={() => {
-									$message = undefined;
-									$file = undefined;
-								}}>Upload More</Button
-							>
-							<a href={resolve('/questionbank')}>
-								<Button>Go to Question Bank</Button>
-							</a>
-						</div>
 					</div>
 				{:else if $form.file}
 					<!-- File selected state -->

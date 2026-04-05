@@ -112,7 +112,7 @@
 			<Button
 				{...props}
 				variant="outline"
-				class="h-10 w-full justify-start rounded-full text-gray-500"
+				class="bg-gray-0 h-10 w-full justify-start rounded-full text-gray-500"
 				role="combobox"
 				aria-expanded={open}
 			>

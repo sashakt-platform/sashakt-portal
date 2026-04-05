@@ -161,6 +161,7 @@
 						name="completion_message"
 						placeholder="E.g., Thank you for completing the assessment. Your results will be shared soon."
 						class="min-h-25 border-gray-300 placeholder:font-light placeholder:text-gray-500"
+						bind:value={$formData.completion_message}
 					/>
 				</div>
 			</div>
@@ -179,6 +180,26 @@
 								{#each Object.entries(languageOptions) as [key, label] (key)}
 									<Select.Item value={key} {label}>{label}</Select.Item>
 								{/each}
+							</Select.Group>
+						</Select.Content>
+					</Select.Root>
+				</div>
+				<div>
+					{@render label('OMR Mode')}
+					<Select.Root type="single" name="omr" bind:value={$formData.omr}>
+						{@render selectTrigger(
+							$formData.omr === OmrMode.NEVER
+								? 'Never'
+								: $formData.omr === OmrMode.ALWAYS
+									? 'Always'
+									: 'Optional',
+							true
+						)}
+						<Select.Content>
+							<Select.Group>
+								<Select.Item value={OmrMode.NEVER} label="Never">Never</Select.Item>
+								<Select.Item value={OmrMode.ALWAYS} label="Always">Always</Select.Item>
+								<Select.Item value={OmrMode.OPTIONAL} label="Optional">Optional</Select.Item>
 							</Select.Group>
 						</Select.Content>
 					</Select.Root>
@@ -253,73 +274,155 @@
 	</ConfigureBox>
 
 	<!-- 2. Test Rules -->
+	{#snippet labelTestRules(label: string)}
+		<Label class="text-sm font-medium text-gray-700">{label}</Label>
+	{/snippet}
+	{#snippet yesNo(value: boolean, onYes: () => void, onNo: () => void)}
+		<div class="bg-muted flex rounded-xl p-1">
+			<button
+				type="button"
+				class={[
+					'rounded-xl px-4 py-1.5 text-sm transition-colors',
+					value ? 'bg-background text-primary font-semibold shadow' : 'text-gray-500'
+				]}
+				onclick={onYes}>Yes</button
+			>
+			<button
+				type="button"
+				class={[
+					'rounded-xl px-4 py-1.5 text-sm transition-colors',
+					!value ? 'bg-background text-primary font-semibold shadow' : 'text-gray-500'
+				]}
+				onclick={onNo}>No</button
+			>
+		</div>
+	{/snippet}
 	<ConfigureBox title="Test Rules" Icon={Settings}>
-		<div class="flex flex-col gap-6 py-4 md:py-6 lg:w-1/2">
-			<div class="flex items-center justify-between">
-				<Label class="text-sm font-medium text-gray-700">Maximum time limit for the test</Label>
-				<Input
-					placeholder="0 minutes"
-					class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
-					type="number"
-					name="time_limit"
-					bind:value={$formData.time_limit}
-				/>
-			</div>
-
-			<div class="flex items-center justify-between">
-				<Label class="text-sm font-medium text-gray-700">Shuffle question order per candidate</Label
-				>
-				<div class="bg-muted flex rounded-xl p-1">
-					<button
-						type="button"
-						class={[
-							'rounded-xl px-4 py-1.5 text-sm transition-colors',
-							$formData.shuffle
-								? 'bg-background text-primary font-semibold shadow'
-								: 'text-gray-500'
-						]}
-						onclick={() => {
-							$formData.shuffle = true;
-							$formData.random_questions = false;
-							$formData.no_of_random_questions = 0;
-						}}
-					>
-						Yes
-					</button>
-					<button
-						type="button"
-						class={[
-							'rounded-xl px-4 py-1.5 text-sm transition-colors',
-							!$formData.shuffle
-								? 'bg-background text-primary font-semibold shadow'
-								: 'text-gray-500'
-						]}
-						onclick={() => ($formData.shuffle = false)}
-					>
-						No
-					</button>
-				</div>
-			</div>
-
-			{#if $formData.random_tag_count.length === 0}
+		<div class="flex flex-col lg:flex-row lg:gap-12">
+			<div class="flex flex-col gap-6 py-4 md:py-6 lg:w-1/2">
 				<div class="flex items-center justify-between">
-					<Label class="w-1/2 text-sm font-medium text-gray-700"
-						>Select random questions per candidate</Label
-					>
+					{@render labelTestRules('Maximum time limit for the test')}
 					<Input
-						placeholder="0 questions"
-						class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500 "
+						placeholder="0 minutes"
+						class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
 						type="number"
-						name="no_of_random_questions"
-						bind:value={$formData.no_of_random_questions}
+						name="time_limit"
+						bind:value={$formData.time_limit}
 					/>
 				</div>
-				{#if $formData.no_of_random_questions > 0 && $formData.question_revision_ids.length < $formData.no_of_random_questions}
-					<small class="text-red-400">
-						Number of random questions cannot exceed the total number of questions selected.
-					</small>
+
+				<div class="flex items-center justify-between">
+					{@render labelTestRules('Shuffle question order per candidate')}
+					<div class="bg-muted flex rounded-xl p-1">
+						<button
+							type="button"
+							class={[
+								'rounded-xl px-4 py-1.5 text-sm transition-colors',
+								$formData.shuffle
+									? 'bg-background text-primary font-semibold shadow'
+									: 'text-gray-500'
+							]}
+							onclick={() => {
+								$formData.shuffle = true;
+								$formData.random_questions = false;
+								$formData.no_of_random_questions = 0;
+							}}
+						>
+							Yes
+						</button>
+						<button
+							type="button"
+							class={[
+								'rounded-xl px-4 py-1.5 text-sm transition-colors',
+								!$formData.shuffle
+									? 'bg-background text-primary font-semibold shadow'
+									: 'text-gray-500'
+							]}
+							onclick={() => ($formData.shuffle = false)}
+						>
+							No
+						</button>
+					</div>
+				</div>
+
+				{#if $formData.random_tag_count.length === 0}
+					<div class="flex items-center justify-between">
+						{@render labelTestRules('Select random questions per candidate')}
+						<Input
+							placeholder="0 questions"
+							class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500 "
+							type="number"
+							name="no_of_random_questions"
+							bind:value={$formData.no_of_random_questions}
+						/>
+					</div>
+					{#if $formData.no_of_random_questions > 0 && $formData.question_revision_ids.length < $formData.no_of_random_questions}
+						<small class="text-red-400">
+							Number of random questions cannot exceed the total number of questions selected.
+						</small>
+					{/if}
 				{/if}
-			{/if}
+
+				<div class="flex items-center justify-between">
+					{@render labelTestRules('Questions per page')}
+
+					<Input
+						placeholder="0"
+						class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
+						type="number"
+						name="question_pagination"
+						bind:value={$formData.question_pagination}
+					/>
+				</div>
+			</div>
+			<div class="border-gray-200 lg:border-t-0 lg:border-l"></div>
+			<div class="flex flex-col gap-6 lg:w-1/2 lg:py-4">
+				<div class="flex items-center justify-between">
+					{@render labelTestRules('Show result after test completion')}
+					{@render yesNo(
+						$formData.show_result,
+						() => ($formData.show_result = true),
+						() => ($formData.show_result = false)
+					)}
+				</div>
+
+				<div class="flex items-center justify-between">
+					{@render labelTestRules('Show question palette during test')}
+					{@render yesNo(
+						$formData.show_question_palette,
+						() => ($formData.show_question_palette = true),
+						() => ($formData.show_question_palette = false)
+					)}
+				</div>
+
+				<div class="flex items-center justify-between">
+					{@render labelTestRules('Enable mark for review')}
+					{@render yesNo(
+						$formData.bookmark,
+						() => ($formData.bookmark = true),
+						() => ($formData.bookmark = false)
+					)}
+				</div>
+
+				<div class="flex items-center justify-between">
+					{@render labelTestRules('Show feedback after test completion')}
+
+					{@render yesNo(
+						$formData.show_feedback_on_completion,
+						() => ($formData.show_feedback_on_completion = true),
+						() => ($formData.show_feedback_on_completion = false)
+					)}
+				</div>
+
+				<div class="flex items-center justify-between">
+					{@render labelTestRules('Show feedback immediately after each question')}
+					{@render yesNo(
+						$formData.show_feedback_immediately,
+						() => ($formData.show_feedback_immediately = true),
+						() => ($formData.show_feedback_immediately = false)
+					)}
+				</div>
+			</div>
 		</div>
 	</ConfigureBox>
 

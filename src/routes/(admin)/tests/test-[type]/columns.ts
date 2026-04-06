@@ -124,7 +124,7 @@ export const createTestColumns = (
 				customActions.push({
 					label: 'Make a Test',
 					href: resolve(`/tests/test-session/convert/?template_id=${test.id}`),
-					icon: 'file-plus',
+					icon: 'null',
 					inline: true
 				});
 			} else {

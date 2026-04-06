@@ -90,7 +90,7 @@
 					<Button
 						variant="outline"
 						size="sm"
-						class="border-brand-light text-primary border font-semibold">Edit</Button
+						class="border-brand-light text-primary rounded-lg border font-semibold">Edit</Button
 					>
 				</a>
 			{/if}
@@ -120,7 +120,11 @@
 					</form>
 				{:else if action.href}
 					<a href={action.href}>
-						<Button variant="secondary" size="sm" class="font-semibold">
+						<Button
+							variant="secondary"
+							size="sm"
+							class="text-primary bg-brand-light rounded-lg font-semibold"
+						>
 							{#if IconComponent}
 								<IconComponent class="h-4 w-4" />
 							{/if}
@@ -131,7 +135,7 @@
 					<Button
 						variant="secondary"
 						size="sm"
-						class="text-primary bg-brand-light font-semibold"
+						class="text-primary bg-brand-light rounded-lg font-semibold"
 						onclick={action.action}
 					>
 						{#if IconComponent}

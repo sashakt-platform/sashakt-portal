@@ -87,7 +87,11 @@
 		{#if hasInlineActions}
 			{#if canEdit && editInline}
 				<a href={editUrl}>
-					<Button variant="outline" size="sm" class="font-semibold">Edit</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						class="border-brand-light text-primary border font-semibold">Edit</Button
+					>
 				</a>
 			{/if}
 
@@ -124,7 +128,12 @@
 						</Button>
 					</a>
 				{:else if action.action}
-					<Button variant="secondary" size="sm" class="font-semibold" onclick={action.action}>
+					<Button
+						variant="secondary"
+						size="sm"
+						class="text-primary bg-brand-light font-semibold"
+						onclick={action.action}
+					>
 						{#if IconComponent}
 							<IconComponent class="h-4 w-4" />
 						{/if}

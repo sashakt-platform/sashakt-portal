@@ -113,7 +113,7 @@ export const createTestColumns = (
 			const customActions = [];
 
 			customActions.push({
-				label: 'Make a Copy',
+				label: 'Duplicate',
 				href: resolve(`${baseUrl}/${test.id}?/clone`),
 				icon: 'copy',
 				method: 'POST'
@@ -141,7 +141,7 @@ export const createTestColumns = (
 					});
 
 					customActions.push({
-						label: 'Download QR Code',
+						label: 'Download QR',
 						action: async () => {
 							const fileName = `qr-${test.name.replace(/\s+/g, '-').toLowerCase()}`;
 							try {
@@ -150,7 +150,7 @@ export const createTestColumns = (
 								console.error('Failed to download QR code:', error);
 							}
 						},
-						icon: 'qr-code',
+						icon: 'null',
 						inline: true
 					});
 				}

@@ -10,6 +10,7 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
+	import { derived } from 'svelte/store';
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
@@ -23,6 +24,8 @@
 			user: any;
 			test_taker_url: string;
 			testData: Partial<Infer<FormSchema>> | null;
+			templates: any;
+			convertTemplate: boolean;
 			questions: any;
 			selectedQuestions: any;
 			questionParams: any;
@@ -31,6 +34,7 @@
 
 	const testData: Partial<Infer<FormSchema>> | null = data?.testData || null;
 	const isEditing = $derived(!!testData);
+	const convertTemplate = $derived(data.convertTemplate);
 
 	const {
 		form: formData,
@@ -112,11 +116,15 @@
 		}
 	}
 
-	const steps = [
-		{ number: 1, label: 'Primary Details', mode: typeOfScreen.primary },
+	const steps = $derived.by(() => [
+		{
+			number: 1,
+			label: convertTemplate ? 'Select Template' : 'Primary Details',
+			mode: typeOfScreen.primary
+		},
 		{ number: 2, label: 'Select Questions', mode: typeOfScreen.questions },
 		{ number: 3, label: 'Test Configuration', mode: typeOfScreen.configuration }
-	];
+	]);
 </script>
 
 <form method="POST" action="?/save" use:enhance class="pb-10">
@@ -191,9 +199,9 @@
 	<!-- Content -->
 	{#if currentScreen === typeOfScreen.primary || currentScreen === typeOfScreen.questions}
 		<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
-			<div class="bg-gray-0 rounded-2xl border border-gray-300">
+			<div class="bg-gray-0 rounded-2xl border border-gray-300 overflow-hidden">
 				{#if currentScreen === typeOfScreen.primary}
-					<Primary {formData} user={data.user} />
+					<Primary {formData} user={data.user} {convertTemplate} templates={data.templates} />
 				{:else if currentScreen === typeOfScreen.questions}
 					<QuestionList
 						{formData}

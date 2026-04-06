@@ -132,7 +132,7 @@
 					variant="outline"><Plus />Create Manually</Button
 				></a
 			>
-			<a href={resolve('/tests/test-template')}
+			<a href={page.url.pathname + '/convert'}
 				><Button class="font-semibold"><Plus />Create from Template</Button></a
 			>
 		{/if}

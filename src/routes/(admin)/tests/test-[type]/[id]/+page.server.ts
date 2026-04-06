@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const is_template = params?.type === 'template';
 
 	// Check permissions based on action and type
-	if (params?.id === 'new') {
+	if (params?.id === 'new' || params?.id === 'convert') {
 		if (is_template) {
 			requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
 		} else {
@@ -33,9 +33,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const token = getSessionTokenCookie();
 
 	try {
-		if (params?.id !== 'new') {
-			let id = templateID || params.id;
-			const testResponse = await fetch(`${BACKEND_URL}/test/${id}?is_template=${is_template}`, {
+		if (params?.id !== 'new' && params?.id !== 'convert') {
+			// edit existing test
+			const testResponse = await fetch(`${BACKEND_URL}/test/${params.id}?is_template=${is_template}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -49,15 +49,43 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			}
 
 			testData = await testResponse.json();
-			if (templateID) {
-				testData.is_template = false;
-				testData.template_id = templateID;
-				testData.link = null;
+		} else if (params?.id === 'convert' && templateID) {
+			// convert flow: template selected, prefill from it
+			const testResponse = await fetch(`${BACKEND_URL}/test/${templateID}?is_template=true`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
+			});
+
+			if (!testResponse.ok) {
+				console.error(`Failed to fetch template data: ${testResponse.statusText}`);
+				throw new Error('Failed to fetch template data');
 			}
+
+			testData = await testResponse.json();
+			testData.is_template = false;
+			testData.template_id = templateID;
+			testData.link = null;
 		}
+		// id === 'new' or id === 'convert' without templateID: testData stays null
 	} catch (error) {
 		console.error('Error fetching test data:', error);
 		testData = null;
+	}
+
+	// fetch templates list for convert step 1 (no template chosen yet)
+	let templates = { items: [], total: 0, pages: 0 };
+	if (params?.id === 'convert' && !templateID) {
+		try {
+			const templatesRes = await fetch(`${BACKEND_URL}/test/?is_template=true&page=1&size=50`, {
+				headers: { Authorization: `Bearer ${token}` }
+			});
+			if (templatesRes.ok) templates = await templatesRes.json();
+		} catch (error) {
+			console.error('Error fetching templates:', error);
+		}
 	}
 
 	const form = await superValidate(zod4(testSchema));
@@ -122,6 +150,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	return {
 		form,
 		testData,
+		templates,
+		convertTemplate: params.id === 'convert',
 		questions,
 		selectedQuestions,
 		questionParams: questionPaginationParams

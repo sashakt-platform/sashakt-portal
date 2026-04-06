@@ -77,9 +77,35 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	// fetch templates list for convert step 1 (no template chosen yet)
 	let templates = { items: [], total: 0, pages: 0 };
+	let templateParams = { page: 1, size: DEFAULT_PAGE_SIZE, search: '', sortBy: '', sortOrder: 'asc' };
 	if (params?.id === 'convert' && !templateID) {
+		const tPage = Number(url.searchParams.get('page')) || 1;
+		const tSize = Number(url.searchParams.get('size')) || DEFAULT_PAGE_SIZE;
+		const tSearch = url.searchParams.get('search') || '';
+		const tSortBy = url.searchParams.get('sortBy') || '';
+		const tSortOrder = url.searchParams.get('sortOrder') || 'asc';
+		const tTagIds = url.searchParams.getAll('tag_ids');
+		const tStateIds = url.searchParams.getAll('state_ids');
+		const tTagTypeIds = url.searchParams.getAll('tag_type_ids');
+		const tDistrictIds = url.searchParams.getAll('district_ids');
+
+		templateParams = { page: tPage, size: tSize, search: tSearch, sortBy: tSortBy, sortOrder: tSortOrder };
+
+		const tParams = new URLSearchParams({
+			is_template: 'true',
+			page: tPage.toString(),
+			size: tSize.toString(),
+			sort_order: tSortOrder,
+			...(tSearch && { name: tSearch }),
+			...(tSortBy && { sort_by: tSortBy })
+		});
+		for (const id of tTagIds) tParams.append('tag_ids', id);
+		for (const id of tStateIds) tParams.append('state_ids', id);
+		for (const id of tTagTypeIds) tParams.append('tag_type_ids', id);
+		for (const id of tDistrictIds) tParams.append('district_ids', id);
+
 		try {
-			const templatesRes = await fetch(`${BACKEND_URL}/test/?is_template=true&page=1&size=50`, {
+			const templatesRes = await fetch(`${BACKEND_URL}/test/?${tParams}`, {
 				headers: { Authorization: `Bearer ${token}` }
 			});
 			if (templatesRes.ok) templates = await templatesRes.json();
@@ -151,6 +177,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		form,
 		testData,
 		templates,
+		templateParams,
 		convertTemplate: params.id === 'convert',
 		questions,
 		selectedQuestions,

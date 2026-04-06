@@ -25,6 +25,7 @@
 			test_taker_url: string;
 			testData: Partial<Infer<FormSchema>> | null;
 			templates: any;
+			templateParams: any;
 			convertTemplate: boolean;
 			questions: any;
 			selectedQuestions: any;
@@ -201,7 +202,7 @@
 		<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
 			<div class="bg-gray-0 rounded-2xl border border-gray-300 overflow-hidden">
 				{#if currentScreen === typeOfScreen.primary}
-					<Primary {formData} user={data.user} {convertTemplate} templates={data.templates} />
+					<Primary {formData} user={data.user} {convertTemplate} templates={data.templates} templateParams={data.templateParams} />
 				{:else if currentScreen === typeOfScreen.questions}
 					<QuestionList
 						{formData}

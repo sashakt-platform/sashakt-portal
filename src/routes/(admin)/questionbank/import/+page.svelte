@@ -78,7 +78,7 @@
 	</div>
 
 	<!-- Outer card container -->
-	<div class="border-border rounded-xl border border-dashed p-4 sm:p-6">
+	<div class="border-border bg-gray-0 rounded-xl border p-4 sm:p-6">
 		<!-- Template download banner -->
 		<div
 			class="bg-accent mb-6 flex flex-col items-start gap-4 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6"
@@ -109,7 +109,7 @@
 			/>
 
 			<div
-				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center {dragging
+				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed bg-gray-50 p-6 text-center {dragging
 					? 'border-primary bg-accent'
 					: 'border-border'}"
 				ondragover={(e) => {
@@ -216,7 +216,7 @@
 					</div>
 				{:else if $form.file}
 					<!-- File selected state -->
-					<div class="flex w-full max-w-md flex-col items-center gap-4">
+					<div class="flex w-full max-w-md flex-col items-center gap-4 rounded-lg border-1">
 						<div class="bg-accent flex w-full flex-row items-center gap-2 rounded-lg p-4">
 							<div class="flex-1 text-left">
 								<p class="font-bold">{$form.file?.name}</p>
@@ -235,7 +235,7 @@
 								}}
 							/>
 						</div>
-						<div class="flex gap-3">
+						<div class="flex gap-3 p-4">
 							<Button
 								variant="outline"
 								onclick={() => {

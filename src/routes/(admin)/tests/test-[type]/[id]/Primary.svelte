@@ -22,8 +22,9 @@
 		user = null,
 		convertTemplate = false,
 		templates = { items: [], total: 0, pages: 0 },
-		templateParams = {}
-	}: { formData: any; user?: User | null; convertTemplate: boolean; templates?: any; templateParams?: any } = $props();
+		templateParams = {},
+		selectedTemplateId = $bindable(null)
+	}: { formData: any; user?: User | null; convertTemplate: boolean; templates?: any; templateParams?: any; selectedTemplateId?: string | null } = $props();
 	let selectedStates = $derived($formData.state_ids || []);
 	let selectedTagTypes: { id: string; name: string }[] = $state([]);
 
@@ -64,7 +65,7 @@
 	</div>
 </div>
 {#if convertTemplate}
-	<TemplateSelect {templates} {templateParams} />
+	<TemplateSelect {templates} {templateParams} bind:selectedTemplateId />
 {:else}
 	<!-- Two-Column Layout -->
 	<div class="flex flex-col gap-8 p-6 sm:p-8 lg:flex-row lg:gap-0">

@@ -10,11 +10,9 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
-	import { derived } from 'svelte/store';
+	import { goto } from '$app/navigation';
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
-
-	let currentScreen: number = $state(typeOfScreen.primary);
 
 	let {
 		data
@@ -36,6 +34,14 @@
 	const testData: Partial<Infer<FormSchema>> | null = data?.testData || null;
 	const isEditing = $derived(!!testData);
 	const convertTemplate = $derived(data.convertTemplate);
+	let selectedTemplateId = $state<string | null>(null);
+	let currentScreen: number = $state(typeOfScreen.primary);
+
+	$effect(() => {
+		if (data.convertTemplate && data.testData) {
+			currentScreen = typeOfScreen.questions;
+		}
+	});
 
 	const {
 		form: formData,
@@ -55,30 +61,31 @@
 		}
 	});
 
-	if (testData) {
+	function populateFormFromTestData(td: typeof testData) {
+		if (!td) return;
+		$formData.name = (td as any)?.name || '';
+		$formData.description = (td as any)?.description || '';
 		$formData.state_ids =
-			testData?.states?.map((state: Filter) => ({
+			td?.states?.map((state: Filter) => ({
 				id: String(state.id),
 				name: state.name
 			})) || [];
-
 		$formData.district_ids =
-			testData?.districts?.map((district: Filter) => ({
+			td?.districts?.map((district: Filter) => ({
 				id: String(district.id),
 				name: district.name
 			})) || [];
-
 		$formData.tag_ids =
-			testData?.tags?.map((tag: Filter) => ({
+			td?.tags?.map((tag: Filter) => ({
 				id: String(tag.id),
 				name: tag.name
 			})) || [];
 		$formData.question_revision_ids =
-			testData?.question_revisions?.map((q: { id: number }) => q.id) || [];
-
+			td?.question_revisions?.map((q: { id: number }) => q.id) || [];
+		$formData.question_revisions = td?.question_revisions || [];
 		$formData.random_tag_count =
 			(
-				testData?.random_tag_counts as
+				td?.random_tag_counts as
 					| Array<{ tag: { id: string; name: string; tag_type?: { name: string } }; count: number }>
 					| undefined
 			)?.map((t) => ({
@@ -88,6 +95,14 @@
 			})) || [];
 	}
 
+	populateFormFromTestData(testData);
+
+	$effect(() => {
+		if (data.convertTemplate && data.testData) {
+			populateFormFromTestData(data.testData as typeof testData);
+		}
+	});
+
 	const pageTitle = $derived.by(() => {
 		if ($formData.is_template) {
 			return isEditing ? 'Edit Test Template' : 'Create Test Template';
@@ -96,11 +111,14 @@
 	});
 
 	const isNextDisabled = $derived(
-		(currentScreen === typeOfScreen.primary && $formData.name.trim() === '') ||
+		(currentScreen === typeOfScreen.primary && convertTemplate && !selectedTemplateId) ||
+			(currentScreen === typeOfScreen.primary &&
+				!convertTemplate &&
+				($formData.name ?? '').trim() === '') ||
 			(currentScreen === typeOfScreen.configuration &&
 				$formData.random_questions &&
-				$formData.no_of_random_questions <= 0) ||
-			$formData.no_of_random_questions > $formData.question_revision_ids.length
+				($formData.no_of_random_questions ?? 0) <= 0) ||
+			($formData.no_of_random_questions ?? 0) > ($formData.question_revision_ids ?? []).length
 	);
 
 	function handlePrevious() {
@@ -110,6 +128,10 @@
 	}
 
 	function handleNext() {
+		if (currentScreen === typeOfScreen.primary && convertTemplate) {
+			goto(`?template_id=${selectedTemplateId}`, { invalidateAll: true });
+			return;
+		}
 		if (currentScreen === typeOfScreen.configuration) {
 			submit();
 		} else {
@@ -200,9 +222,16 @@
 	<!-- Content -->
 	{#if currentScreen === typeOfScreen.primary || currentScreen === typeOfScreen.questions}
 		<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
-			<div class="bg-gray-0 rounded-2xl border border-gray-300 overflow-hidden">
+			<div class="bg-gray-0 overflow-hidden rounded-2xl border border-gray-300">
 				{#if currentScreen === typeOfScreen.primary}
-					<Primary {formData} user={data.user} {convertTemplate} templates={data.templates} templateParams={data.templateParams} />
+					<Primary
+						{formData}
+						user={data.user}
+						{convertTemplate}
+						templates={data.templates}
+						templateParams={data.templateParams}
+						bind:selectedTemplateId
+					/>
 				{:else if currentScreen === typeOfScreen.questions}
 					<QuestionList
 						{formData}

@@ -24,7 +24,14 @@
 		templates = { items: [], total: 0, pages: 0 },
 		templateParams = {},
 		selectedTemplateId = $bindable(null)
-	}: { formData: any; user?: User | null; convertTemplate: boolean; templates?: any; templateParams?: any; selectedTemplateId?: string | null } = $props();
+	}: {
+		formData: any;
+		user?: User | null;
+		convertTemplate: boolean;
+		templates?: any;
+		templateParams?: any;
+		selectedTemplateId?: string | null;
+	} = $props();
 	let selectedStates = $derived($formData.state_ids || []);
 	let selectedTagTypes: { id: string; name: string }[] = $state([]);
 
@@ -118,11 +125,7 @@
 			<div>
 				<Label class="text-sm font-medium text-gray-700">Tags</Label>
 				<div class="mt-2">
-					<TagsSelection
-						bind:tags={$formData.tag_ids}
-						filteration={true}
-						tagTypes={selectedTagTypes}
-					/>
+					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>
 			</div>
 

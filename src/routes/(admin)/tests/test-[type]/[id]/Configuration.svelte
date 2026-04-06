@@ -382,8 +382,7 @@
 				{/if}
 
 				<div class="flex items-center justify-between">
-					{@render labelTestRules('Questions per page')}
-
+					{@render labelTestRules('Questions per page (0 - All questions in a page)')}
 					<Input
 						placeholder="0"
 						class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"

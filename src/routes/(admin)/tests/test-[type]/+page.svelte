@@ -108,7 +108,7 @@
 
 <DeleteDialog
 	bind:action={deleteAction}
-	elementName={data?.is_template ? 'Test template' : 'Tests'}
+	elementName={data?.is_template ? 'Test template' : 'Test'}
 />
 
 <ListingPageLayout

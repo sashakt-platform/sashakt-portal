@@ -25,7 +25,13 @@
 			total: number;
 			pages: number;
 		};
-		templateParams?: { page: number; size: number; search: string; sortBy: string; sortOrder: string };
+		templateParams?: {
+			page: number;
+			size: number;
+			search: string;
+			sortBy: string;
+			sortOrder: string;
+		};
 		selectedTemplateId?: string | null;
 	} = $props();
 
@@ -93,17 +99,25 @@
 </div>
 
 <!-- Table card -->
-<div class="mx-4 mb-4 overflow-hidden rounded-xl border border-gray-200 sm:mx-5">
+<div class="mx-4 mb-4 overflow-hidden rounded-xl border border-gray-300 sm:mx-5">
 	<!-- Header row -->
 	<div
-		class="grid grid-cols-[44px_1fr_280px_160px] bg-gray-50 px-4 py-3 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+		class="grid grid-cols-[44px_1fr_280px_160px] bg-gray-200 px-4 py-6 text-xs font-semibold tracking-wide text-gray-500 uppercase"
 	>
 		<div></div>
-		<button type="button" class="flex items-center gap-1 text-left hover:text-gray-700" onclick={() => handleSort('name')}>
+		<button
+			type="button"
+			class="flex items-center gap-1 text-left hover:text-gray-700"
+			onclick={() => handleSort('name')}
+		>
 			TEST TEMPLATES <ArrowUpDown class="h-3 w-3" />
 		</button>
 		<div>TAGS</div>
-		<button type="button" class="flex items-center gap-1 hover:text-gray-700" onclick={() => handleSort('modified_date')}>
+		<button
+			type="button"
+			class="flex items-center gap-1 hover:text-gray-700"
+			onclick={() => handleSort('modified_date')}
+		>
 			UPDATED <ArrowUpDown class="h-3 w-3" />
 		</button>
 	</div>
@@ -169,11 +183,21 @@
 			{/if}
 		</p>
 		<div class="flex items-center gap-2">
-			<Button variant="outline" size="sm" disabled={currentPage <= 1} onclick={() => goToPage(currentPage - 1)}>
+			<Button
+				variant="outline"
+				size="sm"
+				disabled={currentPage <= 1}
+				onclick={() => goToPage(currentPage - 1)}
+			>
 				Previous
 			</Button>
 			<span class="text-sm font-medium">{currentPage} / {totalPages}</span>
-			<Button variant="outline" size="sm" disabled={currentPage >= totalPages} onclick={() => goToPage(currentPage + 1)}>
+			<Button
+				variant="outline"
+				size="sm"
+				disabled={currentPage >= totalPages}
+				onclick={() => goToPage(currentPage + 1)}
+			>
 				Next
 			</Button>
 		</div>

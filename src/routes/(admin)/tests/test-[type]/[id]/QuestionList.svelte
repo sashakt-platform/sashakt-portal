@@ -104,7 +104,7 @@
 			{#if $formData.question_revision_ids.length === 0}
 				<div class="my-auto flex flex-col items-center justify-center py-16 text-center">
 					<p class="text-lg font-bold">No questions yet</p>
-					<p class="mt-1 text-sm text-gray-400">
+					<p class="mt-1 text-sm text-gray-500">
 						Add the relevant questions to your test {$formData.is_template ? 'template' : ''}.
 					</p>
 					<Button

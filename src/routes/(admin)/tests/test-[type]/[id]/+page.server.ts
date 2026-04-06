@@ -13,10 +13,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
 	let testData = null;
 	let templateID = url.searchParams.get('template_id') || null;
-	const is_template = params?.type === 'template';
+	const is_template = params.type === 'template';
 
 	// Check permissions based on action and type
-	if (params?.id === 'new' || params?.id === 'convert') {
+	if (params.id === 'new' || params.id === 'convert') {
 		if (is_template) {
 			requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
 		} else {
@@ -33,15 +33,18 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const token = getSessionTokenCookie();
 
 	try {
-		if (params?.id !== 'new' && params?.id !== 'convert') {
+		if (params.id !== 'new' && params.id !== 'convert') {
 			// edit existing test
-			const testResponse = await fetch(`${BACKEND_URL}/test/${params.id}?is_template=${is_template}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
+			const testResponse = await fetch(
+				`${BACKEND_URL}/test/${params.id}?is_template=${is_template}`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`
+					}
 				}
-			});
+			);
 
 			if (!testResponse.ok) {
 				console.error(`Failed to fetch test data: ${testResponse.statusText}`);
@@ -49,7 +52,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			}
 
 			testData = await testResponse.json();
-		} else if (params?.id === 'convert' && templateID) {
+		} else if (params.id === 'convert' && templateID) {
 			// convert flow: template selected, prefill from it
 			const testResponse = await fetch(`${BACKEND_URL}/test/${templateID}?is_template=true`, {
 				method: 'GET',
@@ -77,8 +80,14 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	// fetch templates list for convert step 1 (no template chosen yet)
 	let templates = { items: [], total: 0, pages: 0 };
-	let templateParams = { page: 1, size: DEFAULT_PAGE_SIZE, search: '', sortBy: '', sortOrder: 'asc' };
-	if (params?.id === 'convert' && !templateID) {
+	let templateParams = {
+		page: 1,
+		size: DEFAULT_PAGE_SIZE,
+		search: '',
+		sortBy: '',
+		sortOrder: 'asc'
+	};
+	if (params.id === 'convert' && !templateID) {
 		const tPage = Number(url.searchParams.get('page')) || 1;
 		const tSize = Number(url.searchParams.get('size')) || DEFAULT_PAGE_SIZE;
 		const tSearch = url.searchParams.get('search') || '';
@@ -89,7 +98,13 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		const tTagTypeIds = url.searchParams.getAll('tag_type_ids');
 		const tDistrictIds = url.searchParams.getAll('district_ids');
 
-		templateParams = { page: tPage, size: tSize, search: tSearch, sortBy: tSortBy, sortOrder: tSortOrder };
+		templateParams = {
+			page: tPage,
+			size: tSize,
+			search: tSearch,
+			sortBy: tSortBy,
+			sortOrder: tSortOrder
+		};
 
 		const tParams = new URLSearchParams({
 			is_template: 'true',
@@ -189,10 +204,10 @@ export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
-		const is_template = params?.type === 'template';
+		const is_template = params.type === 'template';
 
 		// Check permissions based on action and type
-		if (params?.id === 'new') {
+		if (params.id === 'new') {
 			if (is_template) {
 				requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
 			} else {

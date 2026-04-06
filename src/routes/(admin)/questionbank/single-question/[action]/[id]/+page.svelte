@@ -1299,8 +1299,10 @@
 				<div class="flex items-center justify-between">
 					<Label class="font-semibold">Set Question as Mandatory</Label>
 					<div class="flex items-center gap-2">
-						<span class="text-muted-foreground text-sm"
-							>{$formData.is_mandatory ? 'Yes' : 'No'}</span
+						<span
+							class="text-sm {$formData.is_mandatory
+								? 'text-primary font-semibold'
+								: 'text-muted-foreground'}">{$formData.is_mandatory ? 'Yes' : 'No'}</span
 						>
 						<Switch bind:checked={$formData.is_mandatory} />
 					</div>
@@ -1308,8 +1310,10 @@
 				<div class="flex items-center justify-between">
 					<Label class="font-semibold">Question Status</Label>
 					<div class="flex items-center gap-2">
-						<span class="text-muted-foreground text-sm"
-							>{$formData.is_active ? 'Active' : 'Inactive'}</span
+						<span
+							class="text-sm {$formData.is_active
+								? 'text-primary font-semibold'
+								: 'text-muted-foreground'}">{$formData.is_active ? 'Active' : 'Inactive'}</span
 						>
 						<Switch id="is-active" bind:checked={$formData.is_active} />
 					</div>

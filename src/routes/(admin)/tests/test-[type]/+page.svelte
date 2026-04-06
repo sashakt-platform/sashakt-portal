@@ -108,17 +108,17 @@
 
 <DeleteDialog
 	bind:action={deleteAction}
-	elementName={data?.is_template ? 'Test template' : 'Test session'}
+	elementName={data?.is_template ? 'Test template' : 'Tests'}
 />
 
 <ListingPageLayout
-	title={data?.is_template ? 'Test Templates' : 'Test Sessions'}
+	title={data?.is_template ? 'Test Templates' : 'Tests'}
 	subtitle=""
 	showEmptyState={noTestCreatedYet}
-	infoLabel={data?.is_template ? 'Help: Test templates' : 'Help: Test sessions'}
+	infoLabel={data?.is_template ? 'Help: Test templates' : 'Help: Test'}
 	infoDescription={data?.is_template
 		? 'This panel lists all your test templates. You can create, edit, or delete a template using the available actions.'
-		: 'This panel lists all your test sessions. You can create, edit, or delete a test ,clone an existing test setup, or download the test’s QR code for easy sharing.'}
+		: 'This panel lists all your tests. You can create, edit, or delete a test ,clone an existing test setup, or download the test’s QR code for easy sharing.'}
 >
 	{#snippet headerActions()}
 		{#if data?.is_template && canCreate(data.user, 'test-template')}
@@ -162,9 +162,7 @@
 							</div>
 						{/if}
 					{:else}
-						<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">
-							Create your first test session
-						</h2>
+						<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">Create your first test</h2>
 						<p class="mt-2 text-sm text-gray-400">Choose a method to get started</p>
 
 						{#if canCreate(data.user, 'test')}
@@ -209,7 +207,7 @@
 	{#snippet filters()}
 		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
 			<SearchInput
-				placeholder={data?.is_template ? 'Search test templates...' : 'Search test sessions...'}
+				placeholder={data?.is_template ? 'Search test templates...' : 'Search tests...'}
 				value={search}
 			/>
 
@@ -252,7 +250,7 @@
 			{pageSize}
 			emptyStateMessage={data?.is_template
 				? 'No test templates found matching your criteria.'
-				: 'No test sessions found matching your criteria.'}
+				: 'No tests found matching your criteria.'}
 		/>
 	{/snippet}
 </ListingPageLayout>

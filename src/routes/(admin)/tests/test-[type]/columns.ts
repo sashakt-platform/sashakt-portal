@@ -80,7 +80,7 @@ export const createTestColumns = (
 ): ColumnDef<Test>[] => [
 	createSortableColumn(
 		'name',
-		isTemplate ? 'Test Template' : 'Test Session',
+		isTemplate ? 'Test Template' : 'Tests',
 		currentSortBy,
 		currentSortOrder,
 		handleSort,
@@ -171,7 +171,7 @@ export const createTestColumns = (
 
 			return renderComponent(DataTableActions, {
 				id: test.id,
-				entityName: isTemplate ? 'Test Template' : 'Test Session',
+				entityName: isTemplate ? 'Test Template' : 'Tests',
 				editUrl: resolve(`${baseUrl}/${test.id}/`),
 				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,

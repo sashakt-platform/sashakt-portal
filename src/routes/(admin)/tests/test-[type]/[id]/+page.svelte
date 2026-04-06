@@ -87,7 +87,7 @@
 		if ($formData.is_template) {
 			return isEditing ? 'Edit Test Template' : 'Create Test Template';
 		}
-		return isEditing ? 'Edit Test Session' : 'Create Test Session';
+		return isEditing ? 'Edit Test' : 'Create Test';
 	});
 
 	const isNextDisabled = $derived(

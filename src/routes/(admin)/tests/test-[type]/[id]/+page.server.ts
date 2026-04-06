@@ -261,7 +261,7 @@ export const actions: Actions = {
 				`/tests/test-session`,
 				{
 					type: 'error',
-					message: `Failed to clone test session. Details: ${errorMessage.detail || response.statusText}`
+					message: `Failed to clone test. Details: ${errorMessage.detail || response.statusText}`
 				},
 				cookies
 			);

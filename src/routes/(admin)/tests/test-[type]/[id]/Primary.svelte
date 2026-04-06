@@ -48,7 +48,7 @@
 	<div>
 		<h2 class="text-base font-semibold text-gray-900">Primary Details</h2>
 		<p class="text-sm text-gray-500">
-			Basic information about the {$formData.is_template ? 'test template' : 'test session'}
+			Basic information about the {$formData.is_template ? 'test template' : 'test'}
 		</p>
 	</div>
 </div>
@@ -81,8 +81,8 @@
 				id="description"
 				placeholder="Brief description of this {$formData.is_template
 					? 'test template'
-					: 'test session'}..."
-				class="mt-2 min-h-[120px]"
+					: 'test'}..."
+				class="mt-2 min-h-30"
 				name="description"
 				bind:value={$formData.description}
 			/>

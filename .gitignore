@@ -26,3 +26,6 @@ coverage/
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# AI related plans
+plans/

@@ -759,7 +759,10 @@
 				<div class="rounded-lg border">
 					<div class="bg-muted rounded-t-lg px-4 py-3">
 						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
-							>Answer Settings</span
+							>{$formData.question_type === QuestionTypeEnum.NumericalInteger ||
+							$formData.question_type === QuestionTypeEnum.NumericalDecimal
+								? 'Correct Answer'
+								: 'Answer Settings'}</span
 						>
 					</div>
 					<div class="p-6">

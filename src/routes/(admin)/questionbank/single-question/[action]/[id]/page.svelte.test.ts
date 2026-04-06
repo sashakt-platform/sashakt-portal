@@ -1039,7 +1039,7 @@ describe('Single Question Page - Numerical Integer Question Type', () => {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
-			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
+			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
 		});
 
 		it('should hide Add Answer button', () => {
@@ -1147,7 +1147,7 @@ describe('Single Question Page - Numerical Decimal Question Type', () => {
 				data: { ...baseData, questionData: numericalDecimalData } as any
 			});
 
-			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
+			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
 		});
 
 		it('should hide Add Answer button', () => {

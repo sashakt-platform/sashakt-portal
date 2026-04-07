@@ -13,6 +13,7 @@ import { QUESTION_TYPE_LABELS } from '$lib/types/question';
 export interface Question {
 	id: string;
 	question_text: string;
+	question_type?: string;
 	tags?: Array<{ name: string; tag_type?: { name: string } }>;
 	modified_date: string;
 	options: Array<{ id: string; key: string; value: string }>;
@@ -47,7 +48,7 @@ export const createQuestionColumns = (
 		accessorKey: 'question_type',
 		header: 'Question Type',
 		cell: ({ row }) => {
-			const type = (row.original as any).question_type;
+			const type = row.original.question_type;
 			return type ? (QUESTION_TYPE_LABELS[type] ?? type) : '';
 		},
 		size: 140

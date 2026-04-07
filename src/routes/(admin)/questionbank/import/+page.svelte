@@ -112,6 +112,8 @@
 				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed bg-gray-50 p-6 text-center {dragging
 					? 'border-primary bg-accent'
 					: 'border-border'}"
+				role="region"
+				aria-label="File upload dropzone"
 				ondragover={(e) => {
 					e.preventDefault();
 					dragging = true;
@@ -141,45 +143,32 @@
 						{/if}
 						<p class="text-muted-foreground text-sm">{$message.message}</p>
 
-						<!-- Upload Summary table -->
-						<table class="w-full max-w-sm overflow-hidden rounded-lg border text-left text-sm">
-							<thead>
-								<tr class="bg-muted border-b">
-									<th
-										class="text-muted-foreground px-4 py-3 text-left text-sm font-semibold"
-										colspan="2"
-									>
-										Upload Summary
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr class="border-b">
-									<td class="px-4 py-3 font-medium">Total rows</td>
-									<td class="px-4 py-3 text-right">{$message.uploaded_questions}</td>
-								</tr>
-								<tr class="border-b">
-									<td class="px-4 py-3 font-medium">Validated rows</td>
-									<td class="px-4 py-3 text-right">{$message.success_questions}</td>
-								</tr>
-								<tr>
-									<td
-										class="px-4 py-3 font-medium {$message.failed_questions
-											? 'text-destructive'
-											: ''}"
-									>
-										Errors
-									</td>
-									<td
-										class="px-4 py-3 text-right {$message.failed_questions
-											? 'text-destructive'
-											: ''}"
-									>
-										{$message.failed_questions}
-									</td>
-								</tr>
-							</tbody>
-						</table>
+						<!-- Upload Summary -->
+						<div class="w-full max-w-sm overflow-hidden rounded-2xl border text-left text-sm">
+							<div
+								class="text-muted-foreground bg-muted border-b px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+							>
+								Upload Summary
+							</div>
+							<div class="flex justify-between px-4 py-3 font-medium">
+								<span>Total rows</span>
+								<span>{$message.uploaded_questions}</span>
+							</div>
+							<div class="mx-4 border-b"></div>
+							<div class="flex justify-between px-4 py-3 font-medium">
+								<span>Validated rows</span>
+								<span>{$message.success_questions}</span>
+							</div>
+							<div class="mx-4 border-b"></div>
+							<div
+								class="flex justify-between px-4 py-3 font-medium {$message.failed_questions
+									? 'text-destructive'
+									: ''}"
+							>
+								<span>Errors</span>
+								<span>{$message.failed_questions}</span>
+							</div>
+						</div>
 
 						{#if $message.failed_questions}
 							<div class="mt-2 flex gap-3">

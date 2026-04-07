@@ -90,7 +90,7 @@
 				</p>
 			</div>
 			<a href={BulkTemplate} download="template.csv">
-				<Button variant="outline" class="border-primary text-primary cursor-pointer bg-transparent">
+				<Button variant="outline" class="border-primary text-primary bg-gray-0 cursor-pointer">
 					<Download size={16} />
 					Download Template
 				</Button>
@@ -129,7 +129,7 @@
 							>
 								<CircleX class="text-destructive" size={28} />
 							</div>
-							<h3 class="text-xl font-bold">File upload error</h3>
+							<h3 class="text-xl font-bold">Bulk upload error</h3>
 						{:else}
 							<div
 								class="flex h-14 w-14 items-center justify-center rounded-full"
@@ -137,7 +137,7 @@
 							>
 								<CircleCheck style="color: hsl(var(--success-bold));" size={28} />
 							</div>
-							<h3 class="text-xl font-bold">File upload successful</h3>
+							<h3 class="text-xl font-bold">Bulk upload successful</h3>
 						{/if}
 						<p class="text-muted-foreground text-sm">{$message.message}</p>
 

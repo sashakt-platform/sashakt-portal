@@ -8,6 +8,7 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
+import { QUESTION_TYPE_LABELS } from '$lib/types/question';
 
 export interface Question {
 	id: string;
@@ -45,7 +46,10 @@ export const createQuestionColumns = (
 	{
 		accessorKey: 'question_type',
 		header: 'Question Type',
-		cell: ({ row }) => (row.original as any).question_type || '',
+		cell: ({ row }) => {
+			const type = (row.original as any).question_type;
+			return type ? (QUESTION_TYPE_LABELS[type] ?? type) : '';
+		},
 		size: 140
 	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen, fireEvent } from '@testing-library/svelte';
+import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import TooltipInfo from './TooltipInfo.svelte';
 
 describe('TooltipInfo', () => {
@@ -272,7 +272,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help: Marks' });
 			await fireEvent.click(trigger);
 
-			expect(screen.getByText('What is Marks')).toBeInTheDocument();
+			expect(await screen.findByText('What is Marks')).toBeInTheDocument();
 		});
 
 		it('should strip "help: " prefix case-insensitively', async () => {
@@ -286,7 +286,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'HELP: Passing Criteria' });
 			await fireEvent.click(trigger);
 
-			expect(screen.getByText('What is Passing Criteria')).toBeInTheDocument();
+			expect(await screen.findByText('What is Passing Criteria')).toBeInTheDocument();
 		});
 
 		it('should use label as-is when no "Help: " prefix', async () => {
@@ -300,7 +300,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Marks' });
 			await fireEvent.click(trigger);
 
-			expect(screen.getByText('What is Marks')).toBeInTheDocument();
+			expect(await screen.findByText('What is Marks')).toBeInTheDocument();
 		});
 	});
 
@@ -316,8 +316,8 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help' });
 			await fireEvent.click(trigger);
 
-			expect(screen.getByText('What is Help')).toBeInTheDocument();
-			expect(screen.getByText('This is the description text')).toBeInTheDocument();
+			expect(await screen.findByText('What is Help')).toBeInTheDocument();
+			expect(await screen.findByText('This is the description text')).toBeInTheDocument();
 		});
 
 		it('should not show description section when description is empty', async () => {
@@ -331,7 +331,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help' });
 			await fireEvent.click(trigger);
 
-			expect(screen.queryByText('What is Help')).not.toBeInTheDocument();
+			await waitFor(() => expect(screen.queryByText('What is Help')).not.toBeInTheDocument());
 		});
 
 		it('should show title in popover header', async () => {
@@ -345,11 +345,10 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Marks' });
 			await fireEvent.click(trigger);
 
-			const header = screen.getByText('Marks');
-			expect(header).toBeInTheDocument();
+			expect(await screen.findByText('Marks')).toBeInTheDocument();
 		});
 
-		it('should show close button when popover is open', async () => {
+		it('should show close button when popover is open and close popover on click', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
@@ -360,8 +359,12 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help' });
 			await fireEvent.click(trigger);
 
-			const closeButton = screen.getByRole('button', { name: 'Close' });
+			const closeButton = await screen.findByRole('button', { name: 'Close' });
 			expect(closeButton).toBeInTheDocument();
+
+			await fireEvent.click(closeButton);
+
+			await waitFor(() => expect(screen.queryByText('What is Help')).not.toBeInTheDocument());
 		});
 	});
 
@@ -378,7 +381,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help' });
 			await fireEvent.click(trigger);
 
-			const iframe = document.body.querySelector('iframe');
+			const iframe = await screen.findByTitle('How to use Help');
 			expect(iframe).toBeInTheDocument();
 			expect(iframe).toHaveAttribute('src', 'https://www.youtube.com/embed/abc123');
 		});
@@ -395,7 +398,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Marks' });
 			await fireEvent.click(trigger);
 
-			expect(screen.getByText('How to use Marks')).toBeInTheDocument();
+			expect(await screen.findByText('How to use Marks')).toBeInTheDocument();
 		});
 
 		it('should not render iframe when videoUrl is not provided', async () => {
@@ -409,7 +412,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help' });
 			await fireEvent.click(trigger);
 
-			expect(document.body.querySelector('iframe')).not.toBeInTheDocument();
+			await waitFor(() => expect(document.body.querySelector('iframe')).not.toBeInTheDocument());
 		});
 
 		it('should not show "How to use" heading when videoUrl is not provided', async () => {
@@ -423,7 +426,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help' });
 			await fireEvent.click(trigger);
 
-			expect(screen.queryByText('How to use Help')).not.toBeInTheDocument();
+			await waitFor(() => expect(screen.queryByText('How to use Help')).not.toBeInTheDocument());
 		});
 
 		it('should set correct iframe title', async () => {
@@ -438,7 +441,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Marks' });
 			await fireEvent.click(trigger);
 
-			const iframe = document.body.querySelector('iframe');
+			const iframe = await screen.findByTitle('How to use Marks');
 			expect(iframe).toHaveAttribute('title', 'How to use Marks');
 		});
 
@@ -454,8 +457,8 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Marks' });
 			await fireEvent.click(trigger);
 
-			expect(screen.getByText('What is Marks')).toBeInTheDocument();
-			expect(screen.getByText('How to use Marks')).toBeInTheDocument();
+			expect(await screen.findByText('What is Marks')).toBeInTheDocument();
+			expect(await screen.findByText('How to use Marks')).toBeInTheDocument();
 		});
 	});
 });

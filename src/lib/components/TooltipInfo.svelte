@@ -16,59 +16,51 @@
 	let open = $state(false);
 
 	const title = $derived(label.replace(/^Help:\s*/i, ''));
-	const tooltipId = `tooltip-${label.replace(/\s+/g, '-').toLowerCase()}`;
+	const tooltipId = $derived(`tooltip-${label.replace(/\s+/g, '-').toLowerCase()}`);
 </script>
 
 <Popover.Root bind:open>
-	<Popover.Trigger>
-		<span
-			role="button"
-			aria-label={label}
-			aria-describedby={tooltipId}
-			class="focus-visible:ring-primary inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded text-gray-400 hover:text-gray-700 focus-visible:ring-2 focus-visible:outline-none"
-		>
-			<Info class="h-4 w-4" />
-		</span>
+	<Popover.Trigger
+		aria-label={label}
+		aria-describedby={tooltipId}
+		class="focus-visible:ring-primary text-muted-foreground hover:text-foreground mt-3 inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded focus-visible:ring-2 focus-visible:outline-none"
+	>
+		<Info class="h-8 w-8" />
 	</Popover.Trigger>
 
 	<Popover.Content
 		id={tooltipId}
-		class="w-90.5 rounded-[20px] border border-[#E4E4E4] bg-white p-0 shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]"
+		class="border-border bg-popover w-90.5 rounded-[20px] border p-0 shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]"
 		side="bottom"
 		sideOffset={8}
 		align="start"
 	>
 		<div class="flex items-center justify-between px-6 pt-6">
-			<span class="text-base font-semibold text-gray-500">{title}</span>
-			<Popover.Close>
-				<button
-					type="button"
-					class="rounded p-0.5 text-gray-500 transition-colors hover:text-gray-800"
-					aria-label="Close"
-				>
-					<X class="h-4 w-4" />
-				</button>
+			<span class="text-muted-foreground text-base font-semibold">{title}</span>
+			<Popover.Close aria-label="Close">
+				<X class="h-4 w-4" />
 			</Popover.Close>
 		</div>
 
 		<div class="flex flex-col gap-6 px-6 pt-4 pb-6">
 			{#if description}
 				<div class="flex flex-col gap-1.5">
-					<p class="text-[12px] font-semibold text-gray-800">
+					<p class="text-foreground text-[12px] font-semibold">
 						What is {title}
 					</p>
-					<p class="text-sm leading-relaxed text-gray-800">{description}</p>
+					<p class="text-foreground text-sm leading-relaxed">{description}</p>
 				</div>
 			{/if}
 
 			{#if videoUrl}
 				<div class="flex flex-col gap-1.5">
-					<p class="text-[12px] font-semibold text-gray-800">
+					<p class="text-foreground text-[12px] font-semibold">
 						How to use {title}
 					</p>
 					<div class="relative overflow-hidden rounded-lg">
 						<iframe
 							src={videoUrl}
+							sandbox="allow-same-origin allow-scripts"
 							title="How to use {title}"
 							class="aspect-video w-full rounded-lg border-0"
 							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

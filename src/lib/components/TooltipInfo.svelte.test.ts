@@ -74,8 +74,8 @@ describe('TooltipInfo', () => {
 				}
 			});
 
-			const span = container.querySelector('span[role="button"]');
-			expect(span).toHaveAttribute('aria-describedby');
+			const button = container.querySelector('button');
+			expect(button).toHaveAttribute('aria-describedby');
 		});
 
 		it('should generate tooltip ID from label', () => {
@@ -151,7 +151,7 @@ describe('TooltipInfo', () => {
 				}
 			});
 
-			const button = container.querySelector('[role="button"]');
+			const button = container.querySelector('button');
 			expect(button).toHaveClass('inline-flex');
 			expect(button).toHaveClass('cursor-pointer');
 			expect(button).toHaveClass('rounded');
@@ -165,8 +165,8 @@ describe('TooltipInfo', () => {
 				}
 			});
 
-			const button = container.querySelector('[role="button"]');
-			expect(button).toHaveClass('hover:text-gray-700');
+			const button = container.querySelector('button');
+			expect(button).toHaveClass('hover:text-foreground');
 		});
 
 		it('should have focus styles', () => {
@@ -177,7 +177,7 @@ describe('TooltipInfo', () => {
 				}
 			});
 
-			const button = container.querySelector('[role="button"]');
+			const button = container.querySelector('button');
 			expect(button).toHaveClass('focus-visible:ring-2');
 			expect(button).toHaveClass('focus-visible:outline-none');
 		});
@@ -192,8 +192,8 @@ describe('TooltipInfo', () => {
 				}
 			});
 
-			const span = container.querySelector('span[role="button"]');
-			expect(span).toBeInTheDocument();
+			const button = container.querySelector('button');
+			expect(button).toBeInTheDocument();
 		});
 
 		it('should handle very long description', () => {

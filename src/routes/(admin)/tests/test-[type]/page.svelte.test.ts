@@ -91,9 +91,9 @@ describe('Test Management Listing Page', () => {
 			expect(screen.getByText('Test Templates')).toBeInTheDocument();
 		});
 
-		it('should show "Test Sessions" title for session mode', () => {
+		it('should show "Tests" title for session mode', () => {
 			render(TestListingPage, { data: baseData(false) });
-			expect(screen.getByText('Test Sessions')).toBeInTheDocument();
+			expect(screen.getByText('Tests')).toBeInTheDocument();
 		});
 
 		it('should not show subtitle for template mode', () => {
@@ -103,7 +103,7 @@ describe('Test Management Listing Page', () => {
 
 		it('should not show subtitle for session mode', () => {
 			render(TestListingPage, { data: baseData(false) });
-			expect(screen.queryByText('Manage test sessions')).not.toBeInTheDocument();
+			expect(screen.queryByText('Manage tests')).not.toBeInTheDocument();
 		});
 	});
 
@@ -111,7 +111,7 @@ describe('Test Management Listing Page', () => {
 	describe('Empty state', () => {
 		it('should show empty state when no items and no filters', () => {
 			render(TestListingPage, { data: baseData(false, []) });
-			expect(screen.getByText('Create your first test session')).toBeInTheDocument();
+			expect(screen.getByText('Create your first test')).toBeInTheDocument();
 		});
 
 		it('should show template empty state text for template mode', () => {
@@ -122,7 +122,7 @@ describe('Test Management Listing Page', () => {
 		it('should not show empty state when items are present', () => {
 			const items = [{ id: '1', name: 'Test A' }];
 			render(TestListingPage, { data: baseData(false, items) });
-			expect(screen.queryByText('Create your first test session')).not.toBeInTheDocument();
+			expect(screen.queryByText('Create your first tests')).not.toBeInTheDocument();
 		});
 	});
 
@@ -166,7 +166,7 @@ describe('Test Management Listing Page', () => {
 
 		it('should show search input when items are present', () => {
 			render(TestListingPage, { data: withItems(false) });
-			expect(screen.getByPlaceholderText('Search test sessions...')).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Search tests...')).toBeInTheDocument();
 		});
 
 		it('should show correct search placeholder for template mode', () => {
@@ -176,7 +176,7 @@ describe('Test Management Listing Page', () => {
 
 		it('should show correct search placeholder for session mode', () => {
 			render(TestListingPage, { data: withItems(false) });
-			expect(screen.getByPlaceholderText('Search test sessions...')).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Search tests...')).toBeInTheDocument();
 		});
 
 		it('should call isStateAdmin to determine state filter visibility', () => {
@@ -212,17 +212,17 @@ describe('Test Management Listing Page', () => {
 
 		it('reflects the current search value from params', () => {
 			render(TestListingPage, { data: withSearch('existing query') });
-			expect(screen.getByPlaceholderText('Search test sessions...')).toHaveValue('existing query');
+			expect(screen.getByPlaceholderText('Search tests...')).toHaveValue('existing query');
 		});
 
 		it('shows empty value when search param is empty', () => {
 			render(TestListingPage, { data: withSearch('') });
-			expect(screen.getByPlaceholderText('Search test sessions...')).toHaveValue('');
+			expect(screen.getByPlaceholderText('Search tests...')).toHaveValue('');
 		});
 
 		it('does not call goto before the 300ms debounce elapses', async () => {
 			render(TestListingPage, { data: withSearch('') });
-			const input = screen.getByPlaceholderText('Search test sessions...');
+			const input = screen.getByPlaceholderText('Search tests...');
 
 			await fireEvent.input(input, { target: { value: 'math' } });
 			vi.advanceTimersByTime(299);
@@ -232,7 +232,7 @@ describe('Test Management Listing Page', () => {
 
 		it('calls goto exactly once after 300ms with the typed value', async () => {
 			render(TestListingPage, { data: withSearch('') });
-			const input = screen.getByPlaceholderText('Search test sessions...');
+			const input = screen.getByPlaceholderText('Search tests...');
 
 			await fireEvent.input(input, { target: { value: 'math' } });
 			vi.advanceTimersByTime(300);
@@ -244,7 +244,7 @@ describe('Test Management Listing Page', () => {
 
 		it('resets page to 1 on every search regardless of current page', async () => {
 			render(TestListingPage, { data: withSearch('') }); // page starts at 2
-			const input = screen.getByPlaceholderText('Search test sessions...');
+			const input = screen.getByPlaceholderText('Search tests...');
 
 			await fireEvent.input(input, { target: { value: 'math' } });
 			vi.advanceTimersByTime(300);
@@ -255,7 +255,7 @@ describe('Test Management Listing Page', () => {
 
 		it('removes the search param from the URL when input is cleared', async () => {
 			render(TestListingPage, { data: withSearch('old query') });
-			const input = screen.getByPlaceholderText('Search test sessions...');
+			const input = screen.getByPlaceholderText('Search tests...');
 
 			await fireEvent.input(input, { target: { value: '' } });
 			vi.advanceTimersByTime(300);
@@ -266,7 +266,7 @@ describe('Test Management Listing Page', () => {
 
 		it('still resets page to 1 when input is cleared', async () => {
 			render(TestListingPage, { data: withSearch('old query') });
-			const input = screen.getByPlaceholderText('Search test sessions...');
+			const input = screen.getByPlaceholderText('Search tests...');
 
 			await fireEvent.input(input, { target: { value: '' } });
 			vi.advanceTimersByTime(300);
@@ -277,7 +277,7 @@ describe('Test Management Listing Page', () => {
 
 		it('calls goto with keepFocus: true and invalidateAll: true', async () => {
 			render(TestListingPage, { data: withSearch('') });
-			const input = screen.getByPlaceholderText('Search test sessions...');
+			const input = screen.getByPlaceholderText('Search tests...');
 
 			await fireEvent.input(input, { target: { value: 'math' } });
 			vi.advanceTimersByTime(300);
@@ -290,7 +290,7 @@ describe('Test Management Listing Page', () => {
 
 		it('debounces rapid typing — only one goto call for the final value', async () => {
 			render(TestListingPage, { data: withSearch('') });
-			const input = screen.getByPlaceholderText('Search test sessions...');
+			const input = screen.getByPlaceholderText('Search tests...');
 
 			// Simulate user typing quickly
 			await fireEvent.input(input, { target: { value: 'm' } });

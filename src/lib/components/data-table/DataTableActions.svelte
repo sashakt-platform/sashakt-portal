@@ -5,10 +5,10 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
-	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import QrCode from '@lucide/svelte/icons/qr-code';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Copy from '@lucide/svelte/icons/copy';
+	import Link2 from '@lucide/svelte/icons/link-2';
 
 	interface CustomAction {
 		label: string;
@@ -67,12 +67,12 @@
 		switch (iconName) {
 			case 'file-plus':
 				return FilePlus;
-			case 'external-link':
-				return ExternalLink;
 			case 'copy':
 				return Copy;
 			case 'qr-code':
 				return QrCode;
+			case 'copy-link':
+				return Link2;
 			default:
 				return undefined;
 		}
@@ -88,13 +88,10 @@
 			{#if canEdit && editInline}
 				<a href={editUrl}>
 					<Button
-						variant="ghost"
+						variant="outline"
 						size="sm"
-						class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
+						class="border-brand-light text-primary rounded-lg border font-semibold">Edit</Button
 					>
-						<Pencil class="h-4 w-4" />
-						Edit
-					</Button>
 				</a>
 			{/if}
 
@@ -114,12 +111,7 @@
 				{@const IconComponent = getIcon(action.icon)}
 				{#if action.href && action.method === 'POST'}
 					<form action={action.href} method="POST" class="inline">
-						<Button
-							type="submit"
-							variant="ghost"
-							size="sm"
-							class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
-						>
+						<Button type="submit" variant="secondary" size="sm" class="font-semibold">
 							{#if IconComponent}
 								<IconComponent class="h-4 w-4" />
 							{/if}
@@ -129,9 +121,9 @@
 				{:else if action.href}
 					<a href={action.href}>
 						<Button
-							variant="ghost"
+							variant="secondary"
 							size="sm"
-							class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
+							class="text-primary bg-brand-light rounded-lg font-semibold"
 						>
 							{#if IconComponent}
 								<IconComponent class="h-4 w-4" />
@@ -141,9 +133,9 @@
 					</a>
 				{:else if action.action}
 					<Button
-						variant="ghost"
+						variant="secondary"
 						size="sm"
-						class="bg-secondary text-primary hover:bg-primary/20 font-semibold"
+						class="text-primary bg-brand-light rounded-lg font-semibold"
 						onclick={action.action}
 					>
 						{#if IconComponent}

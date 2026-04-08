@@ -29,7 +29,7 @@
 			icon: ClipboardList,
 			entity: 'test-template'
 		},
-		{ title: 'Test Sessions', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
+		{ title: 'Tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
 		{ title: 'Tag Management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
 		{ title: 'Certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
 		{ title: 'Forms', url: '/forms', icon: FileText, entity: 'form' },

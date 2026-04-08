@@ -13,10 +13,10 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
 	let testData = null;
 	let templateID = url.searchParams.get('template_id') || null;
-	const is_template = params?.type === 'template';
+	const is_template = params.type === 'template';
 
 	// Check permissions based on action and type
-	if (params?.id === 'new') {
+	if (params.id === 'new' || params.id === 'convert') {
 		if (is_template) {
 			requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
 		} else {
@@ -33,9 +33,28 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const token = getSessionTokenCookie();
 
 	try {
-		if (params?.id !== 'new') {
-			let id = templateID || params.id;
-			const testResponse = await fetch(`${BACKEND_URL}/test/${id}?is_template=${is_template}`, {
+		if (params.id !== 'new' && params.id !== 'convert') {
+			// edit existing test
+			const testResponse = await fetch(
+				`${BACKEND_URL}/test/${params.id}?is_template=${is_template}`,
+				{
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`
+					}
+				}
+			);
+
+			if (!testResponse.ok) {
+				console.error(`Failed to fetch test data: ${testResponse.statusText}`);
+				throw new Error('Failed to fetch test data');
+			}
+
+			testData = await testResponse.json();
+		} else if (params.id === 'convert' && templateID) {
+			// convert flow: template selected, prefill from it
+			const testResponse = await fetch(`${BACKEND_URL}/test/${templateID}?is_template=true`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -44,20 +63,70 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			});
 
 			if (!testResponse.ok) {
-				console.error(`Failed to fetch test data: ${testResponse.statusText}`);
-				throw new Error('Failed to fetch test data');
+				console.error(`Failed to fetch template data: ${testResponse.statusText}`);
+				throw new Error('Failed to fetch template data');
 			}
 
 			testData = await testResponse.json();
-			if (templateID) {
-				testData.is_template = false;
-				testData.template_id = templateID;
-				testData.link = null;
-			}
+			testData.is_template = false;
+			testData.template_id = templateID;
+			testData.link = null;
 		}
+		// id === 'new' or id === 'convert' without templateID: testData stays null
 	} catch (error) {
 		console.error('Error fetching test data:', error);
 		testData = null;
+	}
+
+	// fetch templates list for convert step 1 (no template chosen yet)
+	let templates = { items: [], total: 0, pages: 0 };
+	let templateParams = {
+		page: 1,
+		size: DEFAULT_PAGE_SIZE,
+		search: '',
+		sortBy: '',
+		sortOrder: 'asc'
+	};
+	if (params.id === 'convert' && !templateID) {
+		const tPage = Number(url.searchParams.get('page')) || 1;
+		const tSize = Number(url.searchParams.get('size')) || DEFAULT_PAGE_SIZE;
+		const tSearch = url.searchParams.get('search') || '';
+		const tSortBy = url.searchParams.get('sortBy') || '';
+		const tSortOrder = url.searchParams.get('sortOrder') || 'asc';
+		const tTagIds = url.searchParams.getAll('tag_ids');
+		const tStateIds = url.searchParams.getAll('state_ids');
+		const tTagTypeIds = url.searchParams.getAll('tag_type_ids');
+		const tDistrictIds = url.searchParams.getAll('district_ids');
+
+		templateParams = {
+			page: tPage,
+			size: tSize,
+			search: tSearch,
+			sortBy: tSortBy,
+			sortOrder: tSortOrder
+		};
+
+		const tParams = new URLSearchParams({
+			is_template: 'true',
+			page: tPage.toString(),
+			size: tSize.toString(),
+			sort_order: tSortOrder,
+			...(tSearch && { name: tSearch }),
+			...(tSortBy && { sort_by: tSortBy })
+		});
+		for (const id of tTagIds) tParams.append('tag_ids', id);
+		for (const id of tStateIds) tParams.append('state_ids', id);
+		for (const id of tTagTypeIds) tParams.append('tag_type_ids', id);
+		for (const id of tDistrictIds) tParams.append('district_ids', id);
+
+		try {
+			const templatesRes = await fetch(`${BACKEND_URL}/test/?${tParams}`, {
+				headers: { Authorization: `Bearer ${token}` }
+			});
+			if (templatesRes.ok) templates = await templatesRes.json();
+		} catch (error) {
+			console.error('Error fetching templates:', error);
+		}
 	}
 
 	const form = await superValidate(zod4(testSchema));
@@ -122,6 +191,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	return {
 		form,
 		testData,
+		templates,
+		templateParams,
+		convertTemplate: params.id === 'convert',
 		questions,
 		selectedQuestions,
 		questionParams: questionPaginationParams
@@ -132,10 +204,10 @@ export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
-		const is_template = params?.type === 'template';
+		const is_template = params.type === 'template';
 
 		// Check permissions based on action and type
-		if (params?.id === 'new') {
+		if (params.id === 'new') {
 			if (is_template) {
 				requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
 			} else {
@@ -261,7 +333,7 @@ export const actions: Actions = {
 				`/tests/test-session`,
 				{
 					type: 'error',
-					message: `Failed to clone test session. Details: ${errorMessage.detail || response.statusText}`
+					message: `Failed to clone test. Details: ${errorMessage.detail || response.statusText}`
 				},
 				cookies
 			);

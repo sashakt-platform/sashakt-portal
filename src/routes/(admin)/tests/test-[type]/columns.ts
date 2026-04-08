@@ -1,4 +1,5 @@
 import type { ColumnDef } from '@tanstack/table-core';
+import { toast } from 'svelte-sonner';
 import { createSortableColumn } from '$lib/components/data-table/column-helpers';
 import { downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
@@ -77,10 +78,17 @@ export const createTestColumns = (
 	},
 	user?: User | null
 ): ColumnDef<Test>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
-		meta: { grow: true }
-	}),
+	createSortableColumn(
+		'name',
+		isTemplate ? 'Test Template' : 'Tests',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
+			meta: { grow: true }
+		}
+	),
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
@@ -105,7 +113,7 @@ export const createTestColumns = (
 			const customActions = [];
 
 			customActions.push({
-				label: 'Make a Copy',
+				label: 'Duplicate',
 				href: resolve(`${baseUrl}/${test.id}?/clone`),
 				icon: 'copy',
 				method: 'POST'
@@ -116,7 +124,7 @@ export const createTestColumns = (
 				customActions.push({
 					label: 'Make a Test',
 					href: resolve(`/tests/test-session/convert/?template_id=${test.id}`),
-					icon: 'file-plus',
+					icon: 'null',
 					inline: true
 				});
 			} else {
@@ -124,13 +132,16 @@ export const createTestColumns = (
 
 				if (test.link) {
 					customActions.push({
-						label: 'Conduct Test',
-						action: () => window.open(`${testTakerUrl}/test/${test.link}`, '_blank'),
-						icon: 'external-link'
+						label: 'Copy Test Link',
+						action: async () => {
+							await navigator.clipboard.writeText(`${testTakerUrl}/test/${test.link}`);
+							toast.success('Test Link Copied');
+						},
+						icon: 'copy-link'
 					});
 
 					customActions.push({
-						label: 'Download QR Code',
+						label: 'Download QR',
 						action: async () => {
 							const fileName = `qr-${test.name.replace(/\s+/g, '-').toLowerCase()}`;
 							try {
@@ -139,7 +150,7 @@ export const createTestColumns = (
 								console.error('Failed to download QR code:', error);
 							}
 						},
-						icon: 'qr-code',
+						icon: 'null',
 						inline: true
 					});
 				}
@@ -160,7 +171,7 @@ export const createTestColumns = (
 
 			return renderComponent(DataTableActions, {
 				id: test.id,
-				entityName: isTemplate ? 'Test Template' : 'Test Session',
+				entityName: isTemplate ? 'Test Template' : 'Tests',
 				editUrl: resolve(`${baseUrl}/${test.id}/`),
 				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,

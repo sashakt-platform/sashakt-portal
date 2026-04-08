@@ -1,11 +1,21 @@
 <script lang="ts">
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import TagChip from '$lib/components/ui/tag-chip/TagChip.svelte';
+	import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
 
 	type QuestionRevision = {
 		id: number;
 		question_text: string;
-		tags?: Array<{ name: string }>;
+		question_type?: string;
+		tags?: Array<{ name: string; tag_type?: { name: string } }>;
+		options?: Array<{ id: number; key: string; value: string }>;
+		correct_answer?: number[];
+		instructions?: string;
+		marking_scheme?: any;
+		is_mandatory?: boolean;
+		media?: any;
+		matrix?: any;
 	};
 
 	let {
@@ -18,7 +28,6 @@
 		onRemoveQuestion?: (questionId: number) => void;
 	} = $props();
 
-	// Display all selected questions from testData.question_revisions
 	const displayQuestions = $derived(selectedQuestions);
 
 	const handleRemoveQuestion = (questionId: number) => {
@@ -27,38 +36,70 @@
 			onRemoveQuestion(questionId);
 		}
 	};
+
+	const getVisibleTags = (tags: QuestionRevision['tags']) => {
+		const formatted =
+			tags?.map((tag) => {
+				const typeName = tag.tag_type?.name ?? '';
+				return typeName ? `${tag.name} (${typeName})` : tag.name;
+			}) ?? [];
+		return { visible: formatted.slice(0, 2), overflow: Math.max(0, formatted.length - 2) };
+	};
 </script>
 
-<div class="flex h-full w-full flex-col overflow-auto">
+<div class="w-full overflow-auto rounded-lg border">
+	<!-- Table header -->
+	<div
+		class="grid grid-cols-[auto_1fr_80px_1fr_40px] items-center gap-2 bg-gray-50 px-4 py-4 text-sm font-semibold tracking-wide text-gray-500 uppercase"
+	>
+		<div class="w-5"></div>
+		<div>Questions</div>
+		<div class="text-center">Answers</div>
+		<div>Tags</div>
+		<div></div>
+	</div>
+
+	<!-- Rows -->
 	{#each displayQuestions as question (question.id)}
-		<div class="group mx-2 mt-2 flex flex-row">
-			<div class="my-auto w-fit">
-				<GripVertical />
+		<div class="grid grid-cols-[auto_1fr_80px_1fr_40px] items-center gap-2 border-t px-4 py-4">
+			<!-- Drag handle -->
+			<div class="text-gray-300">
+				<GripVertical class="h-4 w-4" />
 			</div>
-			<div
-				class="hover:bg-primary-foreground my-auto flex w-11/12 flex-row items-center rounded-lg border-1 px-4 py-4 text-sm"
+
+			<!-- Question text -->
+			<p class="text-sm text-gray-800">{question.question_text}</p>
+
+			<!-- Eye preview -->
+			<div class="flex justify-center">
+				<QuestionPreviewCell
+					question={{
+						...question,
+						options: question.options ?? [],
+						correct_answer: question.correct_answer ?? []
+					}}
+				/>
+			</div>
+
+			<!-- Tags -->
+			<div class="flex flex-wrap items-center gap-1">
+				{#each getVisibleTags(question.tags).visible as tag}
+					<TagChip name={tag} class="max-w-40 shrink-0" />
+				{/each}
+				{#if getVisibleTags(question.tags).overflow > 0}
+					<TagChip name="+{getVisibleTags(question.tags).overflow}" class="shrink-0" />
+				{/if}
+			</div>
+
+			<!-- Delete -->
+			<button
+				onclick={() => handleRemoveQuestion(question.id)}
+				class="cursor-pointer text-red-400 hover:text-red-600"
+				type="button"
+				aria-label="Remove question"
 			>
-				<p class="w-4/6">
-					{question.question_text}
-				</p>
-				<span class="w-2/6">
-					{#if question.tags && question.tags.length > 0}
-						<p>
-							<span class="font-bold">Tags:</span>
-							{question.tags.map((tag) => tag?.name).join(', ')}
-						</p>
-					{/if}
-				</span>
-			</div>
-			<div class="my-auto ml-2 hidden w-fit group-hover:block">
-				<button
-					onclick={() => handleRemoveQuestion(question.id)}
-					class="cursor-pointer"
-					type="button"
-				>
-					<Trash2 />
-				</button>
-			</div>
+				<Trash2 class="h-4 w-4" />
+			</button>
 		</div>
 	{/each}
 </div>

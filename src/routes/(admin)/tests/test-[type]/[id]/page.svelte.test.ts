@@ -112,6 +112,12 @@ function baseData(overrides: Record<string, any> = {}) {
 	};
 }
 
+/** Get the bottom navigation Next/Save button (the last one in the DOM). */
+function getBottomNextButton() {
+	const buttons = screen.getAllByText(/^(Next|Save)$/);
+	return buttons[buttons.length - 1].closest('button')!;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Test Create/Update Page', () => {
@@ -133,49 +139,47 @@ describe('Test Create/Update Page', () => {
 			expect(screen.getByText('Select Questions')).toBeInTheDocument();
 		});
 
-		it('renders Configuration Settings step label', () => {
+		it('renders Test Configuration step label', () => {
 			render(TestCreatePage, { data: baseData() });
-			expect(screen.getByText('Configuration Settings')).toBeInTheDocument();
-		});
-
-		it('renders abbreviated step labels for small screens', () => {
-			render(TestCreatePage, { data: baseData() });
-			expect(screen.getByText('Details')).toBeInTheDocument();
-			expect(screen.getByText('Questions')).toBeInTheDocument();
-			expect(screen.getByText('Config')).toBeInTheDocument();
+			expect(screen.getByText('Test Configuration')).toBeInTheDocument();
 		});
 	});
 
-	// ── Footer action buttons ─────────────────────────────────────────────────
+	// ── Navigation buttons ───────────────────────────────────────────────────
 
-	describe('Footer action buttons', () => {
-		it('shows Cancel button', () => {
+	describe('Navigation buttons', () => {
+		it('shows Previous buttons (disabled on step 1)', () => {
 			render(TestCreatePage, { data: baseData() });
-			expect(screen.getByText('Cancel')).toBeInTheDocument();
+			const buttons = screen.getAllByText('Previous');
+			expect(buttons.length).toBeGreaterThanOrEqual(2);
+			buttons.forEach((btn) => {
+				expect(btn.closest('button')).toBeDisabled();
+			});
 		});
 
-		it('shows Continue button on step 1', () => {
+		it('shows Next button on step 1', () => {
 			render(TestCreatePage, { data: baseData() });
-			expect(screen.getByText('Continue')).toBeInTheDocument();
+			const buttons = screen.getAllByText('Next');
+			expect(buttons.length).toBeGreaterThanOrEqual(2);
 		});
 
-		it('shows Continue button on step 2 after advancing', async () => {
+		it('shows Next button on step 2 after advancing', async () => {
 			setupSuperFormMock({ name: 'My Test', description: 'My Description' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
+			await fireEvent.click(getBottomNextButton());
 
-			expect(screen.getByText('Continue')).toBeInTheDocument();
+			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
 		});
 
 		it('shows Save button on step 3 after advancing twice', async () => {
 			setupSuperFormMock({ name: 'My Test', description: 'My Description' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
-			await fireEvent.click(screen.getByText('Continue'));
+			await fireEvent.click(getBottomNextButton());
+			await fireEvent.click(getBottomNextButton());
 
-			expect(screen.getByText('Save')).toBeInTheDocument();
+			expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
 		});
 
 		it('does not show Save button initially (step 1)', () => {
@@ -184,53 +188,48 @@ describe('Test Create/Update Page', () => {
 		});
 	});
 
-	// ── Continue button disabled state ────────────────────────────────────────
+	// ── Next button disabled state ───────────────────────────────────────────
 
-	describe('Continue button — disabled state on step 1', () => {
+	describe('Next button — disabled state on step 1', () => {
 		it('is disabled when name is empty', () => {
 			setupSuperFormMock({ name: '', description: 'Some description' });
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).toBeDisabled();
+			expect(getBottomNextButton()).toBeDisabled();
 		});
 
-		it('is disabled when description is empty', () => {
+		it('is not disabled when description is empty', () => {
 			setupSuperFormMock({ name: 'Some name', description: '' });
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).toBeDisabled();
+			expect(getBottomNextButton()).not.toBeDisabled();
 		});
 
 		it('is disabled when both name and description are empty', () => {
 			setupSuperFormMock({ name: '', description: '' });
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).toBeDisabled();
+			expect(getBottomNextButton()).toBeDisabled();
 		});
 
 		it('is disabled when name is only whitespace', () => {
 			setupSuperFormMock({ name: '   ', description: 'Valid description' });
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).toBeDisabled();
+			expect(getBottomNextButton()).toBeDisabled();
 		});
 
 		it('is enabled when name and description are both filled', () => {
 			setupSuperFormMock({ name: 'Test Name', description: 'Test Description' });
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).not.toBeDisabled();
+			expect(getBottomNextButton()).not.toBeDisabled();
 		});
 	});
 
-	// ── Continue button disabled — cross-screen condition ────────────────────
+	// ── Next button disabled — cross-screen condition ────────────────────────
 
-	describe('Continue button — disabled when random questions exceed selected', () => {
+	describe('Next button — disabled when random questions exceed selected', () => {
 		it('is disabled on step 1 when no_of_random_questions > question_revision_ids count', () => {
 			setupSuperFormMock({
 				name: 'Test Name',
@@ -240,8 +239,7 @@ describe('Test Create/Update Page', () => {
 			});
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).toBeDisabled();
+			expect(getBottomNextButton()).toBeDisabled();
 		});
 
 		it('is enabled when no_of_random_questions equals question_revision_ids count', () => {
@@ -253,8 +251,7 @@ describe('Test Create/Update Page', () => {
 			});
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).not.toBeDisabled();
+			expect(getBottomNextButton()).not.toBeDisabled();
 		});
 
 		it('is enabled when no_of_random_questions is 0 and no questions selected', () => {
@@ -266,47 +263,45 @@ describe('Test Create/Update Page', () => {
 			});
 			render(TestCreatePage, { data: baseData() });
 
-			const btn = screen.getByText('Continue').closest('button');
-			expect(btn).not.toBeDisabled();
+			expect(getBottomNextButton()).not.toBeDisabled();
 		});
 	});
 
 	// ── Step navigation ───────────────────────────────────────────────────────
 
 	describe('Step navigation', () => {
-		it('advances to step 2 when Continue is clicked on step 1', async () => {
+		it('advances to step 2 when Next is clicked on step 1', async () => {
 			setupSuperFormMock({ name: 'Test', description: 'Desc' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
+			await fireEvent.click(getBottomNextButton());
 
-			// Still shows Continue (not Save), confirming we are on step 2
-			expect(screen.getByText('Continue')).toBeInTheDocument();
+			// Still shows Next (not Save), confirming we are on step 2
+			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
 			expect(screen.queryByText('Save')).not.toBeInTheDocument();
 		});
 
-		it('advances to step 3 when Continue is clicked on step 2', async () => {
+		it('advances to step 3 when Next is clicked on step 2', async () => {
 			setupSuperFormMock({ name: 'Test', description: 'Desc' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
-			await fireEvent.click(screen.getByText('Continue'));
+			await fireEvent.click(getBottomNextButton());
+			await fireEvent.click(getBottomNextButton());
 
 			// Now on step 3 — button shows Save
-			expect(screen.getByText('Save')).toBeInTheDocument();
-			expect(screen.queryByText('Continue')).not.toBeInTheDocument();
+			expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
+			expect(screen.queryByText('Next')).not.toBeInTheDocument();
 		});
 
-		it('does not advance from step 1 when Continue is disabled', async () => {
+		it('does not advance from step 1 when Next is disabled', async () => {
 			setupSuperFormMock({ name: '', description: '' });
 			render(TestCreatePage, { data: baseData() });
 
 			// Button is disabled — clicking should not advance
-			const btn = screen.getByText('Continue').closest('button')!;
-			await fireEvent.click(btn);
+			await fireEvent.click(getBottomNextButton());
 
-			// Still on step 1: Continue visible, Save not visible
-			expect(screen.getByText('Continue')).toBeInTheDocument();
+			// Still on step 1: Next visible, Save not visible
+			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
 			expect(screen.queryByText('Save')).not.toBeInTheDocument();
 		});
 	});
@@ -318,28 +313,28 @@ describe('Test Create/Update Page', () => {
 			setupSuperFormMock({ name: 'Test', description: 'Desc' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
-			await fireEvent.click(screen.getByText('Continue'));
-			await fireEvent.click(screen.getByText('Save'));
+			await fireEvent.click(getBottomNextButton());
+			await fireEvent.click(getBottomNextButton());
+			await fireEvent.click(getBottomNextButton());
 
 			expect(mockSubmit).toHaveBeenCalledOnce();
 		});
 
-		it('does not call submit() when Continue is clicked on step 1', async () => {
+		it('does not call submit() when Next is clicked on step 1', async () => {
 			setupSuperFormMock({ name: 'Test', description: 'Desc' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
+			await fireEvent.click(getBottomNextButton());
 
 			expect(mockSubmit).not.toHaveBeenCalled();
 		});
 
-		it('does not call submit() when Continue is clicked on step 2', async () => {
+		it('does not call submit() when Next is clicked on step 2', async () => {
 			setupSuperFormMock({ name: 'Test', description: 'Desc' });
 			render(TestCreatePage, { data: baseData() });
 
-			await fireEvent.click(screen.getByText('Continue'));
-			await fireEvent.click(screen.getByText('Continue'));
+			await fireEvent.click(getBottomNextButton());
+			await fireEvent.click(getBottomNextButton());
 
 			expect(mockSubmit).not.toHaveBeenCalled();
 		});

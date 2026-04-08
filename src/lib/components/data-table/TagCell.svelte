@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import TagChip from '$lib/components/ui/tag-chip/TagChip.svelte';
 
 	interface Props {
 		tags: Array<{ name: string; tag_type?: { name: string } }>;
@@ -25,20 +25,10 @@
 			<Tooltip.Trigger>
 				<div class="flex max-w-full items-center gap-1 overflow-hidden">
 					{#each visibleTags as tag}
-						<Badge
-							variant="secondary"
-							class="bg-muted text-muted-foreground max-w-40 shrink-0 border-transparent"
-						>
-							<span class="truncate">{tag}</span>
-						</Badge>
+						<TagChip name={tag} class="max-w-40 shrink-0" />
 					{/each}
 					{#if overflowCount > 0}
-						<Badge
-							variant="secondary"
-							class="bg-muted text-muted-foreground shrink-0 border-transparent"
-						>
-							+{overflowCount}
-						</Badge>
+						<TagChip name="+{overflowCount}" class="shrink-0" />
 					{/if}
 				</div>
 			</Tooltip.Trigger>

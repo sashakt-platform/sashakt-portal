@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, fireEvent } from '@testing-library/svelte';
 import TooltipInfo from './TooltipInfo.svelte';
 
 describe('TooltipInfo', () => {
@@ -257,6 +257,205 @@ describe('TooltipInfo', () => {
 
 			const button = screen.getByRole('button', { name: 'Help 🎯' });
 			expect(button).toBeInTheDocument();
+		});
+	});
+
+	describe('Title Derivation', () => {
+		it('should strip "Help: " prefix from label for title', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Help: Marks',
+					description: 'Marks description'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Help: Marks' });
+			await fireEvent.click(trigger);
+
+			expect(screen.getByText('What is Marks')).toBeInTheDocument();
+		});
+
+		it('should strip "help: " prefix case-insensitively', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'HELP: Passing Criteria',
+					description: 'Some description'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'HELP: Passing Criteria' });
+			await fireEvent.click(trigger);
+
+			expect(screen.getByText('What is Passing Criteria')).toBeInTheDocument();
+		});
+
+		it('should use label as-is when no "Help: " prefix', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Marks',
+					description: 'Marks description'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Marks' });
+			await fireEvent.click(trigger);
+
+			expect(screen.getByText('What is Marks')).toBeInTheDocument();
+		});
+	});
+
+	describe('Popover Content', () => {
+		it('should show description section when description is provided', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Help',
+					description: 'This is the description text'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Help' });
+			await fireEvent.click(trigger);
+
+			expect(screen.getByText('What is Help')).toBeInTheDocument();
+			expect(screen.getByText('This is the description text')).toBeInTheDocument();
+		});
+
+		it('should not show description section when description is empty', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Help',
+					description: ''
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Help' });
+			await fireEvent.click(trigger);
+
+			expect(screen.queryByText('What is Help')).not.toBeInTheDocument();
+		});
+
+		it('should show title in popover header', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Marks',
+					description: 'Some description'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Marks' });
+			await fireEvent.click(trigger);
+
+			const header = screen.getByText('Marks');
+			expect(header).toBeInTheDocument();
+		});
+
+		it('should show close button when popover is open', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Help',
+					description: 'Description'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Help' });
+			await fireEvent.click(trigger);
+
+			const closeButton = screen.getByRole('button', { name: 'Close' });
+			expect(closeButton).toBeInTheDocument();
+		});
+	});
+
+	describe('Video URL', () => {
+		it('should render iframe when videoUrl is provided', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Help',
+					description: 'Description',
+					videoUrl: 'https://www.youtube.com/embed/abc123'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Help' });
+			await fireEvent.click(trigger);
+
+			const iframe = document.body.querySelector('iframe');
+			expect(iframe).toBeInTheDocument();
+			expect(iframe).toHaveAttribute('src', 'https://www.youtube.com/embed/abc123');
+		});
+
+		it('should show "How to use" heading when videoUrl is provided', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Marks',
+					description: 'Description',
+					videoUrl: 'https://www.youtube.com/embed/abc123'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Marks' });
+			await fireEvent.click(trigger);
+
+			expect(screen.getByText('How to use Marks')).toBeInTheDocument();
+		});
+
+		it('should not render iframe when videoUrl is not provided', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Help',
+					description: 'Description'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Help' });
+			await fireEvent.click(trigger);
+
+			expect(document.body.querySelector('iframe')).not.toBeInTheDocument();
+		});
+
+		it('should not show "How to use" heading when videoUrl is not provided', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Help',
+					description: 'Description'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Help' });
+			await fireEvent.click(trigger);
+
+			expect(screen.queryByText('How to use Help')).not.toBeInTheDocument();
+		});
+
+		it('should set correct iframe title', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Marks',
+					description: 'Description',
+					videoUrl: 'https://www.youtube.com/embed/abc123'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Marks' });
+			await fireEvent.click(trigger);
+
+			const iframe = document.body.querySelector('iframe');
+			expect(iframe).toHaveAttribute('title', 'How to use Marks');
+		});
+
+		it('should show both description and video sections when both are provided', async () => {
+			render(TooltipInfo, {
+				props: {
+					label: 'Marks',
+					description: 'This explains marks',
+					videoUrl: 'https://www.youtube.com/embed/abc123'
+				}
+			});
+
+			const trigger = screen.getByRole('button', { name: 'Marks' });
+			await fireEvent.click(trigger);
+
+			expect(screen.getByText('What is Marks')).toBeInTheDocument();
+			expect(screen.getByText('How to use Marks')).toBeInTheDocument();
 		});
 	});
 });

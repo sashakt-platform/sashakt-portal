@@ -528,7 +528,7 @@ describe('Single Question Page - Marking Type Selection', () => {
 
 		it('should not show "Partial Marking Rules" section by default for single-choice', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 		});
 
 		it('should show "Partial Marking" checkbox for multi-choice question', () => {
@@ -560,7 +560,7 @@ describe('Single Question Page - Marking Type Selection', () => {
 
 		it('should not show partial marking rules section for single-choice question', () => {
 			render(SingleQuestionPage, { data: { ...baseData, questionData: singleChoiceData } as any });
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 		});
 	});
 
@@ -569,7 +569,7 @@ describe('Single Question Page - Marking Type Selection', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartialData } as any
 			});
-			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
 		});
 
 		it('should show "Partial Marking" checkbox as checked when question has partial marking data', () => {
@@ -661,7 +661,7 @@ describe('Single Question Page - Partial Marking Section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
-			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
 		});
 
 		it('should show "Correct selected" label in partial rows', () => {
@@ -678,11 +678,11 @@ describe('Single Question Page - Partial Marking Section', () => {
 			expect(screen.getAllByText('Marks').length).toBeGreaterThan(0);
 		});
 
-		it('should show "Add Row" button in partial marking section', () => {
+		it('should show "Add Rule" button in partial marking section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
-			expect(screen.getByRole('button', { name: /Add Row/i })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Add Rule/i })).toBeInTheDocument();
 		});
 	});
 
@@ -713,14 +713,14 @@ describe('Single Question Page - Partial Marking Section', () => {
 		});
 	});
 
-	describe('Add Row', () => {
-		it('should add a new partial marking row when "Add Row" is clicked', async () => {
+	describe('Add Rule', () => {
+		it('should add a new partial marking row when "Add Rule" is clicked', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
 
 			const initialRows = screen.getAllByText('Correct selected').length;
-			await fireEvent.click(screen.getByRole('button', { name: /Add Row/i }));
+			await fireEvent.click(screen.getByRole('button', { name: /Add Rule/i }));
 			expect(screen.getAllByText('Correct selected').length).toBe(initialRows + 1);
 		});
 	});
@@ -747,7 +747,7 @@ describe('Single Question Page - Partial Marking Section', () => {
 
 			expect(screen.getAllByText('Correct selected').length).toBe(2);
 
-			await fireEvent.click(screen.getByRole('button', { name: /Add Row/i }));
+			await fireEvent.click(screen.getByRole('button', { name: /Add Rule/i }));
 			expect(screen.getAllByText('Correct selected').length).toBe(3);
 
 			const deleteButtons = screen.getAllByTestId('delete-partial-row');
@@ -767,7 +767,7 @@ describe('Single Question Page - Partial Marking Section', () => {
 				marking_scheme: { correct: 3, wrong: 0, skipped: 0 }
 			};
 			render(SingleQuestionPage, { data: { ...baseData, questionData: fullMarksData } as any });
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 		});
 	});
 });
@@ -860,11 +860,11 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 				data: { ...baseData, questionData: multiChoiceWithExistingPartial } as any
 			});
 
-			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
 
 			await fireEvent.click(getPartialCheckbox());
 
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 		});
 
 		it('should uncheck the checkbox and hide rules when clicked while checked', async () => {
@@ -876,7 +876,7 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 
 			await fireEvent.click(getPartialCheckbox());
 
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 		});
 	});
 
@@ -886,11 +886,11 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 				data: { ...baseData, questionData: multiChoiceNoPartial } as any
 			});
 
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 
 			await fireEvent.click(getPartialCheckbox());
 
-			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+			expect(screen.getByText(/Add Rule/)).toBeInTheDocument();
 		});
 
 		it('should create default partial scheme with one row when no partial data exists', async () => {
@@ -933,10 +933,10 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 			expect(screen.getByDisplayValue('3')).toBeInTheDocument();
 
 			await fireEvent.click(getPartialCheckbox());
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 
 			await fireEvent.click(getPartialCheckbox());
-			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
 			expect(screen.getAllByText('Correct selected').length).toBe(1);
 		});
 
@@ -946,12 +946,12 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 			});
 
 			await fireEvent.click(getPartialCheckbox());
-			expect(screen.getByText('Partial Marking Rules')).toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
 
 			const checkboxes = screen.getAllByRole('checkbox');
 			await fireEvent.click(checkboxes[1]);
 
-			expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+			expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 			expect(screen.queryByText('Partial Marking')).not.toBeInTheDocument();
 		});
 	});
@@ -1006,7 +1006,7 @@ describe('Single Question Page - Partial marking hidden for Subjective type', ()
 			data: { ...baseData, questionData: subjectiveWithPartialScheme } as any
 		});
 
-		expect(screen.queryByText('Partial Marking Rules')).not.toBeInTheDocument();
+		expect(document.querySelector('#partial-mark-section')).not.toBeInTheDocument();
 	});
 
 	it('should not show Partial Marking checkbox for Subjective type even with a saved partial scheme', () => {

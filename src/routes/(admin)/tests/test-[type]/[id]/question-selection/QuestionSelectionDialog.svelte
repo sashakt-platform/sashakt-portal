@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Info from '@lucide/svelte/icons/info';
 	import { DataTable } from '$lib/components/data-table';
 	import { createQuestionSelectionColumns } from './columns';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import Input from '$lib/components/ui/input/input.svelte';
+	import SearchInput from '$lib/components/SearchInput.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
+	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -29,17 +29,22 @@
 	} = $props();
 	let tags = $state<string[]>([]);
 	let states = $state<string[]>([]);
-	let searchTimeout: ReturnType<typeof setTimeout>;
-
+	let selectedTagTypes = $state<{ id: string; name: string }[]>([]);
 	// let's format questions data to match QuestionForSelection interface
 	const questionData: QuestionForSelection[] = $derived(
 		questions.items?.map((question: any) => ({
 			id: question.latest_question_revision_id,
 			question_text: question.question_text,
+			question_type: question.question_type,
 			tags: question.tags,
 			options: question.options || [],
 			correct_answer: question.correct_answer || [],
-			latest_question_revision_id: question.latest_question_revision_id
+			latest_question_revision_id: question.latest_question_revision_id,
+			instructions: question.instructions,
+			marking_scheme: question.marking_scheme,
+			is_mandatory: question.is_mandatory,
+			media: question.media,
+			matrix: question.matrix
 		})) || []
 	);
 
@@ -120,29 +125,6 @@
 		}
 	};
 
-	// render expanded row content for question options
-	const renderExpandedRow = (row: QuestionForSelection) => {
-		return `
-			<div class="p-4">
-				${row.options
-					?.map(
-						(option) => `
-					<div class="flex items-center my-2">
-						<span class="bg-primary-foreground rounded-sm p-2 mr-3">${option.key}</span>
-						<span class="mr-4">${option.value}</span>
-						${
-							row.correct_answer?.includes(option.id)
-								? '<svg class="text-primary my-auto ml-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>'
-								: ''
-						}
-					</div>
-				`
-					)
-					.join('')}
-			</div>
-		`;
-	};
-
 	// handle selection confirmation
 	const handleSelectionConfirm = () => {
 		open = false;
@@ -155,47 +137,48 @@
 		preventScroll={false}
 	>
 		<div class="flex h-full flex-col">
-			<Dialog.Header class="border-b-2">
-				<Dialog.Title class="h-fit"
-					><div class="ml-4 flex py-3 text-base sm:ml-6 sm:py-4 sm:text-xl">
-						<p>Select questions from question bank</p>
-						<Info class="my-auto ml-2 w-4" />
-					</div></Dialog.Title
-				>
+			<!-- Header -->
+			<Dialog.Header class="border-b px-6 py-5">
+				<Dialog.Title class="text-xl font-bold text-gray-900">
+					Select Questions from the Question Bank
+				</Dialog.Title>
+				<p class="text-primary text-sm font-medium">
+					{$formData.question_revision_ids?.length || 0} of {questions.total || 0} questions selected
+				</p>
 			</Dialog.Header>
 
-			<div class="m-2 flex h-full flex-col gap-4 sm:m-4 sm:gap-8">
-				<div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-					<div class="w-full lg:mr-8">
-						<Input
-							type="search"
-							placeholder="Search questions..."
+			<div class="flex h-full flex-col gap-4 p-4 sm:gap-6 sm:p-6">
+				<!-- Filter Row -->
+				<div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+					<!-- Search -->
+					<div class="sm:w-2/5">
+						<SearchInput
+							placeholder="Search questions"
 							value={questionParams?.questionSearch || ''}
-							oninput={(event) => {
-								const url = new URL(page.url);
-								clearTimeout(searchTimeout);
-								searchTimeout = setTimeout(() => {
-									const target = event.target as HTMLInputElement;
-									if (target?.value) {
-										url.searchParams.set('questionSearch', target.value);
-									} else {
-										url.searchParams.delete('questionSearch');
-									}
-									url.searchParams.set('questionPage', '1');
-									goto(url, { keepFocus: true, invalidateAll: true });
-								}, 300);
-							}}
-						></Input>
+							searchParam="questionSearch"
+							pageParam="questionPage"
+						/>
 					</div>
-					<div class="w-full">
-						<TagsSelection bind:tags filteration={true} />
-					</div>
-					{#if !isStateAdmin(user)}
-						<div class="w-full sm:col-span-2 lg:col-span-1">
-							<StateSelection bind:states filteration={true} />
+
+					<!-- Filter Dropdowns -->
+					<div class="flex flex-1 flex-col gap-3 sm:flex-row">
+						{#if !isStateAdmin(user)}
+							<div class="flex-1">
+								<StateSelection bind:states filteration={true} />
+							</div>
+						{/if}
+						<!-- Vertical Divider -->
+						<div class="hidden h-8 w-px bg-gray-200 sm:block"></div>
+						<div class="flex-1">
+							<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 						</div>
-					{/if}
+						<div class="flex-1">
+							<TagsSelection bind:tags filteration={true} tagTypes={selectedTagTypes} />
+						</div>
+					</div>
 				</div>
+
+				<!-- Table -->
 				<div class="relative flex flex-1 flex-col">
 					<div class="overflow-auto pb-20" style="max-height: 65vh;">
 						<DataTable
@@ -206,9 +189,6 @@
 							currentPage={questionParams?.questionPage || 1}
 							pageSize={questionParams?.questionSize || DEFAULT_PAGE_SIZE}
 							paramPrefix="question"
-							expandable={true}
-							{renderExpandedRow}
-							expandColumnId="answers"
 							emptyStateMessage="No questions found."
 							enableSelection={true}
 							onSelectionChange={handleSelectionChange}
@@ -217,21 +197,15 @@
 						/>
 					</div>
 
-					<!-- fixed bottom bar -->
+					<!-- Fixed bottom bar -->
 					<div class="absolute right-0 bottom-0 left-0 border-t bg-white p-3 sm:p-4">
-						<div
-							class="flex flex-col-reverse items-center justify-between gap-2 sm:flex-row sm:gap-0"
-						>
+						<div class="flex justify-center">
 							<Button
 								class="bg-primary hover:bg-primary/90 w-full sm:w-auto"
 								onclick={handleSelectionConfirm}
 							>
-								Add to Test{$formData.is_template ? ' Template' : ''}
+								Add Questions to {$formData.is_template ? 'Template' : 'Test'}
 							</Button>
-
-							<div class="text-muted-foreground text-sm">
-								{$formData.question_revision_ids?.length || 0} question(s) selected
-							</div>
 						</div>
 					</div>
 				</div>

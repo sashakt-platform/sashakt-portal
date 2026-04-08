@@ -11,13 +11,17 @@
 		value = '',
 		class: className,
 		useResolve = false,
-		debounceMs = 300
+		debounceMs = 300,
+		searchParam = 'search',
+		pageParam = 'page'
 	}: {
 		placeholder?: string;
 		value?: string;
 		class?: string;
 		useResolve?: boolean;
 		debounceMs?: number;
+		searchParam?: string;
+		pageParam?: string;
 	} = $props();
 
 	let searchTimeout: ReturnType<typeof setTimeout>;
@@ -30,11 +34,11 @@
 		clearTimeout(searchTimeout);
 		searchTimeout = setTimeout(() => {
 			if (inputValue) {
-				url.searchParams.set('search', inputValue);
+				url.searchParams.set(searchParam, inputValue);
 			} else {
-				url.searchParams.delete('search');
+				url.searchParams.delete(searchParam);
 			}
-			url.searchParams.set('page', '1');
+			url.searchParams.set(pageParam, '1');
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			const target = useResolve ? resolve((url.pathname + url.search) as any) : url;
 			goto(target, { keepFocus: true, invalidateAll: true });

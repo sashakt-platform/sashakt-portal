@@ -38,29 +38,35 @@
 
 <div>
 	<!-- Page Header -->
-	<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
-		<div class="my-auto flex flex-col">
-			<div class="flex w-full items-center align-middle">
-				<div class="flex flex-row">
-					<h2
-						class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
-					>
-						{title}
-					</h2>
-					{#if showInfoIcon}
-						<TooltipInfo label={infoLabel} description={infoDescription} videoUrl={infoVideoUrl} />
-					{/if}
+	<div class="bg-gray-0">
+		<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
+			<div class="my-auto flex flex-col">
+				<div class="flex w-full items-center align-middle">
+					<div class="flex flex-row">
+						<h2
+							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
+						>
+							{title}
+						</h2>
+						{#if showInfoIcon}
+							<TooltipInfo
+								label={infoLabel}
+								description={infoDescription}
+								videoUrl={infoVideoUrl}
+							/>
+						{/if}
+					</div>
 				</div>
+				{#if subtitle}
+					<Label class="my-auto align-middle text-sm font-extralight">{subtitle}</Label>
+				{/if}
 			</div>
-			{#if subtitle}
-				<Label class="my-auto align-middle text-sm font-extralight">{subtitle}</Label>
+			{#if headerActions}
+				<div class="my-auto flex flex-wrap gap-3 sm:ml-auto sm:p-4">
+					{@render headerActions()}
+				</div>
 			{/if}
 		</div>
-		{#if headerActions}
-			<div class="my-auto flex flex-wrap gap-3 sm:ml-auto sm:p-4">
-				{@render headerActions()}
-			</div>
-		{/if}
 	</div>
 	<hr class="border-gray-200" />
 
@@ -69,21 +75,23 @@
 		{@render emptyState()}
 	{:else}
 		<!-- Content Section -->
-		<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
-			<!-- Toolbar (always shown if present, e.g., batch actions) -->
-			{#if toolbar}
-				{@render toolbar()}
-			{/if}
+		<div class="bg-gray-50">
+			<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
+				<!-- Toolbar (always shown if present, e.g., batch actions) -->
+				{#if toolbar}
+					{@render toolbar()}
+				{/if}
 
-			<!-- Filter Section (conditionally shown) -->
-			{#if showFilters && filters}
-				{@render filters()}
-			{/if}
+				<!-- Filter Section (conditionally shown) -->
+				{#if showFilters && filters}
+					{@render filters()}
+				{/if}
 
-			<!-- Main Content (DataTable) -->
-			{#if content}
-				{@render content()}
-			{/if}
+				<!-- Main Content (DataTable) -->
+				{#if content}
+					{@render content()}
+				{/if}
+			</div>
 		</div>
 	{/if}
 </div>

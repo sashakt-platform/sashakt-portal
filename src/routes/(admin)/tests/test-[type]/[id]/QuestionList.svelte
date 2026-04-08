@@ -2,15 +2,14 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import QuestionSelectionDialog from './question-selection/QuestionSelectionDialog.svelte';
 	import SelectedQuestionsList from './question-selection/SelectedQuestionsList.svelte';
-	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
-	import { Label } from '$lib/components/ui/label';
-	import TestPaper from '$lib/icons/TestPaper.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import type { Filter } from '$lib/types/filters';
 	import type { User } from '$lib/utils/permissions.js';
+	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
+	import FileQuestionIcon from '@lucide/svelte/icons/file-question';
 
 	let {
 		formData,
@@ -54,149 +53,139 @@
 
 <QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
 
-<div class="mx-auto flex h-dvh">
-	<div class="mx-auto w-full p-4 sm:p-8 md:p-12 lg:p-20">
-		<div
-			class="mb-6 flex h-fit flex-col gap-4 rounded-lg bg-white p-4 shadow-lg sm:mb-8 sm:flex-row sm:items-center"
-		>
-			<div class="flex items-center gap-3">
-				<div class="flex h-full w-fit shrink-0">
-					<TestPaper />
-				</div>
-				<p class="text-base font-semibold sm:text-lg">Selection</p>
+<div class="overflow-hidden rounded-xl border bg-white shadow-sm">
+	<!-- Card header -->
+	<div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+		<div class="flex items-center gap-4">
+			<div class="bg-primary/10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
+				<FileQuestionIcon class="text-primary h-5 w-5" />
 			</div>
-			<RadioGroup.Root
-				bind:value={questionSelectionMode}
-				class="flex w-full flex-col gap-4 sm:mx-auto sm:flex-row sm:justify-center sm:gap-8"
-			>
-				<div class="flex w-fit items-center space-x-2">
-					<RadioGroup.Item
-						id="manual"
-						value="manual"
-						onclick={() => ($formData.random_tag_count = [])}
-					/>
-					<Label for="manual"
-						><p class="font-bold">Manual</p>
-						<p class="text-sm font-extralight">Select from the Question Bank</p></Label
-					>
-				</div>
-				<div class="flex w-fit flex-row items-center gap-4">
-					<div class="flex w-fit flex-row items-center space-x-2">
-						<RadioGroup.Item
-							id="tagBased"
-							value="tagBased"
-							onclick={() => (($formData.question_revision_ids = []), setDefaultTagsRandom())}
-						/>
-						<Label for="tagBased"
-							><p class="font-bold">Random</p>
-							<p class="text-sm font-extralight">Based on the Tags</p>
-						</Label>
-					</div>
-				</div>
-			</RadioGroup.Root>
-		</div>
-		<div
-			class="mb-2 flex min-h-1/6 flex-col gap-4 rounded-t-xl rounded-b-sm border bg-white p-4 shadow-lg sm:flex-row sm:items-center"
-		>
-			<div class="hidden h-full items-center sm:flex">
-				<TestPaper />
-			</div>
-			<div class="flex h-full w-full flex-col gap-4 md:flex-row md:gap-8">
-				<div class="flex w-full flex-col md:w-1/2">
-					<div class="flex">
-						<p class="font-bold">{$formData.name}</p>
-					</div>
-					<div class="flex flex-wrap items-center gap-2 text-sm sm:flex-row">
-						<span
-							class="bg-secondary my-2 rounded-sm p-1 px-2 text-xs font-bold sm:my-4 sm:mr-4 sm:text-sm"
-							>{$formData.is_template ? 'TEST TEMPLATE' : 'TEST SESSION'}</span
-						>
-						<span class="text-gray-500"
-							>{totalSelectedCount}
-							{totalSelectedCount === 1 ? 'question' : 'questions'}
-						</span>
-					</div>
-				</div>
-				{#if questionSelectionMode == 'tagBased'}
-					<div class="my-auto flex w-full flex-col justify-center align-middle md:w-1/2">
-						<TagsSelection bind:tags={$formData.random_tag_count} />
-					</div>
-				{/if}
-				{#if $formData.question_revision_ids.length != 0}
-					<div class="my-auto flex md:ml-auto">
-						<Button class="w-full sm:w-auto" onclick={() => (dialogOpen = true)}
-							>Select More Questions</Button
-						>
-					</div>
-				{/if}
+			<div>
+				<p class="font-semibold">Select Questions</p>
+				<p class="text-sm text-gray-500">Choose questions to include in this template</p>
 			</div>
 		</div>
 
-		<div
-			class="my-auto flex h-full justify-center rounded-t-sm rounded-b-xl border bg-white p-4 pb-48 shadow-lg md:pb-28"
+		<!-- Pill toggle -->
+		<Tabs
+			bind:value={questionSelectionMode}
+			class="w-fit"
+			onValueChange={(v) => {
+				if (v === 'manual') $formData.random_tag_count = [];
+				if (v === 'tagBased') {
+					$formData.question_revision_ids = [];
+					setDefaultTagsRandom();
+				}
+			}}
 		>
-			{#if questionSelectionMode == 'manual'}
-				{#if $formData.question_revision_ids.length == 0}
-					<div class="my-auto text-center">
-						<p class="text-lg font-bold">Shortlist your Questions</p>
-						<p class="text-sm text-gray-400">
-							Add the relevant questions to your test {$formData.is_template ? 'template' : ''}
-						</p>
-						<Button
-							class="bg-primary mt-6"
-							onclick={() => {
-								dialogOpen = true;
-								const url = new URL(page.url);
-								url.searchParams.delete('state_ids');
-								goto(url, { keepFocus: true, invalidateAll: true });
-							}}>Select from question bank</Button
-						>
-					</div>
-				{:else}
-					<SelectedQuestionsList
-						selectedQuestions={$formData.question_revisions || []}
-						bind:selectedQuestionIds={$formData.question_revision_ids}
-						onRemoveQuestion={handleRemoveQuestion}
-					/>
-				{/if}
-			{:else if questionSelectionMode == 'tagBased'}
-				{#if $formData.random_tag_count.length == 0}
-					<div class="my-auto text-center">
-						<p class="text-sm text-gray-400">
-							No tags selected. Please select tags to enable random question for the test.
-						</p>
-					</div>
-				{:else}
-					<div class="flex h-full w-full flex-col gap-4 overflow-auto">
-						<div class="flex flex-col">
-							<p class="text-base font-bold sm:text-lg">Random Configuration</p>
-							<p class="text-sm text-gray-400">Enter number of questions for the selected Tags</p>
-						</div>
-						<div class="flex flex-col">
-							{#each $formData.random_tag_count as tag (tag.id)}
-								<div
-									class="m-2 flex flex-col gap-2 rounded p-2 text-sm sm:m-4 sm:flex-row sm:items-center sm:gap-0"
-								>
-									<span class="w-full font-medium sm:w-1/4 sm:font-normal">{tag.name}</span>
-									<div class="w-full sm:w-3/4">
-										<Input
-											type="number"
-											placeholder="No of questions"
-											class="rounded border p-2 sm:ml-2"
-											bind:value={tag.count}
-										/>
-										<small class="mt-1 block text-red-400 sm:ml-2"
-											>{tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)
-												? 'Enter a positive integer'
-												: ''}</small
-										>
-									</div>
-								</div>
-							{/each}
-						</div>
-					</div>
-				{/if}
+			<TabsList class="bg-muted rounded-full p-1">
+				<TabsTrigger
+					value="manual"
+					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+				>
+					Manual Selection
+				</TabsTrigger>
+				<TabsTrigger
+					value="tagBased"
+					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+				>
+					Auto Selection
+				</TabsTrigger>
+			</TabsList>
+		</Tabs>
+	</div>
+
+	<!-- Divider -->
+	<div class="border-t"></div>
+
+	<!-- Card body -->
+	<div class="flex min-h-96 flex-col p-5">
+		{#if questionSelectionMode === 'manual'}
+			{#if $formData.question_revision_ids.length === 0}
+				<div class="my-auto flex flex-col items-center justify-center py-16 text-center">
+					<p class="text-lg font-bold">No questions yet</p>
+					<p class="mt-1 text-sm text-gray-500">
+						Add the relevant questions to your test {$formData.is_template ? 'template' : ''}.
+					</p>
+					<Button
+						class="mt-6"
+						onclick={() => {
+							dialogOpen = true;
+							const url = new URL(page.url);
+							url.searchParams.delete('state_ids');
+							goto(url, { keepFocus: true, invalidateAll: true });
+						}}>Select from Question Bank</Button
+					>
+				</div>
+			{:else}
+				<div class="mb-4 flex items-center justify-between">
+					<p class="text-primary text-sm font-semibold">
+						✓ {totalSelectedCount}
+						{totalSelectedCount === 1 ? 'question' : 'questions'} added
+					</p>
+					<button
+						type="button"
+						class="text-primary hover:text-primary/80 flex items-center gap-1 text-sm font-semibold hover:cursor-pointer"
+						onclick={() => (dialogOpen = true)}
+					>
+						+ Add more questions
+					</button>
+				</div>
+				<SelectedQuestionsList
+					selectedQuestions={$formData.question_revisions || []}
+					bind:selectedQuestionIds={$formData.question_revision_ids}
+					onRemoveQuestion={handleRemoveQuestion}
+				/>
 			{/if}
-		</div>
+		{:else if questionSelectionMode === 'tagBased'}
+			<div class="flex flex-col items-center gap-4 py-8 text-center">
+				<p class="text-sm text-gray-600">
+					Select tags and specify how many questions to randomly pull from each.<br />
+					Questions will be drawn from the question bank at test creation time.
+				</p>
+				<div class="w-80">
+					<TagsSelection bind:tags={$formData.random_tag_count} />
+				</div>
+			</div>
+
+			{#if $formData.random_tag_count.length > 0}
+				<p class="text-primary mb-4 text-center text-sm font-semibold">
+					{totalSelectedCount}
+					{totalSelectedCount === 1 ? 'question' : 'questions'}
+				</p>
+
+				<div class="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border bg-gray-50">
+					<!-- Table header -->
+					<div
+						class="grid grid-cols-2 bg-gray-100 px-6 py-4 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+					>
+						<div>Tags</div>
+						<div>No. of Questions</div>
+					</div>
+
+					<!-- Tag rows -->
+					{#each $formData.random_tag_count as tag (tag.id)}
+						<div class="grid grid-cols-2 items-center gap-4 border-t bg-white px-6 py-4">
+							<span
+								class="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700"
+							>
+								{tag.name}
+							</span>
+							<div>
+								<Input
+									type="number"
+									placeholder="0"
+									class="w-full rounded-lg border bg-white text-center"
+									bind:value={tag.count}
+								/>
+								{#if tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)}
+									<small class="mt-1 block text-red-400">Enter a positive integer</small>
+								{/if}
+							</div>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		{/if}
 	</div>
 </div>

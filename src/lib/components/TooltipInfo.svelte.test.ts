@@ -166,7 +166,7 @@ describe('TooltipInfo', () => {
 			});
 
 			const button = container.querySelector('[role="button"]');
-			expect(button).toHaveClass('hover:text-gray-900');
+			expect(button).toHaveClass('hover:text-gray-700');
 		});
 
 		it('should have focus styles', () => {

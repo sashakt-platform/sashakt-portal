@@ -8,6 +8,7 @@
 		subtitle: string;
 		infoLabel?: string;
 		infoDescription?: string;
+		infoVideoUrl?: string;
 		showFilters?: boolean;
 		showEmptyState?: boolean;
 		showInfoIcon?: boolean;
@@ -26,6 +27,7 @@
 		showInfoIcon = true,
 		infoLabel,
 		infoDescription,
+		infoVideoUrl,
 		headerActions,
 		toolbar,
 		filters,
@@ -46,7 +48,7 @@
 						{title}
 					</h2>
 					{#if showInfoIcon}
-						<TooltipInfo label={infoLabel} description={infoDescription} />
+						<TooltipInfo label={infoLabel} description={infoDescription} videoUrl={infoVideoUrl} />
 					{/if}
 				</div>
 			</div>

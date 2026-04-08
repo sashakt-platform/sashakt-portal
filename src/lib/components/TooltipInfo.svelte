@@ -1,33 +1,82 @@
 <script lang="ts">
-	import * as Tooltip from '$lib/components/ui/tooltip';
+	import * as Popover from '$lib/components/ui/popover';
 	import Info from '@lucide/svelte/icons/info';
+	import X from '@lucide/svelte/icons/x';
 
-	export let description: string = '';
-	export let label: string = 'Help';
+	let {
+		label = 'Help',
+		description = '',
+		videoUrl = ''
+	}: {
+		label?: string;
+		description?: string;
+		videoUrl?: string;
+	} = $props();
+
+	let open = $state(false);
+
+	const title = $derived(label.replace(/^Help:\s*/i, ''));
 	const tooltipId = `tooltip-${label.replace(/\s+/g, '-').toLowerCase()}`;
 </script>
 
-<Tooltip.Provider>
-	<Tooltip.Root>
-		<Tooltip.Trigger>
-			<span
-				role="button"
-				aria-label={label}
-				aria-describedby={tooltipId}
-				class="focus-visible:ring-primary inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded text-gray-600 hover:text-gray-900 focus-visible:ring-2 focus-visible:outline-none"
-			>
-				<Info class="h-4 w-4" />
-			</span>
-		</Tooltip.Trigger>
-
-		<Tooltip.Content
-			id={tooltipId}
-			class="text-accent-foreground max-w-xs rounded-md border border-gray-200 bg-white p-3 text-xs shadow-lg/20 backdrop-blur-sm"
-			side="bottom"
-			sideOffset={8}
-			align="start"
+<Popover.Root bind:open>
+	<Popover.Trigger>
+		<span
+			role="button"
+			aria-label={label}
+			aria-describedby={tooltipId}
+			class="focus-visible:ring-primary inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded text-gray-400 hover:text-gray-700 focus-visible:ring-2 focus-visible:outline-none"
 		>
-			<p>{description}</p>
-		</Tooltip.Content>
-	</Tooltip.Root>
-</Tooltip.Provider>
+			<Info class="h-4 w-4" />
+		</span>
+	</Popover.Trigger>
+
+	<Popover.Content
+		id={tooltipId}
+		class="w-90.5 rounded-[20px] border border-[#E4E4E4] bg-white p-0 shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]"
+		side="bottom"
+		sideOffset={8}
+		align="start"
+	>
+		<div class="flex items-center justify-between px-6 pt-6">
+			<span class="text-base font-semibold text-gray-500">{title}</span>
+			<Popover.Close>
+				<button
+					type="button"
+					class="rounded p-0.5 text-gray-500 transition-colors hover:text-gray-800"
+					aria-label="Close"
+				>
+					<X class="h-4 w-4" />
+				</button>
+			</Popover.Close>
+		</div>
+
+		<div class="flex flex-col gap-6 px-6 pt-4 pb-6">
+			{#if description}
+				<div class="flex flex-col gap-1.5">
+					<p class="text-[12px] font-semibold text-gray-800">
+						What is {title}
+					</p>
+					<p class="text-sm leading-relaxed text-gray-800">{description}</p>
+				</div>
+			{/if}
+
+			{#if videoUrl}
+				<div class="flex flex-col gap-1.5">
+					<p class="text-[12px] font-semibold text-gray-800">
+						How to use {title}
+					</p>
+					<div class="relative overflow-hidden rounded-lg">
+						<iframe
+							src={videoUrl}
+							title="How to use {title}"
+							class="aspect-video w-full rounded-lg border-0"
+							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+							allowfullscreen
+						></iframe>
+					</div>
+				</div>
+			{/if}
+		</div>
+	</Popover.Content>
+</Popover.Root>

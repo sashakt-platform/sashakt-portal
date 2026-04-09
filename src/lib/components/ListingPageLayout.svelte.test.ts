@@ -70,12 +70,12 @@ describe('ListingPageLayout', () => {
 			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
-		it('should pass infoLabel and infoDescription to TooltipInfo', () => {
+		it('should pass infoLabel and infoItems to TooltipInfo', () => {
 			render(ListingPageLayout, {
 				props: {
 					...defaultProps,
 					infoLabel: 'Help',
-					infoDescription: 'This is the help text'
+					infoItems: [{ question: 'What is Help', text: 'This is the help text' }]
 				}
 			});
 

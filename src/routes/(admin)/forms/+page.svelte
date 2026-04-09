@@ -49,7 +49,7 @@
 	subtitle=""
 	showEmptyState={noFormsCreatedYet}
 	infoLabel="Help: Forms"
-	infoDescription="This panel displays all forms in the system. Forms are used to collect candidate information before tests. You can create, edit, or delete forms by using the actions."
+	infoItems={[{ question: 'What is Forms', text: 'This panel displays all forms in the system. Forms are used to collect candidate information before tests. You can create, edit, or delete forms by using the actions.' }]}
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'form')}

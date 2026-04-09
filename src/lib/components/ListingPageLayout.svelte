@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { QAItem } from '$lib/types/tooltip';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import TooltipInfo from './TooltipInfo.svelte';
 
@@ -7,8 +8,7 @@
 		title: string;
 		subtitle: string;
 		infoLabel?: string;
-		infoDescription?: string;
-		infoVideoUrl?: string;
+		infoItems?: QAItem[];
 		showFilters?: boolean;
 		showEmptyState?: boolean;
 		showInfoIcon?: boolean;
@@ -26,8 +26,7 @@
 		showEmptyState = false,
 		showInfoIcon = true,
 		infoLabel,
-		infoDescription,
-		infoVideoUrl,
+		infoItems,
 		headerActions,
 		toolbar,
 		filters,
@@ -51,8 +50,7 @@
 						{#if showInfoIcon}
 							<TooltipInfo
 								label={infoLabel}
-								description={infoDescription}
-								videoUrl={infoVideoUrl}
+								items={infoItems}
 							/>
 						{/if}
 					</div>

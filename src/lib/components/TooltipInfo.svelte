@@ -2,15 +2,14 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import Info from '@lucide/svelte/icons/info';
 	import X from '@lucide/svelte/icons/x';
+	import type { QAItem } from '$lib/types/tooltip';
 
 	let {
 		label = 'Help',
-		description = '',
-		videoUrl = ''
+		items = []
 	}: {
 		label?: string;
-		description?: string;
-		videoUrl?: string;
+		items?: QAItem[];
 	} = $props();
 
 	let open = $state(false);
@@ -43,32 +42,25 @@
 		</div>
 
 		<div class="flex flex-col gap-6 px-6 pt-4 pb-6">
-			{#if description}
+			{#each items as item (item.question)}
 				<div class="flex flex-col gap-1.5">
-					<p class="text-foreground text-[12px] font-semibold">
-						What is {title}
-					</p>
-					<p class="text-foreground text-sm leading-relaxed">{description}</p>
+					<p class="text-foreground text-[12px] font-semibold">{item.question}</p>
+					{#if item.text}
+						<p class="text-foreground text-sm leading-relaxed">{item.text}</p>
+					{:else if item.videoUrl}
+						<div class="relative overflow-hidden rounded-lg">
+							<iframe
+								src={item.videoUrl}
+								sandbox="allow-same-origin allow-scripts"
+								title={item.question}
+								class="aspect-video w-full rounded-lg border-0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen
+							></iframe>
+						</div>
+					{/if}
 				</div>
-			{/if}
-
-			{#if videoUrl}
-				<div class="flex flex-col gap-1.5">
-					<p class="text-foreground text-[12px] font-semibold">
-						How to use {title}
-					</p>
-					<div class="relative overflow-hidden rounded-lg">
-						<iframe
-							src={videoUrl}
-							sandbox="allow-same-origin allow-scripts"
-							title="How to use {title}"
-							class="aspect-video w-full rounded-lg border-0"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowfullscreen
-						></iframe>
-					</div>
-				</div>
-			{/if}
+			{/each}
 		</div>
 	</Popover.Content>
 </Popover.Root>

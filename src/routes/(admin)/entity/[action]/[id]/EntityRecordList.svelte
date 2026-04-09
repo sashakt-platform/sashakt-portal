@@ -51,7 +51,7 @@
 	title={entityTypeName}
 	subtitle=""
 	infoLabel="Help: Record management"
-	infoDescription={`This panel displays all ${entityTypeName} records. You can edit or delete an existing record by clicking the three dots next to their entry.`}
+	infoItems={[{ question: `What is ${entityTypeName} records`, text: `This panel displays all ${entityTypeName} records. You can edit or delete an existing record by clicking the three dots next to their entry.` }]}
 >
 	{#snippet headerActions()}
 		<a href={resolve('/entity')}><Button variant="outline"><ArrowLeft />Back to Entities</Button></a

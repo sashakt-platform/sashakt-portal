@@ -155,7 +155,7 @@
 	showFilters={selectedQuestionIds.length === 0}
 	showEmptyState={noQuestionCreatedYet}
 	infoLabel="Help: Question Bank"
-	infoDescription="The Question Bank is your central repository for creating, organising, and managing all test questions. Use tags, filters, and categories to build a reusable library across tests."
+	infoItems={[{ question: 'What is Question Bank', text: 'The Question Bank is your central repository for creating, organising, and managing all test questions. Use tags, filters, and categories to build a reusable library across tests.' }]}
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'question')}

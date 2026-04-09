@@ -9,7 +9,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'This is help text'
+					items: [{ question: 'What is Help', text: 'This is help text' }]
 				}
 			});
 
@@ -20,7 +20,7 @@ describe('TooltipInfo', () => {
 		it('should render with default label', () => {
 			render(TooltipInfo, {
 				props: {
-					description: 'Some description'
+					items: [{ question: 'What is Help', text: 'Some description' }]
 				}
 			});
 
@@ -32,7 +32,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Information',
-					description: 'Some description'
+					items: [{ question: 'What is Information', text: 'Some description' }]
 				}
 			});
 
@@ -40,11 +40,11 @@ describe('TooltipInfo', () => {
 			expect(button).toBeInTheDocument();
 		});
 
-		it('should render with empty description', () => {
+		it('should render with empty items', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: ''
+					items: []
 				}
 			});
 
@@ -58,7 +58,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help Text',
-					description: 'Description'
+					items: [{ question: 'What is Help Text', text: 'Description' }]
 				}
 			});
 
@@ -70,7 +70,7 @@ describe('TooltipInfo', () => {
 			const { container } = render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description'
+					items: [{ question: 'What is Help', text: 'Description' }]
 				}
 			});
 
@@ -82,7 +82,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'User Help',
-					description: 'Description'
+					items: [{ question: 'What is User Help', text: 'Description' }]
 				}
 			});
 
@@ -96,7 +96,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description'
+					items: [{ question: 'What is Help', text: 'Description' }]
 				}
 			});
 
@@ -108,7 +108,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'User Management Help',
-					description: 'Description'
+					items: [{ question: 'What is User Management Help', text: 'Description' }]
 				}
 			});
 
@@ -120,7 +120,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'HELP',
-					description: 'Description'
+					items: [{ question: 'What is HELP', text: 'Description' }]
 				}
 			});
 
@@ -132,7 +132,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help    Text    Here',
-					description: 'Description'
+					items: [{ question: 'What is Help Text Here', text: 'Description' }]
 				}
 			});
 
@@ -147,7 +147,7 @@ describe('TooltipInfo', () => {
 			const { container } = render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description'
+					items: [{ question: 'What is Help', text: 'Description' }]
 				}
 			});
 
@@ -161,7 +161,7 @@ describe('TooltipInfo', () => {
 			const { container } = render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description'
+					items: [{ question: 'What is Help', text: 'Description' }]
 				}
 			});
 
@@ -173,7 +173,7 @@ describe('TooltipInfo', () => {
 			const { container } = render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description'
+					items: [{ question: 'What is Help', text: 'Description' }]
 				}
 			});
 
@@ -188,7 +188,7 @@ describe('TooltipInfo', () => {
 			const { container } = render(TooltipInfo, {
 				props: {
 					label: '',
-					description: 'Description'
+					items: [{ question: 'What is it', text: 'Description' }]
 				}
 			});
 
@@ -196,14 +196,14 @@ describe('TooltipInfo', () => {
 			expect(button).toBeInTheDocument();
 		});
 
-		it('should handle very long description', () => {
-			const longDescription =
+		it('should handle very long text answer', () => {
+			const longText =
 				'This is a very long description that contains a lot of text and should still render properly in the tooltip component without any issues';
 
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: longDescription
+					items: [{ question: 'What is Help', text: longText }]
 				}
 			});
 
@@ -215,7 +215,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: "User's & Admin's Help",
-					description: 'Description'
+					items: [{ question: 'What is it', text: 'Description' }]
 				}
 			});
 
@@ -223,11 +223,11 @@ describe('TooltipInfo', () => {
 			expect(button).toBeInTheDocument();
 		});
 
-		it('should handle special characters in description', () => {
+		it('should handle special characters in text answer', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Special chars: <>&"\'{}[]'
+					items: [{ question: 'What is Help', text: 'Special chars: <>&"\'{}[]' }]
 				}
 			});
 
@@ -239,7 +239,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help123',
-					description: 'Description'
+					items: [{ question: 'What is Help123', text: 'Description' }]
 				}
 			});
 
@@ -251,7 +251,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help 🎯',
-					description: 'Description with emoji 🚀'
+					items: [{ question: 'What is Help', text: 'Description with emoji 🚀' }]
 				}
 			});
 
@@ -261,55 +261,55 @@ describe('TooltipInfo', () => {
 	});
 
 	describe('Title Derivation', () => {
-		it('should strip "Help: " prefix from label for title', async () => {
+		it('should strip "Help: " prefix from label for header title', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help: Marks',
-					description: 'Marks description'
+					items: [{ question: 'What is Marks', text: 'Marks description' }]
 				}
 			});
 
 			const trigger = screen.getByRole('button', { name: 'Help: Marks' });
 			await fireEvent.click(trigger);
 
-			expect(await screen.findByText('What is Marks')).toBeInTheDocument();
+			expect(await screen.findByText('Marks')).toBeInTheDocument();
 		});
 
 		it('should strip "help: " prefix case-insensitively', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'HELP: Passing Criteria',
-					description: 'Some description'
+					items: [{ question: 'What is Passing Criteria', text: 'Some description' }]
 				}
 			});
 
 			const trigger = screen.getByRole('button', { name: 'HELP: Passing Criteria' });
 			await fireEvent.click(trigger);
 
-			expect(await screen.findByText('What is Passing Criteria')).toBeInTheDocument();
+			expect(await screen.findByText('Passing Criteria')).toBeInTheDocument();
 		});
 
 		it('should use label as-is when no "Help: " prefix', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Marks',
-					description: 'Marks description'
+					items: [{ question: 'What is Marks', text: 'Marks description' }]
 				}
 			});
 
 			const trigger = screen.getByRole('button', { name: 'Marks' });
 			await fireEvent.click(trigger);
 
-			expect(await screen.findByText('What is Marks')).toBeInTheDocument();
+			expect(await screen.findByText('Marks')).toBeInTheDocument();
 		});
 	});
 
 	describe('Popover Content', () => {
-		it('should show description section when description is provided', async () => {
+		it('should show question and text answer when item is provided', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'This is the description text'
+					items: [{ question: 'What is Help', text: 'This is the description text' }]
 				}
 			});
 
@@ -320,11 +320,11 @@ describe('TooltipInfo', () => {
 			expect(await screen.findByText('This is the description text')).toBeInTheDocument();
 		});
 
-		it('should not show description section when description is empty', async () => {
+		it('should not show any Q&A content when items is empty', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: ''
+					items: []
 				}
 			});
 
@@ -338,7 +338,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Marks',
-					description: 'Some description'
+					items: [{ question: 'What is Marks', text: 'Some description' }]
 				}
 			});
 
@@ -352,7 +352,7 @@ describe('TooltipInfo', () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description'
+					items: [{ question: 'What is Help', text: 'Description' }]
 				}
 			});
 
@@ -369,12 +369,11 @@ describe('TooltipInfo', () => {
 	});
 
 	describe('Video URL', () => {
-		it('should render iframe when videoUrl is provided', async () => {
+		it('should render iframe when videoUrl item is provided', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description',
-					videoUrl: 'https://www.youtube.com/embed/abc123'
+					items: [{ question: 'How to use Help', videoUrl: 'https://www.youtube.com/embed/abc123' }]
 				}
 			});
 
@@ -386,12 +385,11 @@ describe('TooltipInfo', () => {
 			expect(iframe).toHaveAttribute('src', 'https://www.youtube.com/embed/abc123');
 		});
 
-		it('should show "How to use" heading when videoUrl is provided', async () => {
+		it('should show video question heading when videoUrl item is provided', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Marks',
-					description: 'Description',
-					videoUrl: 'https://www.youtube.com/embed/abc123'
+					items: [{ question: 'How to use Marks', videoUrl: 'https://www.youtube.com/embed/abc123' }]
 				}
 			});
 
@@ -401,11 +399,11 @@ describe('TooltipInfo', () => {
 			expect(await screen.findByText('How to use Marks')).toBeInTheDocument();
 		});
 
-		it('should not render iframe when videoUrl is not provided', async () => {
+		it('should not render iframe when no videoUrl item is provided', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Help',
-					description: 'Description'
+					items: [{ question: 'What is Help', text: 'Description' }]
 				}
 			});
 
@@ -415,26 +413,11 @@ describe('TooltipInfo', () => {
 			await waitFor(() => expect(document.body.querySelector('iframe')).not.toBeInTheDocument());
 		});
 
-		it('should not show "How to use" heading when videoUrl is not provided', async () => {
-			render(TooltipInfo, {
-				props: {
-					label: 'Help',
-					description: 'Description'
-				}
-			});
-
-			const trigger = screen.getByRole('button', { name: 'Help' });
-			await fireEvent.click(trigger);
-
-			await waitFor(() => expect(screen.queryByText('How to use Help')).not.toBeInTheDocument());
-		});
-
-		it('should set correct iframe title', async () => {
+		it('should set correct iframe title from item question', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Marks',
-					description: 'Description',
-					videoUrl: 'https://www.youtube.com/embed/abc123'
+					items: [{ question: 'How to use Marks', videoUrl: 'https://www.youtube.com/embed/abc123' }]
 				}
 			});
 
@@ -445,12 +428,14 @@ describe('TooltipInfo', () => {
 			expect(iframe).toHaveAttribute('title', 'How to use Marks');
 		});
 
-		it('should show both description and video sections when both are provided', async () => {
+		it('should show both text and video items when both are in the array', async () => {
 			render(TooltipInfo, {
 				props: {
 					label: 'Marks',
-					description: 'This explains marks',
-					videoUrl: 'https://www.youtube.com/embed/abc123'
+					items: [
+						{ question: 'What is Marks', text: 'This explains marks' },
+						{ question: 'How to use Marks', videoUrl: 'https://www.youtube.com/embed/abc123' }
+					]
 				}
 			});
 

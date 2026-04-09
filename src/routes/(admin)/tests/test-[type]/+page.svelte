@@ -46,6 +46,15 @@
 	const currentPage = $derived(data?.params?.page || 1);
 	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
 	const search = $derived(data?.params?.search || '');
+	const testTooltipInfo = $derived({
+		label: data?.is_template ? 'Help: Test templates' : 'Help: Test',
+		items: [{
+			question: data?.is_template ? 'What is Test templates' : 'What is Tests',
+			text: data?.is_template
+				? 'This panel lists all your test templates. You can create, edit, or delete a template using the available actions.'
+				: "This panel lists all your tests. You can create, edit, or delete a test, clone an existing test setup, or download the test's QR code for easy sharing."
+		}]
+	});
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
@@ -115,10 +124,8 @@
 	title={data?.is_template ? 'Test Templates' : 'Tests'}
 	subtitle=""
 	showEmptyState={noTestCreatedYet}
-	infoLabel={data?.is_template ? 'Help: Test templates' : 'Help: Test'}
-	infoDescription={data?.is_template
-		? 'This panel lists all your test templates. You can create, edit, or delete a template using the available actions.'
-		: 'This panel lists all your tests. You can create, edit, or delete a test ,clone an existing test setup, or download the test’s QR code for easy sharing.'}
+	infoLabel={testTooltipInfo.label}
+	infoItems={testTooltipInfo.items}
 >
 	{#snippet headerActions()}
 		{#if data?.is_template && canCreate(data.user, 'test-template')}

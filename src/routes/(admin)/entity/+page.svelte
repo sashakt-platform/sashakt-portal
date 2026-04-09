@@ -51,7 +51,7 @@
 	subtitle=""
 	showEmptyState={noEntitiesCreatedYet}
 	infoLabel="Help: Entity management"
-	infoDescription="This panel displays all entities in the system. You can view records, edit or delete an entity by clicking the three dots next to their entry."
+	infoItems={[{ question: 'What is Entity management', text: 'This panel displays all entities in the system. You can view records, edit or delete an entity by clicking the three dots next to their entry.' }]}
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'entity')}

@@ -105,7 +105,10 @@
 
 							<TooltipInfo
 								label="Help: Forms"
-								description="Create dynamic forms to collect candidate information before tests. Add various field types like text, select, date, and more."
+								items={[{
+									question: 'What is Forms',
+									text: 'Create dynamic forms to collect candidate information before tests. Add various field types like text, select, date, and more.'
+								}]}
 							/>
 						</div>
 					</div>

@@ -2,31 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import { tick } from 'svelte';
+import { writable } from 'svelte/store';
 import ImportQuestions from './+page.svelte';
 
 type MessageData = Record<string, unknown> | undefined;
 
-function reactiveStore<T>(initial: T) {
-	let value = $state(initial);
-	return {
-		subscribe(fn: (v: T) => void) {
-			fn(value);
-			return $effect.root(() => {
-				$effect(() => fn(value));
-			});
-		},
-		set(v: T) {
-			value = v;
-		},
-		update(fn: (v: T) => T) {
-			value = fn(value);
-		}
-	};
-}
-
 let capturedOnSubmit: (() => void) | undefined;
 let capturedOnUpdated: (() => void) | undefined;
-let formMessageStore = reactiveStore<MessageData>(undefined);
+let formMessageStore = writable<MessageData>(undefined);
 
 const mockSubmit = vi.fn(() => capturedOnSubmit?.());
 
@@ -43,7 +26,7 @@ vi.mock('sveltekit-superforms', () => ({
 		capturedOnSubmit = options?.onSubmit as (() => void) | undefined;
 		capturedOnUpdated = options?.onUpdated as (() => void) | undefined;
 		return {
-			form: reactiveStore(initialData),
+			form: writable(initialData),
 			message: formMessageStore,
 			enhance: () => () => {},
 			submit: mockSubmit
@@ -61,7 +44,7 @@ describe('Import Questions Page', () => {
 		vi.clearAllMocks();
 		capturedOnSubmit = undefined;
 		capturedOnUpdated = undefined;
-		formMessageStore = reactiveStore<MessageData>(undefined);
+		formMessageStore = writable<MessageData>(undefined);
 	});
 
 	describe('Basic Rendering', () => {

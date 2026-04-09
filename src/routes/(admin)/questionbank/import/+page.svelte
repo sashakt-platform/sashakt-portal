@@ -15,6 +15,12 @@
 	import { resolve } from '$app/paths';
 
 	let { data } = $props();
+
+	let dragging = $state(false);
+	let dropError = $state('');
+	let fileInput = $state<HTMLInputElement | null>(null);
+	let processing = $state(false);
+
 	const { form, enhance, submit, message } = superForm(data.form, {
 		validators: zod4Client(schema),
 		dataType: 'json',
@@ -24,15 +30,13 @@
 		},
 		onUpdated: () => {
 			processing = false;
+		},
+		onError: () => {
+			processing = false;
 		}
 	});
 
 	const file = fileProxy(form, 'file');
-
-	let dragging = $state(false);
-	let dropError = $state('');
-	let fileInput = $state<HTMLInputElement | null>(null);
-	let processing = $state(false);
 
 	function clearFile() {
 		$file = undefined;

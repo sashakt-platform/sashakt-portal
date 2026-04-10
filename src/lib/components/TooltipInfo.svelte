@@ -3,14 +3,17 @@
 	import Info from '@lucide/svelte/icons/info';
 	import X from '@lucide/svelte/icons/x';
 	import type { QAItem } from '$lib/types/tooltip';
+	import { TOOLTIPS, type TooltipKey } from '$lib/config/tooltips';
 
 	let {
-		label = 'Help',
-		items = []
+		tooltipKey
 	}: {
-		label?: string;
-		items?: QAItem[];
+		tooltipKey?: TooltipKey;
 	} = $props();
+
+	const resolved = $derived(tooltipKey ? TOOLTIPS[tooltipKey] : null);
+	const label = $derived(resolved?.label ?? 'Help');
+	const items = $derived<QAItem[]>(resolved?.items ?? []);
 
 	let open = $state(false);
 

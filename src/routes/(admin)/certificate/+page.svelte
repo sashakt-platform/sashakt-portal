@@ -48,8 +48,7 @@
 	title="Certificates"
 	subtitle=""
 	showEmptyState={noCertificatesCreatedYet}
-	infoLabel="Help: Certificate management"
-	infoItems={[{ question: 'What is Certificate management', text: 'This panel displays all certificates in the system. You can edit or delete a certificate by clicking the three dots next to it.' }]}
+	tooltipKey="certificate-management"
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'certificate')}

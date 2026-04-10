@@ -46,8 +46,7 @@
 <ListingPageLayout
 	title="Users"
 	subtitle=""
-	infoLabel="Help: User management"
-	infoItems={[{ question: 'What is User management', text: 'This panel displays all users in the system. You can edit or delete a user by clicking the three dots next to their entry.' }]}
+	tooltipKey="users"
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}

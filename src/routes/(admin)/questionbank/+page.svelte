@@ -154,8 +154,7 @@
 	subtitle=""
 	showFilters={selectedQuestionIds.length === 0}
 	showEmptyState={noQuestionCreatedYet}
-	infoLabel="Help: Question Bank"
-	infoItems={[{ question: 'What is Question Bank', text: 'The Question Bank is your central repository for creating, organising, and managing all test questions. Use tags, filters, and categories to build a reusable library across tests.' }]}
+	tooltipKey="question-bank"
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'question')}

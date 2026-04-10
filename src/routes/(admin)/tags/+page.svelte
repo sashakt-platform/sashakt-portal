@@ -131,8 +131,7 @@
 	title="Tag Management"
 	subtitle=""
 	showEmptyState={noTagTypesCreatedYet}
-	infoLabel="Help: Tag Management"
-	infoItems={[{ question: 'What is Tag Management', text: 'Manage all tags and tag types here. You can create, edit, or delete tags and tag types using the available actions.' }]}
+	tooltipKey="tag-management"
 >
 	{#snippet headerActions()}
 		{#if userCanCreate}

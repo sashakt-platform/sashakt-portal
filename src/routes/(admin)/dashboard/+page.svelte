@@ -5,11 +5,6 @@
 	import { type Filter } from '$lib/types/filters.js';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
 
-	const dashboardTooltipItems = [{
-		question: 'What is Dashboard',
-		text: "Dashboard provides a quick overview of your organization's activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
-	}];
-
 	// lazy-loaded components
 	let DistrictSelection: Component | null = $state(null);
 	let StateSelection: Component | null = $state(null);
@@ -218,10 +213,7 @@
 				>
 					Dashboard
 				</h2>
-				<TooltipInfo
-					label="Help: Dashboard"
-					items={dashboardTooltipItems}
-				/>
+				<TooltipInfo tooltipKey="dashboard" />
 			</div>
 		</div>
 	</div>

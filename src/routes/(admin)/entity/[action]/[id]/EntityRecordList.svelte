@@ -50,8 +50,7 @@
 <ListingPageLayout
 	title={entityTypeName}
 	subtitle=""
-	infoLabel="Help: Record management"
-	infoItems={[{ question: `What is ${entityTypeName} records`, text: `This panel displays all ${entityTypeName} records. You can edit or delete an existing record by clicking the three dots next to their entry.` }]}
+	tooltipKey="entity-records"
 >
 	{#snippet headerActions()}
 		<a href={resolve('/entity')}><Button variant="outline"><ArrowLeft />Back to Entities</Button></a

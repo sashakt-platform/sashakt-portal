@@ -1,14 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { QAItem } from '$lib/types/tooltip';
+	import type { TooltipKey } from '$lib/config/tooltips';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import TooltipInfo from './TooltipInfo.svelte';
 
 	type ListingPageLayoutProps = {
 		title: string;
 		subtitle: string;
-		infoLabel?: string;
-		infoItems?: QAItem[];
+		tooltipKey?: TooltipKey;
 		showFilters?: boolean;
 		showEmptyState?: boolean;
 		showInfoIcon?: boolean;
@@ -25,8 +24,7 @@
 		showFilters = true,
 		showEmptyState = false,
 		showInfoIcon = true,
-		infoLabel,
-		infoItems,
+		tooltipKey,
 		headerActions,
 		toolbar,
 		filters,
@@ -48,10 +46,7 @@
 							{title}
 						</h2>
 						{#if showInfoIcon}
-							<TooltipInfo
-								label={infoLabel}
-								items={infoItems}
-							/>
+							<TooltipInfo {tooltipKey} />
 						{/if}
 					</div>
 				</div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Component } from 'svelte';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -65,6 +66,10 @@
 	let matrixRatingSelections: Record<string, string> = $state({});
 	let matrixInputAnswers: Record<string, string> = $state({});
 
+	function toggleReview() {
+		markedForReview = !markedForReview;
+	}
+
 	function resetSelections() {
 		selectedSingleChoice = '';
 		selectedMultiChoices = {};
@@ -78,6 +83,47 @@
 	}
 </script>
 
+{#snippet reviewButton(variant: 'mobile' | 'desktop')}
+	{#if variant === 'mobile'}
+		<button
+			type="button"
+			onclick={toggleReview}
+			class="my-6 flex items-center justify-center text-sm {markedForReview
+				? 'text-primary'
+				: 'text-muted-foreground'}"
+			style="width: 296px; height: 28px; gap: 6px; padding-right: 14px; padding-left: 12px;"
+		>
+			<Flag size={13} />
+			Mark for Review
+		</button>
+	{:else}
+		<button
+			type="button"
+			onclick={toggleReview}
+			class="flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors {markedForReview
+				? 'border-primary bg-primary/10 text-primary'
+				: 'text-muted-foreground hover:text-foreground'}"
+		>
+			<Flag size={13} />
+			Review
+		</button>
+	{/if}
+{/snippet}
+
+{#snippet viewModeButton(mode: 'mobile' | 'desktop', Icon: Component<{ size?: number }>, label: string)}
+	<button
+		type="button"
+		onclick={() => (viewMode = mode)}
+		class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors {viewMode ===
+		mode
+			? 'bg-background text-primary font-medium shadow-sm'
+			: 'text-muted-foreground hover:text-foreground'}"
+	>
+		<Icon size={14} />
+		{label}
+	</button>
+{/snippet}
+
 <Dialog.Root
 	bind:open
 	onOpenChange={(isOpen) => {
@@ -90,34 +136,13 @@
 		class="flex flex-col gap-0 overflow-hidden rounded-xl p-0"
 		style="width: 1200px; max-width: 95vw; height: 700px; max-height: 90vh;"
 	>
-		<Dialog.Header class="flex flex-row items-center justify-between border-b px-8 py-4 space-y-0">
+		<Dialog.Header class="flex flex-row items-center justify-between space-y-0 border-b px-8 py-4">
 			<Dialog.Title class="text-base font-semibold">Question Preview</Dialog.Title>
 
 			<div class="flex items-center gap-3">
 				<div class="bg-muted flex items-center rounded-lg border p-1">
-					<button
-						type="button"
-						onclick={() => (viewMode = 'mobile')}
-						class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors {viewMode ===
-						'mobile'
-							? 'bg-background text-primary font-medium shadow-sm'
-							: 'text-muted-foreground hover:text-foreground'}"
-					>
-						<Smartphone size={14} />
-						Mobile
-					</button>
-
-					<button
-						type="button"
-						onclick={() => (viewMode = 'desktop')}
-						class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors {viewMode ===
-						'desktop'
-							? 'bg-background text-primary font-medium shadow-sm'
-							: 'text-muted-foreground hover:text-foreground'}"
-					>
-						<Monitor size={14} />
-						Desktop
-					</button>
+					{@render viewModeButton('mobile', Smartphone, 'Mobile')}
+					{@render viewModeButton('desktop', Monitor, 'Desktop')}
 				</div>
 
 				<Dialog.Close
@@ -137,17 +162,7 @@
 				>
 					<div class="overflow-y-auto px-4" style="max-height: 553px;">
 						{@render questionCard()}
-						<button
-							type="button"
-							onclick={() => (markedForReview = !markedForReview)}
-							class="my-6 flex items-center justify-center text-sm {markedForReview
-								? 'text-primary'
-								: 'text-muted-foreground'}"
-							style="width: 296px; height: 28px; gap: 6px; padding-right: 14px; padding-left: 12px;"
-						>
-							<Flag size={13} />
-							Mark for Review
-						</button>
+						{@render reviewButton('mobile')}
 					</div>
 				</div>
 			{:else}
@@ -236,16 +251,7 @@
 			</div>
 
 			{#if viewMode === 'desktop'}
-				<button
-					type="button"
-					onclick={() => (markedForReview = !markedForReview)}
-					class="flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors {markedForReview
-						? 'border-primary bg-primary/10 text-primary'
-						: 'text-muted-foreground hover:text-foreground'}"
-				>
-					<Flag size={12} />
-					Review
-				</button>
+				{@render reviewButton('desktop')}
 			{/if}
 		</div>
 
@@ -280,21 +286,21 @@
 					<RadioGroup.Root bind:value={selectedSingleChoice}>
 						{#each validOptions as opt (opt.key)}
 							{@const uid = `${previewId}-${opt.key}`}
-							<div>
-								<Label
-									for={uid}
-									class="flex w-full cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-colors {selectedSingleChoice ===
-									opt.key
-										? 'border-primary bg-primary/5'
-										: 'hover:bg-muted/50'}"
-								>
-									<RadioGroup.Item value={opt.key} id={uid} />
+							<Label
+								for={uid}
+								class="flex w-full cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm transition-colors {selectedSingleChoice ===
+								opt.key
+									? 'border-primary bg-primary/5'
+									: 'hover:bg-muted/50'}"
+							>
+								<RadioGroup.Item value={opt.key} id={uid} class="mt-0.5 shrink-0" />
+								<div class="flex flex-col gap-2">
 									<span>{opt.value}</span>
-								</Label>
-								{#if optionMediaMap[opt.id as number]}
-									<MediaDisplay media={optionMediaMap[opt.id as number]} />
-								{/if}
-							</div>
+									{#if optionMediaMap[opt.id as number]}
+										<MediaDisplay media={optionMediaMap[opt.id as number]} />
+									{/if}
+								</div>
+							</Label>
 						{/each}
 					</RadioGroup.Root>
 				{:else}
@@ -303,26 +309,27 @@
 			{:else if data.questionType === QuestionTypeEnum.MultiChoice && validOptions.length > 0}
 				{#each validOptions as opt (opt.key)}
 					{@const uid = `${previewId}-${opt.key}`}
-					<div>
-						<Label
-							for={uid}
-							class="flex w-full cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-colors {selectedMultiChoices[
-								opt.key
-							]
-								? 'border-primary bg-primary/5'
-								: 'hover:bg-muted/50'}"
-						>
-							<Checkbox
-								id={uid}
-								checked={selectedMultiChoices[opt.key] || false}
-								onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
-							/>
+					<Label
+						for={uid}
+						class="flex w-full cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm transition-colors {selectedMultiChoices[
+							opt.key
+						]
+							? 'border-primary bg-primary/5'
+							: 'hover:bg-muted/50'}"
+					>
+						<Checkbox
+							id={uid}
+							checked={selectedMultiChoices[opt.key] || false}
+							onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
+							class="mt-0.5 shrink-0"
+						/>
+						<div class="flex flex-col gap-2">
 							<span>{opt.value}</span>
-						</Label>
-						{#if optionMediaMap[opt.id as number]}
-							<MediaDisplay media={optionMediaMap[opt.id as number]} />
-						{/if}
-					</div>
+							{#if optionMediaMap[opt.id as number]}
+								<MediaDisplay media={optionMediaMap[opt.id as number]} />
+							{/if}
+						</div>
+					</Label>
 				{/each}
 			{:else if data.questionType === QuestionTypeEnum.NumericalInteger || data.questionType === QuestionTypeEnum.NumericalDecimal}
 				<Input type="number" class="w-full" bind:value={numberAnswer} inputmode="numeric" />

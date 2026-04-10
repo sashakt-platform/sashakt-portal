@@ -8,6 +8,11 @@
 	import MediaDisplay from '$lib/components/MediaDisplay.svelte';
 	import type { TMedia } from '$lib/types/media';
 	import { QuestionTypeEnum } from '$lib/types/question';
+	import Flag from '@lucide/svelte/icons/flag';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Monitor from '@lucide/svelte/icons/monitor';
+	import Smartphone from '@lucide/svelte/icons/smartphone';
+	import X from '@lucide/svelte/icons/x';
 
 	export type MatrixItem = { id: number; key: string; value: string };
 
@@ -48,6 +53,10 @@
 	const matrixRows = $derived(data.matrix?.rows?.filter((r) => r.value.trim() !== '') ?? []);
 	const matrixColumns = $derived(data.matrix?.columns?.filter((c) => c.value.trim() !== '') ?? []);
 
+	let viewMode: 'mobile' | 'desktop' = $state('mobile');
+	let marksExpanded = $state(false);
+	let markedForReview = $state(false);
+
 	let selectedSingleChoice = $state('');
 	let selectedMultiChoices: Record<string, boolean> = $state({});
 	let subjectiveAnswer = $state('');
@@ -64,6 +73,8 @@
 		matrixSelections = {};
 		matrixRatingSelections = {};
 		matrixInputAnswers = {};
+		marksExpanded = false;
+		markedForReview = false;
 	}
 </script>
 
@@ -74,46 +85,171 @@
 	}}
 >
 	<Dialog.Overlay class="fixed bg-black/30 backdrop-blur-sm" />
-
 	<Dialog.Content
-		class="bg-accent flex max-h-[90vh] w-[95vw] max-w-4xl flex-col items-start gap-6 rounded-xl p-8 shadow-2xl sm:w-[90vw]"
+		showCloseButton={false}
+		class="flex flex-col gap-0 overflow-hidden rounded-xl p-0"
+		style="width: 1200px; max-width: 95vw; height: 568px; max-height: 90vh;"
 	>
-		<h2 class="text-xl font-bold text-gray-800">Preview</h2>
+		<div class="flex items-center justify-between border-b px-8 py-4">
+			<!-- Left: Title -->
+			<h2 class="text-base font-semibold">Question Preview</h2>
 
-		<div
-			class="border-secondary w-full overflow-y-auto rounded-xl border bg-white p-6 shadow-md sm:p-8"
-		>
-			<div class="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
-				<span class="text-sm font-medium text-gray-500">1 of 1</span>
-				<span class="text-sm font-semibold text-gray-600"
-					>{marking.correct}
-					{marking.correct === 1 ? 'MARK' : 'MARKS'}</span
+			<!-- Right: Buttons + Close -->
+			<div class="flex items-center gap-3">
+				<div class="bg-muted flex items-center rounded-lg border p-1">
+					<button
+						type="button"
+						onclick={() => (viewMode = 'mobile')}
+						class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors {viewMode ===
+						'mobile'
+							? 'bg-background text-primary font-medium shadow-sm'
+							: 'text-muted-foreground hover:text-foreground'}"
+					>
+						<Smartphone size={14} />
+						Mobile
+					</button>
+
+					<button
+						type="button"
+						onclick={() => (viewMode = 'desktop')}
+						class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors {viewMode ===
+						'desktop'
+							? 'bg-background text-primary font-medium shadow-sm'
+							: 'text-muted-foreground hover:text-foreground'}"
+					>
+						<Monitor size={14} />
+						Desktop
+					</button>
+				</div>
+
+				<Dialog.Close
+					aria-label="Close"
+					class="text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center rounded-md p-2 transition-colors"
 				>
+					<X size={22} />
+				</Dialog.Close>
 			</div>
-			<div class="mb-4">
-				{#if data.questionText.trim()}
-					<p class="text-base/normal font-medium text-gray-900">
-						{data.questionText}
-						{#if data.isMandatory}
-							<span class="ml-1 text-red-500">*</span>
+		</div>
+
+		<div class="bg-muted/30 flex flex-1 items-start justify-center overflow-y-auto p-10">
+			{#if viewMode === 'mobile'}
+				<div
+					class="border-foreground/80 bg-background relative mx-auto w-100 rounded-2xl border-[3px]"
+					style="min-height: 424px;"
+				>
+					<div class=" overflow-y-auto px-4" style="max-height: 424px;">
+						{@render questionCard()}
+						<button
+							type="button"
+							onclick={() => (markedForReview = !markedForReview)}
+							class="mt-4 flex w-full items-center justify-center gap-1.5 text-sm {markedForReview
+								? 'text-primary'
+								: 'text-muted-foreground'}"
+						>
+							<Flag size={13} />
+							Mark for Review
+						</button>
+					</div>
+				</div>
+			{:else}
+				<div class="border-foreground/80 bg-background w-full overflow-hidden rounded-2xl border-2">
+					{@render questionCard()}
+				</div>
+			{/if}
+		</div>
+	</Dialog.Content>
+</Dialog.Root>
+
+{#snippet questionCard()}
+	<div class="p-4">
+		<div class="mb-3 flex items-center gap-2">
+			<span
+				class="bg-primary/15 text-primary flex h-8 w-8 items-center justify-center rounded-[8px] px-1 text-xs font-bold"
+			>
+				Q1
+			</span>
+			<div class="flex-1"></div>
+
+			<div class="relative">
+				<button
+					type="button"
+					onclick={() => (marksExpanded = !marksExpanded)}
+					class="bg-background flex h-8 w-36.5 items-center justify-between gap-1.5 rounded-[999px] border border-[#D1D1D1] pr-3 pl-3.5 text-xs"
+				>
+					<span class="text-foreground">Marks:</span>
+					<span class="font-medium text-green-600">+{marking.correct}</span>
+
+					{#if marking.wrong !== 0}
+						<span class="text-destructive font-medium">-{Math.abs(marking.wrong)}</span>
+					{/if}
+
+					<ChevronDown
+						size={12}
+						class="text-muted-foreground transition-transform {marksExpanded ? 'rotate-180' : ''}"
+					/>
+				</button>
+
+				{#if marksExpanded}
+					<div
+						class="bg-background absolute top-full right-0 z-20 mt-1 w-40 rounded-lg border p-3 shadow-md"
+					>
+						<div class="flex items-center justify-between text-xs">
+							<span class="text-muted-foreground">Correct</span>
+							<span class="font-medium text-green-600">+{marking.correct}</span>
+						</div>
+						{#if marking.wrong !== 0}
+							<div class="mt-1 flex items-center justify-between text-xs">
+								<span class="text-muted-foreground">Wrong</span>
+								<span class="text-destructive font-medium">-{Math.abs(marking.wrong)}</span>
+							</div>
 						{/if}
-					</p>
-				{:else}
-					<p class="text-base leading-relaxed text-gray-400 italic">
-						Enter your question to see preview...
-					</p>
+						<div class="mt-1 flex items-center justify-between text-xs">
+							<span class="text-muted-foreground">Skipped</span>
+							<span class="font-medium">{marking.skipped}</span>
+						</div>
+					</div>
 				{/if}
-				{#if data.instructions}
-					<p class="text-muted-foreground mt-2 text-sm">{data.instructions}</p>
-				{/if}
-				<MediaDisplay {media} />
 			</div>
 
+			{#if viewMode === 'desktop'}
+				<button
+					type="button"
+					onclick={() => (markedForReview = !markedForReview)}
+					class="flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs transition-colors {markedForReview
+						? 'border-primary bg-primary/10 text-primary'
+						: 'text-muted-foreground hover:text-foreground'}"
+				>
+					<Flag size={12} />
+					Review
+				</button>
+			{/if}
+		</div>
+
+		{#if data.questionText.trim()}
+			<p
+				class="text-foreground my-2 pt-4 font-[Open_Sans] text-[14px] leading-[140%] font-semibold tracking-[0px]"
+			>
+				{data.questionText}
+				{#if data.isMandatory}
+					<span class="text-destructive ml-0.5">*</span>
+				{/if}
+			</p>
+		{:else}
+			<p class="text-muted-foreground mb-1 text-sm italic">Enter your question to see preview...</p>
+		{/if}
+
+		{#if data.instructions}
+			<p class="text-muted-foreground mb-3 text-xs">{data.instructions}</p>
+		{/if}
+
+		<MediaDisplay {media} />
+
+		<div class="mt-3 flex flex-col gap-2">
 			{#if data.questionType === QuestionTypeEnum.Subjective}
 				<Textarea
 					placeholder="Type your answer here..."
 					bind:value={subjectiveAnswer}
-					class="min-h-20"
+					class="min-h-20 text-sm"
 				/>
 			{:else if data.questionType === QuestionTypeEnum.SingleChoice}
 				{#if validOptions.length > 0}
@@ -123,19 +259,13 @@
 							<div>
 								<Label
 									for={uid}
-									class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedSingleChoice ===
+									class="flex w-full cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-colors {selectedSingleChoice ===
 									opt.key
-										? 'bg-primary text-muted *:border-muted *:text-muted'
-										: ''}"
+										? 'border-primary bg-primary/5'
+										: 'hover:bg-muted/50'}"
 								>
-									<span>{opt.key}. {opt.value}</span>
-									<RadioGroup.Item
-										value={opt.key}
-										id={uid}
-										class={selectedSingleChoice === opt.key
-											? 'border-white [&_svg]:fill-white'
-											: ''}
-									/>
+									<RadioGroup.Item value={opt.key} id={uid} />
+									<span>{opt.value}</span>
 								</Label>
 								{#if optionMediaMap[opt.id as number]}
 									<MediaDisplay media={optionMediaMap[opt.id as number]} />
@@ -144,27 +274,26 @@
 						{/each}
 					</RadioGroup.Root>
 				{:else}
-					<p class="text-sm text-gray-400 italic">Add options to see them in preview...</p>
+					<p class="text-muted-foreground text-sm italic">Add options to see them in preview...</p>
 				{/if}
 			{:else if data.questionType === QuestionTypeEnum.MultiChoice && validOptions.length > 0}
 				{#each validOptions as opt (opt.key)}
 					{@const uid = `${previewId}-${opt.key}`}
-					<div class="mb-2">
+					<div>
 						<Label
 							for={uid}
-							class="flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-5 {selectedMultiChoices[
+							class="flex w-full cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-colors {selectedMultiChoices[
 								opt.key
 							]
-								? 'bg-primary text-muted *:border-muted *:text-muted'
-								: ''}"
+								? 'border-primary bg-primary/5'
+								: 'hover:bg-muted/50'}"
 						>
-							<span>{opt.key}. {opt.value}</span>
 							<Checkbox
 								id={uid}
 								checked={selectedMultiChoices[opt.key] || false}
 								onCheckedChange={(checked) => (selectedMultiChoices[opt.key] = checked === true)}
-								class={selectedMultiChoices[opt.key] ? 'text-primary! border-white! bg-white!' : ''}
 							/>
+							<span>{opt.value}</span>
 						</Label>
 						{#if optionMediaMap[opt.id as number]}
 							<MediaDisplay media={optionMediaMap[opt.id as number]} />
@@ -180,13 +309,13 @@
 							<thead>
 								<tr>
 									<th
-										class="border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
+										class="border-border bg-muted text-foreground border px-4 py-3 text-left text-xs font-semibold"
 									>
 										{data.matrix?.rowLabel || 'Item'}
 									</th>
 									{#each matrixColumns as col (col.id)}
 										<th
-											class="border border-gray-200 bg-gray-50 px-4 py-3 text-center text-sm font-semibold text-gray-700"
+											class="border-border bg-muted text-foreground border px-4 py-3 text-center text-xs font-semibold"
 										>
 											{col.value || col.key}
 										</th>
@@ -196,19 +325,20 @@
 							<tbody>
 								{#each matrixRows as row (row.id)}
 									<tr>
-										<td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800">
+										<td class="border-border text-foreground border px-4 py-3 text-sm font-medium">
 											{row.value}
 										</td>
 										{#each matrixColumns as col (col.id)}
-											<td class="border border-gray-200 px-4 py-3 text-center">
+											<td class="border-border border px-4 py-3 text-center">
 												<button
 													type="button"
 													role="radio"
 													aria-checked={matrixRatingSelections[row.key] === String(col.id)}
-													class="mx-auto flex size-4 items-center justify-center rounded-full border transition-colors
-														{matrixRatingSelections[row.key] === String(col.id)
+													class="mx-auto flex size-4 items-center justify-center rounded-full border transition-colors {matrixRatingSelections[
+														row.key
+													] === String(col.id)
 														? 'border-primary'
-														: 'border-gray-400 hover:border-gray-500'}"
+														: 'border-muted-foreground hover:border-foreground'}"
 													onclick={() => {
 														matrixRatingSelections = {
 															...matrixRatingSelections,
@@ -228,19 +358,17 @@
 						</table>
 					</div>
 				{:else}
-					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>
+					<p class="text-muted-foreground text-sm italic">Add items to see them in preview...</p>
 				{/if}
 			{:else if data.questionType === QuestionTypeEnum.MatrixMatch}
 				{#if matrixRows.length > 0 && matrixColumns.length > 0}
-					<div class="mb-5 grid grid-cols-2 gap-6 border-b border-gray-200 pb-5">
+					<div class="border-border mb-5 grid grid-cols-2 gap-6 border-b pb-5">
 						<div>
-							<p class="mb-2 text-sm font-semibold text-gray-700">
-								{data.matrix?.rowLabel}
-							</p>
+							<p class="text-foreground mb-2 text-xs font-semibold">{data.matrix?.rowLabel}</p>
 							<div class="flex flex-col gap-3">
 								{#each matrixRows as row (row.id)}
 									<div>
-										<p class="text-sm text-gray-800">
+										<p class="text-foreground text-sm">
 											<span class="font-semibold">{row.key}.</span>
 											<span class="ml-1">{row.value}</span>
 										</p>
@@ -252,13 +380,11 @@
 							</div>
 						</div>
 						<div>
-							<p class="mb-2 text-sm font-semibold text-gray-700">
-								{data.matrix?.colLabel}
-							</p>
+							<p class="text-foreground mb-2 text-xs font-semibold">{data.matrix?.colLabel}</p>
 							<div class="flex flex-col gap-3">
 								{#each matrixColumns as col (col.id)}
 									<div>
-										<p class="text-sm text-gray-800">
+										<p class="text-foreground text-sm">
 											<span class="font-semibold">{col.key}.</span>
 											<span class="ml-1">{col.value}</span>
 										</p>
@@ -277,7 +403,7 @@
 								<tr>
 									<th class="w-10 px-3 py-2"></th>
 									{#each matrixColumns as col (col.id)}
-										<th class="px-5 py-2 text-center text-sm font-semibold text-gray-700">
+										<th class="text-foreground px-5 py-2 text-center text-xs font-semibold">
 											{col.key}
 										</th>
 									{/each}
@@ -286,7 +412,7 @@
 							<tbody>
 								{#each matrixRows as row (row.id)}
 									<tr>
-										<td class="px-3 py-3 text-sm font-semibold text-gray-700">{row.key}</td>
+										<td class="text-foreground px-3 py-3 text-xs font-semibold">{row.key}</td>
 										{#each matrixColumns as col (col.id)}
 											{@const isChecked = (matrixSelections[row.key] ?? []).includes(col.id)}
 											<td class="px-5 py-3 text-center">
@@ -315,7 +441,7 @@
 						</table>
 					</div>
 				{:else}
-					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>
+					<p class="text-muted-foreground text-sm italic">Add items to see them in preview...</p>
 				{/if}
 			{:else if data.questionType === QuestionTypeEnum.MatrixString || data.questionType === QuestionTypeEnum.MatrixNumber || data.questionType === QuestionTypeEnum.MatrixInput}
 				{#if matrixRows.length > 0}
@@ -327,12 +453,12 @@
 							<thead>
 								<tr>
 									<th
-										class="border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
+										class="border-border bg-muted text-foreground w-1/2 border px-4 py-3 text-left text-xs font-semibold"
 									>
 										{data.matrix?.rowLabel || 'Questions'}
 									</th>
 									<th
-										class="border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
+										class="border-border bg-muted text-foreground w-1/2 border px-4 py-3 text-left text-xs font-semibold"
 									>
 										{data.matrix?.colLabel || 'Answer'}
 									</th>
@@ -341,10 +467,10 @@
 							<tbody>
 								{#each matrixRows as row (row.id)}
 									<tr>
-										<td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800">
+										<td class="border-border text-foreground border px-4 py-3 text-sm font-medium">
 											{row.value}
 										</td>
-										<td class="border border-gray-200 px-4 py-3">
+										<td class="border-border border px-4 py-3">
 											<Input
 												type={inputType}
 												class="w-full"
@@ -358,11 +484,11 @@
 						</table>
 					</div>
 				{:else}
-					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>
+					<p class="text-muted-foreground text-sm italic">Add items to see them in preview...</p>
 				{/if}
 			{:else}
-				<p class="text-sm text-gray-400 italic">Add options to see them in preview...</p>
+				<p class="text-muted-foreground text-sm italic">Add options to see them in preview...</p>
 			{/if}
 		</div>
-	</Dialog.Content>
-</Dialog.Root>
+	</div>
+{/snippet}

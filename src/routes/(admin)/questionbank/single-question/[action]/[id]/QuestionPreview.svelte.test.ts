@@ -35,7 +35,7 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByRole('heading', { name: 'Preview' })).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: 'Question Preview' })).toBeInTheDocument();
 	});
 
 	it('displays question text in dialog', async () => {
@@ -110,9 +110,9 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A. Option 1')).toBeInTheDocument();
-		expect(screen.getByText('B. Option 2')).toBeInTheDocument();
-		expect(screen.getByText('C. Option 3')).toBeInTheDocument();
+		expect(screen.getByText('Option 1')).toBeInTheDocument();
+		expect(screen.getByText('Option 2')).toBeInTheDocument();
+		expect(screen.getByText('Option 3')).toBeInTheDocument();
 	});
 
 	it('filters out options with empty values', async () => {
@@ -127,9 +127,9 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A. Valid option')).toBeInTheDocument();
-		expect(screen.queryByText(/^B\./)).not.toBeInTheDocument();
-		expect(screen.queryByText(/^C\./)).not.toBeInTheDocument();
+		expect(screen.getByText('Valid option')).toBeInTheDocument();
+		expect(screen.queryByText('B.')).not.toBeInTheDocument();
+		expect(screen.queryByText('C.')).not.toBeInTheDocument();
 	});
 
 	it('shows placeholder when no valid options exist', async () => {
@@ -142,24 +142,24 @@ describe('Question_preview', () => {
 		expect(screen.getByText('Add options to see them in preview...')).toBeInTheDocument();
 	});
 
-	it('displays singular "MARK" for 1 mark', async () => {
+	it('displays correct mark value for 1 mark', async () => {
 		render(QuestionPreview, {
 			props: { data: createData({ marking_scheme: { correct: 1, wrong: 0, skipped: 0 } }) }
 		});
 
 		await openDialog();
 
-		expect(screen.getByText(/1\s+MARK$/)).toBeInTheDocument();
+		expect(screen.getByText('+1')).toBeInTheDocument();
 	});
 
-	it('displays plural "MARKS" for multiple marks', async () => {
+	it('displays correct mark value for multiple marks', async () => {
 		render(QuestionPreview, {
 			props: { data: createData({ marking_scheme: { correct: 3, wrong: -1, skipped: 0 } }) }
 		});
 
 		await openDialog();
 
-		expect(screen.getByText(/3\s+MARKS/)).toBeInTheDocument();
+		expect(screen.getByText('+3')).toBeInTheDocument();
 	});
 
 	it('uses default marking scheme when not provided', async () => {
@@ -173,7 +173,7 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText(/1\s+MARK$/)).toBeInTheDocument();
+		expect(screen.getByText('+1')).toBeInTheDocument();
 	});
 
 	it('handles undefined data fields gracefully', async () => {

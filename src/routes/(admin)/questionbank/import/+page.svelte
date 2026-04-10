@@ -4,6 +4,8 @@
 	import Download from '@lucide/svelte/icons/download';
 	import CircleX from '@lucide/svelte/icons/circle-x';
 	import Upload from '@lucide/svelte/icons/upload';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import X from '@lucide/svelte/icons/x';
 	import { fileProxy, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
@@ -13,19 +15,28 @@
 	import { resolve } from '$app/paths';
 
 	let { data } = $props();
+
+	let dragging = $state(false);
+	let dropError = $state('');
+	let fileInput = $state<HTMLInputElement | null>(null);
+	let processing = $state(false);
+
 	const { form, enhance, submit, message } = superForm(data.form, {
 		validators: zod4Client(schema),
 		dataType: 'json',
 		onSubmit: () => {
 			$form.user_id = data.user.id;
+			processing = true;
+		},
+		onUpdated: () => {
+			processing = false;
+		},
+		onError: () => {
+			processing = false;
 		}
 	});
 
 	const file = fileProxy(form, 'file');
-
-	let dragging = $state(false);
-	let dropError = $state('');
-	let fileInput = $state<HTMLInputElement | null>(null);
 
 	function clearFile() {
 		$file = undefined;
@@ -34,6 +45,12 @@
 
 	const MAX_FILE_SIZE = 20 * 1024 * 1024;
 	const MAX_FILE_SIZE_MB = MAX_FILE_SIZE / (1024 * 1024);
+
+	function formatFileSize(bytes: number): string {
+		return bytes < 1024 * 1024
+			? `${(bytes / 1024).toFixed(2)} KB`
+			: `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+	}
 
 	function isValidCsv(file: File): boolean {
 		return file.type === 'text/csv' || file.name.endsWith('.csv');
@@ -203,6 +220,28 @@
 							</div>
 						{/if}
 					</div>
+				{:else if processing}
+					<div class="flex w-full max-w-md flex-col items-center gap-4">
+						<div class="bg-primary flex h-14 w-14 items-center justify-center rounded-full">
+							<LoaderCircle class="text-primary-foreground animate-spin" size={28} />
+						</div>
+						<h3 class="text-xl font-bold">Processing your file...</h3>
+						<p class="text-muted-foreground text-sm">
+							We're validating and importing your questions. This may take a moment depending on the
+							file size.
+						</p>
+						{#if $form.file}
+							<div
+								class="border-border bg-muted inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm"
+							>
+								<FileText class="text-foreground shrink-0" size={16} />
+								<span class="font-medium">{$form.file.name}</span>
+								<span class="text-muted-foreground">
+									({formatFileSize($form.file.size)})
+								</span>
+							</div>
+						{/if}
+					</div>
 				{:else if $form.file}
 					<!-- File selected state -->
 					<div class="flex w-full max-w-md flex-col items-center gap-4 rounded-lg border-1">
@@ -211,9 +250,7 @@
 								<p class="font-bold">{$form.file?.name}</p>
 								<p class="text-muted-foreground text-sm">
 									{#if $form.file?.size}
-										{$form.file.size < 1024 * 1024
-											? `${($form.file.size / 1024).toFixed(2)} KB`
-											: `${($form.file.size / (1024 * 1024)).toFixed(2)} MB`}
+										{formatFileSize($form.file.size)}
 									{/if}
 								</p>
 							</div>

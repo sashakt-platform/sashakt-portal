@@ -14,7 +14,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { questionSchema, matrixInputOptionsSchema, type FormSchema } from './schema';
-	import { QuestionTypeEnum } from '$lib/types/question';
+	import { QuestionTypeEnum, QUESTION_TYPE_LABELS } from '$lib/types/question';
 	import ChooseQuestionType from './ChooseQuestionType.svelte';
 	import AttachmentInput from './AttachmentInput.svelte';
 	import UnsavedChangesDialog from '$lib/components/UnsavedChangesDialog.svelte';
@@ -691,21 +691,7 @@
 							>Question Type</span
 						>
 						<span class="text-muted-foreground text-xs">
-							{#if $formData.question_type === QuestionTypeEnum.Subjective}
-								Subjective
-							{:else if $formData.question_type === QuestionTypeEnum.NumericalInteger || $formData.question_type === QuestionTypeEnum.NumericalDecimal}
-								Numerical
-							{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
-								Matrix Match
-							{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
-								Matrix Rating
-							{:else if $formData.question_type === QuestionTypeEnum.MatrixString}
-								Matrix Text
-							{:else if $formData.question_type === QuestionTypeEnum.MatrixNumber}
-								Matrix Number
-							{:else}
-								Single/Multiple Choice
-							{/if}
+							{QUESTION_TYPE_LABELS[$formData.question_type] ?? $formData.question_type}
 						</span>
 					</button>
 					<ChooseQuestionType

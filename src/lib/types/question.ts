@@ -10,3 +10,16 @@ export enum QuestionTypeEnum {
 	MatrixString = 'matrix-string',
 	MatrixNumber = 'matrix-number'
 }
+
+export const QUESTION_TYPE_LABELS: Record<string, string> = {
+	[QuestionTypeEnum.SingleChoice]: 'Single/Multiple Choice',
+	[QuestionTypeEnum.MultiChoice]: 'Single/Multiple Choice',
+	[QuestionTypeEnum.Subjective]: 'Subjective',
+	[QuestionTypeEnum.NumericalInteger]: 'Numerical',
+	[QuestionTypeEnum.NumericalDecimal]: 'Numerical',
+	[QuestionTypeEnum.MatrixMatch]: 'Matrix Match',
+	[QuestionTypeEnum.MatrixRating]: 'Matrix Rating',
+	[QuestionTypeEnum.MatrixInput]: 'Matrix Input',
+	[QuestionTypeEnum.MatrixString]: 'Matrix Text',
+	[QuestionTypeEnum.MatrixNumber]: 'Matrix Number'
+};

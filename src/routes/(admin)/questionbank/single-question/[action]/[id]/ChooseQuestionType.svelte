@@ -6,7 +6,7 @@
 	import Equal from '@lucide/svelte/icons/equal';
 	import Route from '@lucide/svelte/icons/route';
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
-	import { QuestionTypeEnum } from '$lib/types/question';
+	import { QuestionTypeEnum, QUESTION_TYPE_LABELS } from '$lib/types/question';
 
 	let { open = $bindable(false), onSelect } = $props<{
 		open: boolean;
@@ -14,16 +14,16 @@
 	}>();
 
 	const commonTypes = [
-		{ label: 'Single/Multiple Choice', icon: ListChecks, type: QuestionTypeEnum.SingleChoice },
-		{ label: 'Subjective', icon: AlignJustify, type: QuestionTypeEnum.Subjective },
-		{ label: 'Numerical', icon: Hash, type: QuestionTypeEnum.NumericalInteger }
+		{ icon: ListChecks, type: QuestionTypeEnum.SingleChoice },
+		{ icon: AlignJustify, type: QuestionTypeEnum.Subjective },
+		{ icon: Hash, type: QuestionTypeEnum.NumericalInteger }
 	];
 
 	const advancedTypes = [
-		{ label: 'Matrix Text', icon: Equal, type: QuestionTypeEnum.MatrixString },
-		{ label: 'Matrix Number', icon: Equal, type: QuestionTypeEnum.MatrixNumber },
-		{ label: 'Matrix Match', icon: Route, type: QuestionTypeEnum.MatrixMatch },
-		{ label: 'Matrix Rating', icon: CircleDot, type: QuestionTypeEnum.MatrixRating }
+		{ icon: Equal, type: QuestionTypeEnum.MatrixString },
+		{ icon: Equal, type: QuestionTypeEnum.MatrixNumber },
+		{ icon: Route, type: QuestionTypeEnum.MatrixMatch },
+		{ icon: CircleDot, type: QuestionTypeEnum.MatrixRating }
 	];
 
 	function handleSelect(type: QuestionTypeEnum) {
@@ -45,14 +45,14 @@
 					>Commonly Used</span
 				>
 				<div class="grid grid-cols-3 gap-3">
-					{#each commonTypes as { label, icon: Icon, type } (type)}
+					{#each commonTypes as { icon: Icon, type } (type)}
 						<button
 							type="button"
 							class="hover:bg-muted flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
 							onclick={() => handleSelect(type)}
 						>
 							<Icon size={18} class="text-muted-foreground" />
-							{label}
+							{QUESTION_TYPE_LABELS[type]}
 						</button>
 					{/each}
 				</div>
@@ -64,14 +64,14 @@
 					>Advanced</span
 				>
 				<div class="grid grid-cols-3 gap-3">
-					{#each advancedTypes as { label, icon: Icon, type } (type)}
+					{#each advancedTypes as { icon: Icon, type } (type)}
 						<button
 							type="button"
 							class="hover:bg-muted flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors"
 							onclick={() => handleSelect(type)}
 						>
 							<Icon size={18} class="text-muted-foreground" />
-							{label}
+							{QUESTION_TYPE_LABELS[type]}
 						</button>
 					{/each}
 				</div>

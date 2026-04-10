@@ -90,8 +90,8 @@
 		class="flex flex-col gap-0 overflow-hidden rounded-xl p-0"
 		style="width: 1200px; max-width: 95vw; height: 700px; max-height: 90vh;"
 	>
-		<div class="flex items-center justify-between border-b px-8 py-4">
-			<h2 class="text-base font-semibold">Question Preview</h2>
+		<Dialog.Header class="flex flex-row items-center justify-between border-b px-8 py-4 space-y-0">
+			<Dialog.Title class="text-base font-semibold">Question Preview</Dialog.Title>
 
 			<div class="flex items-center gap-3">
 				<div class="bg-muted flex items-center rounded-lg border p-1">
@@ -127,7 +127,7 @@
 					<X size={22} />
 				</Dialog.Close>
 			</div>
-		</div>
+		</Dialog.Header>
 
 		<div class="bg-muted/30 flex flex-1 items-start justify-center overflow-y-auto p-10">
 			{#if viewMode === 'mobile'}

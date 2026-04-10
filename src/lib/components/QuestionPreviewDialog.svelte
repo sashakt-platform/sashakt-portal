@@ -91,10 +91,8 @@
 		style="width: 1200px; max-width: 95vw; height: 700px; max-height: 90vh;"
 	>
 		<div class="flex items-center justify-between border-b px-8 py-4">
-			<!-- Left: Title -->
 			<h2 class="text-base font-semibold">Question Preview</h2>
 
-			<!-- Right: Buttons + Close -->
 			<div class="flex items-center gap-3">
 				<div class="bg-muted flex items-center rounded-lg border p-1">
 					<button
@@ -135,16 +133,17 @@
 			{#if viewMode === 'mobile'}
 				<div
 					class="border-foreground/80 bg-background relative mx-auto w-100 rounded-2xl border-[3px]"
-					style="min-height: 424px;"
+					style="min-height: 553px;"
 				>
-					<div class=" overflow-y-auto px-4" style="max-height: 424px;">
+					<div class="overflow-y-auto px-4" style="max-height: 553px;">
 						{@render questionCard()}
 						<button
 							type="button"
 							onclick={() => (markedForReview = !markedForReview)}
-							class="mt-4 flex w-full items-center justify-center gap-1.5 text-sm {markedForReview
+							class="my-6 flex items-center justify-center text-sm {markedForReview
 								? 'text-primary'
 								: 'text-muted-foreground'}"
+							style="width: 296px; height: 28px; gap: 6px; padding-right: 14px; padding-left: 12px;"
 						>
 							<Flag size={13} />
 							Mark for Review
@@ -160,11 +159,36 @@
 	</Dialog.Content>
 </Dialog.Root>
 
+{#snippet matrixColumnCard(
+	label: string,
+	items: MatrixItem[],
+	mediaMap: Record<number, TMedia | null>
+)}
+	<div class="border-border overflow-hidden rounded-xl border">
+		<div class="bg-muted border-b px-4 py-2.5 text-center">
+			<p class="text-foreground text-xs font-semibold tracking-wide uppercase">{label}</p>
+		</div>
+		<div class="divide-border divide-y">
+			{#each items as item (item.id)}
+				<div class="flex items-start gap-4 px-4 py-3">
+					<span class="text-foreground w-5 shrink-0 text-sm font-semibold">{item.key}</span>
+					<div class="flex-1">
+						<span class="text-foreground text-sm">{item.value}</span>
+						{#if mediaMap[item.id]}
+							<MediaDisplay media={mediaMap[item.id]} />
+						{/if}
+					</div>
+				</div>
+			{/each}
+		</div>
+	</div>
+{/snippet}
+
 {#snippet questionCard()}
 	<div class="p-4">
 		<div class="mb-3 flex items-center gap-2">
 			<span
-				class="bg-primary/15 text-primary flex h-8 w-8 items-center justify-center rounded-[8px] px-1 text-xs font-bold"
+				class="bg-primary/15 text-primary flex h-8 w-8 items-center justify-center rounded-lg px-1 text-xs font-bold"
 			>
 				Q1
 			</span>
@@ -174,7 +198,7 @@
 				<button
 					type="button"
 					onclick={() => (marksExpanded = !marksExpanded)}
-					class="bg-background flex h-8 w-36.5 items-center justify-between gap-1.5 rounded-[999px] border border-[#D1D1D1] pr-3 pl-3.5 text-xs"
+					class="bg-background border-border flex h-8 w-36.5 items-center justify-between gap-1.5 rounded-full border pr-3 pl-3.5 text-xs"
 				>
 					<span class="text-foreground">Marks:</span>
 					<span class="font-medium text-green-600">+{marking.correct}</span>
@@ -304,18 +328,18 @@
 				<Input type="number" class="w-full" bind:value={numberAnswer} inputmode="numeric" />
 			{:else if data.questionType === QuestionTypeEnum.MatrixRating}
 				{#if matrixRows.length > 0 && matrixColumns.length > 0}
-					<div class="border-border overflow-hidden overflow-x-auto rounded-xl border">
+					<div class="border-border overflow-x-auto rounded-xl border">
 						<table class="w-full border-collapse text-sm">
 							<thead>
 								<tr>
 									<th
-										class="border-border bg-muted text-foreground border-b px-4 py-3 text-left font-semibold {viewMode === 'desktop' ? 'text-sm' : 'text-xs'}"
+										class="bg-muted text-foreground border-b px-4 py-3 text-left text-xs font-semibold"
 									>
 										{data.matrix?.rowLabel || 'Item'}
 									</th>
 									{#each matrixColumns as col (col.id)}
 										<th
-											class="border-border bg-muted text-foreground border-b px-4 py-3 text-center font-semibold {viewMode === 'desktop' ? 'text-sm' : 'text-xs'}"
+											class="bg-muted text-foreground border-b px-4 py-3 text-center text-xs font-semibold"
 										>
 											{col.value || col.key}
 										</th>
@@ -324,7 +348,7 @@
 							</thead>
 							<tbody>
 								{#each matrixRows as row (row.id)}
-									<tr class="border-border border-b last:border-b-0">
+									<tr class="border-b last:border-b-0">
 										<td class="text-foreground px-4 py-3 text-sm font-medium">
 											{row.value}
 										</td>
@@ -363,49 +387,16 @@
 			{:else if data.questionType === QuestionTypeEnum.MatrixMatch}
 				{#if matrixRows.length > 0 && matrixColumns.length > 0}
 					<div class={viewMode === 'desktop' ? 'grid grid-cols-2 gap-4' : 'flex flex-col gap-3'}>
-						<div class="border-border overflow-hidden rounded-xl border">
-							<div class="bg-muted border-border border-b px-4 py-2.5 text-center">
-								<p class="text-foreground text-xs font-semibold tracking-wide uppercase">
-									{data.matrix?.rowLabel || 'Column 1'}
-								</p>
-							</div>
-							<div class="divide-border divide-y">
-								{#each matrixRows as row (row.id)}
-									<div class="flex items-start gap-4 px-4 py-3">
-										<span class="text-foreground w-5 shrink-0 text-sm font-semibold">{row.key}</span
-										>
-										<div class="flex-1">
-											<span class="text-foreground text-sm">{row.value}</span>
-											{#if optionMediaMap[row.id]}
-												<MediaDisplay media={optionMediaMap[row.id]} />
-											{/if}
-										</div>
-									</div>
-								{/each}
-							</div>
-						</div>
-
-						<div class="border-border overflow-hidden rounded-xl border">
-							<div class="bg-muted border-border border-b px-4 py-2.5 text-center">
-								<p class="text-foreground text-xs font-semibold tracking-wide uppercase">
-									{data.matrix?.colLabel || 'Column 2'}
-								</p>
-							</div>
-							<div class="divide-border divide-y">
-								{#each matrixColumns as col (col.id)}
-									<div class="flex items-start gap-4 px-4 py-3">
-										<span class="text-foreground w-5 shrink-0 text-sm font-semibold">{col.key}</span
-										>
-										<div class="flex-1">
-											<span class="text-foreground text-sm">{col.value}</span>
-											{#if optionMediaMap[col.id]}
-												<MediaDisplay media={optionMediaMap[col.id]} />
-											{/if}
-										</div>
-									</div>
-								{/each}
-							</div>
-						</div>
+						{@render matrixColumnCard(
+							data.matrix?.rowLabel || 'Column 1',
+							matrixRows,
+							optionMediaMap
+						)}
+						{@render matrixColumnCard(
+							data.matrix?.colLabel || 'Column 2',
+							matrixColumns,
+							optionMediaMap
+						)}
 					</div>
 
 					<div
@@ -421,11 +412,9 @@
 							<table class="w-full border-collapse text-sm">
 								<thead>
 									<tr class="bg-muted">
-										<th class="border-border w-12 border-b px-3 py-3"></th>
+										<th class="w-12 border-b px-3 py-3"></th>
 										{#each matrixColumns as col (col.id)}
-											<th
-												class="border-border justify-center border-b px-5 py-3 text-center text-xs font-semibold last:border-r-0"
-											>
+											<th class="border-b px-5 py-3 text-center text-xs font-semibold">
 												{col.key}
 											</th>
 										{/each}
@@ -433,15 +422,13 @@
 								</thead>
 								<tbody>
 									{#each matrixRows as row (row.id)}
-										<tr class="border-border border-b last:border-b-0">
-											<td
-												class="border-border text-foreground px-3 py-3 text-center align-middle text-xs font-semibold"
-											>
+										<tr class="border-b last:border-b-0">
+											<td class="text-foreground px-3 py-3 text-center text-xs font-semibold">
 												{row.key}
 											</td>
 											{#each matrixColumns as col (col.id)}
 												{@const isChecked = (matrixSelections[row.key] ?? []).includes(col.id)}
-												<td class="border-border px-5 py-3 last:border-r-0">
+												<td class="px-5 py-3">
 													<div class="flex items-center justify-center">
 														<Checkbox
 															checked={isChecked}
@@ -477,17 +464,17 @@
 					{@const inputType =
 						data.matrix?.inputType ??
 						(data.questionType === QuestionTypeEnum.MatrixNumber ? 'number' : 'text')}
-					<div class="overflow-x-auto">
+					<div class="border-border overflow-x-auto rounded-xl border">
 						<table class="w-full border-collapse text-sm">
 							<thead>
 								<tr>
 									<th
-										class="border-border bg-muted text-foreground w-1/2 border px-4 py-3 text-left text-xs font-semibold"
+										class="bg-muted text-foreground w-1/2 border-b px-4 py-3 text-left text-xs font-semibold"
 									>
 										{data.matrix?.rowLabel || 'Questions'}
 									</th>
 									<th
-										class="border-border bg-muted text-foreground w-1/2 border px-4 py-3 text-left text-xs font-semibold"
+										class="bg-muted text-foreground w-1/2 border-b px-4 py-3 text-left text-xs font-semibold"
 									>
 										{data.matrix?.colLabel || 'Answer'}
 									</th>
@@ -495,11 +482,11 @@
 							</thead>
 							<tbody>
 								{#each matrixRows as row (row.id)}
-									<tr>
-										<td class="border-border text-foreground border px-4 py-3 text-sm font-medium">
+									<tr class="border-b last:border-b-0">
+										<td class="text-foreground px-4 py-3 text-sm font-medium">
 											{row.value}
 										</td>
-										<td class="border-border border px-4 py-3">
+										<td class="px-4 py-3">
 											<Input
 												type={inputType}
 												class="w-full"

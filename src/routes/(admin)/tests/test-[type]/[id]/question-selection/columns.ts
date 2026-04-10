@@ -4,15 +4,22 @@ import {
 	createSelectionColumn,
 	createSortableColumn
 } from '$lib/components/data-table/column-helpers';
-import Eye from '@lucide/svelte/icons/eye';
+import TagCell from '$lib/components/data-table/TagCell.svelte';
+import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
 
 export interface QuestionForSelection {
 	id: number;
 	question_text: string;
+	question_type?: string;
 	tags?: Array<{ name: string }>;
 	options: Array<{ id: number; key: string; value: string }>;
 	correct_answer: number[];
 	latest_question_revision_id: number;
+	instructions?: string;
+	marking_scheme?: any;
+	is_mandatory?: boolean;
+	media?: any;
+	matrix?: any;
 }
 
 export const createQuestionSelectionColumns = (
@@ -23,7 +30,7 @@ export const createQuestionSelectionColumns = (
 	createSelectionColumn<QuestionForSelection>(),
 	createSortableColumn<QuestionForSelection>(
 		'question_text',
-		'Name',
+		'Questions',
 		currentSortBy,
 		currentSortOrder,
 		handleSort,
@@ -32,22 +39,14 @@ export const createQuestionSelectionColumns = (
 	{
 		id: 'answers',
 		header: 'Answers',
-		cell: ({ row }) => {
-			return renderComponent(Eye, { class: 'text-gray-400 cursor-pointer mx-auto' });
-		},
+		cell: ({ row }) => renderComponent(QuestionPreviewCell, { question: row.original }),
 		size: 80,
 		meta: { align: 'center' as const }
 	},
 	{
 		accessorKey: 'tags',
 		header: 'Tags',
-		cell: ({ row }) => {
-			const tags = row.original.tags;
-			if (tags && tags.length > 0) {
-				return tags.map((tag) => tag.name).join(', ');
-			}
-			return '';
-		},
+		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] }),
 		size: 200
 	}
 ];

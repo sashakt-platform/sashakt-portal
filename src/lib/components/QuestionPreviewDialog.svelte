@@ -25,6 +25,7 @@
 			columns: MatrixItem[];
 			rowLabel?: string;
 			colLabel?: string;
+			inputType?: 'text' | 'number';
 		} | null;
 	};
 
@@ -53,6 +54,7 @@
 	let numberAnswer: number | null = $state(null);
 	let matrixSelections: Record<string, number[]> = $state({});
 	let matrixRatingSelections: Record<string, string> = $state({});
+	let matrixInputAnswers: Record<string, string> = $state({});
 
 	function resetSelections() {
 		selectedSingleChoice = '';
@@ -61,6 +63,7 @@
 		numberAnswer = null;
 		matrixSelections = {};
 		matrixRatingSelections = {};
+		matrixInputAnswers = {};
 	}
 </script>
 
@@ -306,6 +309,49 @@
 												/>
 											</td>
 										{/each}
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				{:else}
+					<p class="text-sm text-gray-400 italic">Add items to see them in preview...</p>
+				{/if}
+			{:else if data.questionType === QuestionTypeEnum.MatrixString || data.questionType === QuestionTypeEnum.MatrixNumber || data.questionType === QuestionTypeEnum.MatrixInput}
+				{#if matrixRows.length > 0}
+					{@const inputType =
+						data.matrix?.inputType ??
+						(data.questionType === QuestionTypeEnum.MatrixNumber ? 'number' : 'text')}
+					<div class="overflow-x-auto">
+						<table class="w-full border-collapse text-sm">
+							<thead>
+								<tr>
+									<th
+										class="border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
+									>
+										{data.matrix?.rowLabel || 'Questions'}
+									</th>
+									<th
+										class="border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700"
+									>
+										{data.matrix?.colLabel || 'Answer'}
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each matrixRows as row (row.id)}
+									<tr>
+										<td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-800">
+											{row.value}
+										</td>
+										<td class="border border-gray-200 px-4 py-3">
+											<Input
+												type={inputType}
+												class="w-full"
+												bind:value={matrixInputAnswers[row.key]}
+												placeholder="Enter answer..."
+											/>
+										</td>
 									</tr>
 								{/each}
 							</tbody>

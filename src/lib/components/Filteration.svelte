@@ -7,6 +7,7 @@
 	import { cn } from '$lib/utils.js';
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
+	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import LoaderIcon from '@lucide/svelte/icons/loader';
 	import { goto } from '$app/navigation';
 
@@ -111,7 +112,7 @@
 			<Button
 				{...props}
 				variant="outline"
-				class="h-10 w-full justify-start rounded-full bg-white"
+				class="bg-gray-0 h-10 w-full justify-start rounded-full text-gray-500"
 				role="combobox"
 				aria-expanded={open}
 			>
@@ -125,7 +126,7 @@
 							{/each}
 						</span>
 					{:else if items?.length >= 3}
-						<span class="flex min-w-0 flex-1 flex-row overflow-hidden text-start">
+						<span class="flex min-w-0 flex-row overflow-hidden text-start">
 							{#if items[0]}
 								{@render myBadge(items[0])}
 							{/if}
@@ -144,7 +145,7 @@
 				{:else if items && items.length > 0 && items[0]}
 					{items[0].name}
 				{/if}
-				<ChevronsUpDownIcon class="ml-auto opacity-50" />
+				<ChevronDownIcon class="ml-auto opacity-50" />
 			</Button>
 		{/snippet}
 	</Popover.Trigger>

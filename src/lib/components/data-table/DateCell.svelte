@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { formatDatePart, formatTimePart } from '$lib/utils';
-
 	const { value }: { value: string } = $props();
 </script>
 

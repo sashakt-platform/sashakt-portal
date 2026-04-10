@@ -1,81 +1,71 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import History from '@lucide/svelte/icons/history';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import Button from '$lib/components/ui/button/button.svelte';
+
 	const { data } = $props();
 
 	let revisions = data?.questionRevisions;
 	let openrevisionDialog: boolean = $state(false);
 </script>
 
-<div class="m-4 flex h-1/2 flex-col gap-4">
-	<Dialog.Root bind:open={openrevisionDialog}>
-		<Label
-			onclick={() => (openrevisionDialog = true)}
-			class="text-primary flex cursor-pointer flex-row items-center text-xl font-semibold"
-			><History /> Revision History</Label
-		>
-		<Dialog.Content
-			class=" flex max-h-[608px]  w-[440px] flex-col items-start justify-start sm:h-[70%] sm:max-w-[45%]"
-		>
-			<Dialog.Header class="m-0 h-fit  py-1">
-				<Dialog.Title class="m-0 p-0 text-[20px]">Revision history</Dialog.Title>
-				<p class="  m-0 p-0 text-[14px] text-gray-600">
-					View the logs & changes done to this question
-				</p>
-			</Dialog.Header>
-			<div class=" w-full overflow-y-auto">
-				{#if revisions && revisions.length > 0}
-					{#each revisions as revision, i (revision.id || revision.created_date)}
-						{@const length = revisions.length}
-						<div class="m-10">
-							<div class="  flex items-center gap-4 text-xl">
-								<div class="relative flex flex-col items-center">
-									{#if revision.is_current}
-										<CircleCheck
-											class="z-10 flex h-4 w-4 items-center justify-center  rounded-full   bg-green-600 text-white "
-										/>
-									{:else}
-										<div class="bg-secondary z-10 h-4 w-4 rounded-full border-1"></div>
-									{/if}
+<Button variant="outline" onclick={() => (openrevisionDialog = true)} class="gap-2 text-sm">
+	Revision History
+</Button>
 
-									{#if i < length - 1}
-										<div class="bg-secondary absolute h-32 w-0.5"></div>
-									{/if}
-								</div>
-
-								<p
-									class="bg-accent flex h-8 w-15 items-center justify-center rounded-md text-[14px] font-semibold"
-								>
-									#{length - i}
-								</p>
-
-								<p class=" text-[15px] font-semibold text-gray-500">
-									{new Date(revision.created_date).toLocaleDateString('en-GB', {
-										day: 'numeric',
-										month: 'short',
-										year: 'numeric'
-									}) +
-										', ' +
-										new Date(revision.created_date).toLocaleTimeString('en-GB', {
-											hour: 'numeric',
-											minute: '2-digit',
-											hour12: true
-										})}
-								</p>
-							</div>
-							<p class="mt-2 ml-8 text-[14px] font-medium text-gray-500">
-								{revision.created_by_id?.full_name}
-							</p>
+<Dialog.Root bind:open={openrevisionDialog}>
+	<Dialog.Content class="sm:max-w-lg">
+		<Dialog.Header>
+			<Dialog.Title class="text-xl font-semibold">Revision History</Dialog.Title>
+		</Dialog.Header>
+		<div class="w-full overflow-y-auto py-4">
+			{#if revisions && revisions.length > 0}
+				{#each revisions as revision, i (revision.id || revision.created_date)}
+					<div class="flex gap-4">
+						<!-- Date/Time -->
+						<div class="flex w-28 shrink-0 flex-col text-right text-sm">
+							<span class="text-foreground font-medium">
+								{new Date(revision.created_date).toLocaleDateString('en-GB', {
+									day: 'numeric',
+									month: 'short',
+									year: 'numeric'
+								})}
+							</span>
+							<span class="text-muted-foreground text-xs">
+								{new Date(revision.created_date).toLocaleTimeString('en-GB', {
+									hour: 'numeric',
+									minute: '2-digit',
+									hour12: true
+								})}
+							</span>
 						</div>
-					{/each}
-				{:else}
-					<div class="m-10 flex items-center gap-2 text-sm text-gray-500">
-						<History class="h-4 w-4" /> No revisions found.
+
+						<!-- Timeline dot + line -->
+						<div class="flex flex-col items-center">
+							<div class="bg-primary mt-1.5 h-3 w-3 shrink-0 rounded-full"></div>
+							{#if i < revisions.length - 1}
+								<div class="bg-border w-px flex-1"></div>
+							{/if}
+						</div>
+
+						<!-- Description + username -->
+						<div class="flex flex-col pb-6">
+							<span class="text-sm font-semibold">
+								Revision #{revisions.length - i}
+							</span>
+							{#if revision.created_by_id?.full_name}
+								<span class="text-muted-foreground text-xs">
+									{revision.created_by_id.full_name}
+								</span>
+							{/if}
+						</div>
 					</div>
-				{/if}
-			</div>
-		</Dialog.Content>
-	</Dialog.Root>
-</div>
+				{/each}
+			{:else}
+				<div class="text-muted-foreground flex items-center gap-2 px-4 text-sm">
+					<History class="h-4 w-4" /> No revisions found.
+				</div>
+			{/if}
+		</div>
+	</Dialog.Content>
+</Dialog.Root>

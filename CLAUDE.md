@@ -110,3 +110,5 @@ Located in `e2e/`. Config builds and previews the app on port 4173.
 - Use Zod schemas for form validation with sveltekit-superforms
 - Follow SvelteKit file-based routing conventions (+page.svelte, +page.server.ts, +layout.svelte, etc.)
 - URL params as primary state for listing pages (page, size, search, sort_by, sort_order)
+- Create plan/tracking files in the `plans/` folder (gitignored), never in the project root. Never delete plan files.
+- Never hardcode colors (e.g., `text-gray-600`, `bg-blue-500`). Use theme tokens defined in `app.css` (e.g., `text-muted-foreground`, `bg-primary`, `border-border`).

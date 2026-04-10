@@ -13,7 +13,7 @@ export enum QuestionTypeEnum {
 
 export const QUESTION_TYPE_LABELS: Record<string, string> = {
 	[QuestionTypeEnum.SingleChoice]: 'Single/Multiple Choice',
-	[QuestionTypeEnum.MultiChoice]: 'Multiple Choice',
+	[QuestionTypeEnum.MultiChoice]: 'Single/Multiple Choice',
 	[QuestionTypeEnum.Subjective]: 'Subjective',
 	[QuestionTypeEnum.NumericalInteger]: 'Numerical',
 	[QuestionTypeEnum.NumericalDecimal]: 'Numerical',

@@ -691,7 +691,7 @@
 							>Question Type</span
 						>
 						<span class="text-muted-foreground text-xs">
-							{QUESTION_TYPE_LABELS[$formData.question_type] ?? 'Single/Multiple Choice'}
+							{QUESTION_TYPE_LABELS[$formData.question_type] ?? $formData.question_type}
 						</span>
 					</button>
 					<ChooseQuestionType

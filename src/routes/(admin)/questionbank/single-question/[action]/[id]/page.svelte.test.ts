@@ -99,7 +99,7 @@ describe('Single Question Page - Create Mode', () => {
 		it('should add a new answer when "Add Answer" button is clicked', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const addButton = screen.getByRole('button', { name: /Add Answer/i });
+			const addButton = screen.getByRole('button', { name: /Add Row/i });
 			const initialInputs = screen.getAllByRole('textbox');
 
 			await fireEvent.click(addButton);
@@ -301,7 +301,7 @@ describe('Single Question Page - Edit Mode', () => {
 		it('should add a new answer', async () => {
 			render(SingleQuestionPage, { data: { ...baseData, questionData: editQuestionData } as any });
 
-			const addButton = screen.getByRole('button', { name: /Add Answer/i });
+			const addButton = screen.getByRole('button', { name: /Add Row/i });
 			const initialInputs = screen.getAllByRole('textbox');
 
 			await fireEvent.click(addButton);
@@ -345,7 +345,7 @@ describe('Single Question Page - Question Type Selection', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
 			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
-			expect(screen.getByRole('button', { name: /Add Answer/i })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Add Row/i })).toBeInTheDocument();
 		});
 	});
 });
@@ -382,7 +382,7 @@ describe('Single Question Page - Subjective Question Type', () => {
 			});
 
 			expect(screen.queryByText('Answer')).not.toBeInTheDocument();
-			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Row/i })).not.toBeInTheDocument();
 		});
 
 		it('should show character limit input for subjective questions', () => {
@@ -1047,7 +1047,7 @@ describe('Single Question Page - Numerical Integer Question Type', () => {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
-			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Row/i })).not.toBeInTheDocument();
 		});
 
 		it('should hide subjective answer settings for numerical questions', () => {
@@ -1155,7 +1155,7 @@ describe('Single Question Page - Numerical Decimal Question Type', () => {
 				data: { ...baseData, questionData: numericalDecimalData } as any
 			});
 
-			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Row/i })).not.toBeInTheDocument();
 		});
 
 		it('should render number input with step="any"', () => {
@@ -2020,11 +2020,11 @@ describe('Single Question Page - Media', () => {
 	});
 
 	describe('Add attachment button', () => {
-		it('should show "Add attachment" buttons in create mode', () => {
+		it('should show "Add attachment" button for question-level in create mode', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 			const attachmentButtons = screen.getAllByText('Add attachment');
-			// Question-level + 4 default options
-			expect(attachmentButtons.length).toBe(5);
+			// Question-level only (options use icon trigger with hideTrigger)
+			expect(attachmentButtons.length).toBe(1);
 		});
 
 		it('should show attachment dropdown when clicked', async () => {
@@ -2039,11 +2039,11 @@ describe('Single Question Page - Media', () => {
 			expect(screen.getByText('Audio')).toBeInTheDocument();
 		});
 
-		it('should show all attachment buttons when no attachment is selected', () => {
+		it('should show question-level attachment button when no attachment is selected', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			// Should have 5 "Add attachment" buttons
-			expect(screen.getAllByText('Add attachment').length).toBe(5);
+			// Only question-level "Add attachment" (options use icon trigger)
+			expect(screen.getAllByText('Add attachment').length).toBe(1);
 		});
 	});
 
@@ -2105,13 +2105,12 @@ describe('Single Question Page - Media', () => {
 			expect(screen.getByText(/image\/png/)).toBeInTheDocument();
 		});
 
-		it('should show "Add attachment" for options without media', () => {
+		it('should display existing media for options with media in edit mode', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: questionDataWithMedia } as any
 			});
-			// Option B has no media — its button says "Add attachment"
-			const addAttachmentButtons = screen.getAllByText('Add attachment');
-			expect(addAttachmentButtons.length).toBeGreaterThanOrEqual(1);
+			// Option A has media, so its media info should be displayed
+			expect(screen.getByText(/image\/png/)).toBeInTheDocument();
 		});
 	});
 

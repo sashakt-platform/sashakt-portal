@@ -642,6 +642,7 @@
 			<div class="flex items-center gap-2">
 				{#if questionData}
 					<QuestionRevision {data} />
+					<div class="bg-border mx-1 h-6 w-px"></div>
 				{/if}
 				<QuestionPreview
 					data={{

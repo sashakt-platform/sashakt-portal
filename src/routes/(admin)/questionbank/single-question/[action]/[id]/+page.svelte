@@ -7,6 +7,10 @@
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import Plus from '@lucide/svelte/icons/plus';
+	import Paperclip from '@lucide/svelte/icons/paperclip';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import Film from '@lucide/svelte/icons/film';
+	import Music from '@lucide/svelte/icons/music';
 	import { Input } from '$lib/components/ui/input';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
@@ -310,6 +314,8 @@
 	let stagedExternalUrl = $state('');
 	let stagedOptionFiles = $state<Record<number, File | null>>({});
 	let stagedOptionUrls = $state<Record<number, string>>({});
+	let openAttachmentDropdownId = $state<number | null>(null);
+	let optionAttachmentModes = $state<Record<number, 'none' | 'image' | 'video' | 'audio'>>({});
 
 	// Initialize option media from question data
 	if (questionData?.options) {
@@ -792,44 +798,17 @@
 									}}
 								>
 									{#each totalOptions as { id, key }, index (id)}
-										<div class="group flex flex-row gap-4 pb-4">
-											<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
-												<p
-													class="flex h-full w-full items-center justify-center text-xl font-semibold"
-												>
-													{key}
-												</p>
-											</div>
-											<div class="flex w-full flex-col gap-2">
-												<div class="border-border flex flex-row rounded-sm border">
-													<span use:dragHandle aria-label="drag handle">
-														<GripVertical
-															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-														/>
-													</span>
-													<Input
-														class=" border-0"
-														name={key}
-														bind:value={totalOptions[index].value}
-													/>
-												</div>
-												<div class="flex flex-row items-center gap-4">
-													<div class="flex flex-row items-center gap-2">
-														<Checkbox
-															disabled={!hasContent(
-																totalOptions[index].value,
-																id,
-																optionMediaMap,
-																stagedOptionFiles,
-																stagedOptionUrls
-															)}
-															checked={totalOptions[index].correct_answer}
-															onCheckedChange={(checked: boolean) =>
-																(totalOptions[index].correct_answer = checked)}
-														/><Label class="text-sm">Set as correct answer</Label>
-													</div>
-												</div>
+										<div class="border-border flex items-start gap-3 border-b py-6 last:border-b-0">
+											<span class="mt-2.5 text-lg font-bold">{key}</span>
+											<span use:dragHandle aria-label="drag handle" class="mt-2">
+												<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+											</span>
+											<div class="flex min-w-0 flex-1 flex-col gap-2">
+												<Input name={key} bind:value={totalOptions[index].value} />
 												<AttachmentInput
+													hideTrigger={true}
+													mode={optionAttachmentModes[id] ?? 'none'}
+													onModeChange={(m) => (optionAttachmentModes[id] = m)}
 													media={optionMediaMap[id] ?? null}
 													onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
 													onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
@@ -846,52 +825,123 @@
 																)
 														: undefined}
 												/>
+												<div class="flex items-center gap-2">
+													<Checkbox
+														disabled={!hasContent(
+															totalOptions[index].value,
+															id,
+															optionMediaMap,
+															stagedOptionFiles,
+															stagedOptionUrls
+														)}
+														checked={totalOptions[index].correct_answer}
+														onCheckedChange={(checked: boolean) =>
+															(totalOptions[index].correct_answer = checked)}
+													/><Label class="text-sm">Correct answer</Label>
+												</div>
 											</div>
-											<div
-												class={[
-													'mt-2 gap-0 opacity-0',
-													totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
-												]}
-											>
-												<Trash_2
+											{#if !(optionMediaMap[id]?.image || optionMediaMap[id]?.external_media || stagedOptionFiles[id] || (stagedOptionUrls[id] && stagedOptionUrls[id].trim()) || (optionAttachmentModes[id] && optionAttachmentModes[id] !== 'none'))}
+												<div class="relative mt-2.5 shrink-0">
+													<button
+														type="button"
+														class="text-muted-foreground hover:text-foreground transition-colors"
+														onclick={() => {
+															openAttachmentDropdownId =
+																openAttachmentDropdownId === id ? null : id;
+														}}
+													>
+														<Paperclip size={18} />
+													</button>
+													{#if openAttachmentDropdownId === id}
+														<!-- svelte-ignore a11y_no_static_element_interactions -->
+														<div
+															class="bg-popover absolute top-full right-0 z-10 mt-1 w-48 rounded-lg border py-1 shadow-lg"
+															onmouseleave={() => (openAttachmentDropdownId = null)}
+														>
+															<button
+																type="button"
+																class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																onclick={() => {
+																	optionAttachmentModes[id] = 'image';
+																	openAttachmentDropdownId = null;
+																}}
+															>
+																<span class="flex items-center gap-2">
+																	<ImageIcon size={16} class="text-muted-foreground" />
+																	Image
+																</span>
+																<span class="text-muted-foreground text-xs">Upload</span>
+															</button>
+															<button
+																type="button"
+																class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																onclick={() => {
+																	optionAttachmentModes[id] = 'video';
+																	openAttachmentDropdownId = null;
+																}}
+															>
+																<span class="flex items-center gap-2">
+																	<Film size={16} class="text-muted-foreground" />
+																	Video
+																</span>
+																<span class="text-muted-foreground text-xs">URL</span>
+															</button>
+															<button
+																type="button"
+																class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																onclick={() => {
+																	optionAttachmentModes[id] = 'audio';
+																	openAttachmentDropdownId = null;
+																}}
+															>
+																<span class="flex items-center gap-2">
+																	<Music size={16} class="text-muted-foreground" />
+																	Audio
+																</span>
+																<span class="text-muted-foreground text-xs">URL</span>
+															</button>
+														</div>
+													{/if}
+												</div>
+											{/if}
+											{#if totalOptions.length > 1}
+												<button
+													type="button"
+													class="mt-2.5 shrink-0"
 													data-testid="trash-icon"
-													size={18}
-													class={[
-														'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
-														totalOptions.length > 1 ? 'cursor-pointer' : ''
-													]}
 													onclick={() => {
-														if (totalOptions.length > 1) {
-															totalOptions = totalOptions
-																.filter((_, i) => i !== index)
-																.map((option, i) => ({
-																	...option,
-																	key: String.fromCharCode(65 + i)
-																}));
-														}
+														totalOptions = totalOptions
+															.filter((_, i) => i !== index)
+															.map((option, i) => ({
+																...option,
+																key: String.fromCharCode(65 + i)
+															}));
 													}}
-												/>
-											</div>
+												>
+													<Trash_2
+														size={18}
+														class="text-muted-foreground hover:text-destructive cursor-pointer"
+													/>
+												</button>
+											{/if}
 										</div>
 									{/each}
 								</div>
 
-								<div class="flex justify-end">
-									<Button
-										variant="outline"
-										class="text-primary border-primary"
-										onclick={() => {
-											totalOptions.push({
-												id: totalOptions[totalOptions.length - 1].id + 1,
-												key: String.fromCharCode(64 + totalOptions.length + 1),
-												value: '',
-												correct_answer: false
-											});
-										}}
-									>
-										<Plus />Add Answer</Button
-									>
-								</div>
+								<button
+									type="button"
+									class="border-border text-muted-foreground hover:border-primary hover:text-primary w-full rounded-lg border-2 border-dashed py-3 text-center text-sm transition-colors"
+									onclick={() => {
+										totalOptions.push({
+											id: totalOptions[totalOptions.length - 1].id + 1,
+											key: String.fromCharCode(64 + totalOptions.length + 1),
+											value: '',
+											correct_answer: false
+										});
+									}}
+								>
+									Add Row
+								</button>
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
 							<div class="flex flex-col gap-4">

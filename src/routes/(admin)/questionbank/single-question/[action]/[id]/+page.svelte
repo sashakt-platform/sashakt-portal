@@ -11,6 +11,7 @@
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import Film from '@lucide/svelte/icons/film';
 	import Music from '@lucide/svelte/icons/music';
+	import X from '@lucide/svelte/icons/x';
 	import { Input } from '$lib/components/ui/input';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
@@ -1285,78 +1286,110 @@
 								</div>
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
-							<div class="flex flex-col gap-4">
-								<div class="flex gap-4">
-									<div class="flex flex-1 flex-col gap-2">
-										<Input bind:value={matrixRowLabel} class="font-semibold" />
-										<p class="text-xs font-medium text-gray-500">Items to Rate</p>
-										<div class="flex flex-col gap-2">
-											{#each matrixLeftItems as item, index (item.id)}
-												<div class="group flex flex-row items-center gap-2">
-													<div
-														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
-													>
-														{item.key}
-													</div>
-													<Input
-														class="flex-1 border border-black"
-														bind:value={matrixLeftItems[index].value}
-													/>
-													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-														if (matrixLeftItems.length > 1) {
-															matrixLeftItems = matrixLeftItems
-																.filter((_, i) => i !== index)
-																.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
-														}
-													})}
+							<div class="flex flex-col gap-6">
+								<!-- Rating scale labels -->
+								<div class="flex flex-col gap-3">
+									<Label class="font-semibold">Rating scale labels</Label>
+									<div class="flex flex-wrap items-end gap-3">
+										{#each matrixRightItems as item, index (item.id)}
+											<div class="flex flex-col gap-1">
+												<div class="flex items-center justify-between">
+													<span class="text-muted-foreground text-xs font-medium">{item.key}</span>
+													{#if matrixRightItems.length > 1}
+														<button
+															type="button"
+															class="text-muted-foreground hover:text-destructive"
+															onclick={() => {
+																matrixRightItems = matrixRightItems
+																	.filter((_, i) => i !== index)
+																	.map((it, i) => ({ ...it, key: String(i + 1) }));
+															}}
+														>
+															<X size={12} />
+														</button>
+													{/if}
 												</div>
-											{/each}
-										</div>
-										{@render matrixAddButton('Add Item', () => {
+												<Input
+													class="w-32"
+													placeholder={[
+														'e.g. Poor',
+														'e.g. Fair',
+														'e.g. Good',
+														'e.g. Excellent',
+														'e.g. Outstanding'
+													][index] ?? ''}
+													bind:value={matrixRightItems[index].value}
+												/>
+											</div>
+										{/each}
+										<button
+											type="button"
+											class="border-border text-muted-foreground hover:border-primary hover:text-primary mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-dashed transition-colors"
+											onclick={() => {
+												matrixRightItems.push({
+													id: nextId(matrixRightItems),
+													key: String(matrixRightItems.length + 1),
+													value: ''
+												});
+											}}
+										>
+											<Plus size={16} />
+										</button>
+									</div>
+								</div>
+
+								<!-- Statements -->
+								<div class="flex flex-col gap-3">
+									<Label class="font-semibold">Statements</Label>
+									<div
+										class="flex flex-col"
+										use:dragHandleZone={{
+											items: matrixLeftItems,
+											flipDurationMs: 150,
+											type: 'matrix-left'
+										}}
+										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
+										onfinalize={({ detail }) => {
+											matrixLeftItems = detail.items.map((item, i) => ({
+												...item,
+												key: String.fromCharCode(65 + i)
+											}));
+										}}
+									>
+										{#each matrixLeftItems as item, index (item.id)}
+											<div class="flex items-center gap-2 py-2">
+												<span use:dragHandle aria-label="drag handle">
+													<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+												</span>
+												<Input
+													class="flex-1"
+													placeholder="Statement {item.key}"
+													bind:value={matrixLeftItems[index].value}
+												/>
+												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+													if (matrixLeftItems.length > 1) {
+														matrixLeftItems = matrixLeftItems
+															.filter((_, i) => i !== index)
+															.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
+													}
+												})}
+											</div>
+										{/each}
+									</div>
+
+									<button
+										type="button"
+										class="border-border text-muted-foreground hover:border-primary hover:text-primary w-full rounded-lg border-2 border-dashed py-3 text-center text-sm transition-colors"
+										onclick={() => {
 											matrixLeftItems.push({
 												id: nextId(matrixLeftItems),
 												key: String.fromCharCode(65 + matrixLeftItems.length),
 												value: ''
 											});
-										})}
-									</div>
-
-									<div class="flex flex-1 flex-col gap-2">
-										<Input bind:value={matrixColLabel} class="font-semibold" />
-										<p class="text-xs font-medium text-gray-500">Rating Options</p>
-										<div class="flex flex-col gap-2">
-											{#each matrixRightItems as item, index (item.id)}
-												<div class="group flex flex-row items-center gap-2">
-													<div
-														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
-													>
-														{item.key}
-													</div>
-													<Input
-														class="flex-1 border border-black"
-														bind:value={matrixRightItems[index].value}
-													/>
-													{@render matrixTrashButton(matrixRightItems.length > 1, () => {
-														if (matrixRightItems.length > 1) {
-															matrixRightItems = matrixRightItems
-																.filter((_, i) => i !== index)
-																.map((it, i) => ({
-																	...it,
-																	key: String(i + 1)
-																}));
-														}
-													})}
-												</div>
-											{/each}
-										</div>
-										{@render matrixAddButton('Add Rating', () => {
-											matrixRightItems.push({
-												id: nextId(matrixRightItems),
-												key: String(matrixRightItems.length + 1),
-												value: ''
-											});
-										})}
-									</div>
+										}}
+									>
+										Add Row
+									</button>
 								</div>
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.MatrixString || $formData.question_type === QuestionTypeEnum.MatrixNumber}

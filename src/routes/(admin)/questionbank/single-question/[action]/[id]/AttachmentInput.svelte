@@ -69,9 +69,6 @@
 	function selectMode(m: AttachmentMode) {
 		setMode(m);
 		showDropdown = false;
-		if (m === 'image') {
-			fileInput?.click();
-		}
 	}
 
 	function handleFileSelect(event: Event) {

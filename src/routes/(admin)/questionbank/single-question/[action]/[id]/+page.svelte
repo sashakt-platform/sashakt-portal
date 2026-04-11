@@ -801,7 +801,7 @@
 												</p>
 											</div>
 											<div class="flex w-full flex-col gap-2">
-												<div class="flex flex-row rounded-sm border-1 border-black">
+												<div class="border-border flex flex-row rounded-sm border">
 													<span use:dragHandle aria-label="drag handle">
 														<GripVertical
 															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"

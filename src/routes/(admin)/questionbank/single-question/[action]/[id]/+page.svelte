@@ -752,10 +752,7 @@
 				<div class="rounded-lg border">
 					<div class="bg-muted rounded-t-lg px-4 py-3">
 						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
-							>{$formData.question_type === QuestionTypeEnum.NumericalInteger ||
-							$formData.question_type === QuestionTypeEnum.NumericalDecimal
-								? 'Correct Answer'
-								: 'Answer Settings'}</span
+							>Answer Settings</span
 						>
 					</div>
 					<div class="p-6">
@@ -1289,11 +1286,13 @@
 								</div>
 							</div>
 						{:else}
-							<div class="flex flex-col gap-2">
+							<div class="flex items-center justify-between gap-4">
+								<Label class="text-sm font-semibold">Correct answer</Label>
 								<Input
 									type="number"
 									step="any"
-									class="w-full"
+									class="w-1/2"
+									placeholder="e.g. 25"
 									bind:value={$formData.correct_answer}
 									oninput={(e) => {
 										const val = (e.target as HTMLInputElement).value;

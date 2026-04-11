@@ -835,6 +835,9 @@
 												<div class="relative mt-2.5 shrink-0">
 													<button
 														type="button"
+														aria-label="Add attachment"
+														aria-haspopup="menu"
+														aria-expanded={openAttachmentDropdownId === id}
 														class="text-muted-foreground hover:text-foreground transition-colors"
 														onclick={() => {
 															openAttachmentDropdownId =
@@ -1007,6 +1010,9 @@
 														<div class="relative mt-2.5 shrink-0">
 															<button
 																type="button"
+																aria-label="Add attachment"
+																aria-haspopup="menu"
+																aria-expanded={openAttachmentDropdownId === item.id}
 																class="text-muted-foreground hover:text-foreground transition-colors"
 																onclick={() => {
 																	openAttachmentDropdownId =
@@ -1132,6 +1138,9 @@
 														<div class="relative mt-2.5 shrink-0">
 															<button
 																type="button"
+																aria-label="Add attachment"
+																aria-haspopup="menu"
+																aria-expanded={openAttachmentDropdownId === item.id}
 																class="text-muted-foreground hover:text-foreground transition-colors"
 																onclick={() => {
 																	openAttachmentDropdownId =
@@ -1298,6 +1307,7 @@
 													{#if matrixRightItems.length > 1}
 														<button
 															type="button"
+															aria-label="Remove rating label"
 															class="text-muted-foreground hover:text-destructive"
 															onclick={() => {
 																matrixRightItems = matrixRightItems
@@ -1324,6 +1334,7 @@
 										{/each}
 										<button
 											type="button"
+											aria-label="Add rating label"
 											class="border-border text-muted-foreground hover:border-primary hover:text-primary mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-dashed transition-colors"
 											onclick={() => {
 												matrixRightItems.push({

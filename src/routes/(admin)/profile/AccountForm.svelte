@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
 	import { editUserSchema, type EditUserSchema } from './schema';
-	import { resolve } from '$app/paths';
 	import Settings from '@lucide/svelte/icons/settings';
 
 	let { data }: { data: PageData } = $props();
@@ -83,13 +81,6 @@
 						<Input id="organisation-field" value={orgName} disabled />
 					</div>
 				</div>
-			</div>
-
-			<div class="mt-4 flex justify-between gap-2">
-				<a href={resolve('/dashboard')}>
-					<Button variant="outline" class="border-primary text-primary">Cancel</Button>
-				</a>
-				<Form.Button class="bg-primary">Save</Form.Button>
 			</div>
 		</div>
 	</div>

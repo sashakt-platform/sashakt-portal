@@ -6,6 +6,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { editUserSchema } from './schema.js';
+import { passwordSchema } from './schema.js';
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	const token = getSessionTokenCookie();
@@ -34,6 +35,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 
 	return {
 		form: await superValidate(zod4(editUserSchema)),
+		passwordForm: await superValidate(zod4(passwordSchema)),
 		currentUser: userData
 	};
 };
@@ -74,6 +76,50 @@ export const actions: Actions = {
 			303,
 			`/profile`,
 			{ type: 'success', message: `Details Updated Successfully` },
+			cookies
+		);
+	},
+
+	Passwordsave: async ({ request, fetch, cookies }) => {
+		const token = getSessionTokenCookie();
+
+		const form = await superValidate(request, zod4(passwordSchema));
+
+		if (!form.valid) {
+			return fail(400, {
+				form
+			});
+		}
+
+		const passwordUpdateData: { current_password: string; new_password: string } = {
+			current_password: form.data.current_password,
+			new_password: form.data.new_password
+		};
+
+		const response = await fetch(`${BACKEND_URL}/users/me/password`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify(passwordUpdateData)
+		});
+
+		if (!response.ok) {
+			let message = 'Unable to update password';
+
+			const error = await response.json();
+			message = error?.detail?.[0].msg ?? error?.detail ?? message;
+
+			form.errors = { current_password: [message] };
+			return fail(response.status === 401 ? 401 : 400, { form });
+		}
+
+		await response.json();
+		throw redirect(
+			303,
+			`/`,
+			{ type: 'success', message: `Password Updated Successfully` },
 			cookies
 		);
 	}

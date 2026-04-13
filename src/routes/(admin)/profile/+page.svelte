@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
 	import AccountForm from './AccountForm.svelte';
+	import ChangePassword from './ChangePassword.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { resolve } from '$app/paths';
 
@@ -23,3 +24,4 @@
 </div>
 
 <AccountForm {data} />
+<ChangePassword {data} />

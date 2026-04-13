@@ -28,7 +28,7 @@ export const createColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<Certificate>[] => [
-	createSortableColumn('name', 'CERTIFICATE NAMES', currentSortBy, currentSortOrder, handleSort, {
+	createSortableColumn('name', 'NAME', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
 		meta: { grow: true }
 	}),

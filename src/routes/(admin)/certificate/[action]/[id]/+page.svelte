@@ -61,7 +61,7 @@
 				</h2>
 			</div>
 			<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>
-				Save Certificate
+				Save
 			</Button>
 		</div>
 
@@ -106,7 +106,7 @@
 							type="text"
 							name="url"
 							bind:value={$formData.url}
-							placeholder="e.g. www.example.com"
+							placeholder="e.g. https://www.example.com"
 						/>
 						{#if $errors.url}
 							<span class="text-destructive text-sm">{$errors.url}</span>

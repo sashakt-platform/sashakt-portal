@@ -73,7 +73,7 @@ describe('CertificatePage', () => {
 		const { goto } = await import('$app/navigation');
 		render(CertificatePage, { data: baseData });
 
-		const tableHeader = screen.getByText('CERTIFICATE NAMES');
+		const tableHeader = screen.getByText('NAME');
 		await fireEvent.click(tableHeader);
 
 		expect(goto).toHaveBeenCalledOnce();

@@ -12,7 +12,12 @@
 	): options is {
 		rows: { label: string; items: { id: number; key: string; value: string }[] };
 		columns: { label: string; items: { id: number; key: string; value: string }[]; input_type?: 'number' | 'text' };
-	} => options !== null && typeof options === 'object' && !Array.isArray(options) && 'rows' in (options as object);
+	} =>
+		options !== null &&
+		typeof options === 'object' &&
+		!Array.isArray(options) &&
+		'rows' in (options as object) &&
+		'columns' in (options as object);
 
 	const opts = $derived(question.options);
 

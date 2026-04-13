@@ -6,6 +6,8 @@ import {
 } from '$lib/components/data-table/column-helpers';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
+import ActiveStatusBadge from '$lib/components/data-table/ActiveStatusBadge.svelte';
+import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 export const certificateSchema = z.object({
 	id: z.number(),
 	name: z.string(),
@@ -26,19 +28,31 @@ export const createColumns = (
 		canDelete?: boolean;
 	}
 ): ColumnDef<Certificate>[] => [
-	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+	createSortableColumn('name', 'CERTIFICATE NAMES', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
 		meta: { grow: true }
 	}),
-	createSortableColumn('is_active', 'Active', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => (row.original.is_active ? 'Yes' : 'No'),
-		size: 100
+	createSortableColumn('description', 'Description', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) =>
+			renderComponent(TruncatedTextCell, { value: row.original.description ?? '' }),
+		size: 220,
+		meta: { cellClassName: 'max-w-[220px] overflow-hidden' }
 	}),
+	{
+		accessorKey: 'is_active',
+		header: 'Status',
+		enableSorting: false,
+		cell: ({ row }) => renderComponent(ActiveStatusBadge, { active: row.original.is_active }),
+		size: 130,
+		meta: { align: 'center' }
+	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
 		size: 160
 	}),
 	createActionsColumn<Certificate>('Certificate', '/certificate', {
 		...permissions,
-		editInline: true
+		editInline: true,
+		deleteInline: true
 	})
 ];

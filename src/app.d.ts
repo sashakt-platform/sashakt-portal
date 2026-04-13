@@ -7,6 +7,8 @@ declare module '@tanstack/table-core' {
 	interface ColumnMeta<TData extends RowData, TValue> {
 		grow?: boolean;
 		align?: 'left' | 'center' | 'right';
+		cellClassName?: string;
+		headerClassName?: string;
 	}
 }
 

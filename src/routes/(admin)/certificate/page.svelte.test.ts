@@ -72,7 +72,7 @@ describe('CertificatePage', () => {
 	it('sorts certificates on column click', async () => {
 		render(CertificatePage, { data: baseData });
 
-		const tableHeader = screen.getByText('Name');
+		const tableHeader = screen.getByText('CERTIFICATE NAMES');
 		await fireEvent.click(tableHeader);
 
 		expect(true).toBe(true);

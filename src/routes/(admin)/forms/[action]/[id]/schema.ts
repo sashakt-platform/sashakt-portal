@@ -13,6 +13,7 @@ export const FormFieldType = {
 	RADIO: 'radio',
 	CHECKBOX: 'checkbox',
 	MULTI_SELECT: 'multi_select',
+	TOGGLE: 'toggle',
 	ENTITY: 'entity',
 	STATE: 'state',
 	DISTRICT: 'district',
@@ -21,19 +22,19 @@ export const FormFieldType = {
 
 export type FormFieldTypeValue = (typeof FormFieldType)[keyof typeof FormFieldType];
 
-// Field type labels for UI
 export const fieldTypeLabels: Record<FormFieldTypeValue, string> = {
-	full_name: 'Full Name',
+	full_name: 'Name',
 	email: 'Email',
-	phone: 'Phone',
-	text: 'Text',
-	textarea: 'Text Area',
+	phone: 'Phone number',
+	text: 'Short Text',
+	textarea: 'Paragraph',
 	number: 'Number',
 	date: 'Date',
-	select: 'Dropdown Select',
-	radio: 'Radio Buttons',
-	checkbox: 'Checkbox',
+	select: 'Dropdown',
+	radio: 'Radio button',
+	checkbox: 'Check box',
 	multi_select: 'Multi Select',
+	toggle: 'Toggle',
 	entity: 'Entity',
 	state: 'State',
 	district: 'District',
@@ -42,17 +43,22 @@ export const fieldTypeLabels: Record<FormFieldTypeValue, string> = {
 
 // Group field types by category for UI
 export const fieldTypeCategories = {
-	'Core User Fields': [FormFieldType.FULL_NAME, FormFieldType.EMAIL, FormFieldType.PHONE],
-	'Text Fields': [FormFieldType.TEXT, FormFieldType.TEXTAREA],
-	'Choice Fields': [
-		FormFieldType.SELECT,
-		FormFieldType.RADIO,
-		FormFieldType.CHECKBOX,
-		FormFieldType.MULTI_SELECT
+	'Commonly Used': [
+		FormFieldType.FULL_NAME,
+		FormFieldType.EMAIL,
+		FormFieldType.PHONE,
+		FormFieldType.STATE,
+		FormFieldType.DISTRICT,
+		FormFieldType.BLOCK,
+		FormFieldType.ENTITY
 	],
-	'Other Fields': [FormFieldType.NUMBER, FormFieldType.DATE],
-	'Location Fields': [FormFieldType.STATE, FormFieldType.DISTRICT, FormFieldType.BLOCK],
-	'Entity Fields': [FormFieldType.ENTITY]
+	General: [FormFieldType.TEXT, FormFieldType.TEXTAREA, FormFieldType.NUMBER, FormFieldType.DATE],
+	'Choice List': [
+		FormFieldType.CHECKBOX,
+		FormFieldType.RADIO,
+		FormFieldType.SELECT,
+		FormFieldType.TOGGLE
+	]
 };
 
 // Field option schema

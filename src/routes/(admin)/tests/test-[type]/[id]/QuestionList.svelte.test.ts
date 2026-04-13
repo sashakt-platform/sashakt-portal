@@ -75,6 +75,6 @@ describe('QuestionList', () => {
 		});
 
 		expect(screen.getByText('50 questions across 2 sections')).toBeInTheDocument();
-		expect(screen.getByText('• Answer up to 26')).toBeInTheDocument();
+		expect(screen.getByText('Answer up to 26 across all sections')).toBeInTheDocument();
 	});
 });

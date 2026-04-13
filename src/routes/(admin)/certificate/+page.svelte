@@ -123,7 +123,7 @@
 						<Button
 							{...props}
 							variant="outline"
-							class="h-10 rounded-full text-gray-500 {isActive !== ''
+							class="text-muted-foreground h-10 rounded-full {isActive !== ''
 								? 'border-primary text-primary'
 								: ''}"
 						>
@@ -136,7 +136,7 @@
 					{#each STATUS_OPTIONS as option (option.value)}
 						<button
 							type="button"
-							class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100"
+							class="hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm"
 							onclick={() => selectStatus(option.value)}
 						>
 							<CheckIcon

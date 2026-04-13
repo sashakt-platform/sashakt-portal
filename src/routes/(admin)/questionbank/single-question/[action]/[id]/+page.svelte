@@ -1,6 +1,13 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ListChecks from '@lucide/svelte/icons/list-checks';
+	import AlignJustify from '@lucide/svelte/icons/align-justify';
+	import Hash from '@lucide/svelte/icons/hash';
+	import Equal from '@lucide/svelte/icons/equal';
+	import Route from '@lucide/svelte/icons/route';
+	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
@@ -47,6 +54,16 @@
 	} = $props();
 
 	const questionData: any = data?.questionData || null;
+
+	const QUESTION_TYPE_ICONS: Record<string, typeof ListChecks> = {
+		[QuestionTypeEnum.SingleChoice]: ListChecks,
+		[QuestionTypeEnum.Subjective]: AlignJustify,
+		[QuestionTypeEnum.NumericalInteger]: Hash,
+		[QuestionTypeEnum.MatrixString]: Equal,
+		[QuestionTypeEnum.MatrixNumber]: Equal,
+		[QuestionTypeEnum.MatrixMatch]: Route,
+		[QuestionTypeEnum.MatrixRating]: CircleDot
+	};
 
 	const {
 		form: formData,
@@ -683,18 +700,23 @@
 			<div class="flex flex-col gap-6 lg:w-2/3">
 				<!-- Card 1: QUESTION TYPE -->
 				<div class="rounded-lg border">
-					<button
-						type="button"
-						class="bg-muted hover:bg-muted/80 flex w-full items-center justify-between rounded-t-lg px-4 py-3 transition-colors"
-						onclick={() => (openQuestionTypeDialog = true)}
-					>
+					<div class="bg-muted flex w-full items-center justify-between rounded-t-lg px-4 py-3">
 						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
-							>Question Type</span
+							>Question Settings</span
 						>
-						<span class="text-muted-foreground text-xs">
+						<button
+							type="button"
+							class="bg-background hover:bg-accent flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
+							onclick={() => (openQuestionTypeDialog = true)}
+						>
+							{#if QUESTION_TYPE_ICONS[$formData.question_type]}
+								{@const TypeIcon = QUESTION_TYPE_ICONS[$formData.question_type]}
+								<TypeIcon size={18} class="text-muted-foreground" />
+							{/if}
 							{QUESTION_TYPE_LABELS[$formData.question_type] ?? $formData.question_type}
-						</span>
-					</button>
+							<ChevronDown size={16} class="text-muted-foreground" />
+						</button>
+					</div>
 					<ChooseQuestionType
 						bind:open={openQuestionTypeDialog}
 						onSelect={(type) => {

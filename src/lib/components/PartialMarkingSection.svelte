@@ -26,7 +26,8 @@
 
 <div
 	class={[
-		bordered && 'rounded-xl border  p-4',
+		'min-w-0',
+		bordered && 'rounded-xl border p-4',
 		bordered && (partialMarking ? 'border-primary bg-primary/5' : 'border-gray-200'),
 		labelClass
 	]}
@@ -40,9 +41,9 @@
 	</label>
 
 	{#if partialMarking && partial}
-		<div class="mt-4 ml-6 flex flex-col gap-6" id="partial-mark-section">
+		<div class="mt-4 flex flex-col gap-6" id="partial-mark-section">
 			{#each partial.correct_answers as answer, i (i)}
-				<div class="flex items-center gap-6">
+				<div class="flex min-w-0 flex-wrap items-center gap-2">
 					<input
 						type="number"
 						name="marking_scheme.partial.correct_answers.{i}.num_correct_selected"
@@ -57,9 +58,9 @@
 								)
 							};
 						}}
-						class="bg-gray-0 w-20 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
+						class="bg-gray-0 w-16 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
-					<span class="text-sm text-gray-500">Correct selected</span>
+					<span class="text-sm whitespace-nowrap text-gray-500">Correct answer</span>
 					<span class="font-light text-gray-500"><MoveRight /></span>
 					<input
 						type="number"
@@ -75,13 +76,13 @@
 								)
 							};
 						}}
-						class="bg-gray-0 w-20 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
+						class="bg-gray-0 w-16 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
-					<span class="text-sm text-gray-500">Marks</span>
+					<span class="text-sm whitespace-nowrap text-gray-500">Marks</span>
 					<button
 						type="button"
 						data-testid="delete-partial-row"
-						class="ml-auto text-gray-500 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30"
+						class="shrink-0 text-gray-500 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30"
 						disabled={partial.correct_answers.length <= 1}
 						onclick={() => {
 							partial = {

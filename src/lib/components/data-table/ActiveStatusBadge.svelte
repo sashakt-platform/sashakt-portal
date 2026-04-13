@@ -3,10 +3,10 @@
 </script>
 
 <span
-	style="width:110px; height:29px; padding: 6px 14px 6px 12px; gap:6px; border-radius:1000px; background:{active
-		? '#D5F5EB'
-		: '#F0F0F0'};"
-	class="inline-flex items-center justify-center text-sm font-medium {active ? 'text-green-700' : 'text-gray-500'}"
+	style="width:110px; height:29px; padding: 6px 14px 6px 12px; gap:6px; border-radius:1000px;"
+	class="inline-flex items-center justify-center text-sm font-medium {active
+		? 'bg-[hsl(var(--success-subtle))] text-[hsl(var(--success-bold))]'
+		: 'bg-muted text-muted-foreground'}"
 >
 	{active ? 'Active' : 'Inactive'}
 </span>

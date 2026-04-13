@@ -31,7 +31,6 @@
 	const {
 		form: formData,
 		enhance,
-		submit,
 		errors
 	} = superForm(certificateData || data.form, {
 		validators: zod4Client(
@@ -54,24 +53,21 @@
 	<div class="mx-auto flex flex-col gap-10 py-8">
 		<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
 			<div class="flex items-center gap-3">
-				<a href={resolve('/certificate')} class="hover:bg-muted rounded-lg border p-2">
+				<a href={resolve('/certificate')} class="hover:bg-muted rounded-lg border p-2" aria-label="Back to certificates">
 					<ArrowLeft size={20} />
 				</a>
 				<h2 class="text-2xl font-bold tracking-tight">
 					{certificateData ? 'Edit Certificate' : 'Create Certificate'}
 				</h2>
 			</div>
-			<Button class="bg-primary font-semibold" onclick={submit} disabled={!canSave}>
+			<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>
 				Save Certificate
 			</Button>
 		</div>
 
 		<div class="mx-4 flex flex-col sm:mx-6 md:mx-10">
-			<div class="rounded-2xl border bg-white">
-				<div
-					style="padding: 32px; gap: 20px; border-bottom: 1px solid #E4E4E4; background: #FFFFFF;"
-					class="flex items-center rounded-t-2xl"
-				>
+			<div class="bg-card rounded-2xl border">
+				<div class="border-border flex items-center gap-5 rounded-t-2xl border-b p-8">
 					<span class="bg-brand-subtle shrink-0 rounded-lg p-2">
 						<Settings class="text-primary h-4 w-4 sm:h-5 sm:w-5" />
 					</span>
@@ -120,7 +116,11 @@
 					<div class="flex items-center justify-between">
 						<Label class="font-semibold">Certificate Status</Label>
 						<div class="flex items-center gap-2">
-							<span class="text-sm {$formData.is_active ? 'text-primary font-semibold' : 'text-muted-foreground'}">
+							<span
+								class="text-sm {$formData.is_active
+									? 'text-primary font-semibold'
+									: 'text-muted-foreground'}"
+							>
 								{$formData.is_active ? 'Active' : 'Inactive'}
 							</span>
 							<Switch id="is_active" name="is_active" bind:checked={$formData.is_active} />

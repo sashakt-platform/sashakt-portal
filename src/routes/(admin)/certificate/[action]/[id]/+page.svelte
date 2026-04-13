@@ -114,7 +114,7 @@
 					</div>
 
 					<div class="flex items-center justify-between">
-						<Label class="font-semibold">Certificate Status</Label>
+						<Label for="is_active" class="font-semibold">Certificate Status</Label>
 						<div class="flex items-center gap-2">
 							<span
 								class="text-sm {$formData.is_active

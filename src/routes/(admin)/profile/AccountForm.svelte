@@ -5,18 +5,11 @@
 	import { type Infer, superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
-	import type { Snippet } from 'svelte';
 	import { editUserSchema, type EditUserSchema } from './schema';
 	import { resolve } from '$app/paths';
+	import Settings from '@lucide/svelte/icons/settings';
 
-	let {
-		data,
-		header
-	}: {
-		data: PageData;
-		header: Snippet;
-	} = $props();
-
+	let { data }: { data: PageData } = $props();
 	let userData: Partial<Infer<EditUserSchema>> | null = data?.currentUser || null;
 
 	const form = superForm(userData || data.form, {
@@ -25,54 +18,78 @@
 	});
 
 	const { form: formData, enhance } = form;
+
+	const roleName = $derived(data.currentUser?.role_label ?? '');
+	const orgName = $derived(data.currentUser?.organization_name ?? '');
 </script>
 
-<form method="POST" use:enhance action="?/save">
-	<div class="mx-auto flex h-lvh flex-col gap-6 py-6 md:gap-10 md:py-8">
-		{@render header()}
-		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-10 md:p-9">
-			<Form.Field {form} name="full_name" class="flex w-full flex-col gap-2 md:pr-8">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label class="font-semibold">Name</Form.Label>
-						<Input {...props} bind:value={$formData.full_name} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+<form id="profile-form" method="POST" use:enhance action="?/save">
+	<div class="flex justify-center px-4 py-8">
+		<div class="w-full max-w-160">
+			<div class="bg-card rounded-xl border shadow-sm">
+				<div class="flex h-23 items-center gap-3.5 border-b border-[#E4E4E4] p-8">
+					<Settings class="text-primary h-5 w-5" />
+					<h3 class="text-base font-semibold">My Profile</h3>
+				</div>
 
-			<Form.Field {form} name="email" class="flex w-full flex-col gap-2 md:pr-8">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label class="font-semibold">Email</Form.Label>
-						<Input {...props} type="email" bind:value={$formData.email} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+				<div class="flex flex-col gap-6 p-8">
+					<Form.Field {form} name="full_name" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Name</Form.Label>
+								<Input {...props} bind:value={$formData.full_name} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
 
-			<Form.Field {form} name="phone" class="flex w-full flex-col gap-2 md:pr-8">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label class="font-semibold">Phone</Form.Label>
-						<Input {...props} type="tel" bind:value={$formData.phone} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-		</div>
-	</div>
-	<div
-		class="sticky right-0 bottom-0 left-0 mt-2 flex w-full border-t-4 bg-white p-3 shadow-md sm:mt-4 sm:p-4"
-	>
-		<div class="flex w-full justify-between gap-2">
-			<a href={resolve('/dashboard')}>
-				<Button variant="outline" class="border-primary text-primary border-1 text-sm sm:text-base"
-					>Cancel</Button
-				>
-			</a>
-			<div class="flex gap-2">
-				<Form.Button class="bg-primary text-sm sm:text-base">Save</Form.Button>
+					<Form.Field {form} name="email" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Email</Form.Label>
+								<Input {...props} type="email" bind:value={$formData.email} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Field {form} name="phone" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Phone number</Form.Label>
+								<Input {...props} type="tel" bind:value={$formData.phone} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<div class="flex flex-col gap-1.5">
+						<label for="role-field" class="text-sm font-medium">
+							Role
+							<span class="text-muted-foreground font-normal">
+								(Managed by your organisation admin)
+							</span>
+						</label>
+						<Input id="role-field" value={roleName} disabled />
+					</div>
+
+					<div class="flex flex-col gap-1.5">
+						<label for="organisation-field" class="text-sm font-medium">
+							Organisation
+							<span class="text-muted-foreground font-normal">
+								(Managed by your organisation admin)
+							</span>
+						</label>
+						<Input id="organisation-field" value={orgName} disabled />
+					</div>
+				</div>
+			</div>
+
+			<div class="mt-4 flex justify-between gap-2">
+				<a href={resolve('/dashboard')}>
+					<Button variant="outline" class="border-primary text-primary">Cancel</Button>
+				</a>
+				<Form.Button class="bg-primary">Save</Form.Button>
 			</div>
 		</div>
 	</div>

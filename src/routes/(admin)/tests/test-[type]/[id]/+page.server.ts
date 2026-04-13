@@ -228,6 +228,8 @@ export const actions: Actions = {
 			);
 			return fail(400, { form });
 		}
+		const isSectionedTest = (form.data.question_sets?.length ?? 0) > 0;
+		const isCreateFlow = params.id === 'new' || params.id === 'convert';
 		const transformedFormData = {
 			...form.data,
 			start_time: form.data.start_time || null,
@@ -237,6 +239,28 @@ export const actions: Actions = {
 			district_ids: form.data.district_ids.map((d) => d.id),
 			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
 		};
+
+		if (isSectionedTest) {
+			delete transformedFormData.question_revision_ids;
+
+			if (isCreateFlow) {
+				transformedFormData.question_sets = form.data.question_sets.map((questionSet) => ({
+					...(questionSet.id ? { id: questionSet.id } : {}),
+					title: questionSet.title,
+					description: questionSet.description || null,
+					max_questions_allowed_to_attempt: questionSet.max_questions_allowed_to_attempt,
+					display_order: questionSet.display_order,
+					marking_scheme: questionSet.marking_scheme || null,
+					question_revision_ids:
+						questionSet.question_revision_ids?.length > 0
+							? questionSet.question_revision_ids
+							: questionSet.question_revisions.map((question) => question.id)
+				}));
+			} else {
+				delete transformedFormData.question_sets;
+			}
+		}
+
 		const response = await fetch(
 			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : '/'}`,
 			{

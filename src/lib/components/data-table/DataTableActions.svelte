@@ -88,22 +88,16 @@
 			{#if canEdit && editInline}
 				<a href={editUrl}>
 					<Button
-						variant="outline"
+						variant="secondary"
 						size="sm"
-						class="border-brand-light text-primary rounded-lg border font-semibold">Edit</Button
+						class="text-primary bg-brand-light rounded-lg font-semibold">Edit</Button
 					>
 				</a>
 			{/if}
 
 			{#if canDelete && deleteInline}
-				<Button
-					variant="ghost"
-					size="sm"
-					class="bg-red-50 text-red-700 hover:bg-red-100"
-					onclick={handleDelete}
-				>
+				<Button variant="ghost" size="icon" class="text-red-700" aria-label="Delete" onclick={handleDelete}>
 					<Trash_2 class="h-4 w-4" />
-					Delete
 				</Button>
 			{/if}
 

@@ -56,17 +56,16 @@ describe('CertificateFormPage', () => {
 
 	it('renders field labels', () => {
 		render(CertificateFormPage, { data: addModeData });
-		expect(screen.getByText('Name')).toBeInTheDocument();
+		expect(screen.getByText('Certificate Name')).toBeInTheDocument();
 		expect(screen.getByText('Description')).toBeInTheDocument();
-		expect(screen.getByText('URL')).toBeInTheDocument();
-		expect(screen.getByText('Is Active?')).toBeInTheDocument();
+		expect(screen.getByText('Certificate URL')).toBeInTheDocument();
+		expect(screen.getByText('Certificate Status')).toBeInTheDocument();
 	});
 
-	it('renders Cancel button linking to certificate list', () => {
+	it('renders back link to certificate list', () => {
 		const { container } = render(CertificateFormPage, { data: addModeData });
-		const cancelLink = container.querySelector('a[href="/certificate/"]');
-		expect(cancelLink).toBeInTheDocument();
-		expect(cancelLink).toHaveTextContent('Cancel');
+		const backLink = container.querySelector('a[href="/certificate"]');
+		expect(backLink).toBeInTheDocument();
 	});
 
 	it('renders Save button', () => {

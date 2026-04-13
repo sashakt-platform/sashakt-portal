@@ -45,7 +45,21 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('What is 2 + 2?')).toBeInTheDocument();
+		expect(
+			screen.getAllByText((_, element) => element?.textContent === 'What is 2 + 2?').length
+		).toBeGreaterThan(0);
+	});
+
+	it('renders backend-authored html question text in dialog', async () => {
+		render(QuestionPreview, {
+			props: { data: createData({ question_text: '<p>What is <strong>2 + 2</strong>?</p>' }) }
+		});
+
+		await openDialog();
+
+		expect(
+			screen.getAllByText((_, element) => element?.textContent === 'What is 2 + 2?').length
+		).toBeGreaterThan(0);
 	});
 
 	it('shows placeholder when question text is empty', async () => {
@@ -110,9 +124,24 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A. Option 1')).toBeInTheDocument();
-		expect(screen.getByText('B. Option 2')).toBeInTheDocument();
-		expect(screen.getByText('C. Option 3')).toBeInTheDocument();
+		expect(screen.getByText('A.')).toBeInTheDocument();
+		expect(screen.getByText('B.')).toBeInTheDocument();
+		expect(screen.getByText('C.')).toBeInTheDocument();
+		expect(screen.getByText('Option 1')).toBeInTheDocument();
+		expect(screen.getByText('Option 2')).toBeInTheDocument();
+		expect(screen.getByText('Option 3')).toBeInTheDocument();
+	});
+
+	it('renders backend-authored html option content in dialog', async () => {
+		const options = [{ key: 'A', value: '<p><strong>Option 1</strong></p>', correct_answer: false }];
+		render(QuestionPreview, {
+			props: { data: createData({ options }) }
+		});
+
+		await openDialog();
+
+		expect(screen.getByText('A.')).toBeInTheDocument();
+		expect(screen.getByText('Option 1')).toBeInTheDocument();
 	});
 
 	it('filters out options with empty values', async () => {
@@ -127,7 +156,8 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A. Valid option')).toBeInTheDocument();
+		expect(screen.getByText('A.')).toBeInTheDocument();
+		expect(screen.getByText('Valid option')).toBeInTheDocument();
 		expect(screen.queryByText(/^B\./)).not.toBeInTheDocument();
 		expect(screen.queryByText(/^C\./)).not.toBeInTheDocument();
 	});

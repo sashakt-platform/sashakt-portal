@@ -314,7 +314,7 @@
 								>
 									{$formData.is_active ? 'Active' : 'Inactive'}
 								</span>
-								<Switch id="is-active" bind:checked={$formData.is_active} />
+								<Switch {...props} bind:checked={$formData.is_active} />
 							</div>
 						</div>
 					{/snippet}

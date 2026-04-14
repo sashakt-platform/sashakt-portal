@@ -13,7 +13,7 @@ export const userSchema = z.object({
 	email: z.string(),
 	phone: z.string(),
 	role_label: z.string().optional(),
-	modified_date: z.string().optional().nullable()
+	modified_date: z.string()
 });
 
 export type User = z.infer<typeof userSchema>;
@@ -40,8 +40,12 @@ export const createColumns = (
 		size: 150
 	}),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date ?? '' }),
+		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
 		size: 160
 	}),
-	createActionsColumn<User>('User', '/users', { ...permissions, editInline: true, deleteInline: true })
+	createActionsColumn<User>('User', '/users', {
+		...permissions,
+		editInline: true,
+		deleteInline: true
+	})
 ];

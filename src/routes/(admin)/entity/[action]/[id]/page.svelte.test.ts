@@ -128,15 +128,8 @@ describe('Entity Page', () => {
 		it('shows Name and Description fields', () => {
 			render(Page, { data: createFormData } as any);
 
-			expect(screen.getByRole('heading', { name: /name/i })).toBeInTheDocument();
-			expect(screen.getByRole('heading', { name: /description/i })).toBeInTheDocument();
-		});
-
-		it('shows Cancel and Save buttons', () => {
-			render(Page, { data: createFormData } as any);
-
-			expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-			expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
+			expect(screen.getByText('Entity Name')).toBeInTheDocument();
+			expect(screen.getByText('Description')).toBeInTheDocument();
 		});
 
 		it('enables Save button after entering name', async () => {

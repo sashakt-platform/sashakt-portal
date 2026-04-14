@@ -123,8 +123,8 @@ describe('UserForm Component', () => {
 			// Check all fields are present
 			expect(screen.getByLabelText('Name')).toBeInTheDocument();
 			expect(screen.getByLabelText('Email')).toBeInTheDocument();
-			expect(screen.getByLabelText('Phone')).toBeInTheDocument();
-			expect(screen.getByText('Is Active?')).toBeInTheDocument();
+			expect(screen.getByLabelText('Phone Number')).toBeInTheDocument();
+			expect(screen.getByText('User Status')).toBeInTheDocument();
 			expect(screen.getByText('Role')).toBeInTheDocument();
 		});
 
@@ -154,7 +154,7 @@ describe('UserForm Component', () => {
 
 			const nameInput = screen.getByLabelText('Name') as HTMLInputElement;
 			const emailInput = screen.getByLabelText('Email') as HTMLInputElement;
-			const phoneInput = screen.getByLabelText('Phone') as HTMLInputElement;
+			const phoneInput = screen.getByLabelText('Phone Number') as HTMLInputElement;
 
 			expect(nameInput.value).toBe('Jane Smith');
 			expect(emailInput.value).toBe('jane.smith@example.com');
@@ -172,7 +172,7 @@ describe('UserForm Component', () => {
 
 			const nameInput = screen.getByLabelText('Name') as HTMLInputElement;
 			const emailInput = screen.getByLabelText('Email') as HTMLInputElement;
-			const phoneInput = screen.getByLabelText('Phone') as HTMLInputElement;
+			const phoneInput = screen.getByLabelText('Phone Number') as HTMLInputElement;
 
 			expect(nameInput.value).toBe("O'Brien-Smith");
 			expect(emailInput.value).toBe('test+admin@example.co.uk');
@@ -213,7 +213,7 @@ describe('UserForm Component', () => {
 
 			const nameInput = screen.getByLabelText('Name') as HTMLInputElement;
 			const emailInput = screen.getByLabelText('Email') as HTMLInputElement;
-			const phoneInput = screen.getByLabelText('Phone') as HTMLInputElement;
+			const phoneInput = screen.getByLabelText('Phone Number') as HTMLInputElement;
 
 			expect(nameInput.value).toBe('Complete User');
 			expect(emailInput.value).toBe('complete@example.com');

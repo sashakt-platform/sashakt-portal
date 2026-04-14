@@ -47,11 +47,11 @@
 	title="Users"
 	subtitle=""
 	infoLabel="Help: User management"
-	infoDescription="This panel displays all users in the system. You can edit or delete a user by clicking the three dots next to their entry."
+	infoDescription="This panel displays all users in the system. You can edit or delete a user by clicking the icons next to their entry."
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
-			<a href={resolve('/users/add/new')}><Button class="font-semibold"><Plus />Add User</Button></a
+			<a href={resolve('/users/add/new')}><Button class="font-semibold"><Plus />Create User</Button></a
 			>
 		{/if}
 	{/snippet}

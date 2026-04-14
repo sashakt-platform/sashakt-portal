@@ -126,12 +126,6 @@ describe('UserForm Component', () => {
 			expect(screen.getByLabelText('Phone')).toBeInTheDocument();
 			expect(screen.getByText('Is Active?')).toBeInTheDocument();
 			expect(screen.getByText('Role')).toBeInTheDocument();
-
-			// Check buttons
-			expect(screen.getByRole('button', { name: /Save/i })).toBeInTheDocument();
-			const cancelLink = screen.getByRole('link', { name: /Cancel/i });
-			expect(cancelLink).toBeInTheDocument();
-			expect(cancelLink).toHaveAttribute('href', '/users');
 		});
 
 		it('should show password fields as optional in edit mode', () => {

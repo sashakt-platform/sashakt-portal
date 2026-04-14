@@ -18,7 +18,6 @@
 	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
-	import { resolve } from '$app/paths';
 
 	let { data }: { data: any } = $props();
 
@@ -106,7 +105,7 @@
 	}
 </script>
 
-<form method="POST" use:enhance action="?/save" class="flex flex-col gap-6">
+<form id="user-form" method="POST" use:enhance action="?/save" class="flex flex-col gap-6">
 	{#if $errors._errors && $errors._errors.length > 0}
 		<div class="border-destructive bg-destructive/10 rounded-md border p-4">
 			<h3 class="text-destructive mb-2 text-sm font-medium">Please fix the following errors:</h3>
@@ -275,10 +274,4 @@
 		</div>
 	{/if}
 
-	<div class="flex justify-end gap-4 pt-6">
-		<Button variant="outline" type="button">
-			<a href={resolve('/users')} class="block">Cancel</a>
-		</Button>
-		<Form.Button>Save</Form.Button>
-	</div>
 </form>

@@ -37,6 +37,7 @@ export const createColumns = (
 	createActionsColumn<EntityType>('Entity', '/entity', {
 		...permissions,
 		editInline: true,
+		deleteInline: true,
 		customActions: (row) => [
 			{
 				label: 'View Records',

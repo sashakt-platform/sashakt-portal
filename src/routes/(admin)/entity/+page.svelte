@@ -11,6 +11,7 @@
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 	import Boxes from '@lucide/svelte/icons/boxes';
 	import SearchInput from '$lib/components/SearchInput.svelte';
+	import StatusFilter from '$lib/components/StatusFilter.svelte';
 
 	let { data } = $props();
 
@@ -22,8 +23,8 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
+	const isActive = $derived(data?.params?.isActive || '');
 
-	// handle sorting
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
 		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
@@ -35,7 +36,6 @@
 		goto(resolve(url.pathname + url.search), { replaceState: false });
 	}
 
-	// create columns for the data table
 	const columns = $derived(
 		createColumns(sortBy, sortOrder, handleSort, {
 			canEdit: canUpdate(data.user, 'entity'),
@@ -43,7 +43,7 @@
 		})
 	);
 
-	const noEntitiesCreatedYet = $derived(totalItems === 0 && !search);
+	const noEntitiesCreatedYet = $derived(totalItems === 0 && !search && isActive === '');
 </script>
 
 <ListingPageLayout
@@ -88,7 +88,10 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<SearchInput placeholder="Search entities..." value={search} useResolve />
+		<div class="flex items-center justify-between gap-2">
+			<SearchInput placeholder="Search entities..." value={search} useResolve />
+			<StatusFilter value={isActive} useResolve />
+		</div>
 	{/snippet}
 
 	{#snippet content()}

@@ -107,7 +107,7 @@
 				</Button>
 			{/if}
 
-			{#each inlineCustomActions as action}
+			{#each inlineCustomActions as action (action.label)}
 				{@const IconComponent = getIcon(action.icon)}
 				{#if action.href && action.method === 'POST'}
 					<form action={action.href} method="POST" class="inline">
@@ -145,6 +145,18 @@
 					</Button>
 				{/if}
 			{/each}
+
+			{#if canDelete && deleteInline}
+				<Button
+					variant="ghost"
+					size="icon"
+					class="text-red-700"
+					aria-label="Delete"
+					onclick={handleDelete}
+				>
+					<Trash_2 class="h-4 w-4" />
+				</Button>
+			{/if}
 		{/if}
 
 		<!-- OVERFLOW ZONE -->
@@ -174,7 +186,7 @@
 						</DropdownMenu.Item>
 					{/if}
 
-					{#each overflowCustomActions as action}
+					{#each overflowCustomActions as action (action.label)}
 						{#if action.href && action.method === 'POST'}
 							<form action={action.href} method="POST">
 								<DropdownMenu.Item class="cursor-pointer p-0">

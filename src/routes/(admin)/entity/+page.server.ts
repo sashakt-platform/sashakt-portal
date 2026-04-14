@@ -14,14 +14,16 @@ export const load = async ({ url }) => {
 	const search = url.searchParams.get('search') || '';
 	const sortBy = url.searchParams.get('sortBy') || '';
 	const sortOrder = url.searchParams.get('sortOrder') || 'asc';
+	const isActiveRaw = url.searchParams.get('isActive')?.toLowerCase();
+	const isActive = isActiveRaw === 'true' || isActiveRaw === 'false' ? isActiveRaw : '';
 
 	// build query parameters
 	const queryParams = new URLSearchParams({
 		page: page.toString(),
 		size: size.toString(),
 		...(search && { name: search }),
-		...(sortBy && { sort_by: sortBy }),
-		...(sortBy && { sort_order: sortOrder })
+		...(sortBy && { sort_by: sortBy, sort_order: sortOrder }),
+		...(isActive && { is_active: isActive })
 	});
 
 	const res = await fetch(`${BACKEND_URL}/entitytype/?${queryParams}`, {
@@ -34,7 +36,7 @@ export const load = async ({ url }) => {
 	if (!res.ok) {
 		return {
 			entities: null,
-			params: { page, size, search, sortBy, sortOrder }
+			params: { page, size, search, sortBy, sortOrder, isActive }
 		};
 	}
 
@@ -43,6 +45,6 @@ export const load = async ({ url }) => {
 	return {
 		entities: entityTypes,
 		totalPages: entityTypes.pages || 0,
-		params: { page, size, search, sortBy, sortOrder }
+		params: { page, size, search, sortBy, sortOrder, isActive }
 	};
 };

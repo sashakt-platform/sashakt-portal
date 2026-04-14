@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen, fireEvent } from '@testing-library/svelte';
+import { render, screen, fireEvent, within } from '@testing-library/svelte';
 import SingleQuestionPage from './+page.svelte';
 import { QuestionTypeEnum } from '$lib/types/question';
 
@@ -333,7 +333,7 @@ describe('Single Question Page - Question Type Selection', () => {
 	describe('Question Type Dropdown', () => {
 		it('should render question type dropdown with label', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Question Type')).toBeInTheDocument();
+			expect(screen.getByText('Question Settings')).toBeInTheDocument();
 		});
 
 		it('should show Single Choice as default selected type', () => {
@@ -664,11 +664,11 @@ describe('Single Question Page - Partial Marking Section', () => {
 			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
 		});
 
-		it('should show "Correct selected" label in partial rows', () => {
+		it('should show "Correct answer" label in partial rows', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
-			expect(screen.getAllByText('Correct selected').length).toBeGreaterThan(0);
+			expect(screen.getAllByText('Correct answer').length).toBeGreaterThan(0);
 		});
 
 		it('should show "Marks" label in partial rows', () => {
@@ -691,7 +691,8 @@ describe('Single Question Page - Partial Marking Section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
-			expect(screen.getAllByText('Correct selected').length).toBe(2);
+			const section = within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section.getAllByText('Correct answer').length).toBe(2);
 		});
 
 		it('should display prefilled num_correct_selected values', () => {
@@ -719,9 +720,10 @@ describe('Single Question Page - Partial Marking Section', () => {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
 
-			const initialRows = screen.getAllByText('Correct selected').length;
+			const section = () => within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			const initialRows = section().getAllByText('Correct answer').length;
 			await fireEvent.click(screen.getByRole('button', { name: /Add Rule/i }));
-			expect(screen.getAllByText('Correct selected').length).toBe(initialRows + 1);
+			expect(section().getAllByText('Correct answer').length).toBe(initialRows + 1);
 		});
 	});
 
@@ -745,10 +747,11 @@ describe('Single Question Page - Partial Marking Section', () => {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
 
-			expect(screen.getAllByText('Correct selected').length).toBe(2);
+			const section = () => within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section().getAllByText('Correct answer').length).toBe(2);
 
 			await fireEvent.click(screen.getByRole('button', { name: /Add Rule/i }));
-			expect(screen.getAllByText('Correct selected').length).toBe(3);
+			expect(section().getAllByText('Correct answer').length).toBe(3);
 
 			const deleteButtons = screen.getAllByTestId('delete-partial-row');
 			expect(deleteButtons.length).toBe(3);
@@ -756,7 +759,7 @@ describe('Single Question Page - Partial Marking Section', () => {
 			expect(deleteButtons[0]).toBeEnabled();
 
 			await fireEvent.click(deleteButtons[0]);
-			expect(screen.getAllByText('Correct selected').length).toBe(2);
+			expect(section().getAllByText('Correct answer').length).toBe(2);
 		});
 	});
 
@@ -900,7 +903,8 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 
 			await fireEvent.click(getPartialCheckbox());
 
-			expect(screen.getAllByText('Correct selected').length).toBe(1);
+			const section = within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section.getAllByText('Correct answer').length).toBe(1);
 		});
 
 		it('should initialize default partial scheme with num_correct_selected=1 and marks=0', async () => {
@@ -937,7 +941,8 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 
 			await fireEvent.click(getPartialCheckbox());
 			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
-			expect(screen.getAllByText('Correct selected').length).toBe(1);
+			const section = within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section.getAllByText('Correct answer').length).toBe(1);
 		});
 
 		it('should auto-uncheck and hide partial rules when question becomes single-choice', async () => {

@@ -98,7 +98,8 @@ describe('page.server load function', () => {
 				size: 10,
 				search: 'test',
 				sortBy: 'name',
-				sortOrder: 'desc'
+				sortOrder: 'desc',
+				isActive: ''
 			});
 		});
 

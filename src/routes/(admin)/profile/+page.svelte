@@ -3,8 +3,27 @@
 	import ChangePassword from './ChangePassword.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { resolve } from '$app/paths';
+	import { superForm } from 'sveltekit-superforms';
+	import { zod4Client } from 'sveltekit-superforms/adapters';
+	import { profileSchema } from './schema';
 
 	const { data } = $props();
+
+	const form = superForm(data.currentUser ? { ...data.currentUser } : data.form, {
+		validators: zod4Client(profileSchema),
+		dataType: 'json',
+		onResult({ result }) {
+			if (result.type === 'redirect') {
+				form.form.update((f) => ({
+					...f,
+					current_password: '',
+					new_password: '',
+					confirm_password: ''
+				}));
+			}
+		}
+	});
+	const { enhance } = form;
 </script>
 
 <div
@@ -23,5 +42,7 @@
 	</div>
 </div>
 
-<AccountForm {data} />
-<ChangePassword {data} />
+<form id="profile-form" method="POST" action="?/save" use:enhance>
+	<AccountForm {form} />
+	<ChangePassword {form} />
+</form>

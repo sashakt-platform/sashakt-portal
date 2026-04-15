@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { deserialize } from '$app/forms';
+	import { dragHandle } from 'svelte-dnd-action';
 	import { Input } from '$lib/components/ui/input';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
@@ -212,7 +213,9 @@
 	<!-- Header bar -->
 	<div class="border-border flex items-center justify-between border-b px-4 py-3">
 		<div class="flex items-center gap-3">
-			<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+			<span use:dragHandle aria-label="drag to reorder">
+				<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+			</span>
 
 			<span
 				class="bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-md text-xs font-semibold"

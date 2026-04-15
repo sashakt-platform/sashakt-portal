@@ -10,6 +10,7 @@
 	import { deserialize } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
+	import { dragHandleZone } from 'svelte-dnd-action';
 	import InlineFieldCard from './InlineFieldCard.svelte';
 	import ChooseFieldTypeDialog from './ChooseFieldTypeDialog.svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
@@ -137,6 +138,34 @@
 		fields = fields.filter((f) => f.id !== fieldId);
 	}
 
+	function handleDndConsider(e: CustomEvent<{ items: FormField[] }>) {
+		fields = e.detail.items;
+	}
+
+	async function handleDndFinalize(e: CustomEvent<{ items: FormField[] }>) {
+		fields = e.detail.items.map((f, i) => ({ ...f, order: i }));
+
+		const fieldIds = fields.map((f) => f.id);
+		const formDataPayload = new FormData();
+		formDataPayload.set('fieldIds', JSON.stringify(fieldIds));
+
+		try {
+			const response = await fetch('?/reorderFields', {
+				method: 'POST',
+				body: formDataPayload
+			});
+
+			const result = deserialize(await response.text());
+			if (result.type === 'failure') {
+				toast.error('Failed to reorder fields');
+				await invalidateAll();
+			}
+		} catch {
+			toast.error('Failed to reorder fields');
+			await invalidateAll();
+		}
+	}
+
 	async function handleDuplicateField(sourceField: FormField) {
 		const duplicateName = `${sourceField.name}_copy`;
 		const duplicateLabel = `${sourceField.label} (Copy)`;
@@ -253,14 +282,23 @@
 			</div>
 
 			<!-- Field Cards -->
-			{#each fields as field, i (field.id)}
-				<InlineFieldCard
-					{field}
-					index={i}
-					onDelete={handleFieldDeleted}
-					onDuplicate={handleDuplicateField}
-				/>
-			{/each}
+			{#if fields.length > 0}
+				<div
+					class="flex flex-col gap-6"
+					use:dragHandleZone={{ items: fields, flipDurationMs: 150 }}
+					onconsider={handleDndConsider}
+					onfinalize={handleDndFinalize}
+				>
+					{#each fields as field, i (field.id)}
+						<InlineFieldCard
+							{field}
+							index={i}
+							onDelete={handleFieldDeleted}
+							onDuplicate={handleDuplicateField}
+						/>
+					{/each}
+				</div>
+			{/if}
 
 			<!-- Add Field Button -->
 			<button

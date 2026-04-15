@@ -138,7 +138,7 @@
 				<Button
 					variant="ghost"
 					size="icon"
-					class="text-red-700"
+					class="text-destructive"
 					aria-label="Delete"
 					onclick={handleDelete}
 				>

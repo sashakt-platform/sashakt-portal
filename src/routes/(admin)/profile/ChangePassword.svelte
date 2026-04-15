@@ -1,12 +1,13 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import type { SuperForm } from 'sveltekit-superforms';
+	import type { SuperForm, Infer } from 'sveltekit-superforms';
+	import type { ProfileSchema } from './schema';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 
-	let { form }: { form: SuperForm<any> } = $props();
+	let { form }: { form: SuperForm<Infer<ProfileSchema>> } = $props();
 
 	const { form: formData } = form;
 
@@ -15,12 +16,7 @@
 	let showConfirm = $state(false);
 </script>
 
-{#snippet passwordInput(
-	name: string,
-	label: string,
-	show: boolean,
-	toggleShow: () => void
-)}
+{#snippet passwordInput(name: string, label: string, show: boolean, toggleShow: () => void)}
 	<Form.Field {form} {name} class="flex flex-col gap-1.5">
 		<Form.Control>
 			{#snippet children({ props })}
@@ -59,9 +55,19 @@
 			</div>
 
 			<div class="flex flex-col gap-6 p-8">
-				{@render passwordInput('current_password', 'Current password', showCurrent, () => (showCurrent = !showCurrent))}
+				{@render passwordInput(
+					'current_password',
+					'Current password',
+					showCurrent,
+					() => (showCurrent = !showCurrent)
+				)}
 				{@render passwordInput('new_password', 'New password', showNew, () => (showNew = !showNew))}
-				{@render passwordInput('confirm_password', 'Re-enter password', showConfirm, () => (showConfirm = !showConfirm))}
+				{@render passwordInput(
+					'confirm_password',
+					'Re-enter password',
+					showConfirm,
+					() => (showConfirm = !showConfirm)
+				)}
 			</div>
 		</div>
 	</div>

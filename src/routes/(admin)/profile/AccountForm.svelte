@@ -1,11 +1,11 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import type { SuperForm } from 'sveltekit-superforms';
-
+	import type { SuperForm, Infer } from 'sveltekit-superforms';
+	import type { ProfileSchema } from './schema';
 	import Settings from '@lucide/svelte/icons/settings';
 
-	let { form }: { form: SuperForm<any> } = $props();
+	let { form }: { form: SuperForm<Infer<ProfileSchema>> } = $props();
 
 	const { form: formData } = form;
 </script>

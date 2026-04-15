@@ -8,30 +8,38 @@
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import { toast } from 'svelte-sonner';
 
+	type AttachmentMode = 'none' | 'image' | 'video' | 'audio';
+
 	let {
 		media = null,
 		onStagedFileChange,
 		onStagedUrlChange,
 		onDeleteImage,
-		onDeleteExternal
+		onDeleteExternal,
+		hideTrigger = false,
+		mode = 'none' as AttachmentMode,
+		onModeChange
 	}: {
 		media: TMedia | null | undefined;
 		onStagedFileChange?: (file: File | null) => void;
 		onStagedUrlChange?: (url: string) => void;
 		onDeleteImage?: () => void;
 		onDeleteExternal?: () => void;
+		hideTrigger?: boolean;
+		mode?: AttachmentMode;
+		onModeChange?: (mode: AttachmentMode) => void;
 	} = $props();
 
-	type AttachmentMode = 'none' | 'image' | 'video' | 'audio';
-
 	let showDropdown = $state(false);
-	let attachmentMode = $state<AttachmentMode>('none');
 	let fileInput: HTMLInputElement;
 	let previewUrl = $state<string | null>(null);
 	let selectedFile = $state<File | null>(null);
 	let externalUrlInput = $state('');
 	let isDeletingImage = $state(false);
 	let isDeletingExternal = $state(false);
+	let internalMode = $state<AttachmentMode>('none');
+	// When hideTrigger is true, parent controls the mode; otherwise use internal state
+	const attachmentMode = $derived(hideTrigger ? mode : internalMode);
 
 	const MAX_FILE_SIZE_MB = 5;
 	const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
@@ -44,33 +52,44 @@
 		hasExistingImage || hasExistingExternal || !!selectedFile || externalUrlInput.trim().length > 0
 	);
 
-	function selectMode(mode: AttachmentMode) {
-		attachmentMode = mode;
-		showDropdown = false;
-		if (mode === 'image') {
+	// Trigger file input when mode changes to 'image'
+	let prevMode = $state<AttachmentMode>('none');
+	$effect(() => {
+		if (attachmentMode === 'image' && prevMode !== 'image' && !selectedFile && !hasExistingImage) {
 			fileInput?.click();
 		}
+		prevMode = attachmentMode;
+	});
+
+	function setMode(newMode: AttachmentMode) {
+		internalMode = newMode;
+		onModeChange?.(newMode);
+	}
+
+	function selectMode(m: AttachmentMode) {
+		setMode(m);
+		showDropdown = false;
 	}
 
 	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) {
-			attachmentMode = 'none';
+			setMode('none');
 			return;
 		}
 
 		if (file.size > MAX_FILE_SIZE) {
 			toast.error(`File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB.`);
 			input.value = '';
-			attachmentMode = 'none';
+			setMode('none');
 			return;
 		}
 
 		if (!ALLOWED_TYPES.includes(file.type)) {
 			toast.error('Invalid file type. Allowed: PNG, JPG, WebP, GIF');
 			input.value = '';
-			attachmentMode = 'none';
+			setMode('none');
 			return;
 		}
 
@@ -88,14 +107,14 @@
 		}
 		selectedFile = null;
 		previewUrl = null;
-		attachmentMode = 'none';
+		setMode('none');
 		if (fileInput) fileInput.value = '';
 		onStagedFileChange?.(null);
 	}
 
 	function clearUrl() {
 		externalUrlInput = '';
-		attachmentMode = 'none';
+		setMode('none');
 		onStagedUrlChange?.('');
 	}
 
@@ -110,7 +129,7 @@
 			await onDeleteImage();
 		} finally {
 			isDeletingImage = false;
-			attachmentMode = 'none';
+			setMode('none');
 		}
 	}
 
@@ -121,7 +140,7 @@
 			await onDeleteExternal();
 		} finally {
 			isDeletingExternal = false;
-			attachmentMode = 'none';
+			setMode('none');
 		}
 	}
 
@@ -235,7 +254,7 @@
 			class="text-muted-foreground hover:text-destructive ml-auto"
 			onclick={(e) => {
 				e.stopPropagation();
-				attachmentMode = 'none';
+				setMode('none');
 			}}
 		>
 			<X size={14} />
@@ -292,7 +311,7 @@
 {/if}
 
 <!-- Add attachment trigger -->
-{#if !hasAttachment && attachmentMode === 'none'}
+{#if !hideTrigger && !hasAttachment && attachmentMode === 'none'}
 	<div class="relative flex justify-end">
 		<button
 			type="button"
@@ -306,12 +325,12 @@
 		{#if showDropdown}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
-				class="absolute top-full right-0 z-10 mt-1 w-48 rounded-lg border bg-white py-1 shadow-lg"
+				class="bg-popover absolute top-full right-0 z-10 mt-1 w-48 rounded-lg border py-1 shadow-lg"
 				onmouseleave={() => (showDropdown = false)}
 			>
 				<button
 					type="button"
-					class="flex w-full items-center justify-between px-4 py-2 text-sm hover:bg-gray-50"
+					class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
 					onclick={() => selectMode('image')}
 				>
 					<span class="flex items-center gap-2">
@@ -322,7 +341,7 @@
 				</button>
 				<button
 					type="button"
-					class="flex w-full items-center justify-between px-4 py-2 text-sm hover:bg-gray-50"
+					class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
 					onclick={() => selectMode('video')}
 				>
 					<span class="flex items-center gap-2">
@@ -333,7 +352,7 @@
 				</button>
 				<button
 					type="button"
-					class="flex w-full items-center justify-between px-4 py-2 text-sm hover:bg-gray-50"
+					class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
 					onclick={() => selectMode('audio')}
 				>
 					<span class="flex items-center gap-2">

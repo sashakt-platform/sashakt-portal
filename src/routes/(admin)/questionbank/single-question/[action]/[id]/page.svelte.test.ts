@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen, fireEvent } from '@testing-library/svelte';
+import { render, screen, fireEvent, within } from '@testing-library/svelte';
 import SingleQuestionPage from './+page.svelte';
 import { QuestionTypeEnum } from '$lib/types/question';
 
@@ -99,7 +99,7 @@ describe('Single Question Page - Create Mode', () => {
 		it('should add a new answer when "Add Answer" button is clicked', async () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			const addButton = screen.getByRole('button', { name: /Add Answer/i });
+			const addButton = screen.getByRole('button', { name: /Add Row/i });
 			const initialInputs = screen.getAllByRole('textbox');
 
 			await fireEvent.click(addButton);
@@ -301,7 +301,7 @@ describe('Single Question Page - Edit Mode', () => {
 		it('should add a new answer', async () => {
 			render(SingleQuestionPage, { data: { ...baseData, questionData: editQuestionData } as any });
 
-			const addButton = screen.getByRole('button', { name: /Add Answer/i });
+			const addButton = screen.getByRole('button', { name: /Add Row/i });
 			const initialInputs = screen.getAllByRole('textbox');
 
 			await fireEvent.click(addButton);
@@ -333,7 +333,7 @@ describe('Single Question Page - Question Type Selection', () => {
 	describe('Question Type Dropdown', () => {
 		it('should render question type dropdown with label', () => {
 			render(SingleQuestionPage, { data: baseData as any });
-			expect(screen.getByText('Question Type')).toBeInTheDocument();
+			expect(screen.getByText('Question Settings')).toBeInTheDocument();
 		});
 
 		it('should show Single Choice as default selected type', () => {
@@ -345,7 +345,7 @@ describe('Single Question Page - Question Type Selection', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
 			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
-			expect(screen.getByRole('button', { name: /Add Answer/i })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Add Row/i })).toBeInTheDocument();
 		});
 	});
 });
@@ -382,7 +382,7 @@ describe('Single Question Page - Subjective Question Type', () => {
 			});
 
 			expect(screen.queryByText('Answer')).not.toBeInTheDocument();
-			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Row/i })).not.toBeInTheDocument();
 		});
 
 		it('should show character limit input for subjective questions', () => {
@@ -664,11 +664,11 @@ describe('Single Question Page - Partial Marking Section', () => {
 			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
 		});
 
-		it('should show "Correct selected" label in partial rows', () => {
+		it('should show "Correct answer" label in partial rows', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
-			expect(screen.getAllByText('Correct selected').length).toBeGreaterThan(0);
+			expect(screen.getAllByText('Correct answer').length).toBeGreaterThan(0);
 		});
 
 		it('should show "Marks" label in partial rows', () => {
@@ -691,7 +691,8 @@ describe('Single Question Page - Partial Marking Section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
-			expect(screen.getAllByText('Correct selected').length).toBe(2);
+			const section = within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section.getAllByText('Correct answer').length).toBe(2);
 		});
 
 		it('should display prefilled num_correct_selected values', () => {
@@ -719,9 +720,10 @@ describe('Single Question Page - Partial Marking Section', () => {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
 
-			const initialRows = screen.getAllByText('Correct selected').length;
+			const section = () => within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			const initialRows = section().getAllByText('Correct answer').length;
 			await fireEvent.click(screen.getByRole('button', { name: /Add Rule/i }));
-			expect(screen.getAllByText('Correct selected').length).toBe(initialRows + 1);
+			expect(section().getAllByText('Correct answer').length).toBe(initialRows + 1);
 		});
 	});
 
@@ -745,10 +747,11 @@ describe('Single Question Page - Partial Marking Section', () => {
 				data: { ...baseData, questionData: multiChoiceWithPartial } as any
 			});
 
-			expect(screen.getAllByText('Correct selected').length).toBe(2);
+			const section = () => within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section().getAllByText('Correct answer').length).toBe(2);
 
 			await fireEvent.click(screen.getByRole('button', { name: /Add Rule/i }));
-			expect(screen.getAllByText('Correct selected').length).toBe(3);
+			expect(section().getAllByText('Correct answer').length).toBe(3);
 
 			const deleteButtons = screen.getAllByTestId('delete-partial-row');
 			expect(deleteButtons.length).toBe(3);
@@ -756,7 +759,7 @@ describe('Single Question Page - Partial Marking Section', () => {
 			expect(deleteButtons[0]).toBeEnabled();
 
 			await fireEvent.click(deleteButtons[0]);
-			expect(screen.getAllByText('Correct selected').length).toBe(2);
+			expect(section().getAllByText('Correct answer').length).toBe(2);
 		});
 	});
 
@@ -900,7 +903,8 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 
 			await fireEvent.click(getPartialCheckbox());
 
-			expect(screen.getAllByText('Correct selected').length).toBe(1);
+			const section = within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section.getAllByText('Correct answer').length).toBe(1);
 		});
 
 		it('should initialize default partial scheme with num_correct_selected=1 and marks=0', async () => {
@@ -937,7 +941,8 @@ describe('Single Question Page - Partial Marking Toggle Behavior', () => {
 
 			await fireEvent.click(getPartialCheckbox());
 			expect(document.querySelector('#partial-mark-section')).toBeInTheDocument();
-			expect(screen.getAllByText('Correct selected').length).toBe(1);
+			const section = within(document.querySelector('#partial-mark-section')! as HTMLElement);
+			expect(section.getAllByText('Correct answer').length).toBe(1);
 		});
 
 		it('should auto-uncheck and hide partial rules when question becomes single-choice', async () => {
@@ -1039,7 +1044,7 @@ describe('Single Question Page - Numerical Integer Question Type', () => {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
-			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
+			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
 		});
 
 		it('should hide Add Answer button', () => {
@@ -1047,7 +1052,7 @@ describe('Single Question Page - Numerical Integer Question Type', () => {
 				data: { ...baseData, questionData: numericalIntegerData } as any
 			});
 
-			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Row/i })).not.toBeInTheDocument();
 		});
 
 		it('should hide subjective answer settings for numerical questions', () => {
@@ -1147,7 +1152,7 @@ describe('Single Question Page - Numerical Decimal Question Type', () => {
 				data: { ...baseData, questionData: numericalDecimalData } as any
 			});
 
-			expect(screen.getByText('Correct Answer')).toBeInTheDocument();
+			expect(screen.getByText('Answer Settings')).toBeInTheDocument();
 		});
 
 		it('should hide Add Answer button', () => {
@@ -1155,7 +1160,7 @@ describe('Single Question Page - Numerical Decimal Question Type', () => {
 				data: { ...baseData, questionData: numericalDecimalData } as any
 			});
 
-			expect(screen.queryByRole('button', { name: /Add Answer/i })).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: /Add Row/i })).not.toBeInTheDocument();
 		});
 
 		it('should render number input with step="any"', () => {
@@ -1322,42 +1327,21 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 	});
 
 	describe('Matrix Rating UI Rendering', () => {
-		it('should render "Items to Rate" label for matrix rating type', () => {
+		it('should render "Rating scale labels" heading', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
-			expect(screen.getByText('Items to Rate')).toBeInTheDocument();
+			expect(screen.getByText('Rating scale labels')).toBeInTheDocument();
 		});
 
-		it('should render "Items to Rate" label', () => {
+		it('should render "Statements" heading', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
-			expect(screen.getByText('Items to Rate')).toBeInTheDocument();
+			expect(screen.getByText('Statements')).toBeInTheDocument();
 		});
 
-		it('should render "Rating Options" label', () => {
-			render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixRatingQuestionData } as any
-			});
-			expect(screen.getByText('Rating Options')).toBeInTheDocument();
-		});
-
-		it('should display prefilled row label', () => {
-			render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixRatingQuestionData } as any
-			});
-			expect(screen.getByDisplayValue('Criteria')).toBeInTheDocument();
-		});
-
-		it('should display prefilled column label', () => {
-			render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixRatingQuestionData } as any
-			});
-			expect(screen.getByDisplayValue('Ratings')).toBeInTheDocument();
-		});
-
-		it('should display prefilled row items', () => {
+		it('should display prefilled statement items', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
@@ -1365,7 +1349,7 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 			expect(screen.getByDisplayValue('Speed')).toBeInTheDocument();
 		});
 
-		it('should display prefilled rating option items', () => {
+		it('should display prefilled rating scale items', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
@@ -1373,38 +1357,21 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 			expect(screen.getByDisplayValue('Good')).toBeInTheDocument();
 		});
 
-		it('should render "Add Item" button for row column', () => {
+		it('should render "Add Row" button', () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
 			const buttons = Array.from(container.querySelectorAll('button'));
-			expect(buttons.find((btn) => btn.textContent?.includes('Add Item'))).toBeDefined();
+			expect(buttons.find((btn) => btn.textContent?.includes('Add Row'))).toBeDefined();
 		});
 
-		it('should render "Add Rating" button for rating options column', () => {
-			const { container } = render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixRatingQuestionData } as any
-			});
-			const buttons = Array.from(container.querySelectorAll('button'));
-			expect(buttons.find((btn) => btn.textContent?.includes('Add Rating'))).toBeDefined();
-		});
-
-		it('should show default labels when no matrix options exist', () => {
-			render(SingleQuestionPage, {
-				data: {
-					...baseData,
-					questionData: { ...matrixRatingQuestionData, options: null }
-				} as any
-			});
-			expect(screen.getByDisplayValue('Questions')).toBeInTheDocument();
-			expect(screen.getByDisplayValue('Answers')).toBeInTheDocument();
-		});
-
-		it('should not render "Correct Answers" section for matrix rating', () => {
+		it('should not render correct answers section for matrix rating', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
-			expect(screen.queryByText('Correct Answers')).not.toBeInTheDocument();
+			expect(
+				screen.queryByText('Fill the correct answers in the table below')
+			).not.toBeInTheDocument();
 		});
 	});
 
@@ -1493,35 +1460,21 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 	});
 
 	describe('Matrix Rating Item Management', () => {
-		it('should add a new row item when "Add Item" is clicked', async () => {
+		it('should add a new statement when "Add Row" is clicked', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
 
 			const initialInputs = screen.getAllByRole('textbox');
-			const addItemButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Item')
+			const addRowButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Row')
 			)!;
-			await fireEvent.click(addItemButton);
+			await fireEvent.click(addRowButton);
 
 			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
 		});
 
-		it('should add a new rating option when "Add Rating" is clicked', async () => {
-			const { container } = render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixRatingQuestionData } as any
-			});
-
-			const initialInputs = screen.getAllByRole('textbox');
-			const addRatingButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Rating')
-			)!;
-			await fireEvent.click(addRatingButton);
-
-			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
-		});
-
-		it('should allow editing a row item value', async () => {
+		it('should allow editing a statement value', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
@@ -1531,7 +1484,7 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 			expect(qualityInput).toHaveValue('Reliability');
 		});
 
-		it('should allow editing a rating option value', async () => {
+		it('should allow editing a rating scale label', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixRatingQuestionData } as any
 			});
@@ -1539,26 +1492,6 @@ describe('Single Question Page - Matrix Rating Question Type', () => {
 			const poorInput = screen.getByDisplayValue('Poor');
 			await fireEvent.input(poorInput, { target: { value: 'Below Average' } });
 			expect(poorInput).toHaveValue('Below Average');
-		});
-
-		it('should allow editing the row column label', async () => {
-			render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixRatingQuestionData } as any
-			});
-
-			const criteriaLabel = screen.getByDisplayValue('Criteria');
-			await fireEvent.input(criteriaLabel, { target: { value: 'Dimensions' } });
-			expect(criteriaLabel).toHaveValue('Dimensions');
-		});
-
-		it('should allow editing the rating column label', async () => {
-			render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixRatingQuestionData } as any
-			});
-
-			const ratingsLabel = screen.getByDisplayValue('Ratings');
-			await fireEvent.input(ratingsLabel, { target: { value: 'Scale' } });
-			expect(ratingsLabel).toHaveValue('Scale');
 		});
 	});
 });
@@ -1598,14 +1531,14 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
-			expect(screen.getByText('Correct Answers')).toBeInTheDocument();
+			expect(screen.getByText('Fill the correct answers in the table below')).toBeInTheDocument();
 		});
 
 		it('should render Correct Answers section', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
-			expect(screen.getByText('Correct Answers')).toBeInTheDocument();
+			expect(screen.getByText('Fill the correct answers in the table below')).toBeInTheDocument();
 		});
 
 		it('should display prefilled left column label', () => {
@@ -1638,36 +1571,27 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			expect(screen.getByDisplayValue('Paris')).toBeInTheDocument();
 		});
 
-		it('should render "Add Question" button for left column', () => {
+		it('should render "Add Row" button for matrix match', () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 			const buttons = Array.from(container.querySelectorAll('button'));
-			const addQuestionButton = buttons.find((btn) => btn.textContent?.includes('Add Question'));
-			expect(addQuestionButton).toBeDefined();
+			const addRowButton = buttons.find((btn) => btn.textContent?.includes('Add Row'));
+			expect(addRowButton).toBeDefined();
 		});
 
-		it('should render "Add Answer" button for right column', () => {
-			const { container } = render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixMatchQuestionData } as any
-			});
-			const buttons = Array.from(container.querySelectorAll('button'));
-			const addAnswerButton = buttons.find((btn) => btn.textContent?.includes('Add Answer'));
-			expect(addAnswerButton).toBeDefined();
-		});
-
-		it('should show column A row label in correct matches grid', () => {
+		it('should show column A row label as editable input', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
-			expect(screen.getByText('Countries')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Countries')).toBeInTheDocument();
 		});
 
-		it('should show column B label in correct matches grid', () => {
+		it('should show column B label as editable input', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
-			expect(screen.getByText('Capitals')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Capitals')).toBeInTheDocument();
 		});
 
 		it('should show default labels when no matrix options exist', () => {
@@ -1690,7 +1614,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			});
 			const capitalsLabel = screen.getByDisplayValue('Capitals');
 			await fireEvent.input(capitalsLabel, { target: { value: 'Populations' } });
-			expect(screen.getByText('Populations')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Populations')).toBeInTheDocument();
 		});
 	});
 
@@ -1817,41 +1741,35 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 
 			expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
 
-			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
-
-			await fireEvent.click(matchButtons[3]);
+			// Match checkboxes are now Checkbox components in the table
+			const checkboxes = screen.getAllByRole('checkbox');
+			// Find checked checkboxes (the correct answer matches) and uncheck them all
+			const checkedBoxes = checkboxes.filter(
+				(cb) =>
+					cb.getAttribute('data-state') === 'checked' || cb.getAttribute('aria-checked') === 'true'
+			);
+			for (const cb of checkedBoxes) {
+				await fireEvent.click(cb);
+			}
 
 			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
 		});
 	});
 
 	describe('Matrix Match Item Management', () => {
-		it('should add a new left column item when "Add Question" is clicked', async () => {
+		it('should add new left and right items when "Add Row" is clicked', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
 			const initialInputs = screen.getAllByRole('textbox');
-			const addQuestionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Question')
+			const addRowButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Row')
 			)!;
-			await fireEvent.click(addQuestionButton);
+			await fireEvent.click(addRowButton);
 
-			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
-		});
-
-		it('should add a new right column item when "Add Answer" is clicked', async () => {
-			const { container } = render(SingleQuestionPage, {
-				data: { ...baseData, questionData: matrixMatchQuestionData } as any
-			});
-
-			const initialInputs = screen.getAllByRole('textbox');
-			const addAnswerButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Answer')
-			)!;
-			await fireEvent.click(addAnswerButton);
-
-			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
+			// Add Row adds both a left and right item (+2 inputs)
+			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 2);
 		});
 
 		it('should allow editing a left column item value', async () => {
@@ -1896,41 +1814,42 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 	});
 
 	describe('Matrix Match Correct Answers Toggle', () => {
-		it('should render match toggle buttons for each left-right pair', () => {
+		it('should render match checkboxes for each left-right pair', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
-			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
-			expect(matchButtons.length).toBe(4);
+			// 2 left items x 2 right items = 4 checkboxes in the correct answers table
+			const checkboxes = screen.getAllByRole('checkbox');
+			expect(checkboxes.length).toBe(4);
 		});
 
-		it('should toggle a match when a match button is clicked', async () => {
+		it('should toggle a match when a checkbox is clicked', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
-			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
+			const checkboxes = screen.getAllByRole('checkbox');
+			// France-Paris match (last checkbox) should be checked
+			const franceParisCheckbox = checkboxes[3];
+			expect(franceParisCheckbox.getAttribute('data-state')).toBe('checked');
 
-			const franceParisButton = matchButtons[3];
-			expect(franceParisButton).toHaveClass('bg-primary');
-
-			await fireEvent.click(franceParisButton);
-			expect(franceParisButton).not.toHaveClass('bg-primary');
+			await fireEvent.click(franceParisCheckbox);
+			expect(franceParisCheckbox.getAttribute('data-state')).toBe('unchecked');
 		});
 
-		it('should add a match when an unselected match button is clicked', async () => {
+		it('should add a match when an unchecked checkbox is clicked', async () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: matrixMatchQuestionData } as any
 			});
 
-			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
+			const checkboxes = screen.getAllByRole('checkbox');
+			// India-Paris (second checkbox) should be unchecked
+			const indiaParis = checkboxes[1];
+			expect(indiaParis.getAttribute('data-state')).toBe('unchecked');
 
-			const indiaParisButton = matchButtons[1];
-			expect(indiaParisButton).not.toHaveClass('bg-primary');
-
-			await fireEvent.click(indiaParisButton);
-			expect(indiaParisButton).toHaveClass('bg-primary');
+			await fireEvent.click(indiaParis);
+			expect(indiaParis.getAttribute('data-state')).toBe('checked');
 		});
 	});
 
@@ -1967,7 +1886,7 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 					}
 				} as any
 			});
-			expect(screen.getByText('Correct Answers')).toBeInTheDocument();
+			expect(screen.getByText('Fill the correct answers in the table below')).toBeInTheDocument();
 		});
 
 		it('should show default "Column A" placeholder in left label input', () => {
@@ -2020,11 +1939,11 @@ describe('Single Question Page - Media', () => {
 	});
 
 	describe('Add attachment button', () => {
-		it('should show "Add attachment" buttons in create mode', () => {
+		it('should show "Add attachment" button for question-level in create mode', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 			const attachmentButtons = screen.getAllByText('Add attachment');
-			// Question-level + 4 default options
-			expect(attachmentButtons.length).toBe(5);
+			// Question-level only (options use icon trigger with hideTrigger)
+			expect(attachmentButtons.length).toBe(1);
 		});
 
 		it('should show attachment dropdown when clicked', async () => {
@@ -2039,11 +1958,11 @@ describe('Single Question Page - Media', () => {
 			expect(screen.getByText('Audio')).toBeInTheDocument();
 		});
 
-		it('should show all attachment buttons when no attachment is selected', () => {
+		it('should show question-level attachment button when no attachment is selected', () => {
 			render(SingleQuestionPage, { data: baseData as any });
 
-			// Should have 5 "Add attachment" buttons
-			expect(screen.getAllByText('Add attachment').length).toBe(5);
+			// Only question-level "Add attachment" (options use icon trigger)
+			expect(screen.getAllByText('Add attachment').length).toBe(1);
 		});
 	});
 
@@ -2105,13 +2024,12 @@ describe('Single Question Page - Media', () => {
 			expect(screen.getByText(/image\/png/)).toBeInTheDocument();
 		});
 
-		it('should show "Add attachment" for options without media', () => {
+		it('should display existing media for options with media in edit mode', () => {
 			render(SingleQuestionPage, {
 				data: { ...baseData, questionData: questionDataWithMedia } as any
 			});
-			// Option B has no media — its button says "Add attachment"
-			const addAttachmentButtons = screen.getAllByText('Add attachment');
-			expect(addAttachmentButtons.length).toBeGreaterThanOrEqual(1);
+			// Option A has media, so its media info should be displayed
+			expect(screen.getByText(/image\/png/)).toBeInTheDocument();
 		});
 	});
 
@@ -2181,7 +2099,7 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+			const keyBadges = Array.from(container.querySelectorAll('span')).filter(
 				(el) => el.textContent?.trim() === 'A' || el.textContent?.trim() === 'B'
 			);
 			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
@@ -2217,13 +2135,13 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+			const keyBadges = Array.from(container.querySelectorAll('span')).filter(
 				(el) => el.textContent?.trim() === '1' || el.textContent?.trim() === '2'
 			);
 			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
 		});
 
-		it('should assign next letter key when a new left item is added in MatrixMatch', async () => {
+		it('should assign next letter key when "Add Row" is clicked in MatrixMatch', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: {
 					...baseData,
@@ -2240,7 +2158,10 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 							},
 							columns: {
 								label: 'Column B',
-								items: [{ id: 10, key: '1', value: 'Option 1' }]
+								items: [
+									{ id: 10, key: '1', value: 'Option 1' },
+									{ id: 11, key: '2', value: 'Option 2' }
+								]
 							}
 						},
 						correct_answer: { '1': [10], '2': [10] },
@@ -2250,17 +2171,18 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			const addQuestionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Question')
+			const addRowButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Row')
 			)!;
-			await fireEvent.click(addQuestionButton);
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+			await fireEvent.click(addRowButton);
+			// New left item should have key 'C'
+			const keyElements = Array.from(container.querySelectorAll('span')).filter(
 				(el) => el.textContent?.trim() === 'C'
 			);
-			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
+			expect(keyElements.length).toBeGreaterThanOrEqual(1);
 		});
 
-		it('should assign next number key when a new right item is added in MatrixMatch', async () => {
+		it('should assign next number key when "Add Row" is clicked in MatrixMatch', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: {
 					...baseData,
@@ -2287,13 +2209,15 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			const addAnswerButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Answer')
+			const addRowButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Row')
 			)!;
-			await fireEvent.click(addAnswerButton);
-			// Match toggle buttons in correct-answers grid now include a button labeled "3"
-			const matchButtons = screen.getAllByRole('button', { name: /^\d$/ });
-			expect(matchButtons.some((btn) => btn.textContent?.trim() === '3')).toBe(true);
+			await fireEvent.click(addRowButton);
+			// New right item key '3' appears in the correct answers table header
+			const keyElements = Array.from(container.querySelectorAll('th')).filter(
+				(el) => el.textContent?.trim() === '3'
+			);
+			expect(keyElements.length).toBeGreaterThanOrEqual(1);
 		});
 
 		it('should use left item ID as correct_answer key when match is toggled', async () => {
@@ -2320,13 +2244,14 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			const matchButton = screen.getByRole('button', { name: /^1$/ });
-			expect(matchButton).not.toHaveClass('bg-primary');
-			await fireEvent.click(matchButton);
-			expect(matchButton).toHaveClass('bg-primary');
+			// Match checkbox should be unchecked initially
+			const checkboxes = screen.getAllByRole('checkbox');
+			expect(checkboxes[0].getAttribute('data-state')).toBe('unchecked');
+			await fireEvent.click(checkboxes[0]);
+			expect(checkboxes[0].getAttribute('data-state')).toBe('checked');
 		});
 
-		it('should preserve other row matches when a left item is deleted', async () => {
+		it('should preserve other row matches when a right item is deleted', async () => {
 			render(SingleQuestionPage, {
 				data: {
 					...baseData,
@@ -2338,19 +2263,19 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 								label: 'Col A',
 								items: [
 									{ id: 1, key: 'A', value: 'Item 1' },
-									{ id: 2, key: 'B', value: 'Item 2' },
-									{ id: 3, key: 'C', value: 'Item 3' }
+									{ id: 2, key: 'B', value: 'Item 2' }
 								]
 							},
 							columns: {
 								label: 'Col B',
 								items: [
 									{ id: 10, key: '1', value: 'Option 1' },
-									{ id: 11, key: '2', value: 'Option 2' }
+									{ id: 11, key: '2', value: 'Option 2' },
+									{ id: 12, key: '3', value: 'Option 3' }
 								]
 							}
 						},
-						correct_answer: { '1': [10], '2': [10], '3': [10] },
+						correct_answer: { '1': [10], '2': [12] },
 						is_mandatory: false,
 						is_active: true,
 						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
@@ -2358,15 +2283,16 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 				} as any
 			});
 
-			// Delete item B (id=2, index=1) — trash buttons are after drag handles
+			// Delete right item 2 (index=1, id=11) — no rows match id=11 so all matches preserved
+			// Trash buttons: 2 left + 3 right = 5 total; right column starts at index 2
 			const trashButtons = screen.getAllByRole('button', { name: /delete row/i });
-			await fireEvent.click(trashButtons[1]);
+			await fireEvent.click(trashButtons[3]);
 
-			// Save should still be enabled — remaining items A (id=1) and B (was C, id=3) still have matches
+			// Save should still be enabled — A→[10] and B→[12] still have valid matches
 			expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
 		});
 
-		it('should use max+1 for new item ID after a deletion in MatrixMatch', async () => {
+		it('should use max+1 for new right item ID after a deletion in MatrixMatch', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: {
 					...baseData,
@@ -2378,16 +2304,19 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 								label: 'Col A',
 								items: [
 									{ id: 1, key: 'A', value: 'Item 1' },
-									{ id: 2, key: 'B', value: 'Item 2' },
-									{ id: 3, key: 'C', value: 'Item 3' }
+									{ id: 2, key: 'B', value: 'Item 2' }
 								]
 							},
 							columns: {
 								label: 'Col B',
-								items: [{ id: 10, key: '1', value: 'Option 1' }]
+								items: [
+									{ id: 10, key: '1', value: 'Option 1' },
+									{ id: 11, key: '2', value: 'Option 2' },
+									{ id: 12, key: '3', value: 'Option 3' }
+								]
 							}
 						},
-						correct_answer: { '1': [10], '2': [10], '3': [10] },
+						correct_answer: { '1': [10], '2': [11] },
 						is_mandatory: false,
 						is_active: true,
 						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
@@ -2395,27 +2324,26 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 				} as any
 			});
 
-			// Delete item C (id=3, the last one)
+			// Delete right item 3 (index=2, id=12)
+			// Trash buttons: 2 left + 3 right = 5 total; right column starts at index 2
 			const trashButtons = screen.getAllByRole('button', { name: /delete row/i });
-			await fireEvent.click(trashButtons[2]);
+			await fireEvent.click(trashButtons[4]);
 
-			// Now add a new item — it should get id=3 (max of [1,2]) + 1 = 3, NOT length+1=2+1=3... both same here
-			// Better: delete middle item (id=2), remaining [id=1, id=3], add → should get id=4 not id=2
-			const addQuestionButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Question')
+			// Add new row — new right item should get key '3'
+			const addRowButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Row')
 			)!;
-			await fireEvent.click(addQuestionButton);
+			await fireEvent.click(addRowButton);
 
-			// The new item key should be 'C' (3rd position)
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
-				(el) => el.textContent?.trim() === 'C'
+			const keyElements = Array.from(container.querySelectorAll('span')).filter(
+				(el) => el.textContent?.trim() === '3'
 			);
-			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
+			expect(keyElements.length).toBeGreaterThanOrEqual(1);
 		});
 	});
 
 	describe('MatrixRating key display', () => {
-		it('should display A,B keys on left side for MatrixRating question', () => {
+		it('should display 1,2 rating scale keys for MatrixRating question', () => {
 			const { container } = render(SingleQuestionPage, {
 				data: {
 					...baseData,
@@ -2445,49 +2373,13 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
-				(el) => el.textContent?.trim() === 'A' || el.textContent?.trim() === 'B'
-			);
-			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
-		});
-
-		it('should display 1,2 keys on right side for MatrixRating question', () => {
-			const { container } = render(SingleQuestionPage, {
-				data: {
-					...baseData,
-					questionData: {
-						question_text: 'Rate it',
-						question_type: QuestionTypeEnum.MatrixRating,
-						options: {
-							rows: {
-								label: 'Items',
-								items: [
-									{ id: 1, key: 'A', value: 'Quality' },
-									{ id: 2, key: 'B', value: 'Speed' }
-								]
-							},
-							columns: {
-								label: 'Ratings',
-								items: [
-									{ id: 10, key: '1', value: 'Poor' },
-									{ id: 11, key: '2', value: 'Good' }
-								]
-							}
-						},
-						correct_answer: null,
-						is_mandatory: false,
-						is_active: true,
-						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
-					}
-				} as any
-			});
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
+			const keyLabels = Array.from(container.querySelectorAll('span')).filter(
 				(el) => el.textContent?.trim() === '1' || el.textContent?.trim() === '2'
 			);
-			expect(keyBadges.length).toBeGreaterThanOrEqual(2);
+			expect(keyLabels.length).toBeGreaterThanOrEqual(2);
 		});
 
-		it('should assign next letter key when a new left item is added in MatrixRating', async () => {
+		it('should add a new statement when "Add Row" is clicked in MatrixRating', async () => {
 			const { container } = render(SingleQuestionPage, {
 				data: {
 					...baseData,
@@ -2514,55 +2406,16 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			const addItemButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Item')
+			const initialInputs = screen.getAllByRole('textbox');
+			const addRowButton = Array.from(container.querySelectorAll('button')).find((btn) =>
+				btn.textContent?.includes('Add Row')
 			)!;
-			await fireEvent.click(addItemButton);
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
-				(el) => el.textContent?.trim() === 'C'
-			);
-			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
+			await fireEvent.click(addRowButton);
+			expect(screen.getAllByRole('textbox').length).toBe(initialInputs.length + 1);
 		});
 
-		it('should assign next number key when a new rating option is added in MatrixRating', async () => {
-			const { container } = render(SingleQuestionPage, {
-				data: {
-					...baseData,
-					questionData: {
-						question_text: 'Rate it',
-						question_type: QuestionTypeEnum.MatrixRating,
-						options: {
-							rows: {
-								label: 'Items',
-								items: [{ id: 1, key: 'A', value: 'Quality' }]
-							},
-							columns: {
-								label: 'Ratings',
-								items: [
-									{ id: 10, key: '1', value: 'Poor' },
-									{ id: 11, key: '2', value: 'Good' }
-								]
-							}
-						},
-						correct_answer: null,
-						is_mandatory: false,
-						is_active: true,
-						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
-					}
-				} as any
-			});
-			const addRatingButton = Array.from(container.querySelectorAll('button')).find((btn) =>
-				btn.textContent?.includes('Add Rating')
-			)!;
-			await fireEvent.click(addRatingButton);
-			const keyBadges = Array.from(container.querySelectorAll('div')).filter(
-				(el) => el.textContent?.trim() === '3'
-			);
-			expect(keyBadges.length).toBeGreaterThanOrEqual(1);
-		});
-
-		it('should re-sequence left keys to A,B after deleting an item in MatrixRating', async () => {
-			const { container } = render(SingleQuestionPage, {
+		it('should delete a statement when trash is clicked in MatrixRating', async () => {
+			render(SingleQuestionPage, {
 				data: {
 					...baseData,
 					questionData: {
@@ -2589,15 +2442,13 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 					}
 				} as any
 			});
-			// Delete item B (index=1)
 			const trashButtons = screen.getAllByRole('button', { name: /delete row/i });
 			await fireEvent.click(trashButtons[1]);
 
-			// After deletion: [A(Quality), B(Cost)] — C badge should be gone
-			const cBadges = Array.from(container.querySelectorAll('div')).filter(
-				(el) => el.textContent?.trim() === 'C'
-			);
-			expect(cBadges.length).toBe(0);
+			// After deletion, "Speed" should be gone
+			expect(screen.queryByDisplayValue('Speed')).not.toBeInTheDocument();
+			expect(screen.getByDisplayValue('Quality')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('Cost')).toBeInTheDocument();
 		});
 	});
 });

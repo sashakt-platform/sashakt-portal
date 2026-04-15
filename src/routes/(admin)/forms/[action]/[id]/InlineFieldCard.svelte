@@ -6,6 +6,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -25,7 +26,7 @@
 	import ToggleLeft from '@lucide/svelte/icons/toggle-left';
 	import { toast } from 'svelte-sonner';
 	import type { FormField, FieldOption } from './schema.js';
-	import { fieldTypeLabels, type FormFieldTypeValue } from './schema.js';
+	import { fieldTypeLabels, fieldTypeCategories, type FormFieldTypeValue } from './schema.js';
 	import type { Component } from 'svelte';
 
 	interface Props {
@@ -38,8 +39,10 @@
 	let { field, index, onDelete, onDuplicate }: Props = $props();
 
 	// Local editable state — initialized empty, synced via $effect
+	let fieldType = $state('');
 	let label = $state('');
 	let name = $state('');
+	let typePopoverOpen = $state(false);
 	let placeholder = $state('');
 	let helpText = $state('');
 	let isRequired = $state(false);
@@ -58,6 +61,7 @@
 
 	// Sync state when field prop changes (e.g. after server reload)
 	$effect(() => {
+		fieldType = field.field_type;
 		label = field.label;
 		name = field.name;
 		placeholder = field.placeholder || '';
@@ -92,23 +96,23 @@
 
 	// Field types that need options
 	const optionFieldTypes = ['select', 'radio', 'multi_select'];
-	const needsOptions = $derived(optionFieldTypes.includes(field.field_type));
+	const needsOptions = $derived(optionFieldTypes.includes(fieldType));
 
 	// Field types that support text validation
 	const textFieldTypes = ['text', 'textarea', 'full_name'];
-	const needsTextValidation = $derived(textFieldTypes.includes(field.field_type));
+	const needsTextValidation = $derived(textFieldTypes.includes(fieldType));
 
 	// Field types that support number validation
-	const needsNumberValidation = $derived(field.field_type === 'number');
+	const needsNumberValidation = $derived(fieldType === 'number');
 
 	const showAdditionalControls = $derived(needsTextValidation || needsNumberValidation);
 
-	const FieldIcon = $derived(fieldTypeIcons[field.field_type]);
+	const FieldIcon = $derived(fieldTypeIcons[fieldType]);
 
 	function buildFieldData(): FormField {
 		const fieldData: FormField = {
 			id: field.id,
-			field_type: field.field_type,
+			field_type: fieldType,
 			label,
 			name,
 			placeholder: placeholder || null,
@@ -164,6 +168,12 @@
 		saveTimeout = setTimeout(saveField, 800);
 	}
 
+	function handleFieldTypeChange(newType: FormFieldTypeValue) {
+		fieldType = newType;
+		typePopoverOpen = false;
+		debouncedSave();
+	}
+
 	function handleRequiredToggle(checked: boolean) {
 		isRequired = checked;
 		debouncedSave();
@@ -210,15 +220,52 @@
 				{index + 1}
 			</span>
 
-			<div class="border-border flex items-center gap-1.5 rounded-md border px-3 py-1.5">
-				{#if FieldIcon}
-					<FieldIcon class="text-muted-foreground h-4 w-4" />
-				{/if}
-				<span class="text-sm font-medium">
-					{fieldTypeLabels[field.field_type as FormFieldTypeValue] || field.field_type}
-				</span>
-				<ChevronDown class="text-muted-foreground h-3.5 w-3.5" />
-			</div>
+			<Popover.Root bind:open={typePopoverOpen}>
+				<Popover.Trigger
+					class="border-border hover:bg-accent flex items-center gap-1.5 rounded-md border px-3 py-1.5 transition-colors"
+				>
+					{#if FieldIcon}
+						<FieldIcon class="text-muted-foreground h-4 w-4" />
+					{/if}
+					<span class="text-sm font-medium">
+						{fieldTypeLabels[fieldType as FormFieldTypeValue] || fieldType}
+					</span>
+					<ChevronDown class="text-muted-foreground h-3.5 w-3.5" />
+				</Popover.Trigger>
+				<Popover.Content class="w-[480px] p-4" align="start">
+					<div class="flex flex-col gap-4">
+						{#each Object.entries(fieldTypeCategories) as [category, types] (category)}
+							<div class="flex flex-col gap-2">
+								<span class="text-primary text-xs font-semibold tracking-wider uppercase">
+									{category}
+								</span>
+								<div class="grid grid-cols-3 gap-1">
+									{#each types as type (type)}
+										{@const TypeIcon = fieldTypeIcons[type]}
+										<button
+											type="button"
+											class="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors {type ===
+											fieldType
+												? 'bg-primary/10 text-primary font-medium'
+												: 'hover:bg-accent'}"
+											onclick={() => handleFieldTypeChange(type)}
+										>
+											{#if TypeIcon}
+												<TypeIcon
+													class="h-4 w-4 {type === fieldType
+														? 'text-primary'
+														: 'text-muted-foreground'}"
+												/>
+											{/if}
+											<span>{fieldTypeLabels[type]}</span>
+										</button>
+									{/each}
+								</div>
+							</div>
+						{/each}
+					</div>
+				</Popover.Content>
+			</Popover.Root>
 		</div>
 
 		<div class="flex items-center gap-2">

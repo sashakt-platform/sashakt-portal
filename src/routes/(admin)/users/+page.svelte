@@ -51,7 +51,8 @@
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
-			<a href={resolve('/users/add/new')}><Button class="font-semibold"><Plus />Add User</Button></a
+			<a href={resolve('/users/add/new')}
+				><Button class="font-semibold"><Plus />Create User</Button></a
 			>
 		{/if}
 	{/snippet}

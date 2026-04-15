@@ -53,16 +53,18 @@
 	<div class="mx-auto flex flex-col gap-10 py-8">
 		<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
 			<div class="flex items-center gap-3">
-				<a href={resolve('/certificate')} class="hover:bg-muted rounded-lg border p-2" aria-label="Back to certificates">
+				<a
+					href={resolve('/certificate')}
+					class="hover:bg-muted rounded-lg border p-2"
+					aria-label="Back to certificates"
+				>
 					<ArrowLeft size={20} />
 				</a>
 				<h2 class="text-2xl font-bold tracking-tight">
 					{certificateData ? 'Edit Certificate' : 'Create Certificate'}
 				</h2>
 			</div>
-			<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>
-				Save
-			</Button>
+			<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>Save</Button>
 		</div>
 
 		<div class="mx-4 flex flex-col sm:mx-6 md:mx-10">

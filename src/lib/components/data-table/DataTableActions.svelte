@@ -96,7 +96,13 @@
 			{/if}
 
 			{#if canDelete && deleteInline}
-				<Button variant="ghost" size="icon" class="text-red-700" aria-label="Delete" onclick={handleDelete}>
+				<Button
+					variant="ghost"
+					size="icon"
+					class="text-red-700"
+					aria-label="Delete"
+					onclick={handleDelete}
+				>
 					<Trash_2 class="h-4 w-4" />
 				</Button>
 			{/if}

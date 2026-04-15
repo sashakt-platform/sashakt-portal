@@ -30,14 +30,17 @@
 	import { fieldTypeLabels, fieldTypeCategories, type FormFieldTypeValue } from './schema.js';
 	import type { Component } from 'svelte';
 
+	import * as Select from '$lib/components/ui/select/index.js';
+
 	interface Props {
 		field: FormField;
 		index: number;
+		entityTypes: Array<{ id: number; name: string }>;
 		onDelete: (fieldId: number) => void;
 		onDuplicate: (field: FormField) => void;
 	}
 
-	let { field, index, onDelete, onDuplicate }: Props = $props();
+	let { field, index, entityTypes, onDelete, onDuplicate }: Props = $props();
 
 	// Local editable state — initialized empty, synced via $effect
 	let fieldType = $state('');
@@ -47,6 +50,7 @@
 	let placeholder = $state('');
 	let helpText = $state('');
 	let isRequired = $state(false);
+	let entityTypeId = $state<number | null>(null);
 	let options = $state<FieldOption[]>([]);
 
 	// Validation fields
@@ -68,6 +72,7 @@
 		placeholder = field.placeholder || '';
 		helpText = field.help_text || '';
 		isRequired = field.is_required || false;
+		entityTypeId = field.entity_type_id ?? null;
 		options = field.options || [];
 		minLength = field.validation?.min_length ?? null;
 		maxLength = field.validation?.max_length ?? null;
@@ -106,6 +111,8 @@
 	// Field types that support number validation
 	const needsNumberValidation = $derived(fieldType === 'number');
 
+	const needsEntityType = $derived(fieldType === 'entity');
+
 	const showAdditionalControls = $derived(needsTextValidation || needsNumberValidation);
 
 	const FieldIcon = $derived(fieldTypeIcons[fieldType]);
@@ -121,7 +128,7 @@
 			is_required: isRequired,
 			order: field.order,
 			default_value: field.default_value || null,
-			entity_type_id: field.entity_type_id || null,
+			entity_type_id: needsEntityType ? entityTypeId : null,
 			options: needsOptions && options.length > 0 ? options : null,
 			validation: null
 		};
@@ -341,6 +348,34 @@
 				/>
 			</div>
 		</div>
+
+		<!-- Entity type selection -->
+		{#if needsEntityType}
+			<div class="grid grid-cols-2 gap-6">
+				<div class="flex flex-col gap-2">
+					<Label class="font-semibold">Entity Type</Label>
+					<Select.Root
+						type="single"
+						value={entityTypeId?.toString()}
+						onValueChange={(value) => {
+							entityTypeId = value ? parseInt(value) : null;
+							debouncedSave();
+						}}
+					>
+						<Select.Trigger class="w-full">
+							{entityTypeId
+								? entityTypes.find((et) => et.id === entityTypeId)?.name || 'Select entity type'
+								: 'Select entity type'}
+						</Select.Trigger>
+						<Select.Content>
+							{#each entityTypes as entityType (entityType.id)}
+								<Select.Item value={entityType.id.toString()}>{entityType.name}</Select.Item>
+							{/each}
+						</Select.Content>
+					</Select.Root>
+				</div>
+			</div>
+		{/if}
 
 		<!-- Options for select/radio/multi_select -->
 		{#if needsOptions}

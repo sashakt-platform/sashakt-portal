@@ -32,6 +32,7 @@
 				is_active: boolean;
 				fields: FormField[];
 			} | null;
+			entityTypes: Array<{ id: number; name: string }>;
 			currentUser: { organization_id?: number };
 		};
 	} = $props();
@@ -227,7 +228,7 @@
 						disabled={!$formData.name?.trim()}
 						onclick={submit}
 					>
-						Save Form
+						Save
 					</Button>
 				</div>
 			</div>
@@ -293,6 +294,7 @@
 						<InlineFieldCard
 							{field}
 							index={i}
+							entityTypes={data.entityTypes}
 							onDelete={handleFieldDeleted}
 							onDuplicate={handleDuplicateField}
 						/>

@@ -88,10 +88,9 @@
 		<button
 			type="button"
 			onclick={toggleReview}
-			class="my-6 flex items-center justify-center text-sm {markedForReview
+			class="mx-auto my-6 flex items-center justify-center gap-1.5 text-sm {markedForReview
 				? 'text-primary'
 				: 'text-muted-foreground'}"
-			style="width: 296px; height: 28px; gap: 6px; padding-right: 14px; padding-left: 12px;"
 		>
 			<Flag size={13} />
 			Mark for Review
@@ -110,7 +109,11 @@
 	{/if}
 {/snippet}
 
-{#snippet viewModeButton(mode: 'mobile' | 'desktop', Icon: Component<{ size?: number }>, label: string)}
+{#snippet viewModeButton(
+	mode: 'mobile' | 'desktop',
+	Icon: Component<{ size?: number }>,
+	label: string
+)}
 	<button
 		type="button"
 		onclick={() => (viewMode = mode)}

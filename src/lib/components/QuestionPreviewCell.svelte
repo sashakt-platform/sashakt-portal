@@ -7,15 +7,37 @@
 
 	let open = $state(false);
 
+	const isMatrixOptions = (
+		options: unknown
+	): options is {
+		rows: { label: string; items: { id: number; key: string; value: string }[] };
+		columns: { label: string; items: { id: number; key: string; value: string }[]; input_type?: 'number' | 'text' };
+	} =>
+		options !== null &&
+		typeof options === 'object' &&
+		!Array.isArray(options) &&
+		'rows' in (options as object) &&
+		'columns' in (options as object);
+
+	const opts = $derived(question.options);
+
 	const previewData: QuestionPreviewData = $derived({
 		questionText: question.question_text || '',
 		questionType: question.question_type || '',
-		options: question.options || [],
+		options: Array.isArray(opts) ? opts : [],
 		instructions: question.instructions || '',
 		markingScheme: question.marking_scheme,
 		isMandatory: question.is_mandatory || false,
 		media: question.media || null,
-		matrix: question.matrix || null
+		matrix: isMatrixOptions(opts)
+			? {
+					rows: opts.rows.items,
+					columns: opts.columns.items,
+					rowLabel: opts.rows.label,
+					colLabel: opts.columns.label,
+					inputType: opts.columns.input_type
+				}
+			: null
 	});
 </script>
 

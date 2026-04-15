@@ -50,8 +50,7 @@
 	title={entityTypeName}
 	subtitle=""
 	backHref={resolve('/entity')}
-	infoLabel="Help: Record management"
-	infoDescription={`This panel displays all ${entityTypeName} records. You can edit or delete an existing record using the action buttons next to their entry.`}
+	tooltipKey="entity-records"
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'entity')}

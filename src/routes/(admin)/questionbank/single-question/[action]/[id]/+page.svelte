@@ -1,12 +1,24 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ListChecks from '@lucide/svelte/icons/list-checks';
+	import AlignJustify from '@lucide/svelte/icons/align-justify';
+	import Hash from '@lucide/svelte/icons/hash';
+	import Equal from '@lucide/svelte/icons/equal';
+	import Route from '@lucide/svelte/icons/route';
+	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import Plus from '@lucide/svelte/icons/plus';
+	import Paperclip from '@lucide/svelte/icons/paperclip';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import Film from '@lucide/svelte/icons/film';
+	import Music from '@lucide/svelte/icons/music';
+	import X from '@lucide/svelte/icons/x';
 	import { Input } from '$lib/components/ui/input';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
@@ -42,6 +54,16 @@
 	} = $props();
 
 	const questionData: any = data?.questionData || null;
+
+	const QUESTION_TYPE_ICONS: Record<string, typeof ListChecks> = {
+		[QuestionTypeEnum.SingleChoice]: ListChecks,
+		[QuestionTypeEnum.Subjective]: AlignJustify,
+		[QuestionTypeEnum.NumericalInteger]: Hash,
+		[QuestionTypeEnum.MatrixString]: Equal,
+		[QuestionTypeEnum.MatrixNumber]: Equal,
+		[QuestionTypeEnum.MatrixMatch]: Route,
+		[QuestionTypeEnum.MatrixRating]: CircleDot
+	};
 
 	const {
 		form: formData,
@@ -310,6 +332,8 @@
 	let stagedExternalUrl = $state('');
 	let stagedOptionFiles = $state<Record<number, File | null>>({});
 	let stagedOptionUrls = $state<Record<number, string>>({});
+	let openAttachmentDropdownId = $state<number | null>(null);
+	let optionAttachmentModes = $state<Record<number, 'none' | 'image' | 'video' | 'audio'>>({});
 
 	// Initialize option media from question data
 	if (questionData?.options) {
@@ -616,18 +640,11 @@
 			</Button>
 		{/snippet}
 		{#snippet matrixTrashButton(canDelete: boolean, onclick: () => void)}
-			<button
-				type="button"
-				{onclick}
-				disabled={!canDelete}
-				aria-label="Delete row"
-				class={[
-					'shrink-0 opacity-0',
-					canDelete ? 'cursor-pointer group-hover:opacity-100' : 'cursor-default'
-				]}
-			>
-				<Trash_2 size={16} class="text-muted-foreground hover:text-destructive" />
-			</button>
+			{#if canDelete}
+				<button type="button" {onclick} aria-label="Delete row" class="mt-2.5 shrink-0">
+					<Trash_2 size={18} class="text-muted-foreground hover:text-destructive cursor-pointer" />
+				</button>
+			{/if}
 		{/snippet}
 		<!-- HEADER -->
 		<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
@@ -642,6 +659,7 @@
 			<div class="flex items-center gap-2">
 				{#if questionData}
 					<QuestionRevision {data} />
+					<div class="bg-border mx-1 h-6 w-px"></div>
 				{/if}
 				<QuestionPreview
 					data={{
@@ -682,18 +700,23 @@
 			<div class="flex flex-col gap-6 lg:w-2/3">
 				<!-- Card 1: QUESTION TYPE -->
 				<div class="rounded-lg border">
-					<button
-						type="button"
-						class="bg-muted hover:bg-muted/80 flex w-full items-center justify-between rounded-t-lg px-4 py-3 transition-colors"
-						onclick={() => (openQuestionTypeDialog = true)}
-					>
+					<div class="bg-muted flex w-full items-center justify-between rounded-t-lg px-4 py-3">
 						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
-							>Question Type</span
+							>Question Settings</span
 						>
-						<span class="text-muted-foreground text-xs">
+						<button
+							type="button"
+							class="bg-background hover:bg-accent flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
+							onclick={() => (openQuestionTypeDialog = true)}
+						>
+							{#if QUESTION_TYPE_ICONS[$formData.question_type]}
+								{@const TypeIcon = QUESTION_TYPE_ICONS[$formData.question_type]}
+								<TypeIcon size={18} class="text-muted-foreground" />
+							{/if}
 							{QUESTION_TYPE_LABELS[$formData.question_type] ?? $formData.question_type}
-						</span>
-					</button>
+							<ChevronDown size={16} class="text-muted-foreground" />
+						</button>
+					</div>
 					<ChooseQuestionType
 						bind:open={openQuestionTypeDialog}
 						onSelect={(type) => {
@@ -745,10 +768,7 @@
 				<div class="rounded-lg border">
 					<div class="bg-muted rounded-t-lg px-4 py-3">
 						<span class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
-							>{$formData.question_type === QuestionTypeEnum.NumericalInteger ||
-							$formData.question_type === QuestionTypeEnum.NumericalDecimal
-								? 'Correct Answer'
-								: 'Answer Settings'}</span
+							>Answer Settings</span
 						>
 					</div>
 					<div class="p-6">
@@ -791,44 +811,17 @@
 									}}
 								>
 									{#each totalOptions as { id, key }, index (id)}
-										<div class="group flex flex-row gap-4 pb-4">
-											<div class="bg-primary-foreground h-12 w-12 rounded-sm text-center">
-												<p
-													class="flex h-full w-full items-center justify-center text-xl font-semibold"
-												>
-													{key}
-												</p>
-											</div>
-											<div class="flex w-full flex-col gap-2">
-												<div class="flex flex-row rounded-sm border-1 border-black">
-													<span use:dragHandle aria-label="drag handle">
-														<GripVertical
-															class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-														/>
-													</span>
-													<Input
-														class=" border-0"
-														name={key}
-														bind:value={totalOptions[index].value}
-													/>
-												</div>
-												<div class="flex flex-row items-center gap-4">
-													<div class="flex flex-row items-center gap-2">
-														<Checkbox
-															disabled={!hasContent(
-																totalOptions[index].value,
-																id,
-																optionMediaMap,
-																stagedOptionFiles,
-																stagedOptionUrls
-															)}
-															checked={totalOptions[index].correct_answer}
-															onCheckedChange={(checked: boolean) =>
-																(totalOptions[index].correct_answer = checked)}
-														/><Label class="text-sm">Set as correct answer</Label>
-													</div>
-												</div>
+										<div class="border-border flex items-start gap-3 border-b py-6 last:border-b-0">
+											<span class="mt-2.5 text-lg font-bold">{key}</span>
+											<span use:dragHandle aria-label="drag handle" class="mt-2">
+												<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+											</span>
+											<div class="flex min-w-0 flex-1 flex-col gap-2">
+												<Input name={key} bind:value={totalOptions[index].value} />
 												<AttachmentInput
+													hideTrigger={true}
+													mode={optionAttachmentModes[id] ?? 'none'}
+													onModeChange={(m) => (optionAttachmentModes[id] = m)}
 													media={optionMediaMap[id] ?? null}
 													onStagedFileChange={(f) => (stagedOptionFiles[id] = f)}
 													onStagedUrlChange={(u) => (stagedOptionUrls[id] = u)}
@@ -845,60 +838,154 @@
 																)
 														: undefined}
 												/>
+												<div class="flex items-center gap-2">
+													<Checkbox
+														disabled={!hasContent(
+															totalOptions[index].value,
+															id,
+															optionMediaMap,
+															stagedOptionFiles,
+															stagedOptionUrls
+														)}
+														checked={totalOptions[index].correct_answer}
+														onCheckedChange={(checked: boolean) =>
+															(totalOptions[index].correct_answer = checked)}
+													/><Label class="text-sm">Correct answer</Label>
+												</div>
 											</div>
-											<div
-												class={[
-													'mt-2 gap-0 opacity-0',
-													totalOptions.length > 1 ? 'group-hover:opacity-100' : ''
-												]}
-											>
-												<Trash_2
+											{#if !(optionMediaMap[id]?.image || optionMediaMap[id]?.external_media || stagedOptionFiles[id] || (stagedOptionUrls[id] && stagedOptionUrls[id].trim()) || (optionAttachmentModes[id] && optionAttachmentModes[id] !== 'none'))}
+												<div class="relative mt-2.5 shrink-0">
+													<button
+														type="button"
+														aria-label="Add attachment"
+														aria-haspopup="menu"
+														aria-expanded={openAttachmentDropdownId === id}
+														class="text-muted-foreground hover:text-foreground transition-colors"
+														onclick={() => {
+															openAttachmentDropdownId =
+																openAttachmentDropdownId === id ? null : id;
+														}}
+													>
+														<Paperclip size={18} />
+													</button>
+													{#if openAttachmentDropdownId === id}
+														<!-- svelte-ignore a11y_no_static_element_interactions -->
+														<div
+															class="bg-popover absolute top-full right-0 z-10 mt-1 w-48 rounded-lg border py-1 shadow-lg"
+															onmouseleave={() => (openAttachmentDropdownId = null)}
+														>
+															<button
+																type="button"
+																class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																onclick={() => {
+																	optionAttachmentModes[id] = 'image';
+																	openAttachmentDropdownId = null;
+																}}
+															>
+																<span class="flex items-center gap-2">
+																	<ImageIcon size={16} class="text-muted-foreground" />
+																	Image
+																</span>
+																<span class="text-muted-foreground text-xs">Upload</span>
+															</button>
+															<button
+																type="button"
+																class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																onclick={() => {
+																	optionAttachmentModes[id] = 'video';
+																	openAttachmentDropdownId = null;
+																}}
+															>
+																<span class="flex items-center gap-2">
+																	<Film size={16} class="text-muted-foreground" />
+																	Video
+																</span>
+																<span class="text-muted-foreground text-xs">URL</span>
+															</button>
+															<button
+																type="button"
+																class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																onclick={() => {
+																	optionAttachmentModes[id] = 'audio';
+																	openAttachmentDropdownId = null;
+																}}
+															>
+																<span class="flex items-center gap-2">
+																	<Music size={16} class="text-muted-foreground" />
+																	Audio
+																</span>
+																<span class="text-muted-foreground text-xs">URL</span>
+															</button>
+														</div>
+													{/if}
+												</div>
+											{/if}
+											{#if totalOptions.length > 1}
+												<button
+													type="button"
+													class="mt-2.5 shrink-0"
 													data-testid="trash-icon"
-													size={18}
-													class={[
-														'text-muted-foreground hover:text-destructive m-0 my-auto p-0',
-														totalOptions.length > 1 ? 'cursor-pointer' : ''
-													]}
 													onclick={() => {
-														if (totalOptions.length > 1) {
-															totalOptions = totalOptions
-																.filter((_, i) => i !== index)
-																.map((option, i) => ({
-																	...option,
-																	key: String.fromCharCode(65 + i)
-																}));
-														}
+														totalOptions = totalOptions
+															.filter((_, i) => i !== index)
+															.map((option, i) => ({
+																...option,
+																key: String.fromCharCode(65 + i)
+															}));
 													}}
-												/>
-											</div>
+												>
+													<Trash_2
+														size={18}
+														class="text-muted-foreground hover:text-destructive cursor-pointer"
+													/>
+												</button>
+											{/if}
 										</div>
 									{/each}
 								</div>
 
-								<div class="flex justify-end">
-									<Button
-										variant="outline"
-										class="text-primary border-primary"
-										onclick={() => {
-											totalOptions.push({
-												id: totalOptions[totalOptions.length - 1].id + 1,
-												key: String.fromCharCode(64 + totalOptions.length + 1),
-												value: '',
-												correct_answer: false
-											});
-										}}
-									>
-										<Plus />Add Answer</Button
-									>
-								</div>
+								<button
+									type="button"
+									class="border-border text-muted-foreground hover:border-primary hover:text-primary w-full rounded-lg border-2 border-dashed py-3 text-center text-sm transition-colors"
+									onclick={() => {
+										totalOptions.push({
+											id: totalOptions[totalOptions.length - 1].id + 1,
+											key: String.fromCharCode(64 + totalOptions.length + 1),
+											value: '',
+											correct_answer: false
+										});
+									}}
+								>
+									Add Row
+								</button>
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.MatrixMatch}
-							<div class="flex flex-col gap-4">
+							<div class="flex flex-col gap-6">
+								<p class="text-muted-foreground flex items-center gap-2 text-sm">
+									<span
+										class="border-border inline-flex h-5 w-5 items-center justify-center rounded-full border text-xs"
+										>i</span
+									>
+									The matching table will be shown to the candidates as you fill it
+								</p>
+
+								<!-- Column headers -->
+								<div class="flex items-center gap-4">
+									<div class="flex flex-1 items-center gap-2">
+										<Input bind:value={matrixRowLabel} class="bg-muted font-semibold" />
+									</div>
+									<div class="flex flex-1 items-center gap-2">
+										<Input bind:value={matrixColLabel} class="bg-muted font-semibold" />
+									</div>
+									<div class="w-[18px] shrink-0"></div>
+								</div>
+
+								<!-- Two-column layout with independent drag zones -->
 								<div class="flex gap-4">
+									<!-- Left column -->
 									<div class="flex flex-1 flex-col gap-2">
-										<Input bind:value={matrixRowLabel} class="font-semibold" />
 										<div
-											class="flex flex-col gap-2"
+											class="flex flex-col"
 											use:dragHandleZone={{
 												items: matrixLeftItems,
 												flipDurationMs: 150,
@@ -913,69 +1000,120 @@
 											}}
 										>
 											{#each matrixLeftItems as item, index (item.id)}
-												<div class="group flex flex-col gap-1">
-													<div class="flex flex-row items-center gap-2">
-														<div
-															class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm font-semibold"
-														>
-															{item.key}
-														</div>
-														<div class="flex flex-1 flex-row rounded-sm border border-black">
-															<span use:dragHandle aria-label="drag handle">
-																<GripVertical
-																	class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-																/>
-															</span>
-															<Input class="border-0" bind:value={matrixLeftItems[index].value} />
-														</div>
-
-														{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-															if (matrixLeftItems.length > 1) {
-																const deletedId = String(matrixLeftItems[index].id);
-																matrixLeftItems = matrixLeftItems
-																	.filter((_, i) => i !== index)
-																	.map((item, i) => ({
-																		...item,
-																		key: String.fromCharCode(65 + i)
-																	}));
-																const { [deletedId]: _, ...rest } = matrixMatches;
-																matrixMatches = rest;
-															}
-														})}
+												<div class="flex items-start gap-2 py-3">
+													<span class="mt-2.5 text-sm font-bold">{item.key}</span>
+													<span use:dragHandle aria-label="drag handle" class="mt-2">
+														<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+													</span>
+													<div class="flex min-w-0 flex-1 flex-col gap-2">
+														<Input bind:value={matrixLeftItems[index].value} />
+														<AttachmentInput
+															hideTrigger={true}
+															mode={optionAttachmentModes[item.id] ?? 'none'}
+															onModeChange={(m) => (optionAttachmentModes[item.id] = m)}
+															media={optionMediaMap[item.id] ?? null}
+															onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+															onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+															onDeleteImage={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/image`
+																		)
+																: undefined}
+															onDeleteExternal={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/external`
+																		)
+																: undefined}
+														/>
 													</div>
-													<AttachmentInput
-														media={optionMediaMap[item.id] ?? null}
-														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
-														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
-														onDeleteImage={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/image`
-																	)
-															: undefined}
-														onDeleteExternal={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/external`
-																	)
-															: undefined}
-													/>
+													{#if !(optionMediaMap[item.id]?.image || optionMediaMap[item.id]?.external_media || stagedOptionFiles[item.id] || (stagedOptionUrls[item.id] && stagedOptionUrls[item.id].trim()) || (optionAttachmentModes[item.id] && optionAttachmentModes[item.id] !== 'none'))}
+														<div class="relative mt-2.5 shrink-0">
+															<button
+																type="button"
+																aria-label="Add attachment"
+																aria-haspopup="menu"
+																aria-expanded={openAttachmentDropdownId === item.id}
+																class="text-muted-foreground hover:text-foreground transition-colors"
+																onclick={() => {
+																	openAttachmentDropdownId =
+																		openAttachmentDropdownId === item.id ? null : item.id;
+																}}
+															>
+																<Paperclip size={18} />
+															</button>
+															{#if openAttachmentDropdownId === item.id}
+																<!-- svelte-ignore a11y_no_static_element_interactions -->
+																<div
+																	class="bg-popover absolute top-full right-0 z-10 mt-1 w-48 rounded-lg border py-1 shadow-lg"
+																	onmouseleave={() => (openAttachmentDropdownId = null)}
+																>
+																	<button
+																		type="button"
+																		class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																		onclick={() => {
+																			optionAttachmentModes[item.id] = 'image';
+																			openAttachmentDropdownId = null;
+																		}}
+																	>
+																		<span class="flex items-center gap-2"
+																			><ImageIcon size={16} class="text-muted-foreground" /> Image</span
+																		>
+																		<span class="text-muted-foreground text-xs">Upload</span>
+																	</button>
+																	<button
+																		type="button"
+																		class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																		onclick={() => {
+																			optionAttachmentModes[item.id] = 'video';
+																			openAttachmentDropdownId = null;
+																		}}
+																	>
+																		<span class="flex items-center gap-2"
+																			><Film size={16} class="text-muted-foreground" /> Video</span
+																		>
+																		<span class="text-muted-foreground text-xs">URL</span>
+																	</button>
+																	<button
+																		type="button"
+																		class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																		onclick={() => {
+																			optionAttachmentModes[item.id] = 'audio';
+																			openAttachmentDropdownId = null;
+																		}}
+																	>
+																		<span class="flex items-center gap-2"
+																			><Music size={16} class="text-muted-foreground" /> Audio</span
+																		>
+																		<span class="text-muted-foreground text-xs">URL</span>
+																	</button>
+																</div>
+															{/if}
+														</div>
+													{/if}
+													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+														if (matrixLeftItems.length > 1) {
+															const deletedId = String(matrixLeftItems[index].id);
+															matrixLeftItems = matrixLeftItems
+																.filter((_, i) => i !== index)
+																.map((it, i) => ({
+																	...it,
+																	key: String.fromCharCode(65 + i)
+																}));
+															const { [deletedId]: _, ...rest } = matrixMatches;
+															matrixMatches = rest;
+														}
+													})}
 												</div>
 											{/each}
 										</div>
-										{@render matrixAddButton('Add Question', () => {
-											matrixLeftItems.push({
-												id: nextId(matrixLeftItems),
-												key: String.fromCharCode(65 + matrixLeftItems.length),
-												value: ''
-											});
-										})}
 									</div>
 
+									<!-- Right column -->
 									<div class="flex flex-1 flex-col gap-2">
-										<Input bind:value={matrixColLabel} class="font-semibold" />
 										<div
-											class="flex flex-col gap-2"
+											class="flex flex-col"
 											use:dragHandleZone={{
 												items: matrixRightItems,
 												flipDurationMs: 150,
@@ -990,201 +1128,301 @@
 											}}
 										>
 											{#each matrixRightItems as item, index (item.id)}
-												<div class="group flex flex-col gap-1">
-													<div class="flex flex-row items-center gap-2">
-														<div
-															class="bg-primary-foreground flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-sm font-semibold"
-														>
-															{item.key}
+												<div class="flex items-start gap-2 py-3">
+													<span class="mt-2.5 text-sm font-bold">{item.key}</span>
+													<span use:dragHandle aria-label="drag handle" class="mt-2">
+														<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+													</span>
+													<div class="flex min-w-0 flex-1 flex-col gap-2">
+														<Input bind:value={matrixRightItems[index].value} />
+														<AttachmentInput
+															hideTrigger={true}
+															mode={optionAttachmentModes[item.id] ?? 'none'}
+															onModeChange={(m) => (optionAttachmentModes[item.id] = m)}
+															media={optionMediaMap[item.id] ?? null}
+															onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
+															onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
+															onDeleteImage={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/image`
+																		)
+																: undefined}
+															onDeleteExternal={questionId
+																? () =>
+																		deleteMedia(
+																			`/api/media/questions/${questionId}/options/${item.id}/external`
+																		)
+																: undefined}
+														/>
+													</div>
+													{#if !(optionMediaMap[item.id]?.image || optionMediaMap[item.id]?.external_media || stagedOptionFiles[item.id] || (stagedOptionUrls[item.id] && stagedOptionUrls[item.id].trim()) || (optionAttachmentModes[item.id] && optionAttachmentModes[item.id] !== 'none'))}
+														<div class="relative mt-2.5 shrink-0">
+															<button
+																type="button"
+																aria-label="Add attachment"
+																aria-haspopup="menu"
+																aria-expanded={openAttachmentDropdownId === item.id}
+																class="text-muted-foreground hover:text-foreground transition-colors"
+																onclick={() => {
+																	openAttachmentDropdownId =
+																		openAttachmentDropdownId === item.id ? null : item.id;
+																}}
+															>
+																<Paperclip size={18} />
+															</button>
+															{#if openAttachmentDropdownId === item.id}
+																<!-- svelte-ignore a11y_no_static_element_interactions -->
+																<div
+																	class="bg-popover absolute top-full right-0 z-10 mt-1 w-48 rounded-lg border py-1 shadow-lg"
+																	onmouseleave={() => (openAttachmentDropdownId = null)}
+																>
+																	<button
+																		type="button"
+																		class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																		onclick={() => {
+																			optionAttachmentModes[item.id] = 'image';
+																			openAttachmentDropdownId = null;
+																		}}
+																	>
+																		<span class="flex items-center gap-2"
+																			><ImageIcon size={16} class="text-muted-foreground" /> Image</span
+																		>
+																		<span class="text-muted-foreground text-xs">Upload</span>
+																	</button>
+																	<button
+																		type="button"
+																		class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																		onclick={() => {
+																			optionAttachmentModes[item.id] = 'video';
+																			openAttachmentDropdownId = null;
+																		}}
+																	>
+																		<span class="flex items-center gap-2"
+																			><Film size={16} class="text-muted-foreground" /> Video</span
+																		>
+																		<span class="text-muted-foreground text-xs">URL</span>
+																	</button>
+																	<button
+																		type="button"
+																		class="hover:bg-muted flex w-full items-center justify-between px-4 py-2 text-sm"
+																		onclick={() => {
+																			optionAttachmentModes[item.id] = 'audio';
+																			openAttachmentDropdownId = null;
+																		}}
+																	>
+																		<span class="flex items-center gap-2"
+																			><Music size={16} class="text-muted-foreground" /> Audio</span
+																		>
+																		<span class="text-muted-foreground text-xs">URL</span>
+																	</button>
+																</div>
+															{/if}
 														</div>
-														<div class="flex flex-1 flex-row rounded-sm border border-black">
-															<span use:dragHandle aria-label="drag handle">
-																<GripVertical
-																	class="my-auto h-full cursor-grab rounded-sm bg-gray-100"
-																/>
-															</span>
-															<Input class="border-0" bind:value={matrixRightItems[index].value} />
-														</div>
-
-														{@render matrixTrashButton(matrixRightItems.length > 1, () => {
-															if (matrixRightItems.length > 1) {
-																const removedId = matrixRightItems[index].id;
-																matrixRightItems = matrixRightItems
-																	.filter((_, i) => i !== index)
-																	.map((item, i) => ({
-																		...item,
-																		key: String(i + 1)
-																	}));
-																matrixMatches = Object.fromEntries(
-																	Object.entries(matrixMatches).map(([k, ids]) => [
-																		k,
-																		ids.filter((id) => id !== removedId)
-																	])
-																);
-															}
-														})}
-													</div>
-													<AttachmentInput
-														media={optionMediaMap[item.id] ?? null}
-														onStagedFileChange={(f) => (stagedOptionFiles[item.id] = f)}
-														onStagedUrlChange={(u) => (stagedOptionUrls[item.id] = u)}
-														onDeleteImage={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/image`
-																	)
-															: undefined}
-														onDeleteExternal={questionId
-															? () =>
-																	deleteMedia(
-																		`/api/media/questions/${questionId}/options/${item.id}/external`
-																	)
-															: undefined}
-													/>
-												</div>
-											{/each}
-										</div>
-										{@render matrixAddButton('Add Answer', () => {
-											matrixRightItems.push({
-												id: nextId(matrixRightItems),
-												key: String(matrixRightItems.length + 1),
-												value: ''
-											});
-										})}
-									</div>
-								</div>
-
-								<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-									<p class="mb-3 text-sm font-semibold text-gray-700">Correct Answers</p>
-
-									<div class="mb-2 flex items-end gap-4 border-b border-gray-200 pb-2">
-										<span class="min-w-0 flex-1 text-xs font-medium text-gray-500"
-											>{matrixRowLabel}</span
-										>
-										<div class="flex flex-col items-center gap-1">
-											<span class="text-xs font-medium tracking-wide text-gray-500"
-												>{matrixColLabel}</span
-											>
-											<div class="flex gap-2">
-												{#each matrixRightItems as rightColumnItem (rightColumnItem.id)}
-													<span class="w-16 truncate text-center text-xs text-gray-400"
-														>{rightColumnItem.value || rightColumnItem.key}</span
-													>
-												{/each}
-											</div>
-										</div>
-									</div>
-
-									{#each matrixLeftItems as leftItem (leftItem.key)}
-										<div
-											class="flex items-center gap-4 rounded px-1 py-2 transition-colors hover:bg-white"
-										>
-											<span class="min-w-0 flex-1 truncate text-sm font-medium text-gray-800"
-												><span class="text-muted-foreground mr-1 font-semibold"
-													>{leftItem.key}.</span
-												>{leftItem.value || leftItem.key}</span
-											>
-											<div class="flex gap-2">
-												{#each matrixRightItems as rightItem (rightItem.id)}
-													{@const checked = (matrixMatches[String(leftItem.id)] ?? []).includes(
-														rightItem.id
-													)}
-													<button
-														type="button"
-														class="w-16 rounded border py-1 text-xs font-semibold transition-all duration-150 {checked
-															? 'border-primary bg-primary text-white shadow-sm'
-															: 'hover:border-primary/60 hover:text-primary border-gray-200 bg-white text-gray-400'}"
-														onclick={() => {
-															const current = matrixMatches[String(leftItem.id)] ?? [];
-															matrixMatches = {
-																...matrixMatches,
-																[String(leftItem.id)]: checked
-																	? current.filter((id) => id !== rightItem.id)
-																	: [...current, rightItem.id]
-															};
-														}}
-													>
-														{rightItem.key}
-													</button>
-												{/each}
-											</div>
-										</div>
-									{/each}
-								</div>
-							</div>
-						{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
-							<div class="flex flex-col gap-4">
-								<div class="flex gap-4">
-									<div class="flex flex-1 flex-col gap-2">
-										<Input bind:value={matrixRowLabel} class="font-semibold" />
-										<p class="text-xs font-medium text-gray-500">Items to Rate</p>
-										<div class="flex flex-col gap-2">
-											{#each matrixLeftItems as item, index (item.id)}
-												<div class="group flex flex-row items-center gap-2">
-													<div
-														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
-													>
-														{item.key}
-													</div>
-													<Input
-														class="flex-1 border border-black"
-														bind:value={matrixLeftItems[index].value}
-													/>
-													{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
-														if (matrixLeftItems.length > 1) {
-															matrixLeftItems = matrixLeftItems
-																.filter((_, i) => i !== index)
-																.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
-														}
-													})}
-												</div>
-											{/each}
-										</div>
-										{@render matrixAddButton('Add Item', () => {
-											matrixLeftItems.push({
-												id: nextId(matrixLeftItems),
-												key: String.fromCharCode(65 + matrixLeftItems.length),
-												value: ''
-											});
-										})}
-									</div>
-
-									<div class="flex flex-1 flex-col gap-2">
-										<Input bind:value={matrixColLabel} class="font-semibold" />
-										<p class="text-xs font-medium text-gray-500">Rating Options</p>
-										<div class="flex flex-col gap-2">
-											{#each matrixRightItems as item, index (item.id)}
-												<div class="group flex flex-row items-center gap-2">
-													<div
-														class="bg-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-sm text-sm font-semibold"
-													>
-														{item.key}
-													</div>
-													<Input
-														class="flex-1 border border-black"
-														bind:value={matrixRightItems[index].value}
-													/>
+													{/if}
 													{@render matrixTrashButton(matrixRightItems.length > 1, () => {
 														if (matrixRightItems.length > 1) {
+															const removedId = matrixRightItems[index].id;
 															matrixRightItems = matrixRightItems
 																.filter((_, i) => i !== index)
 																.map((it, i) => ({
 																	...it,
 																	key: String(i + 1)
 																}));
+															matrixMatches = Object.fromEntries(
+																Object.entries(matrixMatches).map(([k, ids]) => [
+																	k,
+																	ids.filter((id) => id !== removedId)
+																])
+															);
 														}
 													})}
 												</div>
 											{/each}
 										</div>
-										{@render matrixAddButton('Add Rating', () => {
-											matrixRightItems.push({
-												id: nextId(matrixRightItems),
-												key: String(matrixRightItems.length + 1),
+									</div>
+								</div>
+
+								<button
+									type="button"
+									class="border-border text-muted-foreground hover:border-primary hover:text-primary w-full rounded-lg border-2 border-dashed py-3 text-center text-sm transition-colors"
+									onclick={() => {
+										matrixLeftItems.push({
+											id: nextId(matrixLeftItems),
+											key: String.fromCharCode(65 + matrixLeftItems.length),
+											value: ''
+										});
+										matrixRightItems.push({
+											id: nextId(matrixRightItems),
+											key: String(matrixRightItems.length + 1),
+											value: ''
+										});
+									}}
+								>
+									Add Row
+								</button>
+
+								<!-- Correct answers table -->
+								<p class="text-muted-foreground flex items-center gap-2 text-sm">
+									<span
+										class="border-border inline-flex h-5 w-5 items-center justify-center rounded-full border text-xs"
+										>i</span
+									>
+									Fill the correct answers in the table below
+								</p>
+
+								<div class="bg-muted/50 overflow-x-auto rounded-lg">
+									<table class="w-full">
+										<thead>
+											<tr>
+												<th class="px-4 py-3 text-left"></th>
+												{#each matrixRightItems as rightItem (rightItem.id)}
+													<th class="text-primary px-4 py-3 text-center text-sm font-semibold"
+														>{rightItem.key}</th
+													>
+												{/each}
+											</tr>
+										</thead>
+										<tbody>
+											{#each matrixLeftItems as leftItem (leftItem.key)}
+												<tr class="border-border border-t">
+													<td class="text-primary px-4 py-4 text-sm font-semibold"
+														>{leftItem.key}</td
+													>
+													{#each matrixRightItems as rightItem (rightItem.id)}
+														{@const checked = (matrixMatches[String(leftItem.id)] ?? []).includes(
+															rightItem.id
+														)}
+														<td class="px-4 py-4"
+															><div class="flex justify-center">
+																<Checkbox
+																	{checked}
+																	onCheckedChange={() => {
+																		const current = matrixMatches[String(leftItem.id)] ?? [];
+																		matrixMatches = {
+																			...matrixMatches,
+																			[String(leftItem.id)]: checked
+																				? current.filter((id) => id !== rightItem.id)
+																				: [...current, rightItem.id]
+																		};
+																	}}
+																/>
+															</div></td
+														>
+													{/each}
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						{:else if $formData.question_type === QuestionTypeEnum.MatrixRating}
+							<div class="flex flex-col gap-6">
+								<!-- Rating scale labels -->
+								<div class="flex flex-col gap-3">
+									<Label class="font-semibold">Rating scale labels</Label>
+									<div class="flex flex-wrap items-end gap-3">
+										{#each matrixRightItems as item, index (item.id)}
+											<div class="flex flex-col gap-1">
+												<div class="flex items-center justify-between">
+													<span class="text-muted-foreground text-xs font-medium">{item.key}</span>
+													{#if matrixRightItems.length > 1}
+														<button
+															type="button"
+															aria-label="Remove rating label"
+															class="text-muted-foreground hover:text-destructive"
+															onclick={() => {
+																matrixRightItems = matrixRightItems
+																	.filter((_, i) => i !== index)
+																	.map((it, i) => ({ ...it, key: String(i + 1) }));
+															}}
+														>
+															<X size={12} />
+														</button>
+													{/if}
+												</div>
+												<Input
+													class="w-32"
+													placeholder={[
+														'e.g. Poor',
+														'e.g. Fair',
+														'e.g. Good',
+														'e.g. Excellent',
+														'e.g. Outstanding'
+													][index] ?? ''}
+													bind:value={matrixRightItems[index].value}
+												/>
+											</div>
+										{/each}
+										<button
+											type="button"
+											aria-label="Add rating label"
+											class="border-border text-muted-foreground hover:border-primary hover:text-primary mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border-2 border-dashed transition-colors"
+											onclick={() => {
+												matrixRightItems.push({
+													id: nextId(matrixRightItems),
+													key: String(matrixRightItems.length + 1),
+													value: ''
+												});
+											}}
+										>
+											<Plus size={16} />
+										</button>
+									</div>
+								</div>
+
+								<!-- Statements -->
+								<div class="flex flex-col gap-3">
+									<Label class="font-semibold">Statements</Label>
+									<div
+										class="flex flex-col"
+										use:dragHandleZone={{
+											items: matrixLeftItems,
+											flipDurationMs: 150,
+											type: 'matrix-left'
+										}}
+										onconsider={({ detail }) => (matrixLeftItems = detail.items)}
+										onfinalize={({ detail }) => {
+											matrixLeftItems = detail.items.map((item, i) => ({
+												...item,
+												key: String.fromCharCode(65 + i)
+											}));
+										}}
+									>
+										{#each matrixLeftItems as item, index (item.id)}
+											<div class="flex items-center gap-2 py-2">
+												<span use:dragHandle aria-label="drag handle">
+													<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
+												</span>
+												<Input
+													class="flex-1"
+													placeholder="Statement {item.key}"
+													bind:value={matrixLeftItems[index].value}
+												/>
+												{@render matrixTrashButton(matrixLeftItems.length > 1, () => {
+													if (matrixLeftItems.length > 1) {
+														matrixLeftItems = matrixLeftItems
+															.filter((_, i) => i !== index)
+															.map((it, i) => ({ ...it, key: String.fromCharCode(65 + i) }));
+													}
+												})}
+											</div>
+										{/each}
+									</div>
+
+									<button
+										type="button"
+										class="border-border text-muted-foreground hover:border-primary hover:text-primary w-full rounded-lg border-2 border-dashed py-3 text-center text-sm transition-colors"
+										onclick={() => {
+											matrixLeftItems.push({
+												id: nextId(matrixLeftItems),
+												key: String.fromCharCode(65 + matrixLeftItems.length),
 												value: ''
 											});
-										})}
-									</div>
+										}}
+									>
+										Add Row
+									</button>
 								</div>
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.MatrixString || $formData.question_type === QuestionTypeEnum.MatrixNumber}
@@ -1238,11 +1476,13 @@
 								</div>
 							</div>
 						{:else}
-							<div class="flex flex-col gap-2">
+							<div class="flex items-center justify-between gap-4">
+								<Label class="text-sm font-semibold">Correct answer</Label>
 								<Input
 									type="number"
 									step="any"
-									class="w-full"
+									class="w-1/2"
+									placeholder="e.g. 25"
 									bind:value={$formData.correct_answer}
 									oninput={(e) => {
 										const val = (e.target as HTMLInputElement).value;

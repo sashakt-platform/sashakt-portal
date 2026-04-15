@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { TooltipKey } from '$lib/config/tooltips';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import TooltipInfo from './TooltipInfo.svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
@@ -8,8 +9,7 @@
 		title: string;
 		subtitle: string;
 		backHref?: string;
-		infoLabel?: string;
-		infoDescription?: string;
+		tooltipKey?: TooltipKey;
 		showFilters?: boolean;
 		showEmptyState?: boolean;
 		showInfoIcon?: boolean;
@@ -27,8 +27,7 @@
 		showFilters = true,
 		showEmptyState = false,
 		showInfoIcon = true,
-		infoLabel,
-		infoDescription,
+		tooltipKey,
 		headerActions,
 		toolbar,
 		filters,
@@ -55,7 +54,7 @@
 							{title}
 						</h2>
 						{#if showInfoIcon}
-							<TooltipInfo label={infoLabel} description={infoDescription} />
+							<TooltipInfo {tooltipKey} />
 						{/if}
 					</div>
 				</div>

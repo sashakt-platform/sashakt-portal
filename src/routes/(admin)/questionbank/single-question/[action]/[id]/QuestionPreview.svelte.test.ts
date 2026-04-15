@@ -35,7 +35,7 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByRole('heading', { name: 'Preview' })).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: 'Question Preview' })).toBeInTheDocument();
 	});
 
 	it('displays question text in dialog', async () => {
@@ -110,9 +110,9 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A. Option 1')).toBeInTheDocument();
-		expect(screen.getByText('B. Option 2')).toBeInTheDocument();
-		expect(screen.getByText('C. Option 3')).toBeInTheDocument();
+		expect(screen.getByText('Option 1')).toBeInTheDocument();
+		expect(screen.getByText('Option 2')).toBeInTheDocument();
+		expect(screen.getByText('Option 3')).toBeInTheDocument();
 	});
 
 	it('filters out options with empty values', async () => {
@@ -127,9 +127,8 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A. Valid option')).toBeInTheDocument();
-		expect(screen.queryByText(/^B\./)).not.toBeInTheDocument();
-		expect(screen.queryByText(/^C\./)).not.toBeInTheDocument();
+		expect(screen.getByText('Valid option')).toBeInTheDocument();
+		expect(screen.getAllByRole('radio')).toHaveLength(1);
 	});
 
 	it('shows placeholder when no valid options exist', async () => {
@@ -142,24 +141,25 @@ describe('Question_preview', () => {
 		expect(screen.getByText('Add options to see them in preview...')).toBeInTheDocument();
 	});
 
-	it('displays singular "MARK" for 1 mark', async () => {
+	it('displays correct mark value for 1 mark', async () => {
 		render(QuestionPreview, {
 			props: { data: createData({ marking_scheme: { correct: 1, wrong: 0, skipped: 0 } }) }
 		});
 
 		await openDialog();
 
-		expect(screen.getByText(/1\s+MARK$/)).toBeInTheDocument();
+		expect(screen.getByText('+1')).toBeInTheDocument();
 	});
 
-	it('displays plural "MARKS" for multiple marks', async () => {
+	it('displays correct mark value for multiple marks', async () => {
 		render(QuestionPreview, {
 			props: { data: createData({ marking_scheme: { correct: 3, wrong: -1, skipped: 0 } }) }
 		});
 
 		await openDialog();
 
-		expect(screen.getByText(/3\s+MARKS/)).toBeInTheDocument();
+		expect(screen.getByText('+3')).toBeInTheDocument();
+		expect(screen.getByText('-1')).toBeInTheDocument();
 	});
 
 	it('uses default marking scheme when not provided', async () => {
@@ -173,7 +173,95 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText(/1\s+MARK$/)).toBeInTheDocument();
+		expect(screen.getByText('+1')).toBeInTheDocument();
+	});
+
+	describe('Marks expanded dropdown', () => {
+		it('dropdown is not visible before clicking the marks button', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ marking_scheme: { correct: 2, wrong: -1, skipped: 0 } }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByText('Correct')).not.toBeInTheDocument();
+			expect(screen.queryByText('Wrong')).not.toBeInTheDocument();
+			expect(screen.queryByText('Skipped')).not.toBeInTheDocument();
+		});
+
+		it('opens the dropdown when marks button is clicked', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ marking_scheme: { correct: 2, wrong: -1, skipped: 0 } }) }
+			});
+			await openDialog();
+
+			await fireEvent.click(screen.getByRole('button', { name: /marks/i }));
+
+			expect(screen.getByText('Correct')).toBeInTheDocument();
+			expect(screen.getByText('Wrong')).toBeInTheDocument();
+			expect(screen.getByText('Skipped')).toBeInTheDocument();
+		});
+
+		it('shows correct mark value in dropdown', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ marking_scheme: { correct: 4, wrong: 0, skipped: 0 } }) }
+			});
+			await openDialog();
+
+			await fireEvent.click(screen.getByRole('button', { name: /marks/i }));
+
+			const correctValues = screen.getAllByText('+4');
+			expect(correctValues.length).toBeGreaterThanOrEqual(1);
+		});
+
+		it('shows wrong mark value in dropdown when wrong is non-zero', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ marking_scheme: { correct: 2, wrong: -1, skipped: 0 } }) }
+			});
+			await openDialog();
+
+			await fireEvent.click(screen.getByRole('button', { name: /marks/i }));
+
+			expect(screen.getByText('Wrong')).toBeInTheDocument();
+			const wrongValues = screen.getAllByText('-1');
+			expect(wrongValues.length).toBeGreaterThanOrEqual(1);
+		});
+
+		it('does not show wrong row in dropdown when wrong is 0', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ marking_scheme: { correct: 1, wrong: 0, skipped: 0 } }) }
+			});
+			await openDialog();
+
+			await fireEvent.click(screen.getByRole('button', { name: /marks/i }));
+
+			expect(screen.queryByText('Wrong')).not.toBeInTheDocument();
+		});
+
+		it('shows skipped value in dropdown', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ marking_scheme: { correct: 1, wrong: 0, skipped: 0.5 } }) }
+			});
+			await openDialog();
+
+			await fireEvent.click(screen.getByRole('button', { name: /marks/i }));
+
+			expect(screen.getByText('Skipped')).toBeInTheDocument();
+			expect(screen.getByText('0.5')).toBeInTheDocument();
+		});
+
+		it('closes the dropdown when marks button is clicked again', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ marking_scheme: { correct: 2, wrong: -1, skipped: 0 } }) }
+			});
+			await openDialog();
+
+			const marksButton = screen.getByRole('button', { name: /marks/i });
+			await fireEvent.click(marksButton);
+			expect(screen.getByText('Correct')).toBeInTheDocument();
+
+			await fireEvent.click(marksButton);
+			expect(screen.queryByText('Correct')).not.toBeInTheDocument();
+		});
 	});
 
 	it('handles undefined data fields gracefully', async () => {
@@ -271,6 +359,41 @@ describe('Question_preview', () => {
 
 			await fireEvent.click(checkboxes[0]);
 			expect(checkboxes[0]).not.toBeChecked();
+		});
+	});
+
+	describe('Multi-choice empty state', () => {
+		it('shows placeholder when multi-choice has no options', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'multi-choice', options: [] }) }
+			});
+			await openDialog();
+
+			expect(screen.getByText('Add options to see them in preview...')).toBeInTheDocument();
+			expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+		});
+
+		it('renders checkboxes when multi-choice has valid options', async () => {
+			const options = [
+				{ key: 'A', value: 'Option A', correct_answer: true },
+				{ key: 'B', value: 'Option B', correct_answer: true }
+			];
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'multi-choice', options }) }
+			});
+			await openDialog();
+
+			expect(screen.queryByText('Add options to see them in preview...')).not.toBeInTheDocument();
+			expect(screen.getAllByRole('checkbox')).toHaveLength(2);
+		});
+
+		it('shows placeholder for unknown question type', async () => {
+			render(QuestionPreview, {
+				props: { data: createData({ question_type: 'unknown-type' }) }
+			});
+			await openDialog();
+
+			expect(screen.getByText('Add options to see them in preview...')).toBeInTheDocument();
 		});
 	});
 
@@ -701,6 +824,204 @@ describe('Question_preview', () => {
 			expect(screen.getAllByRole('radio')).toHaveLength(1);
 			expect(screen.getByText('Quality')).toBeInTheDocument();
 		});
+	});
+});
+
+describe('QuestionPreview - Matrix Match', () => {
+	function createMatrixMatchData(matrixOverrides = {}) {
+		return createData({
+			question_type: 'matrix-match',
+			options: [],
+			matrix: {
+				rowLabel: 'Column 1',
+				colLabel: 'Column 2',
+				rows: [
+					{ id: 1, key: 'A', value: 'Statement A' },
+					{ id: 2, key: 'B', value: 'Statement B' }
+				],
+				columns: [
+					{ id: 10, key: 'P', value: 'Option P' },
+					{ id: 11, key: 'Q', value: 'Option Q' }
+				],
+				...matrixOverrides
+			}
+		});
+	}
+
+	it('renders row label and column label headers', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		expect(screen.getByText('Column 1')).toBeInTheDocument();
+		expect(screen.getByText('Column 2')).toBeInTheDocument();
+	});
+
+	it('renders row values', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		expect(screen.getByText('Statement A')).toBeInTheDocument();
+		expect(screen.getByText('Statement B')).toBeInTheDocument();
+	});
+
+	it('renders column values', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		expect(screen.getByText('Option P')).toBeInTheDocument();
+		expect(screen.getByText('Option Q')).toBeInTheDocument();
+	});
+
+	it('renders a match table with row and column keys', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		expect(screen.getByRole('table')).toBeInTheDocument();
+
+		expect(screen.getAllByText('A').length).toBeGreaterThanOrEqual(1);
+		expect(screen.getAllByText('B').length).toBeGreaterThanOrEqual(1);
+		expect(screen.getAllByText('P').length).toBeGreaterThanOrEqual(1);
+		expect(screen.getAllByText('Q').length).toBeGreaterThanOrEqual(1);
+	});
+
+	it('renders checkboxes for each row×column combination', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		expect(screen.getAllByRole('checkbox')).toHaveLength(4);
+	});
+
+	it('all checkboxes start unchecked', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		screen.getAllByRole('checkbox').forEach((cb) => expect(cb).not.toBeChecked());
+	});
+
+	it('allows checking a checkbox', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		const checkboxes = screen.getAllByRole('checkbox');
+		await fireEvent.click(checkboxes[0]);
+
+		expect(checkboxes[0]).toBeChecked();
+	});
+
+	it('allows multiple checkboxes to be checked in the same row', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		const checkboxes = screen.getAllByRole('checkbox');
+		await fireEvent.click(checkboxes[0]);
+		await fireEvent.click(checkboxes[1]);
+
+		expect(checkboxes[0]).toBeChecked();
+		expect(checkboxes[1]).toBeChecked();
+	});
+
+	it('checking in one row does not affect another row', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		const checkboxes = screen.getAllByRole('checkbox');
+		await fireEvent.click(checkboxes[0]);
+		expect(checkboxes[2]).not.toBeChecked();
+	});
+
+	it('allows unchecking a checked checkbox', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		const checkboxes = screen.getAllByRole('checkbox');
+		await fireEvent.click(checkboxes[0]);
+		expect(checkboxes[0]).toBeChecked();
+
+		await fireEvent.click(checkboxes[0]);
+		expect(checkboxes[0]).not.toBeChecked();
+	});
+
+	it('clears selections when dialog closes and reopens', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		const checkboxes = screen.getAllByRole('checkbox');
+		await fireEvent.click(checkboxes[0]);
+		await fireEvent.click(checkboxes[3]);
+		expect(checkboxes[0]).toBeChecked();
+		expect(checkboxes[3]).toBeChecked();
+
+		await fireEvent.click(screen.getByRole('button', { name: /close/i }));
+		await openDialog();
+
+		screen.getAllByRole('checkbox').forEach((cb) => expect(cb).not.toBeChecked());
+	});
+
+	it('shows empty state when matrix has no rows', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createMatrixMatchData({
+					rows: [],
+					columns: [{ id: 10, key: 'P', value: 'Option P' }]
+				})
+			}
+		});
+		await openDialog();
+
+		expect(screen.getByText('Add items to see them in preview...')).toBeInTheDocument();
+		expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+	});
+
+	it('shows empty state when matrix has no columns', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createMatrixMatchData({
+					rows: [{ id: 1, key: 'A', value: 'Statement A' }],
+					columns: []
+				})
+			}
+		});
+		await openDialog();
+
+		expect(screen.getByText('Add items to see them in preview...')).toBeInTheDocument();
+		expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+	});
+
+	it('shows empty state when matrix is null', async () => {
+		render(QuestionPreview, {
+			props: { data: createData({ question_type: 'matrix-match', options: [], matrix: null }) }
+		});
+		await openDialog();
+
+		expect(screen.getByText('Add items to see them in preview...')).toBeInTheDocument();
+	});
+
+	it('filters out rows with empty values', async () => {
+		render(QuestionPreview, {
+			props: {
+				data: createMatrixMatchData({
+					rows: [
+						{ id: 1, key: 'A', value: 'Statement A' },
+						{ id: 2, key: 'B', value: '' },
+						{ id: 3, key: 'C', value: '   ' }
+					],
+					columns: [{ id: 10, key: 'P', value: 'Option P' }]
+				})
+			}
+		});
+		await openDialog();
+
+		expect(screen.getByText('Statement A')).toBeInTheDocument();
+		expect(screen.getAllByRole('checkbox')).toHaveLength(1);
+	});
+
+	it('does not render radio buttons, spinbutton, or textarea', async () => {
+		render(QuestionPreview, { props: { data: createMatrixMatchData() } });
+		await openDialog();
+
+		expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+		expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument();
+		expect(screen.queryByPlaceholderText('Type your answer here...')).not.toBeInTheDocument();
 	});
 });
 

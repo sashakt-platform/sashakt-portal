@@ -2,10 +2,12 @@
 	import type { Snippet } from 'svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import TooltipInfo from './TooltipInfo.svelte';
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 
 	type ListingPageLayoutProps = {
 		title: string;
 		subtitle: string;
+		backHref?: string;
 		infoLabel?: string;
 		infoDescription?: string;
 		showFilters?: boolean;
@@ -21,6 +23,7 @@
 	let {
 		title,
 		subtitle,
+		backHref,
 		showFilters = true,
 		showEmptyState = false,
 		showInfoIcon = true,
@@ -40,7 +43,12 @@
 		<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
 			<div class="my-auto flex flex-col">
 				<div class="flex w-full items-center align-middle">
-					<div class="flex flex-row">
+					<div class="flex flex-row items-center gap-3">
+						{#if backHref}
+							<a href={backHref} class="hover:bg-muted rounded-lg border p-2" aria-label="Go back">
+								<ArrowLeft size={20} />
+							</a>
+						{/if}
 						<h2
 							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 						>

@@ -94,10 +94,10 @@ describe('Entity Page', () => {
 			expect(screen.getByText('Add CLF Record')).toBeInTheDocument();
 		});
 
-		it('shows Back to Entities button', () => {
+		it('shows back navigation link', () => {
 			render(Page, { data: viewData } as any);
 
-			expect(screen.getByText('Back to Entities')).toBeInTheDocument();
+			expect(screen.getByRole('link', { name: /go back/i })).toBeInTheDocument();
 		});
 
 		it('renders search input', () => {

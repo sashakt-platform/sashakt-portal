@@ -4,7 +4,6 @@
 	import { createEntityColumns } from './entity-columns';
 	import { Button } from '$lib/components/ui/button';
 	import Plus from '@lucide/svelte/icons/plus';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
@@ -50,12 +49,11 @@
 <ListingPageLayout
 	title={entityTypeName}
 	subtitle=""
+	backHref={resolve('/entity')}
 	infoLabel="Help: Record management"
-	infoDescription={`This panel displays all ${entityTypeName} records. You can edit or delete an existing record by clicking the three dots next to their entry.`}
+	infoDescription={`This panel displays all ${entityTypeName} records. You can edit or delete an existing record using the action buttons next to their entry.`}
 >
 	{#snippet headerActions()}
-		<a href={resolve('/entity')}><Button variant="outline"><ArrowLeft />Back to Entities</Button></a
-		>
 		{#if canCreate(data.user, 'entity')}
 			<a href={resolve(`/entity/view/${data.entityTypeId}/add/new`)}
 				><Button class="font-semibold"><Plus />{`Add ${entityTypeName} Record`}</Button></a

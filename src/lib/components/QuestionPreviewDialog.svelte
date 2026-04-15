@@ -88,7 +88,7 @@
 		<button
 			type="button"
 			onclick={toggleReview}
-			class="mx-auto my-6 flex items-center justify-center gap-1.5 text-sm {markedForReview
+			class="mx-auto mt-2 mb-5 flex items-center justify-center gap-1.5 text-sm {markedForReview
 				? 'text-primary'
 				: 'text-muted-foreground'}"
 		>

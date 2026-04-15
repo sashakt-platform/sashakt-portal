@@ -211,21 +211,23 @@
 
 <div class="border-border bg-card rounded-lg border">
 	<!-- Header bar -->
-	<div class="border-border flex items-center justify-between border-b px-4 py-3">
+	<div
+		class="bg-muted/50 border-border flex items-center justify-between rounded-t-lg border-b px-4 py-3"
+	>
 		<div class="flex items-center gap-3">
 			<span use:dragHandle aria-label="drag to reorder">
 				<GripVertical class="text-muted-foreground h-5 w-5 cursor-grab" />
 			</span>
 
 			<span
-				class="bg-primary text-primary-foreground flex h-7 w-7 items-center justify-center rounded-md text-xs font-semibold"
+				class="bg-input text-muted-foreground flex h-7 w-7 items-center justify-center rounded-md text-xs font-semibold"
 			>
 				{index + 1}
 			</span>
 
 			<Popover.Root bind:open={typePopoverOpen}>
 				<Popover.Trigger
-					class="border-border hover:bg-accent flex items-center gap-1.5 rounded-md border px-3 py-1.5 transition-colors"
+					class="border-border bg-card hover:bg-accent flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors"
 				>
 					{#if FieldIcon}
 						<FieldIcon class="text-muted-foreground h-4 w-4" />
@@ -271,14 +273,14 @@
 			</Popover.Root>
 		</div>
 
-		<div class="flex items-center gap-2">
+		<div class="flex items-center gap-3">
 			<button
 				type="button"
 				class="text-muted-foreground hover:bg-accent hover:text-foreground rounded-md p-1.5 transition-colors"
 				title="Duplicate field"
 				onclick={() => onDuplicate(buildFieldData())}
 			>
-				<Copy class="h-4 w-4" />
+				<Copy class="h-4.5 w-4.5" />
 			</button>
 
 			<button
@@ -287,13 +289,13 @@
 				title="Delete field"
 				onclick={() => (showDeleteDialog = true)}
 			>
-				<Trash2 class="h-4 w-4" />
+				<Trash2 class="h-4.5 w-4.5" />
 			</button>
 
-			<div class="bg-border mx-1 h-6 w-px"></div>
+			<div class="bg-border mx-2 h-6 w-px"></div>
 
 			<div class="flex items-center gap-2">
-				<span class="text-sm font-medium">Required</span>
+				<span class="text-muted-foreground text-sm">Required</span>
 				<Switch checked={isRequired} onCheckedChange={handleRequiredToggle} />
 			</div>
 		</div>

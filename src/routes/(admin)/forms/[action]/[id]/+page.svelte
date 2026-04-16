@@ -305,7 +305,7 @@
 			<!-- Add Field Button -->
 			<button
 				type="button"
-				class="border-primary/40 text-primary hover:border-primary hover:bg-primary/5 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-4 transition-colors"
+				class="bg-accent border-primary/40 text-primary hover:border-primary flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-4 transition-colors"
 				onclick={handleAddField}
 			>
 				<Plus class="h-4 w-4" />

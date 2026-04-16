@@ -400,7 +400,17 @@
 									placeholder="Option label"
 									class="flex-1"
 								/>
-								<Input value={option.value} disabled class="flex-1" placeholder="Value" />
+								<Input
+									value={option.value}
+									oninput={(e) => {
+										options = options.map((opt, i) =>
+											i === idx ? { ...opt, value: e.currentTarget.value } : opt
+										);
+										debouncedSave();
+									}}
+									class="flex-1"
+									placeholder="Value"
+								/>
 								<Button
 									type="button"
 									variant="ghost"

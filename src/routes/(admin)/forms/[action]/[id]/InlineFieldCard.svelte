@@ -533,6 +533,7 @@
 						if (result.type === 'success' && field.id) {
 							onDelete(field.id);
 							showDeleteDialog = false;
+							toast.success('Field deleted successfully');
 						} else {
 							toast.error('Failed to delete field');
 						}

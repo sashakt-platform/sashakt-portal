@@ -213,10 +213,7 @@
 				>
 					Dashboard
 				</h2>
-				<TooltipInfo
-					label="Help: Dashboard"
-					description="Dashboard provides a quick overview of your organization’s activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
-				/>
+				<TooltipInfo tooltipKey="dashboard" />
 			</div>
 		</div>
 	</div>

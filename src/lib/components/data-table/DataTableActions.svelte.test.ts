@@ -363,7 +363,7 @@ describe('DataTableActions', () => {
 				}
 			});
 
-			expect(screen.getByText('Delete')).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Delete/i })).toBeInTheDocument();
 			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
 		});
 
@@ -378,9 +378,9 @@ describe('DataTableActions', () => {
 				}
 			});
 
-			const deleteButton = screen.getByText('Delete').closest('button');
+			const deleteButton = screen.getByRole('button', { name: /Delete/i });
 			expect(deleteButton).toBeInTheDocument();
-			await fireEvent.click(deleteButton!);
+			await fireEvent.click(deleteButton);
 
 			expect(onDelete).toHaveBeenCalledTimes(1);
 		});
@@ -457,7 +457,7 @@ describe('DataTableActions', () => {
 
 			// Both Edit and Delete are inline
 			expect(screen.getByText('Edit')).toBeInTheDocument();
-			expect(screen.getByText('Delete')).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Delete/i })).toBeInTheDocument();
 			// No overflow dropdown
 			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
 		});

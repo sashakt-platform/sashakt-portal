@@ -70,12 +70,17 @@ describe('CertificatePage', () => {
 	});
 
 	it('sorts certificates on column click', async () => {
+		const { goto } = await import('$app/navigation');
 		render(CertificatePage, { data: baseData });
 
-		const tableHeader = screen.getByText('Name');
+		const tableHeader = screen.getByText('NAME');
 		await fireEvent.click(tableHeader);
 
-		expect(true).toBe(true);
+		expect(goto).toHaveBeenCalledOnce();
+		const calledUrl = (goto as ReturnType<typeof vi.fn>).mock.calls[0][0] as URL;
+		expect(calledUrl.searchParams.get('sortBy')).toBe('name');
+		expect(calledUrl.searchParams.get('sortOrder')).toBe('asc');
+		expect(calledUrl.searchParams.get('page')).toBe('1');
 	});
 
 	it('handles empty certificate list', () => {

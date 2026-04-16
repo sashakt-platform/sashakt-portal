@@ -12,6 +12,27 @@ export enum OmrMode {
 	OPTIONAL = 'OPTIONAL'
 }
 
+const questionPreviewSchema = z
+	.object({
+		id: z.number(),
+		question_text: z.string().default(''),
+		tags: z.array(z.object({ name: z.string() })).default([])
+	})
+	.passthrough();
+
+export const questionSetSchema = z
+	.object({
+		id: z.number().nullable().optional(),
+		title: z.string(),
+		description: z.string().nullable().optional(),
+		max_questions_allowed_to_attempt: z.number().int().min(1),
+		display_order: z.number().int().min(1),
+		marking_scheme: marksSchema.nullable().optional(),
+		question_revision_ids: z.array(z.number()).default([]),
+		question_revisions: z.array(questionPreviewSchema).default([])
+	})
+	.passthrough();
+
 export const testSchema = z.object({
 	name: z.string(),
 	description: z.string(),
@@ -43,6 +64,7 @@ export const testSchema = z.object({
 	template_id: z.string().nullable().optional(),
 	tag_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	question_revision_ids: z.array(z.number()).default([]),
+	question_sets: z.array(questionSetSchema).default([]),
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_result: z.boolean().default(true),

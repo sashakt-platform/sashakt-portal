@@ -117,7 +117,7 @@
 				aria-expanded={open}
 			>
 				{#if multiple}
-					{#if items?.length === 0}
+					{#if !items || items.length === 0}
 						{placeholder}
 					{:else if items?.length < 3}
 						<span class="flex flex-row truncate text-start">

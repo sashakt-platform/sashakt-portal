@@ -90,6 +90,7 @@ const mockValidFormData = {
 	template_id: null,
 	tag_ids: [{ id: 'tag1', name: 'Tag 1' }],
 	question_revision_ids: [1, 2],
+	question_sets: [],
 	state_ids: [{ id: 'state1', name: 'State 1' }],
 	district_ids: [{ id: 'district1', name: 'District 1' }],
 	show_result: true,
@@ -817,6 +818,79 @@ describe('Test Create/Update Page — save action', () => {
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
 			expect(body.random_tag_count).toEqual([{ tag_id: 'tag1', count: 3 }]);
+		});
+
+		it('omits section membership fields when updating an existing sectioned test', async () => {
+			(superValidate as any).mockResolvedValue({
+				valid: true,
+				data: {
+					...mockValidFormData,
+					question_revision_ids: [1, 2],
+					question_sets: [
+						{
+							id: 10,
+							title: 'Physics',
+							description: 'Section A',
+							display_order: 1,
+							max_questions_allowed_to_attempt: 1,
+							marking_scheme: { correct: 4, wrong: -1, skipped: 0 },
+							question_revision_ids: [1],
+							question_revisions: [{ id: 1, question_text: 'What is force?', tags: [] }]
+						}
+					]
+				}
+			});
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body).not.toHaveProperty('question_revision_ids');
+			expect(body).not.toHaveProperty('question_sets');
+		});
+
+		it('submits question_sets when creating from a sectioned test payload', async () => {
+			(superValidate as any).mockResolvedValue({
+				valid: true,
+				data: {
+					...mockValidFormData,
+					template_id: '5',
+					question_revision_ids: [1, 2],
+					question_sets: [
+						{
+							id: 10,
+							title: 'Physics',
+							description: 'Section A',
+							display_order: 1,
+							max_questions_allowed_to_attempt: 1,
+							marking_scheme: { correct: 4, wrong: -1, skipped: 0 },
+							question_revision_ids: [],
+							question_revisions: [{ id: 1, question_text: 'What is force?', tags: [] }]
+						}
+					]
+				}
+			});
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'convert' },
+				cookies: mockCookies
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body.question_revision_ids).toBeUndefined();
+			expect(body.question_sets).toEqual([
+				expect.objectContaining({
+					id: 10,
+					title: 'Physics',
+					question_revision_ids: [1]
+				})
+			]);
 		});
 
 		it('converts empty string start_time to null', async () => {

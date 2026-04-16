@@ -93,6 +93,38 @@
 				name: t.tag.name + (t.tag.tag_type?.name ? `- (${t.tag.tag_type?.name})` : ''),
 				count: t.count
 			})) || [];
+
+		$formData.question_sets =
+			testData?.question_sets?.map(
+				(questionSet: {
+					id?: number | null;
+					title: string;
+					description?: string | null;
+					max_questions_allowed_to_attempt: number;
+					display_order: number;
+					marking_scheme?: Infer<FormSchema>['marking_scheme'] | null;
+					question_revision_ids?: number[];
+					question_revisions?: Array<{
+						id: number;
+						question_text: string;
+						tags?: Array<{ name: string }>;
+					}>;
+				}) => ({
+					id: questionSet.id ?? null,
+					title: questionSet.title,
+					description: questionSet.description ?? null,
+					max_questions_allowed_to_attempt: questionSet.max_questions_allowed_to_attempt,
+					display_order: questionSet.display_order,
+					marking_scheme: questionSet.marking_scheme ?? null,
+					question_revision_ids:
+						(questionSet.question_revision_ids?.length
+							? questionSet.question_revision_ids
+							: null) ||
+						questionSet.question_revisions?.map((question) => question.id) ||
+						[],
+					question_revisions: questionSet.question_revisions || []
+				})
+			) || [];
 	}
 
 	populateFormFromTestData(testData);

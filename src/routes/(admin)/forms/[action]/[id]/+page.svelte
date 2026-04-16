@@ -300,8 +300,10 @@
 
 			<!-- Primary Details Card -->
 			<div class="border-border bg-card rounded-lg border">
-				<div class="border-border flex items-center gap-2 border-b px-6 py-4">
-					<Settings class="text-muted-foreground h-5 w-5" />
+				<div class="border-border flex items-center gap-3 border-b px-6 py-4">
+					<span class="bg-accent flex h-9 w-9 items-center justify-center rounded-lg">
+						<Settings class="text-primary h-5 w-5" />
+					</span>
 					<h2 class="text-lg font-semibold">Primary Details</h2>
 				</div>
 

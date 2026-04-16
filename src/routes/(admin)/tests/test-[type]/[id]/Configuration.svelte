@@ -395,6 +395,15 @@
 			<div class="border-gray-200 lg:border-t-0 lg:border-l"></div>
 			<div class="flex flex-col gap-6 lg:w-1/2 lg:py-4">
 				<div class="flex items-center justify-between">
+					{@render labelTestRules('Show marks to candidate during test')}
+					{@render yesNo(
+						$formData.show_marks,
+						() => ($formData.show_marks = true),
+						() => ($formData.show_marks = false)
+					)}
+				</div>
+
+				<div class="flex items-center justify-between">
 					{@render labelTestRules('Show result after test completion')}
 					{@render yesNo(
 						$formData.show_result,

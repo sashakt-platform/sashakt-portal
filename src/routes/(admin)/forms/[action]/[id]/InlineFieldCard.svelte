@@ -26,9 +26,10 @@
 		entityTypes: Array<{ id: number; name: string }>;
 		onDelete: (fieldId: number) => void;
 		onDuplicate: (field: FormField) => void;
+		onFieldTypeChange: (field: FormField, newType: FormFieldTypeValue) => void;
 	}
 
-	let { field, index, entityTypes, onDelete, onDuplicate }: Props = $props();
+	let { field, index, entityTypes, onDelete, onDuplicate, onFieldTypeChange }: Props = $props();
 
 	// Local editable state — seeded from prop, synced via $effect on prop changes
 	let fieldType = $state(field.field_type);
@@ -187,9 +188,9 @@
 	});
 
 	function handleFieldTypeChange(newType: FormFieldTypeValue) {
-		fieldType = newType;
 		typePopoverOpen = false;
-		debouncedSave();
+		if (newType === fieldType) return;
+		onFieldTypeChange(buildFieldData(), newType);
 	}
 
 	function handleRequiredToggle(checked: boolean) {

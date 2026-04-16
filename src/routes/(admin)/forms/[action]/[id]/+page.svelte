@@ -207,6 +207,65 @@
 			toast.error('Failed to duplicate field');
 		}
 	}
+
+	async function handleFieldTypeChange(currentField: FormField, newType: FormFieldTypeValue) {
+		if (!currentField.id) return;
+
+		// Delete the old field
+		const deletePayload = new FormData();
+		deletePayload.set('fieldId', String(currentField.id));
+
+		try {
+			const deleteResponse = await fetch('?/deleteField', {
+				method: 'POST',
+				body: deletePayload
+			});
+			const deleteResult = deserialize(await deleteResponse.text());
+			if (deleteResult.type !== 'success') {
+				toast.error('Failed to change field type');
+				return;
+			}
+		} catch {
+			toast.error('Failed to change field type');
+			return;
+		}
+
+		// Create a new field with the new type, preserving other properties
+		const newFieldData: FormField = {
+			...currentField,
+			id: undefined,
+			field_type: newType,
+			// Clear type-specific data that may not apply to the new type
+			options: ['select', 'radio', 'multi_select'].includes(newType) ? currentField.options : null,
+			entity_type_id: newType === 'entity' ? currentField.entity_type_id : null
+		};
+
+		const addPayload = new FormData();
+		addPayload.set('field', JSON.stringify(newFieldData));
+
+		try {
+			const addResponse = await fetch('?/addField', {
+				method: 'POST',
+				body: addPayload
+			});
+			const addResult = deserialize(await addResponse.text());
+			if (addResult.type === 'success' && addResult.data) {
+				const createdField: FormField = {
+					...newFieldData,
+					id: (addResult.data as { id: number }).id
+				};
+				fields = fields.map((f) => (f.id === currentField.id ? createdField : f));
+				toast.success('Field type changed');
+			} else {
+				// Delete succeeded but add failed — field is lost, refetch
+				toast.error('Failed to change field type');
+				await invalidateAll();
+			}
+		} catch {
+			toast.error('Failed to change field type');
+			await invalidateAll();
+		}
+	}
 </script>
 
 <form method="POST" action="?/save" use:enhance class="flex min-h-screen flex-col">
@@ -303,6 +362,7 @@
 							entityTypes={data.entityTypes}
 							onDelete={handleFieldDeleted}
 							onDuplicate={handleDuplicateField}
+							onFieldTypeChange={handleFieldTypeChange}
 						/>
 					{/each}
 				</div>

@@ -12,7 +12,7 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import SquareCheck from '@lucide/svelte/icons/square-check';
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
-	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
 	import type { Component } from 'svelte';
 
 	interface Props {
@@ -37,7 +37,7 @@
 		date: Calendar,
 		checkbox: SquareCheck,
 		radio: CircleDot,
-		select: ChevronDown
+		select: ChevronsUpDown
 	};
 
 	function handleSelect(fieldType: FormFieldTypeValue) {

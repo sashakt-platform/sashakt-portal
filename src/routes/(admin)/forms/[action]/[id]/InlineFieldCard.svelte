@@ -12,6 +12,7 @@
 	import Copy from '@lucide/svelte/icons/copy';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
 	import Plus from '@lucide/svelte/icons/plus';
 	import UserRound from '@lucide/svelte/icons/user-round';
 	import Mail from '@lucide/svelte/icons/mail';
@@ -95,7 +96,7 @@
 		date: Calendar,
 		checkbox: SquareCheck,
 		radio: CircleDot,
-		select: ChevronDown
+		select: ChevronsUpDown
 	};
 
 	// Field types that need options

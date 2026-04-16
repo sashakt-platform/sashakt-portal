@@ -398,7 +398,7 @@
 		{#if showAdditionalControls}
 			<Collapsible.Root bind:open={additionalControlsOpen}>
 				<Collapsible.Trigger
-					class="text-foreground flex w-full items-center gap-2 text-left text-sm font-medium"
+					class="text-primary flex w-full items-center gap-2 text-left text-sm font-medium"
 				>
 					<span>Additional controls</span>
 					<ChevronDown

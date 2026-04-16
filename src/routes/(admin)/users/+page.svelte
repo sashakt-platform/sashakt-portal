@@ -43,11 +43,7 @@
 	);
 </script>
 
-<ListingPageLayout
-	title="Users"
-	subtitle=""
-	tooltipKey="users"
->
+<ListingPageLayout title="Users" subtitle="" tooltipKey="users">
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
 			<a href={resolve('/users/add/new')}

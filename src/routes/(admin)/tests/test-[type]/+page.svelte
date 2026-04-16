@@ -46,7 +46,7 @@
 	const currentPage = $derived(data?.params?.page || 1);
 	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
 	const search = $derived(data?.params?.search || '');
-const sortBy = $derived(data?.params?.sortBy || '');
+	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
 	const hasActiveFilters = $derived(

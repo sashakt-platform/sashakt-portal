@@ -125,8 +125,12 @@
 			});
 
 			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				await invalidateAll();
+			if (result.type === 'success' && result.data) {
+				const newField: FormField = {
+					...fieldData,
+					id: (result.data as { id: number }).id
+				};
+				fields = [...fields, newField];
 			} else {
 				toast.error('Failed to add field');
 			}
@@ -189,8 +193,12 @@
 			});
 
 			const result = deserialize(await response.text());
-			if (result.type === 'success') {
-				await invalidateAll();
+			if (result.type === 'success' && result.data) {
+				const newField: FormField = {
+					...fieldData,
+					id: (result.data as { id: number }).id
+				};
+				fields = [...fields, newField];
 				toast.success('Field duplicated');
 			} else {
 				toast.error('Failed to duplicate field');
@@ -209,6 +217,7 @@
 				<div class="flex items-center gap-3">
 					<a
 						href={resolve('/forms/')}
+						aria-label="Back to forms"
 						class="text-foreground hover:bg-accent rounded-md p-1.5 transition-colors"
 					>
 						<ArrowLeft class="h-5 w-5" />
@@ -219,9 +228,6 @@
 				</div>
 
 				<div class="flex items-center gap-3">
-					<Button type="button" variant="outline" class="border-primary text-primary">
-						Preview
-					</Button>
 					<Button
 						type="button"
 						class="bg-primary"

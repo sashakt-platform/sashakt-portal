@@ -44,12 +44,7 @@
 	const noFormsCreatedYet = $derived(totalItems === 0 && !search);
 </script>
 
-<ListingPageLayout
-	title="Forms"
-	subtitle=""
-	showEmptyState={noFormsCreatedYet}
-	tooltipKey="forms"
->
+<ListingPageLayout title="Forms" subtitle="" showEmptyState={noFormsCreatedYet} tooltipKey="forms">
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'form')}
 			<a href={resolve('/forms/add/new')}>

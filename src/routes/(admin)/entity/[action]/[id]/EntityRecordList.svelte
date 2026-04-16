@@ -47,11 +47,7 @@
 	);
 </script>
 
-<ListingPageLayout
-	title={entityTypeName}
-	subtitle=""
-	tooltipKey="entity-records"
->
+<ListingPageLayout title={entityTypeName} subtitle="" tooltipKey="entity-records">
 	{#snippet headerActions()}
 		<a href={resolve('/entity')}><Button variant="outline"><ArrowLeft />Back to Entities</Button></a
 		>

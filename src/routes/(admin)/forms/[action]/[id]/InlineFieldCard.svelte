@@ -425,7 +425,7 @@
 									<Input
 										type="number"
 										bind:value={maxLength}
-										placeholder="Enter minimum length"
+										placeholder="Enter maximum length"
 										min="0"
 										onblur={debouncedSave}
 									/>

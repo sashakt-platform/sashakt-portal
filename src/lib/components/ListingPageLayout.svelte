@@ -4,6 +4,7 @@
 	import Label from '$lib/components/ui/label/label.svelte';
 	import TooltipInfo from './TooltipInfo.svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import { resolve } from '$app/paths';
 
 	type ListingPageLayoutProps = {
 		title: string;
@@ -44,7 +45,7 @@
 				<div class="flex w-full items-center align-middle">
 					<div class="flex flex-row items-center gap-3">
 						{#if backHref}
-							<a href={backHref} class="hover:bg-muted rounded-lg border p-2" aria-label="Go back">
+							<a href={resolve(backHref)} class="hover:bg-muted rounded-lg border p-2" aria-label="Go back">
 								<ArrowLeft size={20} />
 							</a>
 						{/if}

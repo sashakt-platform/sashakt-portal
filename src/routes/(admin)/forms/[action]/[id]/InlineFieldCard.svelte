@@ -8,29 +8,17 @@
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
+	import * as Select from '$lib/components/ui/select/index.js';
 	import GripVertical from '@lucide/svelte/icons/grip-vertical';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import ChevronsUpDown from '@lucide/svelte/icons/chevrons-up-down';
 	import Plus from '@lucide/svelte/icons/plus';
-	import UserRound from '@lucide/svelte/icons/user-round';
-	import Mail from '@lucide/svelte/icons/mail';
-	import Phone from '@lucide/svelte/icons/phone';
-	import MapPin from '@lucide/svelte/icons/map-pin';
-	import Building2 from '@lucide/svelte/icons/building-2';
-	import Minus from '@lucide/svelte/icons/minus';
-	import AlignLeft from '@lucide/svelte/icons/align-left';
-	import Hash from '@lucide/svelte/icons/hash';
-	import Calendar from '@lucide/svelte/icons/calendar';
-	import SquareCheck from '@lucide/svelte/icons/square-check';
-	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import { toast } from 'svelte-sonner';
+	import FieldTypeGrid from './FieldTypeGrid.svelte';
+	import { getFieldTypeIcon } from './fieldTypeIcons.js';
 	import type { FormField, FieldOption } from './schema.js';
-	import { fieldTypeLabels, fieldTypeCategories, type FormFieldTypeValue } from './schema.js';
-	import type { Component } from 'svelte';
-
-	import * as Select from '$lib/components/ui/select/index.js';
+	import { fieldTypeLabels, type FormFieldTypeValue } from './schema.js';
 
 	interface Props {
 		field: FormField;
@@ -63,12 +51,29 @@
 
 	let showDeleteDialog = $state(false);
 	let additionalControlsOpen = $state(false);
+	let nameManuallyEdited = $state(false);
+
+	function toSlug(text: string) {
+		return text
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, '_')
+			.replace(/^_|_$/g, '');
+	}
+
+	// Auto-generate name from label when name hasn't been manually edited
+	$effect(() => {
+		if (!nameManuallyEdited && label) {
+			name = toSlug(label);
+		}
+	});
 
 	// Sync state when field prop changes (e.g. after server reload)
 	$effect(() => {
 		fieldType = field.field_type;
 		label = field.label;
 		name = field.name;
+		// If existing name doesn't match auto-generated from label, it was customized
+		nameManuallyEdited = field.name !== toSlug(field.label);
 		placeholder = field.placeholder || '';
 		helpText = field.help_text || '';
 		isRequired = field.is_required || false;
@@ -82,22 +87,7 @@
 		customErrorMessage = field.validation?.custom_error_message || '';
 	});
 
-	const fieldTypeIcons: Record<string, Component<{ class?: string }>> = {
-		full_name: UserRound,
-		email: Mail,
-		phone: Phone,
-		state: MapPin,
-		district: MapPin,
-		block: MapPin,
-		entity: Building2,
-		text: Minus,
-		textarea: AlignLeft,
-		number: Hash,
-		date: Calendar,
-		checkbox: SquareCheck,
-		radio: CircleDot,
-		select: ChevronsUpDown
-	};
+	const FieldIcon = $derived(getFieldTypeIcon(fieldType));
 
 	// Field types that need options
 	const optionFieldTypes = ['select', 'radio', 'multi_select'];
@@ -114,7 +104,13 @@
 
 	const showAdditionalControls = $derived(needsTextValidation || needsNumberValidation);
 
-	const FieldIcon = $derived(fieldTypeIcons[fieldType]);
+	const isValid = $derived(
+		fieldType !== '' &&
+			label.trim() !== '' &&
+			name.trim() !== '' &&
+			(!needsOptions || options.length > 0) &&
+			(!needsEntityType || entityTypeId !== null)
+	);
 
 	function buildFieldData(): FormField {
 		const fieldData: FormField = {
@@ -149,7 +145,7 @@
 	// Debounced save
 	let saveTimeout: ReturnType<typeof setTimeout>;
 	async function saveField() {
-		if (!field.id) return;
+		if (!field.id || !isValid) return;
 
 		const formData = new FormData();
 		formData.set('field', JSON.stringify(buildFieldData()));
@@ -236,45 +232,17 @@
 					class="border-border bg-card hover:bg-accent flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors"
 				>
 					{#if FieldIcon}
-						<FieldIcon class="text-muted-foreground h-4 w-4" />
+						<span class="text-muted-foreground flex h-4 w-4 items-center">
+							<svelte:component this={FieldIcon} size={16} />
+						</span>
 					{/if}
 					<span class="text-sm font-medium">
 						{fieldTypeLabels[fieldType as FormFieldTypeValue] || fieldType}
 					</span>
 					<ChevronDown class="text-muted-foreground h-3.5 w-3.5" />
 				</Popover.Trigger>
-				<Popover.Content class="w-[480px] p-4" align="start">
-					<div class="flex flex-col gap-4">
-						{#each Object.entries(fieldTypeCategories) as [category, types] (category)}
-							<div class="flex flex-col gap-2">
-								<span class="text-primary text-xs font-semibold tracking-wider uppercase">
-									{category}
-								</span>
-								<div class="grid grid-cols-3 gap-1">
-									{#each types as type (type)}
-										{@const TypeIcon = fieldTypeIcons[type]}
-										<button
-											type="button"
-											class="flex items-center gap-2 rounded-md px-2.5 py-2 text-sm transition-colors {type ===
-											fieldType
-												? 'bg-primary/10 text-primary font-medium'
-												: 'hover:bg-accent'}"
-											onclick={() => handleFieldTypeChange(type)}
-										>
-											{#if TypeIcon}
-												<TypeIcon
-													class="h-4 w-4 {type === fieldType
-														? 'text-primary'
-														: 'text-muted-foreground'}"
-												/>
-											{/if}
-											<span>{fieldTypeLabels[type]}</span>
-										</button>
-									{/each}
-								</div>
-							</div>
-						{/each}
-					</div>
+				<Popover.Content class="w-[640px] p-4" align="start">
+					<FieldTypeGrid selectedType={fieldType} onSelect={handleFieldTypeChange} />
 				</Popover.Content>
 			</Popover.Root>
 		</div>
@@ -323,7 +291,7 @@
 				<Input
 					bind:value={name}
 					placeholder="Enter database label"
-					disabled={!!field.id}
+					oninput={() => (nameManuallyEdited = true)}
 					onblur={debouncedSave}
 				/>
 			</div>

@@ -51,7 +51,12 @@ export const fieldTypeCategories = {
 		FormFieldType.ENTITY
 	],
 	General: [FormFieldType.TEXT, FormFieldType.TEXTAREA, FormFieldType.NUMBER, FormFieldType.DATE],
-	'Choice List': [FormFieldType.CHECKBOX, FormFieldType.RADIO, FormFieldType.SELECT]
+	'Choice List': [
+		FormFieldType.CHECKBOX,
+		FormFieldType.RADIO,
+		FormFieldType.SELECT,
+		FormFieldType.MULTI_SELECT
+	]
 };
 
 // Field option schema

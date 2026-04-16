@@ -9,21 +9,30 @@
 
 	const { data } = $props();
 
+	let initial = $state({ ...(data.currentUser ?? data.form) });
+
 	const form = superForm(data.currentUser ? { ...data.currentUser } : data.form, {
 		validators: zod4Client(profileSchema),
 		dataType: 'json',
 		onResult({ result }) {
 			if (result.type === 'redirect') {
-				form.form.update((f) => ({
-					...f,
-					current_password: '',
-					new_password: '',
-					confirm_password: ''
-				}));
+				form.form.update((f) => {
+					initial.full_name = f.full_name;
+					initial.email = f.email;
+					initial.phone = f.phone;
+					return { ...f, current_password: '', new_password: '', confirm_password: '' };
+				});
 			}
 		}
 	});
-	const { enhance } = form;
+	const { enhance, form: formData } = form;
+
+	const canSave = $derived(
+		$formData.full_name !== initial.full_name ||
+			$formData.email !== initial.email ||
+			$formData.phone !== initial.phone ||
+			!!$formData.new_password
+	);
 </script>
 
 <div
@@ -38,7 +47,12 @@
 				>Cancel</Button
 			>
 		</a>
-		<Button type="submit" form="profile-form" class="bg-primary text-sm sm:text-base">Save</Button>
+		<Button
+			type="submit"
+			form="profile-form"
+			class="bg-primary text-sm sm:text-base"
+			disabled={!canSave}>Save</Button
+		>
 	</div>
 </div>
 

@@ -13,7 +13,6 @@ export const FormFieldType = {
 	RADIO: 'radio',
 	CHECKBOX: 'checkbox',
 	MULTI_SELECT: 'multi_select',
-	TOGGLE: 'toggle',
 	ENTITY: 'entity',
 	STATE: 'state',
 	DISTRICT: 'district',
@@ -34,7 +33,6 @@ export const fieldTypeLabels: Record<FormFieldTypeValue, string> = {
 	radio: 'Radio button',
 	checkbox: 'Check box',
 	multi_select: 'Multi Select',
-	toggle: 'Toggle',
 	entity: 'Entity',
 	state: 'State',
 	district: 'District',
@@ -53,12 +51,7 @@ export const fieldTypeCategories = {
 		FormFieldType.ENTITY
 	],
 	General: [FormFieldType.TEXT, FormFieldType.TEXTAREA, FormFieldType.NUMBER, FormFieldType.DATE],
-	'Choice List': [
-		FormFieldType.CHECKBOX,
-		FormFieldType.RADIO,
-		FormFieldType.SELECT,
-		FormFieldType.TOGGLE
-	]
+	'Choice List': [FormFieldType.CHECKBOX, FormFieldType.RADIO, FormFieldType.SELECT]
 };
 
 // Field option schema

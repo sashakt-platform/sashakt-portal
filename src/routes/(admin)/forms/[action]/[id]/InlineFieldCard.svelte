@@ -24,7 +24,6 @@
 	import Calendar from '@lucide/svelte/icons/calendar';
 	import SquareCheck from '@lucide/svelte/icons/square-check';
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
-	import ToggleLeft from '@lucide/svelte/icons/toggle-left';
 	import { toast } from 'svelte-sonner';
 	import type { FormField, FieldOption } from './schema.js';
 	import { fieldTypeLabels, fieldTypeCategories, type FormFieldTypeValue } from './schema.js';
@@ -96,8 +95,7 @@
 		date: Calendar,
 		checkbox: SquareCheck,
 		radio: CircleDot,
-		select: ChevronDown,
-		toggle: ToggleLeft
+		select: ChevronDown
 	};
 
 	// Field types that need options

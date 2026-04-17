@@ -378,6 +378,39 @@
 
 	const questionId = $derived(questionData?.id ?? null);
 
+	// Combined media map for preview: merges uploaded media with staged file previews
+	// so that image-only staged options appear in the preview dialog
+	const previewOptionMediaMap = $derived.by(() => {
+		const map: Record<number, TMedia | null> = { ...optionMediaMap };
+		for (const [idStr, file] of Object.entries(stagedOptionFiles)) {
+			const id = Number(idStr);
+			if (file && !map[id]) {
+				map[id] = {
+					image: {
+						gcs_path: '',
+						url: URL.createObjectURL(file),
+						content_type: file.type,
+						size_bytes: file.size,
+						uploaded_at: ''
+					}
+				};
+			}
+		}
+		for (const [idStr, url] of Object.entries(stagedOptionUrls)) {
+			const id = Number(idStr);
+			if (url?.trim() && !map[id]) {
+				map[id] = {
+					external_media: {
+						type: 'video',
+						provider: 'generic',
+						url: url.trim()
+					}
+				};
+			}
+		}
+		return map;
+	});
+
 	async function refreshQuestion() {
 		if (!questionId) return;
 		try {
@@ -715,7 +748,7 @@
 							inputType: matrixInputType
 						},
 						media: questionMedia,
-						optionMediaMap
+						optionMediaMap: previewOptionMediaMap
 					}}
 				/>
 				<Button

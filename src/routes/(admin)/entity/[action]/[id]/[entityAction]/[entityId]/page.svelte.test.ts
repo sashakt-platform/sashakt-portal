@@ -129,10 +129,10 @@ describe('Entity Form Page', () => {
 			expect(screen.getByRole('heading', { name: /^block$/i })).toBeInTheDocument();
 		});
 
-		it('shows Cancel and Save buttons', () => {
+		it('shows Save button and back link', () => {
 			render(Page, { data: createFormData } as any);
 
-			expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+			expect(screen.getByRole('link', { name: /back to records/i })).toBeInTheDocument();
 			expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
 		});
 
@@ -146,11 +146,11 @@ describe('Entity Form Page', () => {
 			expect(saveBtn).toBeEnabled();
 		});
 
-		it('has Cancel link pointing to entity type view', () => {
+		it('has back link pointing to entity type view', () => {
 			render(Page, { data: createFormData } as any);
 
-			const cancelLink = screen.getByRole('link', { name: /cancel/i });
-			expect(cancelLink).toHaveAttribute('href', '/entity/view/1');
+			const backLink = screen.getByRole('link', { name: /back to records/i });
+			expect(backLink).toHaveAttribute('href', '/entity/view/1');
 		});
 
 		it('renders name input as empty for new entity', () => {
@@ -196,10 +196,10 @@ describe('Entity Form Page', () => {
 			expect(saveBtn).toBeEnabled();
 		});
 
-		it('shows Cancel and Save buttons in edit mode', () => {
+		it('shows Save button and back link in edit mode', () => {
 			render(Page, { data: editFormData } as any);
 
-			expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+			expect(screen.getByRole('link', { name: /back to records/i })).toBeInTheDocument();
 			expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
 		});
 

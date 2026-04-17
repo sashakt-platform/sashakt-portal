@@ -94,10 +94,10 @@ describe('Entity Page', () => {
 			expect(screen.getByText('Add CLF Record')).toBeInTheDocument();
 		});
 
-		it('shows Back to Entities button', () => {
+		it('shows back navigation link', () => {
 			render(Page, { data: viewData } as any);
 
-			expect(screen.getByText('Back to Entities')).toBeInTheDocument();
+			expect(screen.getByRole('link', { name: /go back/i })).toBeInTheDocument();
 		});
 
 		it('renders search input', () => {
@@ -128,15 +128,8 @@ describe('Entity Page', () => {
 		it('shows Name and Description fields', () => {
 			render(Page, { data: createFormData } as any);
 
-			expect(screen.getByRole('heading', { name: /name/i })).toBeInTheDocument();
-			expect(screen.getByRole('heading', { name: /description/i })).toBeInTheDocument();
-		});
-
-		it('shows Cancel and Save buttons', () => {
-			render(Page, { data: createFormData } as any);
-
-			expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-			expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
+			expect(screen.getByText('Entity Name')).toBeInTheDocument();
+			expect(screen.getByText('Description')).toBeInTheDocument();
 		});
 
 		it('enables Save button after entering name', async () => {

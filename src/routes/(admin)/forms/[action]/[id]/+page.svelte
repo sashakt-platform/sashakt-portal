@@ -75,6 +75,14 @@
 			if (organizationId) {
 				$formData.organization_id = organizationId;
 			}
+		},
+		onError: () => {
+			localStorage.removeItem('openFieldChooser');
+		},
+		onResult: ({ result }) => {
+			if (result.type === 'failure') {
+				localStorage.removeItem('openFieldChooser');
+			}
 		}
 	});
 

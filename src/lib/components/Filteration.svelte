@@ -88,13 +88,13 @@
 				onSearch('');
 			}
 
-			const url = new URL(page.url);
-			try {
-				url.searchParams.delete(itemName + '_search');
-			} catch (e) {
-				console.error('Failed to update URL on popover close', e);
-			}
 			if (filteration) {
+				const url = new URL(page.url);
+				try {
+					url.searchParams.delete(itemName + '_search');
+				} catch (e) {
+					console.error('Failed to update URL on popover close', e);
+				}
 				url.searchParams.delete(itemName + '_ids');
 				items.map((item: Filter) => {
 					url.searchParams.append(itemName + '_ids', item.id);
@@ -102,8 +102,8 @@
 
 				// reset pagination to first page when filters change
 				url.searchParams.set('page', '1');
+				goto(url, { keepFocus: true, invalidateAll: true });
 			}
-			goto(url, { keepFocus: true, invalidateAll: true });
 		}
 	}}
 >

@@ -32,6 +32,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		const search = url.searchParams.get('search') || '';
 		const sortBy = url.searchParams.get('sortBy') || '';
 		const sortOrder = url.searchParams.get('sortOrder') || 'asc';
+		const isActiveRaw = url.searchParams.get('isActive')?.toLowerCase();
+		const isActive = isActiveRaw === 'true' || isActiveRaw === 'false' ? isActiveRaw : '';
 
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
@@ -39,7 +41,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			entity_type_id: entityTypeId,
 			...(search && { name: search }),
 			...(sortBy && { sort_by: sortBy }),
-			...(sortBy && { sort_order: sortOrder })
+			...(sortBy && { sort_order: sortOrder }),
+			...(isActive && { is_active: isActive })
 		});
 
 		const entitiesRes = await fetch(`${BACKEND_URL}/entity/?${queryParams}`, {
@@ -66,7 +69,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			entityType,
 			entityTypeId,
 			totalPages: entities?.pages || 0,
-			params: { page, size, search, sortBy, sortOrder }
+			params: { page, size, search, sortBy, sortOrder, isActive }
 		};
 	}
 

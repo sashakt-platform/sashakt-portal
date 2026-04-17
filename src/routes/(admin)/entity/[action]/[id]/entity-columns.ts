@@ -78,5 +78,9 @@ export const createEntityColumns = (
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date })
 	}),
-	createActionsColumn<Entity>('Record', `/entity/view/${entityTypeId}`, permissions)
+	createActionsColumn<Entity>('Record', `/entity/view/${entityTypeId}`, {
+		...permissions,
+		editInline: true,
+		deleteInline: true
+	})
 ];

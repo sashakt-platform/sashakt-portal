@@ -112,10 +112,13 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod4(questionSchema));
 		if (!form.valid) {
 			setFlash(
-				{ type: 'error', message: 'Question not Created. Please check all the details.' },
+				{ type: 'error', message: 'Question not saved. Please check all the details.' },
 				cookies
 			);
-			return fail(400, { form });
+			return fail(400, {
+				form,
+				errorMessage: 'Question not saved. Please check all the details.'
+			});
 		}
 
 		const transformedFormData = {
@@ -136,14 +139,9 @@ export const actions: Actions = {
 
 			if (!response.ok) {
 				const errorMessage = await response.json();
-				setFlash(
-					{
-						type: 'error',
-						message: errorMessage.detail || 'Question not Created. Please check all the details.'
-					},
-					cookies
-				);
-				return fail(500, { form });
+				const detail = errorMessage.detail || 'Question not Created. Please check all the details.';
+				setFlash({ type: 'error', message: detail }, cookies);
+				return fail(response.status, { form, errorMessage: detail });
 			}
 
 			const newQuestion = await response.json();

@@ -46,13 +46,19 @@
 	} = $props();
 
 	const marking = $derived(data.markingScheme || { correct: 1, wrong: 0, skipped: 0 });
-	const validOptions = $derived(
-		Array.isArray(data.options) ? data.options.filter((opt) => opt.value.trim() !== '') : []
-	);
 	const media = $derived(data.media);
 	const optionMediaMap = $derived(data.optionMediaMap ?? {});
-	const matrixRows = $derived(data.matrix?.rows?.filter((r) => r.value.trim() !== '') ?? []);
-	const matrixColumns = $derived(data.matrix?.columns?.filter((c) => c.value.trim() !== '') ?? []);
+	const validOptions = $derived(
+		Array.isArray(data.options)
+			? data.options.filter((opt) => opt.value.trim() !== '' || optionMediaMap[opt.id as number])
+			: []
+	);
+	const matrixRows = $derived(
+		data.matrix?.rows?.filter((r) => r.value.trim() !== '' || optionMediaMap[r.id]) ?? []
+	);
+	const matrixColumns = $derived(
+		data.matrix?.columns?.filter((c) => c.value.trim() !== '' || optionMediaMap[c.id]) ?? []
+	);
 
 	let viewMode: 'mobile' | 'desktop' = $state('mobile');
 	let marksExpanded = $state(false);

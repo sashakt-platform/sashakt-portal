@@ -115,6 +115,10 @@
 					// Question was saved but media failed — stay on page so user can retry
 					toast.error('Question saved but some media failed to upload.');
 				}
+			} else if (result.type === 'failure') {
+				const msg =
+					(result.data as any)?.errorMessage || 'Question not saved. Please check all the details.';
+				toast.error(msg);
 			}
 		},
 		onSubmit: () => {
@@ -134,7 +138,13 @@
 					return {
 						id: option.id,
 						key: option.key,
-						value: option.value,
+						value: optionValue(
+							option.value,
+							option.id,
+							optionMediaMap,
+							stagedOptionFiles,
+							stagedOptionUrls
+						),
 						...(media ? { media } : {})
 					};
 				});
@@ -164,14 +174,24 @@
 						label: matrixRowLabel,
 						items: rowsWithContent.map(({ id, key, value }) => {
 							const media = stripMediaUrl(optionMediaMap[id]);
-							return { id, key, value, ...(media ? { media } : {}) };
+							return {
+								id,
+								key,
+								value: optionValue(value, id, optionMediaMap, stagedOptionFiles, stagedOptionUrls),
+								...(media ? { media } : {})
+							};
 						})
 					},
 					columns: {
 						label: matrixColLabel,
 						items: colsWithContent.map(({ id, key, value }) => {
 							const media = stripMediaUrl(optionMediaMap[id]);
-							return { id, key, value, ...(media ? { media } : {}) };
+							return {
+								id,
+								key,
+								value: optionValue(value, id, optionMediaMap, stagedOptionFiles, stagedOptionUrls),
+								...(media ? { media } : {})
+							};
 						})
 					}
 				};
@@ -552,6 +572,24 @@
 		if (stagedFiles[itemId]) return true;
 		if (stagedUrls[itemId]?.trim()) return true;
 		return false;
+	}
+
+	// For options with only media (no text), use a placeholder so the backend accepts them.
+	// Media is uploaded separately after question creation, so the initial payload can't include it.
+	function optionValue(
+		text: string,
+		itemId: number,
+		mediaMap: Record<number, TMedia | null>,
+		stagedFiles: Record<number, File | null>,
+		stagedUrls: Record<number, string>
+	): string {
+		if (text.trim()) return text;
+		const hasMedia =
+			mediaMap[itemId]?.image ||
+			mediaMap[itemId]?.external_media ||
+			stagedFiles[itemId] ||
+			stagedUrls[itemId]?.trim();
+		return hasMedia ? '\u200B' : text;
 	}
 
 	// Strip url from image media before sending to backend (only gcs_path is needed)

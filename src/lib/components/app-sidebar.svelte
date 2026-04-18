@@ -13,7 +13,6 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
-	import Settings from '@lucide/svelte/icons/settings';
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -151,11 +150,6 @@
 						{/if}
 						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/profile'))}>
 							<span>My Profile</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item
-							onSelect={() => handleDropdownNavigate(resolve('/profile/password'))}
-						>
-							<span>Change Password</span>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/logout'))}>
 							<span>Sign out</span>

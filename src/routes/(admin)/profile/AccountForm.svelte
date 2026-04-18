@@ -56,7 +56,12 @@
 							(Managed by your organisation admin)
 						</span>
 					</label>
-					<Input id="role-field" value={$formData.role_label ?? ''} disabled />
+					<Input
+						id="role-field"
+						class="disabled:bg-gray-50"
+						value={$formData.role_label ?? ''}
+						disabled
+					/>
 				</div>
 			</div>
 		</div>

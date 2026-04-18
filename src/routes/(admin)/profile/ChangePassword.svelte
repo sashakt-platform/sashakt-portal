@@ -34,9 +34,9 @@
 						class="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
 					>
 						{#if show}
-							<EyeOff class="h-4 w-4" />
-						{:else}
 							<Eye class="h-4 w-4" />
+						{:else}
+							<EyeOff class="h-4 w-4" />
 						{/if}
 					</button>
 				</div>

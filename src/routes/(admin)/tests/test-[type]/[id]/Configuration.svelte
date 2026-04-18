@@ -493,6 +493,7 @@
 										<Input
 											class="w-full"
 											type="number"
+											step="any"
 											placeholder="0"
 											name="marking_scheme.correct"
 											bind:value={$formData.marking_scheme.correct}
@@ -503,6 +504,7 @@
 										<Input
 											class="w-full"
 											type="number"
+											step="any"
 											placeholder="0"
 											name="marking_scheme.wrong"
 											bind:value={$formData.marking_scheme.wrong}
@@ -513,6 +515,7 @@
 										<Input
 											class="w-full"
 											type="number"
+											step="any"
 											placeholder="0"
 											name="marking_scheme.skipped"
 											bind:value={$formData.marking_scheme.skipped}

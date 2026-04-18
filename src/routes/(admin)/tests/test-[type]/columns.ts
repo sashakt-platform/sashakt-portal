@@ -7,6 +7,7 @@ import DateCell from '$lib/components/data-table/DateCell.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
+import TestStatusBadge from '$lib/components/data-table/TestStatusBadge.svelte';
 import {
 	isStateAdmin,
 	hasAssignedDistricts,
@@ -16,6 +17,7 @@ import {
 } from '$lib/utils/permissions.js';
 import { resolve } from '$app/paths';
 import type { NomenclatureKey } from '$lib/nomenclature';
+import type { TestStatus } from '$lib/types/test.js';
 
 export interface Test {
 	id: string;
@@ -26,6 +28,7 @@ export interface Test {
 	link?: string;
 	states?: Array<{ id: string | number; name: string }>;
 	districts?: Array<{ id: string | number; name: string }>;
+	status: TestStatus;
 }
 
 /**
@@ -90,6 +93,17 @@ export const createTestColumns = (
 		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] }),
 		size: 200
 	},
+	...(!isTemplate
+		? [
+				{
+					accessorKey: 'status',
+					header: 'Status',
+					cell: ({ row }: { row: { original: Test } }) =>
+						renderComponent(TestStatusBadge, { status: row.original.status }),
+					size: 100
+				} satisfies ColumnDef<Test>
+			]
+		: []),
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
 		size: 160

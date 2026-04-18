@@ -58,16 +58,6 @@
 					</label>
 					<Input id="role-field" value={$formData.role_label ?? ''} disabled />
 				</div>
-
-				<div class="flex flex-col gap-1.5">
-					<label for="organisation-field" class="text-sm font-medium">
-						Organisation
-						<span class="text-muted-foreground font-normal">
-							(Managed by your organisation admin)
-						</span>
-					</label>
-					<Input id="organisation-field" value={$formData.organization_name ?? ''} disabled />
-				</div>
 			</div>
 		</div>
 	</div>

@@ -7,7 +7,6 @@ export const profileSchema = z
 		email: z.email({ error: 'Invalid email address' }),
 		phone: z.string().optional(),
 		role_label: z.string().optional(),
-		organization_name: z.string().optional(),
 		current_password: z.string().optional(),
 		new_password: z.string().optional(),
 		confirm_password: z.string().optional()

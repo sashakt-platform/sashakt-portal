@@ -35,7 +35,7 @@
 	<label class="flex cursor-pointer items-start gap-3">
 		<Checkbox checked={partialMarking} onCheckedChange={togglePartialMarking} class="mt-0.5" />
 		<div>
-			<p class="text-sm font-semibold text-gray-800">Partial Marking</p>
+			<p class="text-sm font-semibold text-gray-500">Partial Marking</p>
 			<p class="text-sm text-gray-500">Award marks for partially correct answers</p>
 		</div>
 	</label>
@@ -82,7 +82,7 @@
 					<button
 						type="button"
 						data-testid="delete-partial-row"
-						class="shrink-0 text-gray-500 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30"
+						class="text-gray-500 hover:text-destructive shrink-0 disabled:cursor-not-allowed disabled:opacity-30"
 						disabled={partial.correct_answers.length <= 1}
 						onclick={() => {
 							partial = {

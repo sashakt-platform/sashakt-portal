@@ -14,7 +14,7 @@
 >
 	<div class="flex flex-col gap-6 lg:flex-row lg:gap-8">
 		<div class="flex flex-col gap-3 lg:w-1/2">
-			<p class="text-sm font-semibold">Absolute Marking</p>
+			<p class="text-gray-500 text-sm font-semibold">Absolute Marking</p>
 			<div class="grid grid-cols-3 gap-3">
 				<div class="flex flex-col gap-1">
 					<small class="text-muted-foreground">Correct</small>

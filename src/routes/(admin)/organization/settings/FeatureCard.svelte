@@ -18,7 +18,7 @@
 <section class="border-border rounded-2xl border bg-white shadow-sm">
 	<header class="flex items-start justify-between gap-6 px-8 pt-7 pb-6">
 		<div class="max-w-xl min-w-0">
-			<h3 class="text-foreground text-xl font-bold">{title}</h3>
+			<h3 class="text-gray-800 text-xl font-semibold">{title}</h3>
 			<p class="text-muted-foreground mt-2 text-sm">{description}</p>
 		</div>
 		<div class="bg-muted flex h-[41px] w-[176px] shrink-0 items-center rounded-[10px] p-1">

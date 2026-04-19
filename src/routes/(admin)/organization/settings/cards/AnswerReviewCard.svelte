@@ -23,8 +23,8 @@
 			>When should candidates be able to review their answers?</span
 		>
 		<Select.Root type="single" bind:value={settings.answer_review.value.default}>
-			<Select.Trigger class="h-9 w-[176px] rounded-full px-5">
-				{labels[settings.answer_review.value.default]}
+			<Select.Trigger class="h-9 w-[176px] min-w-0 overflow-hidden rounded-full px-5">
+				<span class="block truncate">{labels[settings.answer_review.value.default]}</span>
 			</Select.Trigger>
 			<Select.Content>
 				{#each ANSWER_REVIEW_OPTIONS as option (option)}

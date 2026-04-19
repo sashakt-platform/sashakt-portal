@@ -28,7 +28,7 @@
 						settings.test_timings.value.time_limit = Number.isFinite(v) ? v : null;
 					}}
 				/>
-				<span class="text-muted-foreground ml-2 text-sm whitespace-nowrap">minutes</span>
+				<span class="ml-2 text-sm whitespace-nowrap">minutes</span>
 			</label>
 		</div>
 

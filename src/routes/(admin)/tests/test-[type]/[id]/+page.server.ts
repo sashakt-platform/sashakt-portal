@@ -251,7 +251,7 @@ export const actions: Actions = {
 		}
 		const isSectionedTest = (form.data.question_sets?.length ?? 0) > 0;
 		const isCreateFlow = params.id === 'new' || params.id === 'convert';
-		const transformedFormData = {
+		const transformedFormData: Record<string, any> = {
 			...form.data,
 			start_time: form.data.start_time || null,
 			end_time: form.data.end_time || null,
@@ -260,6 +260,10 @@ export const actions: Actions = {
 			district_ids: form.data.district_ids.map((d) => d.id),
 			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
 		};
+
+		// question_revisions is a client-side mirror for UI rendering (full objects with
+		// media URLs). The backend uses question_revision_ids; strip the heavy field.
+		delete transformedFormData.question_revisions;
 
 		if (isSectionedTest) {
 			delete transformedFormData.question_revision_ids;

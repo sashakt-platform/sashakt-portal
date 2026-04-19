@@ -110,6 +110,11 @@ export function applyOrgSettingsToNewTestForm(
 	formData.time_limit = settings.test_timings.value.time_limit;
 	formData.question_pagination = settings.questions_per_page.value.question_pagination;
 	formData.marking_scheme = structuredClone(settings.marking_scheme.value);
+	// Force test-level marking when the org fixes marking_scheme, otherwise
+	// the default (question-level) would ignore the org's scheme entirely.
+	if (settings.marking_scheme.mode === 'fixed') {
+		formData.marks_level = 'test';
+	}
 
 	const flags = answerReviewToFlags(settings.answer_review.value.default);
 	formData.show_feedback_immediately = flags.show_feedback_immediately;

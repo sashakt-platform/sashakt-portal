@@ -89,6 +89,21 @@ describe('applyOrgSettingsToNewTestForm', () => {
 		expect(formData.marking_scheme).toEqual({ correct: 1, wrong: 0, skipped: 0 });
 	});
 
+	it('forces marks_level to test when marking_scheme is fixed', () => {
+		const formData: any = {};
+		applyOrgSettingsToNewTestForm(formData, settings());
+		expect(formData.marks_level).toBe('test');
+	});
+
+	it('does not force marks_level when marking_scheme is flexible', () => {
+		const formData: any = {};
+		const s = settings({
+			marking_scheme: { mode: 'flexible', value: { correct: 1, wrong: 0, skipped: 0 } }
+		});
+		applyOrgSettingsToNewTestForm(formData, s);
+		expect(formData.marks_level).toBeUndefined();
+	});
+
 	it('maps answer_review=off to both feedback flags false', () => {
 		const formData: any = {};
 		applyOrgSettingsToNewTestForm(formData, settings());

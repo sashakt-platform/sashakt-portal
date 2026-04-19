@@ -12,6 +12,7 @@ import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
 	let testData = null;
+	let orgSettings = null;
 	let templateID = url.searchParams.get('template_id') || null;
 	const is_template = params.type === 'template';
 
@@ -31,6 +32,25 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	const token = getSessionTokenCookie();
+
+	try {
+		const settingsRes = await fetch(
+			`${BACKEND_URL}/organization/${user.organization_id}/settings`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
+			}
+		);
+		if (settingsRes.ok) {
+			const body = await settingsRes.json();
+			orgSettings = body.settings;
+		}
+	} catch (error) {
+		console.error('Error fetching organization settings:', error);
+	}
 
 	try {
 		if (params.id !== 'new' && params.id !== 'convert') {
@@ -191,6 +211,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	return {
 		form,
 		testData,
+		orgSettings,
 		templates,
 		templateParams,
 		convertTemplate: params.id === 'convert',

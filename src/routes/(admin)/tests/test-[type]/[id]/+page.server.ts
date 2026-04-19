@@ -34,25 +34,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const token = getSessionTokenCookie();
 
 	try {
-		const settingsRes = await fetch(
-			`${BACKEND_URL}/organization/${user.organization_id}/settings`,
-			{
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
-				}
-			}
-		);
-		if (settingsRes.ok) {
-			const body = await settingsRes.json();
-			orgSettings = body.settings;
-		}
-	} catch (error) {
-		console.error('Error fetching organization settings:', error);
-	}
-
-	try {
 		if (params.id !== 'new' && params.id !== 'convert') {
 			// edit existing test
 			const testResponse = await fetch(
@@ -207,6 +188,25 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		questionSortBy,
 		questionSortOrder
 	};
+
+	try {
+		const settingsRes = await fetch(
+			`${BACKEND_URL}/organization/${user.organization_id}/settings`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
+			}
+		);
+		if (settingsRes.ok) {
+			const body = await settingsRes.json();
+			orgSettings = body.settings;
+		}
+	} catch (error) {
+		console.error('Error fetching organization settings:', error);
+	}
 
 	return {
 		form,

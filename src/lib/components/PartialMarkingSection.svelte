@@ -58,10 +58,10 @@
 								)
 							};
 						}}
-						class="bg-gray-0 w-16 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
+						class="bg-gray-0 w-12 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
 					<span class="text-sm whitespace-nowrap text-gray-500">Correct answer</span>
-					<span class="font-light text-gray-500"><MoveRight /></span>
+					<span class="font-light text-gray-500"><MoveRight size={20} /></span>
 					<input
 						type="number"
 						name="marking_scheme.partial.correct_answers.{i}.marks"
@@ -76,7 +76,7 @@
 								)
 							};
 						}}
-						class="bg-gray-0 w-16 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
+						class="bg-gray-0 w-12 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
 					<span class="text-sm whitespace-nowrap text-gray-500">Marks</span>
 					<button

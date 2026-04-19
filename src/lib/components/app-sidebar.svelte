@@ -191,11 +191,6 @@
 						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/profile'))}>
 							<span>My Profile</span>
 						</DropdownMenu.Item>
-						<DropdownMenu.Item
-							onSelect={() => handleDropdownNavigate(resolve('/profile/password'))}
-						>
-							<span>Change Password</span>
-						</DropdownMenu.Item>
 						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/logout'))}>
 							<span>Sign out</span>
 						</DropdownMenu.Item>

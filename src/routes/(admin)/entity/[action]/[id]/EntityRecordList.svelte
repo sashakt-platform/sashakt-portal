@@ -4,16 +4,15 @@
 	import { createEntityColumns } from './entity-columns';
 	import { Button } from '$lib/components/ui/button';
 	import Plus from '@lucide/svelte/icons/plus';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
-	import Input from '$lib/components/ui/input/input.svelte';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import StatusFilter from '$lib/components/StatusFilter.svelte';
+	import SearchInput from '$lib/components/SearchInput.svelte';
 
 	let { data } = $props();
-	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	const tableData = $derived(data?.entities?.items || []);
 	const totalItems = $derived(data?.entities?.total || 0);
@@ -24,8 +23,8 @@
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 	const entityTypeName = $derived(data?.entityType?.name || 'Entity');
-	const entityTypeDescription = $derived(data?.entityType?.description || 'Entity Description');
 
+	const isActive = $derived(data?.params?.isActive || '');
 	// handle sorting
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
@@ -50,11 +49,10 @@
 <ListingPageLayout
 	title={entityTypeName}
 	subtitle=""
+	backHref={resolve('/entity')}
 	tooltipKey="entity-records"
 >
 	{#snippet headerActions()}
-		<a href={resolve('/entity')}><Button variant="outline"><ArrowLeft />Back to Entities</Button></a
-		>
 		{#if canCreate(data.user, 'entity')}
 			<a href={resolve(`/entity/view/${data.entityTypeId}/add/new`)}
 				><Button class="font-semibold"><Plus />{`Add ${entityTypeName} Record`}</Button></a
@@ -63,24 +61,10 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<Input
-			placeholder="Search records..."
-			value={search}
-			oninput={(event) => {
-				const url = new URL(page.url);
-				clearTimeout(searchTimeout);
-				searchTimeout = setTimeout(() => {
-					if (event.target?.value) {
-						url.searchParams.set('search', event.target.value);
-					} else {
-						url.searchParams.delete('search');
-					}
-					url.searchParams.set('page', '1');
-					goto(resolve(url.pathname + url.search), { keepFocus: true, invalidateAll: true });
-				}, 300);
-			}}
-			class="max-w-sm"
-		/>
+		<div class="flex items-center justify-between gap-2">
+			<SearchInput placeholder="Search records..." value={search} useResolve />
+			<StatusFilter value={isActive} useResolve />
+		</div>
 	{/snippet}
 
 	{#snippet content()}

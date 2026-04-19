@@ -11,7 +11,11 @@
 		options: unknown
 	): options is {
 		rows: { label: string; items: { id: number; key: string; value: string }[] };
-		columns: { label: string; items: { id: number; key: string; value: string }[]; input_type?: 'number' | 'text' };
+		columns: {
+			label: string;
+			items: { id: number; key: string; value: string }[];
+			input_type?: 'number' | 'text';
+		};
 	} =>
 		options !== null &&
 		typeof options === 'object' &&

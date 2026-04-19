@@ -6,7 +6,6 @@ import type { TooltipKey } from '$lib/config/tooltips';
 
 const testVideoKey = 'test-video' as TooltipKey;
 
-
 vi.mock('$lib/config/tooltips', () => ({
 	TOOLTIPS: {
 		dashboard: {
@@ -217,7 +216,9 @@ describe('TooltipInfo', () => {
 
 			expect(await screen.findByText('What is Dashboard')).toBeInTheDocument();
 			expect(
-				await screen.findByText("Dashboard provides a quick overview of your organization's activity.")
+				await screen.findByText(
+					"Dashboard provides a quick overview of your organization's activity."
+				)
 			).toBeInTheDocument();
 		});
 
@@ -227,9 +228,7 @@ describe('TooltipInfo', () => {
 			const trigger = screen.getByRole('button', { name: 'Help' });
 			await fireEvent.click(trigger);
 
-			await waitFor(() =>
-				expect(screen.queryByText('What is Dashboard')).not.toBeInTheDocument()
-			);
+			await waitFor(() => expect(screen.queryByText('What is Dashboard')).not.toBeInTheDocument());
 		});
 
 		it('should show title in popover header', async () => {
@@ -252,9 +251,7 @@ describe('TooltipInfo', () => {
 
 			await fireEvent.click(closeButton);
 
-			await waitFor(() =>
-				expect(screen.queryByText('What is Dashboard')).not.toBeInTheDocument()
-			);
+			await waitFor(() => expect(screen.queryByText('What is Dashboard')).not.toBeInTheDocument());
 		});
 	});
 

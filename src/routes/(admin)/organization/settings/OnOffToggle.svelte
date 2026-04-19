@@ -10,7 +10,7 @@
 	<button
 		type="button"
 		class={[
-			'rounded-md px-8 py-2 text-sm transition-colors',
+			'w-28 rounded-md py-2 text-sm transition-colors',
 			value
 				? 'bg-background text-primary font-semibold shadow-sm'
 				: 'text-muted-foreground font-medium'
@@ -22,7 +22,7 @@
 	<button
 		type="button"
 		class={[
-			'rounded-md px-8 py-2 text-sm transition-colors',
+			'w-28 rounded-md py-2 text-sm transition-colors',
 			!value
 				? 'bg-background text-primary font-semibold shadow-sm'
 				: 'text-muted-foreground font-medium'

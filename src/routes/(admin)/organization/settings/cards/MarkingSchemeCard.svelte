@@ -18,27 +18,15 @@
 			<div class="grid grid-cols-3 gap-3">
 				<div class="flex flex-col gap-1">
 					<small class="text-muted-foreground">Correct</small>
-					<Input
-						type="number"
-						placeholder="0"
-						bind:value={settings.marking_scheme.value.correct}
-					/>
+					<Input type="number" placeholder="0" bind:value={settings.marking_scheme.value.correct} />
 				</div>
 				<div class="flex flex-col gap-1">
 					<small class="text-muted-foreground">Incorrect</small>
-					<Input
-						type="number"
-						placeholder="0"
-						bind:value={settings.marking_scheme.value.wrong}
-					/>
+					<Input type="number" placeholder="0" bind:value={settings.marking_scheme.value.wrong} />
 				</div>
 				<div class="flex flex-col gap-1">
 					<small class="text-muted-foreground">No Answer</small>
-					<Input
-						type="number"
-						placeholder="0"
-						bind:value={settings.marking_scheme.value.skipped}
-					/>
+					<Input type="number" placeholder="0" bind:value={settings.marking_scheme.value.skipped} />
 				</div>
 			</div>
 		</div>
@@ -46,7 +34,10 @@
 		<div class="border-border lg:border-l"></div>
 
 		<div class="lg:w-1/2">
-			<PartialMarkingSection bind:partial={settings.marking_scheme.value.partial} bordered={false} />
+			<PartialMarkingSection
+				bind:partial={settings.marking_scheme.value.partial}
+				bordered={false}
+			/>
 		</div>
 	</div>
 </FeatureCard>

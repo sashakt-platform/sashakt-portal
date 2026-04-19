@@ -12,7 +12,7 @@
 	bind:mode={settings.question_palette.mode}
 >
 	<div class="flex items-center justify-between gap-4">
-		<span class="text-sm font-medium">Question Palette</span>
+		<span class="text-foreground text-sm font-semibold">Question Palette</span>
 		<OnOffToggle bind:value={settings.question_palette.value.default} />
 	</div>
 </FeatureCard>

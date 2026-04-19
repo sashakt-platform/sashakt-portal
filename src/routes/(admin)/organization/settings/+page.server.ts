@@ -74,9 +74,9 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 export const actions: Actions = {
 	save: async ({ request, fetch, cookies, locals }) => {
 		requireAnyPermission(locals.user, [
-		PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
-		PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
-	]);
+			PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
+			PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
+		]);
 
 		const token = getSessionTokenCookie();
 		const orgId = locals.user.organization_id;

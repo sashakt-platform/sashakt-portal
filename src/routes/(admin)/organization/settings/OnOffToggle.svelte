@@ -6,14 +6,14 @@
 	} = $props();
 </script>
 
-<div class="bg-muted flex shrink-0 rounded-lg p-1">
+<div class="bg-muted flex h-[41px] w-[176px] shrink-0 items-center rounded-[10px] p-1">
 	<button
 		type="button"
 		class={[
-			'w-28 rounded-md py-2 text-sm transition-colors',
+			'h-full flex-1 rounded-lg text-sm transition-colors',
 			value
 				? 'bg-background text-primary font-semibold shadow-sm'
-				: 'text-muted-foreground font-medium'
+				: 'text-gray-500 font-medium'
 		]}
 		onclick={() => (value = true)}
 	>
@@ -22,10 +22,10 @@
 	<button
 		type="button"
 		class={[
-			'w-28 rounded-md py-2 text-sm transition-colors',
+			'h-full flex-1 rounded-lg text-sm transition-colors',
 			!value
 				? 'bg-background text-primary font-semibold shadow-sm'
-				: 'text-muted-foreground font-medium'
+				: 'text-gray-500 font-medium'
 		]}
 		onclick={() => (value = false)}
 	>

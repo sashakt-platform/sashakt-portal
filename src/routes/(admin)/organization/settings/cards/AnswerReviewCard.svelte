@@ -19,11 +19,11 @@
 	bind:mode={settings.answer_review.mode}
 >
 	<div class="flex items-center justify-between gap-4">
-		<span class="text-foreground text-sm font-semibold"
+		<span class="text-gray-500 text-sm font-semibold"
 			>When should candidates be able to review their answers?</span
 		>
 		<Select.Root type="single" bind:value={settings.answer_review.value.default}>
-			<Select.Trigger class="h-11 w-64 rounded-full px-5">
+			<Select.Trigger class="h-9 w-[176px] rounded-full px-5">
 				{labels[settings.answer_review.value.default]}
 			</Select.Trigger>
 			<Select.Content>

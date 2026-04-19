@@ -1628,7 +1628,7 @@
 								type="number"
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
-								min="1"
+								step="any"
 								class="w-full rounded-md border border-gray-300 p-2"
 							/>
 						</div>
@@ -1638,6 +1638,7 @@
 								type="number"
 								name="marking_scheme.wrong"
 								bind:value={$formData.marking_scheme.wrong}
+								step="any"
 								class="w-full rounded-md border border-gray-300 p-2"
 							/>
 						</div>
@@ -1647,6 +1648,7 @@
 								type="number"
 								name="marking_scheme.skipped"
 								bind:value={$formData.marking_scheme.skipped}
+								step="any"
 								class="w-full rounded-md border border-gray-300 p-2"
 							/>
 						</div>

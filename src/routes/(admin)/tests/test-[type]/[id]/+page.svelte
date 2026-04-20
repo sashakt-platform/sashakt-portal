@@ -65,6 +65,8 @@
 		if (!td) return;
 		$formData.name = (td as any)?.name || '';
 		$formData.description = (td as any)?.description || '';
+		$formData.show_marks =
+			typeof (td as any)?.show_marks === 'boolean' ? (td as any).show_marks : $formData.show_marks;
 		$formData.state_ids =
 			td?.states?.map((state: Filter) => ({
 				id: String(state.id),

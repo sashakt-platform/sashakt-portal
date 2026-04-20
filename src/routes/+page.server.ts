@@ -5,7 +5,7 @@ export function load() {
 	const user = requireLogin();
 
 	if (user) {
-		redirect(307, '/dashboard');
+		redirect(307, '/tests/test-session');
 	} else {
 		redirect(307, '/login');
 	}

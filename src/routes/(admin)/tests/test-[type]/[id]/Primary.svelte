@@ -79,7 +79,7 @@
 		<!-- Left Column: Name + Description -->
 		<div class="flex w-full flex-1 flex-col gap-6 lg:w-3/5 lg:pr-8">
 			<div>
-				<Label for="template-name" class="text-sm font-medium text-gray-700">
+				<Label for="template-name" class="text-sm font-medium text-gray-800">
 					{$formData.is_template ? 'Template Name' : 'Test Name'}
 					<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
 				</Label>
@@ -94,7 +94,7 @@
 			</div>
 
 			<div>
-				<Label for="description" class="text-sm font-medium text-gray-700">
+				<Label for="description" class="text-sm font-medium text-gray-800">
 					Description
 					<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
 				</Label>
@@ -116,45 +116,50 @@
 		<!-- Right Column: Tag Types, Tags, State, District, Status -->
 		<div class="flex w-full flex-col gap-5 lg:w-2/5 lg:pl-8">
 			<div>
-				<Label class="text-sm font-medium text-gray-700">Tag Types</Label>
+				<Label class="text-sm font-semibold text-gray-800">Tag Types</Label>
 				<div class="mt-2">
 					<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 				</div>
 			</div>
 
 			<div>
-				<Label class="text-sm font-medium text-gray-700">Tags</Label>
+				<Label class="text-sm font-semibold text-gray-800">Tags</Label>
 				<div class="mt-2">
 					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>
 			</div>
-
-			{#if !isStateAdmin(user)}
-				<div>
-					<Label class="text-sm font-medium text-gray-700">State</Label>
-					<div class="mt-2">
-						<StateSelection bind:states={$formData.state_ids} />
+			{#if !isStateAdmin(user) || !hasAssignedDistricts(user)}
+				<hr class="border-border my-4" />
+				{#if !isStateAdmin(user)}
+					<div>
+						<Label class="text-sm font-semibold text-gray-800">State</Label>
+						<div class="mt-2">
+							<StateSelection bind:states={$formData.state_ids} />
+						</div>
 					</div>
-				</div>
+				{/if}
+
+				{#if !hasAssignedDistricts(user)}
+					<div>
+						<Label class="text-sm font-semibold text-gray-800">District</Label>
+						<div class="mt-2">
+							<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
+						</div>
+					</div>
+				{/if}
 			{/if}
 
-			{#if !hasAssignedDistricts(user)}
-				<div>
-					<Label class="text-sm font-medium text-gray-700">District</Label>
-					<div class="mt-2">
-						<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
-					</div>
-				</div>
-			{/if}
-
+			<hr class="border-border my-4" />
 			<div class="flex items-center justify-between pt-2">
-				<Label class="text-sm font-medium text-gray-700">
+				<Label class="text-sm font-semibold text-gray-800">
 					{$formData.is_template ? 'Template Status' : 'Test Status'}
 				</Label>
 				<div class="flex items-center gap-2">
-					<span class="text-sm text-gray-500">
-						{$formData.is_active ? 'Active' : 'Inactive'}
-					</span>
+					<span
+						class="text-sm {$formData.is_active
+							? 'text-primary font-semibold'
+							: 'text-muted-foreground'}">{$formData.is_active ? 'Active' : 'Inactive'}</span
+					>
 					<Switch id="is-active" bind:checked={$formData.is_active} />
 				</div>
 			</div>

@@ -5,7 +5,12 @@ const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 // Base schema for organization fields
 export const editOrganizationSchema = z.object({
 	name: z.string().min(1, { message: 'Organization name is required' }),
-	shortcode: z.string().min(1, { message: 'Shortcode is required' }),
+	shortcode: z
+		.string()
+		.min(1, { message: 'Shortcode is required' })
+		.regex(/^[a-z0-9]+$/, {
+			message: 'Shortcode must contain only lowercase letters and numbers, with no spaces or special characters'
+		}),
 	logo: z
 		.union([
 			z

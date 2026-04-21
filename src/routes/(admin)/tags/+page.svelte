@@ -13,8 +13,10 @@
 	import TagTypeDialog from './TagTypeDialog.svelte';
 	import TagDeleteDialog from './TagDeleteDialog.svelte';
 	import { createTagManagementColumns } from './columns';
+	import { useTerms } from '$lib/nomenclature';
 
 	const { data } = $props();
+	const term = useTerms();
 
 	// Permissions
 	const userCanCreate = $derived(canCreate(data.user, 'tag'));
@@ -128,7 +130,7 @@
 <TagTypeDialog bind:open={tagTypeDialogOpen} mode={tagTypeDialogMode} tagType={editingTagType} />
 
 <ListingPageLayout
-	title="Tag Management"
+	title={term('tag_management')}
 	subtitle=""
 	showEmptyState={noTagTypesCreatedYet}
 	tooltipKey="tag-management"

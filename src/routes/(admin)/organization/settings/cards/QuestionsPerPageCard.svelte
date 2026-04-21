@@ -12,7 +12,7 @@
 	bind:mode={settings.questions_per_page.mode}
 >
 	<div class="flex items-center justify-between gap-4">
-		<span class="text-gray-500 text-sm font-semibold">Enter number of questions</span>
+		<span class="text-sm font-semibold text-gray-500">Enter number of questions</span>
 		<Input
 			type="number"
 			min="0"

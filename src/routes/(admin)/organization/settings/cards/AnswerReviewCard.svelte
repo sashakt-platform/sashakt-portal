@@ -19,7 +19,7 @@
 	bind:mode={settings.answer_review.mode}
 >
 	<div class="flex items-center justify-between gap-4">
-		<span class="text-gray-500 text-sm font-semibold"
+		<span class="text-sm font-semibold text-gray-500"
 			>When should candidates be able to review their answers?</span
 		>
 		<Select.Root type="single" bind:value={settings.answer_review.value.default}>

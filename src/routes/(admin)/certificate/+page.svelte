@@ -12,8 +12,10 @@
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import SearchInput from '$lib/components/SearchInput.svelte';
 	import StatusFilter from '$lib/components/StatusFilter.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.certificates?.items || []);
 	const totalItems = $derived(data?.certificates?.total || 0);
@@ -47,7 +49,7 @@
 </script>
 
 <ListingPageLayout
-	title="Certificates"
+	title={term('certificates')}
 	subtitle=""
 	showEmptyState={noCertificatesCreatedYet}
 	tooltipKey="certificate-management"

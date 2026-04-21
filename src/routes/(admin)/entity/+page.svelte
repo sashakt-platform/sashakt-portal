@@ -12,8 +12,10 @@
 	import Boxes from '@lucide/svelte/icons/boxes';
 	import SearchInput from '$lib/components/SearchInput.svelte';
 	import StatusFilter from '$lib/components/StatusFilter.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.entities?.items || []);
 	const totalItems = $derived(data?.entities?.total || 0);
@@ -47,7 +49,7 @@
 </script>
 
 <ListingPageLayout
-	title="Entities"
+	title={term('entities')}
 	subtitle=""
 	showEmptyState={noEntitiesCreatedYet}
 	tooltipKey="entity-management"

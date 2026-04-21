@@ -25,6 +25,9 @@
 		isStateAdmin,
 		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		data
@@ -112,7 +115,7 @@
 />
 
 <ListingPageLayout
-	title={data?.is_template ? 'Test Templates' : 'Tests'}
+	title={data?.is_template ? term('test_templates') : term('tests')}
 	subtitle=""
 	showEmptyState={noTestCreatedYet}
 	tooltipKey={data?.is_template ? 'test-templates' : 'tests'}

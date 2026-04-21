@@ -10,8 +10,10 @@
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 	import SearchInput from '$lib/components/SearchInput.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.users?.items || []);
 	const totalItems = $derived(data?.users?.total || 0);
@@ -43,7 +45,7 @@
 	);
 </script>
 
-<ListingPageLayout title="Users" subtitle="" tooltipKey="users">
+<ListingPageLayout title={term('users')} subtitle="" tooltipKey="users">
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
 			<a href={resolve('/users/add/new')}

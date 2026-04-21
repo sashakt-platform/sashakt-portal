@@ -45,7 +45,11 @@
 				<div class="flex w-full items-center align-middle">
 					<div class="flex flex-row items-center gap-3">
 						{#if backHref}
-							<a href={resolve(backHref)} class="hover:bg-muted rounded-lg border p-2" aria-label="Go back">
+							<a
+								href={resolve(backHref)}
+								class="hover:bg-muted rounded-lg border p-2"
+								aria-label="Go back"
+							>
 								<ArrowLeft size={20} />
 							</a>
 						{/if}

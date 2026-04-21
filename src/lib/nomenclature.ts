@@ -64,8 +64,25 @@ export function resolveAll(
 
 export type NomenclatureContext = () => Record<NomenclatureKey, string>;
 
-export function useTerm(key: NomenclatureKey): string {
+/**
+ * Capture the nomenclature context at component init time and return a resolver
+ * usable anywhere (templates, snippets, derived, effects). The resolver always
+ * reads the latest value via the context getter, so labels stay reactive.
+ *
+ * Must be called during component initialization as we use `getContext`
+ *
+ * Use this when looking up multiple keys or when the lookup
+ * happens inside templates / snippets.
+ */
+export function useTerms(): (key: NomenclatureKey) => string {
 	const ctx = getContext<NomenclatureContext | undefined>(NOMENCLATURE_CONTEXT_KEY);
-	const resolved = ctx?.();
-	return resolved?.[key] ?? NOMENCLATURE_DEFAULTS[key];
+	return (key) => ctx?.()?.[key] ?? NOMENCLATURE_DEFAULTS[key];
+}
+
+/**
+ * Single-key convenience wrapper. Must be called during component initialization
+ * For repeated lookups in templates, prefer {@link useTerms}.
+ */
+export function useTerm(key: NomenclatureKey): string {
+	return useTerms()(key);
 }

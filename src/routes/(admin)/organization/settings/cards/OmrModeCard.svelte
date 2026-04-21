@@ -12,7 +12,7 @@
 	bind:mode={settings.omr_mode.mode}
 >
 	<div class="flex items-center justify-between gap-4">
-		<span class="text-gray-500 text-sm font-semibold">OMR Mode</span>
+		<span class="text-sm font-semibold text-gray-500">OMR Mode</span>
 		<OnOffToggle bind:value={settings.omr_mode.value.default} />
 	</div>
 </FeatureCard>

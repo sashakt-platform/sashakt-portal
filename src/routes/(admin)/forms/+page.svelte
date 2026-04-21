@@ -14,8 +14,10 @@
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import SearchInput from '$lib/components/SearchInput.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.forms?.items || []);
 	const totalItems = $derived(data?.forms?.total || 0);
@@ -71,7 +73,12 @@
 	const noFormsCreatedYet = $derived(totalItems === 0 && !search && isActive === '');
 </script>
 
-<ListingPageLayout title="Forms" subtitle="" showEmptyState={noFormsCreatedYet} tooltipKey="forms">
+<ListingPageLayout
+	title={term('forms')}
+	subtitle=""
+	showEmptyState={noFormsCreatedYet}
+	tooltipKey="forms"
+>
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'form')}
 			<a href={resolve('/forms/add/new')}>

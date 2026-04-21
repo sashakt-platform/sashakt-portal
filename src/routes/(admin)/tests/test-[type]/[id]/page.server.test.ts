@@ -81,6 +81,7 @@ const mockValidFormData = {
 	start_time: '',
 	end_time: '',
 	time_limit: null,
+	pause_timer_when_inactive: false,
 	marks_level: 'question',
 	marks: null,
 	marking_scheme: { correct: 1, wrong: 0, skipped: 0 },
@@ -867,6 +868,22 @@ describe('Test Create/Update Page — save action', () => {
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
 			expect(body.random_tag_count).toEqual([{ tag_id: 'tag1', count: 3 }]);
+		});
+
+		it('passes pause_timer_when_inactive through to the backend payload', async () => {
+			(superValidate as any).mockResolvedValue({
+				valid: true,
+				data: { ...mockValidFormData, pause_timer_when_inactive: true }
+			});
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies
+			} as any);
+
+			expect(JSON.parse(mockFetch.mock.calls[0][1].body).pause_timer_when_inactive).toBe(true);
 		});
 
 		it('omits section membership fields when updating an existing sectioned test', async () => {

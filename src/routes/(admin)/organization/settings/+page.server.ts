@@ -7,6 +7,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import {
+	fillMissingNomenclatureKeys,
 	organizationSettingsSchema,
 	trimSeconds,
 	withSeconds,
@@ -23,6 +24,10 @@ function normalizeSettingsFromBackend(raw: OrganizationSettings): OrganizationSe
 				start_time: trimSeconds(raw.test_timings.value.start_time),
 				end_time: trimSeconds(raw.test_timings.value.end_time)
 			}
+		},
+		platform_nomenclature: {
+			mode: raw.platform_nomenclature?.mode ?? 'default',
+			value: fillMissingNomenclatureKeys(raw.platform_nomenclature?.value)
 		}
 	};
 }

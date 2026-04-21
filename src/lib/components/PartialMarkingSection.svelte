@@ -35,7 +35,7 @@
 	<label class="flex cursor-pointer items-start gap-3">
 		<Checkbox checked={partialMarking} onCheckedChange={togglePartialMarking} class="mt-0.5" />
 		<div>
-			<p class="text-sm font-semibold text-gray-800">Partial Marking</p>
+			<p class="text-sm font-semibold text-gray-500">Partial Marking</p>
 			<p class="text-sm text-gray-500">Award marks for partially correct answers</p>
 		</div>
 	</label>
@@ -58,10 +58,10 @@
 								)
 							};
 						}}
-						class="bg-gray-0 w-16 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
+						class="bg-gray-0 w-12 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
 					<span class="text-sm whitespace-nowrap text-gray-500">Correct answer</span>
-					<span class="font-light text-gray-500"><MoveRight /></span>
+					<span class="font-light text-gray-500"><MoveRight size={20} /></span>
 					<input
 						type="number"
 						name="marking_scheme.partial.correct_answers.{i}.marks"
@@ -76,13 +76,13 @@
 								)
 							};
 						}}
-						class="bg-gray-0 w-16 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
+						class="bg-gray-0 w-12 shrink-0 rounded-xl border border-gray-300 px-2 py-2 text-center text-sm"
 					/>
 					<span class="text-sm whitespace-nowrap text-gray-500">Marks</span>
 					<button
 						type="button"
 						data-testid="delete-partial-row"
-						class="shrink-0 text-gray-500 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30"
+						class="text-gray-500 hover:text-destructive shrink-0 disabled:cursor-not-allowed disabled:opacity-30"
 						disabled={partial.correct_answers.length <= 1}
 						onclick={() => {
 							partial = {

@@ -12,6 +12,7 @@ import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
 	let testData = null;
+	let orgSettings = null;
 	let templateID = url.searchParams.get('template_id') || null;
 	const is_template = params.type === 'template';
 
@@ -188,9 +189,29 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		questionSortOrder
 	};
 
+	try {
+		const settingsRes = await fetch(
+			`${BACKEND_URL}/organization/${user.organization_id}/settings`,
+			{
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
+			}
+		);
+		if (settingsRes.ok) {
+			const body = await settingsRes.json();
+			orgSettings = body.settings;
+		}
+	} catch (error) {
+		console.error('Error fetching organization settings:', error);
+	}
+
 	return {
 		form,
 		testData,
+		orgSettings,
 		templates,
 		templateParams,
 		convertTemplate: params.id === 'convert',
@@ -230,7 +251,7 @@ export const actions: Actions = {
 		}
 		const isSectionedTest = (form.data.question_sets?.length ?? 0) > 0;
 		const isCreateFlow = params.id === 'new' || params.id === 'convert';
-		const transformedFormData = {
+		const transformedFormData: Record<string, any> = {
 			...form.data,
 			start_time: form.data.start_time || null,
 			end_time: form.data.end_time || null,
@@ -239,6 +260,10 @@ export const actions: Actions = {
 			district_ids: form.data.district_ids.map((d) => d.id),
 			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
 		};
+
+		// question_revisions is a client-side mirror for UI rendering (full objects with
+		// media URLs). The backend uses question_revision_ids; strip the heavy field.
+		delete transformedFormData.question_revisions;
 
 		if (isSectionedTest) {
 			delete transformedFormData.question_revision_ids;

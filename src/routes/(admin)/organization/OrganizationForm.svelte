@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
+	import { invalidateAll } from '$app/navigation';
 	import { editOrganizationSchema, type EditOrganizationSchema } from './schema';
 	import { toast } from 'svelte-sonner';
 
@@ -27,10 +28,13 @@
 	const form = superForm(orgData || data.form, {
 		validators: zod4Client(editOrganizationSchema),
 		dataType: 'form',
-		onResult: () => {
+		onResult: ({ result }) => {
 			if (fileInput) {
 				fileInput.value = '';
 				fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+			}
+			if (result.type === 'redirect') {
+				invalidateAll();
 			}
 		}
 	});
@@ -64,6 +68,7 @@
 
 		if (res.ok) {
 			currentLogoUrl = null;
+			await invalidateAll();
 			toast.success('Logo deleted successfully');
 		} else {
 			toast.error('Failed to delete logo');

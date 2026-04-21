@@ -33,7 +33,13 @@ vi.mock('sveltekit-superforms', () => ({
 
 // Mock auth functions
 vi.mock('$lib/server/auth.js', () => ({
-	getSessionTokenCookie: vi.fn(() => 'mock-token')
+	getSessionTokenCookie: vi.fn(() => 'mock-token'),
+	organizationCookieName: 'sashakt-organization'
+}));
+
+// Mock organization cache
+vi.mock('$lib/server/organization-cache.js', () => ({
+	invalidateOrganizationCache: vi.fn()
 }));
 
 // Mock flash message redirect
@@ -156,7 +162,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: { get: vi.fn(() => undefined) } as any
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {
@@ -201,7 +207,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: { get: vi.fn(() => undefined) } as any
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {
@@ -242,7 +248,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: { get: vi.fn(() => undefined) } as any
 				} as any);
 			} catch (error: any) {
 				// Expected redirect
@@ -271,7 +277,7 @@ describe('Organization Page Server', () => {
 			const result = await actions.save({
 				request: mockRequest,
 				fetch: mockFetch,
-				cookies: {} as any
+				cookies: { get: vi.fn(() => undefined) } as any
 			} as any);
 
 			expect(result?.status).toBe(401);
@@ -296,7 +302,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: { get: vi.fn(() => undefined) } as any
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {

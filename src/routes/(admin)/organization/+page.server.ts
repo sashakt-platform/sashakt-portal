@@ -1,5 +1,6 @@
 import { BACKEND_URL } from '$env/static/private';
-import { getSessionTokenCookie } from '$lib/server/auth.js';
+import { getSessionTokenCookie, organizationCookieName } from '$lib/server/auth.js';
+import { invalidateOrganizationCache } from '$lib/server/organization-cache.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
@@ -68,6 +69,14 @@ export const actions: Actions = {
 		}
 
 		await res.json();
+
+		const previousShortcode = cookies.get(organizationCookieName);
+		if (previousShortcode) {
+			invalidateOrganizationCache(previousShortcode);
+		}
+		if (form.data.shortcode && form.data.shortcode !== previousShortcode) {
+			invalidateOrganizationCache(form.data.shortcode);
+		}
 
 		throw redirect(
 			303,

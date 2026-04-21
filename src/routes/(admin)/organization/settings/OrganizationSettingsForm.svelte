@@ -26,16 +26,26 @@
 <form method="POST" use:enhance action="?/save">
 	<div class="bg-muted/40 min-h-screen">
 		<header
-			class="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4 md:px-10"
+			class="bg-background border-border sticky top-0 z-10 flex h-23 items-center justify-between gap-[14px] border-b p-8"
 		>
-			<h2 class="text-2xl font-semibold tracking-tight">Organisation Settings</h2>
-			<div class="flex gap-3">
+			<h1 class="font-sans text-[24px] leading-[140%] font-bold tracking-[0px]">
+				Organisation Settings
+			</h1>
+			<div class="flex gap-2">
 				<a href={resolve('/organization')}>
-					<Button type="button" variant="outline" class="border-primary text-primary">
+					<Button
+						type="button"
+						variant="outline"
+						class="border-primary text-primary border text-sm sm:text-base"
+					>
 						Cancel
 					</Button>
 				</a>
-				<Button type="submit" class="bg-primary" disabled={!$tainted || $submitting}>Save</Button>
+				<Button
+					type="submit"
+					class="bg-primary text-sm sm:text-base"
+					disabled={!$tainted || $submitting}>Save</Button
+				>
 			</div>
 		</header>
 

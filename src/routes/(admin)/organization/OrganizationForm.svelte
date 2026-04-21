@@ -1,33 +1,26 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import ClipboardCopy from '@lucide/svelte/icons/clipboard-copy';
-	import Upload from '@lucide/svelte/icons/upload';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import Settings from '@lucide/svelte/icons/settings';
+	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { type Infer, superForm, fileProxy } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import type { PageData } from './$types';
-	import type { Snippet } from 'svelte';
 	import { page } from '$app/stores';
 	import { resolve } from '$app/paths';
 	import { browser } from '$app/environment';
+	import { invalidateAll } from '$app/navigation';
 	import { editOrganizationSchema, type EditOrganizationSchema } from './schema';
-	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import { toast } from 'svelte-sonner';
 
-	let {
-		data,
-		header
-	}: {
-		data: PageData;
-		header: Snippet;
-	} = $props();
+	let { data }: { data: PageData } = $props();
 
 	let orgData: Partial<Infer<EditOrganizationSchema>> | null = data?.currentOrganization || null;
 	let currentLogoUrl = $state<string | null>(data?.currentOrganization?.logo || null);
 
-	// sync currentLogoUrl when data changes
 	$effect(() => {
 		currentLogoUrl = data?.currentOrganization?.logo || null;
 	});
@@ -35,38 +28,45 @@
 	const form = superForm(orgData || data.form, {
 		validators: zod4Client(editOrganizationSchema),
 		dataType: 'form',
-		onResult: () => {
-			// clear file input after successful save
+		onResult: ({ result }) => {
 			if (fileInput) {
 				fileInput.value = '';
 				fileInput.dispatchEvent(new Event('change', { bubbles: true }));
 			}
+			if (result.type === 'redirect') {
+				invalidateAll();
+			}
 		}
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, tainted, submitting } = form;
 	const logoFile = fileProxy(form, 'logo');
 
 	let fileInput: HTMLInputElement;
 
 	const selectedFileName = $derived($logoFile?.[0]?.name || null);
-	const selectedFileSize = $derived(
-		$logoFile?.[0] ? `${($logoFile[0].size / 1024).toFixed(1)} KB` : null
+	let previewUrl = $state<string | null>(null);
+	const logoDisplayName = $derived(
+		selectedFileName ?? (currentLogoUrl ? currentLogoUrl.split('/').pop() : null)
 	);
-	const previewUrl = $derived(browser && $logoFile?.[0] ? URL.createObjectURL($logoFile[0]) : null);
 
-	function clearFileSelection(e: MouseEvent) {
-		e.stopPropagation();
-		if (fileInput) {
-			fileInput.value = '';
-			fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+	$effect(() => {
+		const file = $logoFile?.[0];
+		if (!browser || !file) {
+			previewUrl = null;
+			return;
 		}
-	}
+		const url = URL.createObjectURL(file);
+		previewUrl = url;
+		return () => {
+			URL.revokeObjectURL(url);
+		};
+	});
 
 	let copied = $state(false);
 
-	function copyToClipboard() {
-		const fullUrl = `${$page.url.origin}/${$formData.shortcode}`;
+	function copyPortalUrl() {
+		const fullUrl = `${$page.url.origin}/${$formData.shortcode ?? ''}`;
 		navigator.clipboard.writeText(fullUrl);
 		copied = true;
 		setTimeout(() => {
@@ -81,124 +81,164 @@
 
 		if (res.ok) {
 			currentLogoUrl = null;
+			await invalidateAll();
 			toast.success('Logo deleted successfully');
 		} else {
 			toast.error('Failed to delete logo');
 		}
 	}
+
+	const canSave = $derived(!!$tainted && !$submitting);
 </script>
 
-<form method="POST" use:enhance action="?/save" enctype="multipart/form-data">
-	<div class="mx-auto flex min-h-screen flex-col gap-6 py-6 md:gap-10 md:py-8">
-		{@render header()}
-		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-10 md:p-9">
-			<Form.Field {form} name="name" class="flex w-full flex-col gap-2 md:pr-8">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label class="font-semibold">Name</Form.Label>
-						<Input {...props} bind:value={$formData.name} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+<form
+	id="organization-form"
+	method="POST"
+	use:enhance
+	action="?/save"
+	enctype="multipart/form-data"
+>
+	<div
+		class="bg-background border-border sticky top-0 z-10 flex h-23 items-center justify-between gap-[14px] border-b p-8"
+	>
+		<h1 class="font-sans text-[24px] leading-[140%] font-bold tracking-[0px]">
+			{data.currentOrganization?.name ?? 'Organization Details'}
+		</h1>
+		<div class="flex gap-2">
+			<a href={resolve('/tests/test-session')}>
+				<Button variant="outline" class="border-primary text-primary border text-sm sm:text-base">
+					Cancel
+				</Button>
+			</a>
+			<Form.Button class="bg-primary text-sm sm:text-base" disabled={!canSave}>Save</Form.Button>
+		</div>
+	</div>
 
-			<Form.Field {form} name="shortcode" class="flex w-full flex-col gap-2 md:pr-8">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label class="font-semibold">Shortcode</Form.Label>
-						<Input {...props} bind:value={$formData.shortcode} />
-						<div class="flex items-center gap-2">
-							<p class="text-sm text-gray-500">
-								Your portal URL: {$page.url.origin}/{$formData.shortcode}
-							</p>
-							<button
-								type="button"
-								onclick={copyToClipboard}
-								class="text-gray-500 hover:text-gray-700"
-							>
-								{#if copied}
-									<Check class="h-4 w-4" />
-								{:else}
-									<ClipboardCopy class="h-4 w-4" />
-								{/if}
-							</button>
-						</div>
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
+	<div class="flex justify-center px-4 py-8">
+		<div class="w-full max-w-160">
+			<div class="bg-card rounded-xl border shadow-sm">
+				<div class="border-border flex h-23 items-center gap-3.5 border-b p-8">
+					<div class="bg-primary/10 flex h-9 w-9 items-center justify-center rounded-lg">
+						<Settings class="text-primary h-5 w-5" />
+					</div>
+					<h3 class="text-base font-semibold">Organisation Details</h3>
+				</div>
 
-			<Form.Field {form} name="logo" class="flex w-full flex-col gap-2 md:pr-8">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label class="font-semibold">Logo</Form.Label>
-						<input
-							{...props}
-							type="file"
-							accept="image/png,image/jpeg,image/webp"
-							bind:files={$logoFile}
-							bind:this={fileInput}
-							hidden
-						/>
-						<div class="flex flex-col gap-3">
-							{#if currentLogoUrl && !selectedFileName}
-								<div class="flex items-center gap-3">
-									<img
-										src={currentLogoUrl}
-										alt="Current logo"
-										class="h-16 w-16 rounded border object-contain"
+				<div class="flex flex-col gap-6 p-8">
+					<Form.Field {form} name="name" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label class="font-semibold">Name</Form.Label>
+								<Input {...props} bind:value={$formData.name} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Field {form} name="shortcode" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label class="font-semibold">Shortcode</Form.Label>
+								<div
+									class="border-input ring-offset-background bg-card focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-md border shadow-xs transition-[color,box-shadow] focus-within:ring-[3px]"
+								>
+									<span class="text-muted-foreground pl-3 text-sm whitespace-nowrap">
+										{$page.url.host}/
+									</span>
+									<input
+										{...props}
+										class="text-foreground min-w-0 flex-1 bg-transparent py-1 pr-3 text-sm outline-none"
+										bind:value={$formData.shortcode}
 									/>
-									<Trash_2
-										size={18}
-										class="text-muted-foreground hover:text-destructive cursor-pointer"
-										onclick={deleteLogo}
-									/>
+									<button
+										type="button"
+										onclick={copyPortalUrl}
+										class="text-primary hover:text-primary/80 flex items-center gap-1 px-3 text-sm font-medium whitespace-nowrap"
+									>
+										{#if copied}
+											<Check class="h-4 w-4" /> Copied
+										{:else}
+											Copy Portal URL
+										{/if}
+									</button>
 								</div>
-							{/if}
-							<div
-								class="border-primary/30 hover:border-primary flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors"
-								onclick={() => fileInput.click()}
-								onkeydown={(e) => e.key === 'Enter' && fileInput.click()}
-								role="button"
-								tabindex="0"
-							>
-								{#if selectedFileName && previewUrl}
-									<div class="flex flex-col items-center gap-2">
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Field {form} name="logo" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label class="font-semibold">Logo</Form.Label>
+								<input
+									{...props}
+									type="file"
+									accept="image/png,image/jpeg,image/webp"
+									bind:files={$logoFile}
+									bind:this={fileInput}
+									hidden
+								/>
+								<div class="flex items-center gap-3">
+									{#if previewUrl}
 										<img
 											src={previewUrl}
 											alt="Logo preview"
-											class="h-24 w-24 rounded border object-contain"
+											class="border-border bg-muted h-10 w-10 shrink-0 rounded-md border object-contain"
 										/>
-										<p class="text-sm font-medium">{selectedFileName}</p>
-										<p class="text-xs text-gray-500">{selectedFileSize}</p>
-										<Button type="button" variant="outline" size="sm" onclick={clearFileSelection}>
-											Cancel
-										</Button>
+									{:else if currentLogoUrl}
+										<img
+											src={currentLogoUrl}
+											alt="Current logo"
+											class="border-border bg-muted h-10 w-10 shrink-0 rounded-md border object-contain"
+										/>
+									{:else}
+										<div
+											class="border-border bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-md border"
+										>
+											<ImageIcon class="text-muted-foreground h-4 w-4" />
+										</div>
+									{/if}
+
+									<div
+										class="border-input bg-card flex h-9 flex-1 items-center rounded-md border shadow-xs"
+									>
+										<div class="flex min-w-0 flex-1 items-center gap-2 px-3">
+											<ImageIcon class="text-muted-foreground h-4 w-4 shrink-0" />
+											<span
+												class={[
+													'truncate text-sm',
+													logoDisplayName ? 'text-foreground' : 'text-muted-foreground'
+												]}
+											>
+												{logoDisplayName ?? 'No file selected'}
+											</span>
+										</div>
+										<button
+											type="button"
+											onclick={() => fileInput.click()}
+											class="text-primary hover:text-primary/80 px-3 text-sm font-medium"
+										>
+											Change
+										</button>
+										{#if currentLogoUrl && !selectedFileName}
+											<button
+												type="button"
+												onclick={deleteLogo}
+												class="text-muted-foreground hover:text-destructive pr-3"
+												aria-label="Delete logo"
+											>
+												<Trash_2 class="h-4 w-4" />
+											</button>
+										{/if}
 									</div>
-								{:else}
-									<Upload class="text-primary mb-2 h-8 w-8" />
-									<p class="text-sm font-medium">Click to upload logo</p>
-									<p class="text-xs text-gray-500">PNG, JPG, WebP, max 2MB</p>
-								{/if}
-							</div>
-						</div>
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-		</div>
-	</div>
-	<div
-		class="sticky right-0 bottom-0 left-0 mt-2 flex w-full border-t-4 bg-white p-3 shadow-md sm:mt-4 sm:p-4"
-	>
-		<div class="flex w-full justify-between gap-2">
-			<a href={resolve('/tests/test-session')}>
-				<Button variant="outline" class="border-primary text-primary border-1 text-sm sm:text-base"
-					>Cancel</Button
-				>
-			</a>
-			<div class="flex gap-2">
-				<Form.Button class="bg-primary text-sm sm:text-base">Save</Form.Button>
+								</div>
+								<p class="text-muted-foreground text-xs">PNG, JPG, WebP, max 2MB</p>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				</div>
 			</div>
 		</div>
 	</div>

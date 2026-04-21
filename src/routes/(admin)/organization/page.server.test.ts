@@ -1,5 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Cookies } from '@sveltejs/kit';
 import { load, actions } from './+page.server';
+import { invalidateOrganizationCache } from '$lib/server/organization-cache.js';
+
+function makeCookies(overrides: Partial<Cookies> = {}): Cookies {
+	return {
+		get: vi.fn(() => undefined),
+		getAll: vi.fn(() => []),
+		set: vi.fn(),
+		delete: vi.fn(),
+		serialize: vi.fn(() => ''),
+		...overrides
+	} as unknown as Cookies;
+}
 
 // Mock environment variables
 vi.mock('$env/static/private', () => ({
@@ -33,7 +46,14 @@ vi.mock('sveltekit-superforms', () => ({
 
 // Mock auth functions
 vi.mock('$lib/server/auth.js', () => ({
-	getSessionTokenCookie: vi.fn(() => 'mock-token')
+	getSessionTokenCookie: vi.fn(() => 'mock-token'),
+	organizationCookieName: 'sashakt-organization',
+	setOrganizationCookie: vi.fn()
+}));
+
+// Mock organization cache
+vi.mock('$lib/server/organization-cache.js', () => ({
+	invalidateOrganizationCache: vi.fn()
 }));
 
 // Mock flash message redirect
@@ -156,7 +176,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: makeCookies()
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {
@@ -201,7 +221,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: makeCookies()
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {
@@ -242,7 +262,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: makeCookies()
 				} as any);
 			} catch (error: any) {
 				// Expected redirect
@@ -271,10 +291,47 @@ describe('Organization Page Server', () => {
 			const result = await actions.save({
 				request: mockRequest,
 				fetch: mockFetch,
-				cookies: {} as any
+				cookies: makeCookies()
 			} as any);
 
 			expect(result?.status).toBe(401);
+		});
+
+		it('should invalidate cache for previous and new shortcode when shortcode changes', async () => {
+			const previousShortcode = 'old-code';
+			const newShortcode = 'new-code';
+
+			const formData = new FormData();
+			formData.append('name', 'Renamed Org');
+			formData.append('shortcode', newShortcode);
+
+			const mockRequest = new Request('http://localhost', {
+				method: 'POST',
+				body: formData
+			});
+
+			mockFetch.mockResolvedValueOnce({
+				ok: true,
+				json: async () => ({ id: 1, name: 'Renamed Org', shortcode: newShortcode })
+			});
+
+			const cookies = makeCookies({
+				get: vi.fn(() => previousShortcode)
+			});
+
+			try {
+				await actions.save({
+					request: mockRequest,
+					fetch: mockFetch,
+					cookies
+				} as any);
+				expect.fail('Should have thrown redirect');
+			} catch (error: any) {
+				expect(error.location).toBe('/organization');
+			}
+
+			expect(invalidateOrganizationCache).toHaveBeenCalledWith(previousShortcode);
+			expect(invalidateOrganizationCache).toHaveBeenCalledWith(newShortcode);
 		});
 
 		it('should redirect with success message after successful save', async () => {
@@ -296,7 +353,7 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: {} as any
+					cookies: makeCookies()
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {

@@ -15,6 +15,9 @@
 		applyOrgSettingsToNewTestForm,
 		type OrgSettingsPayload
 	} from '$lib/utils/organizationSettings';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
@@ -149,9 +152,9 @@
 
 	const pageTitle = $derived.by(() => {
 		if ($formData.is_template) {
-			return isEditing ? 'Edit Test Template' : 'Create Test Template';
+			return isEditing ? `Edit ${term('test_template')}` : `Create ${term('test_template')}`;
 		}
-		return isEditing ? 'Edit Test' : 'Create Test';
+		return isEditing ? `Edit ${term('test')}` : `Create ${term('test')}`;
 	});
 
 	const isNextDisabled = $derived(

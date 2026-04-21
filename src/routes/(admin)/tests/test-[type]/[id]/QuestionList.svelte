@@ -10,6 +10,9 @@
 	import type { User } from '$lib/utils/permissions.js';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import FileQuestionIcon from '@lucide/svelte/icons/file-question';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		formData,
@@ -114,7 +117,7 @@
 							const url = new URL(page.url);
 							url.searchParams.delete('state_ids');
 							goto(url, { keepFocus: true, invalidateAll: true });
-						}}>Select from Question Bank</Button
+						}}>Select from {term('question_bank')}</Button
 					>
 				</div>
 			{:else}

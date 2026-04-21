@@ -16,6 +16,9 @@
 		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
 	import TemplateSelect from './TemplateSelect.svelte';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		formData,
@@ -116,14 +119,14 @@
 		<!-- Right Column: Tag Types, Tags, State, District, Status -->
 		<div class="flex w-full flex-col gap-5 lg:w-2/5 lg:pl-8">
 			<div>
-				<Label class="text-sm font-semibold text-gray-800">Tag Types</Label>
+				<Label class="text-sm font-semibold text-gray-800">{term('tag_types')}</Label>
 				<div class="mt-2">
 					<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 				</div>
 			</div>
 
 			<div>
-				<Label class="text-sm font-semibold text-gray-800">Tags</Label>
+				<Label class="text-sm font-semibold text-gray-800">{term('tags')}</Label>
 				<div class="mt-2">
 					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>

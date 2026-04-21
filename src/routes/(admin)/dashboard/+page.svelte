@@ -4,6 +4,9 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	// lazy-loaded components
 	let DistrictSelection: Component | null = $state(null);
@@ -35,19 +38,19 @@
 	let isLoadingAnalytics = $state(true);
 	let areFiltersLoaded = $state(false);
 
-	const information = [
+	const information = $derived([
 		{
-			title: 'Manage Question Banks',
+			title: `Manage ${term('question_bank')}`,
 			description:
 				'Effortlessly create, edit, and organize question banks to keep everything at your fingertips.'
 		},
 		{
-			title: 'Generate Test Templates',
+			title: `Generate ${term('test_templates')}`,
 			description:
 				'Customize test templates to suit diverse requirements, ensuring consistency and ease of use.'
 		},
 		{
-			title: 'Create and Assign Tests',
+			title: `Create and Assign ${term('tests')}`,
 			description:
 				'Build, schedule, and assign tests seamlessly to streamline the evaluation process.'
 		},
@@ -57,10 +60,10 @@
 				'Gain valuable insights through detailed analytics to track performance and progress.'
 		},
 		{
-			title: 'User Management',
+			title: `${term('user')} Management`,
 			description: 'Add, manage, and oversee user roles to ensure collaboration and control.'
 		}
-	];
+	]);
 
 	const stats_box = $derived([
 		{
@@ -68,11 +71,11 @@
 			count: dashboardStats.total_questions
 		},
 		{
-			title: 'No of Tests',
+			title: `No of ${term('tests')}`,
 			count: dashboardStats.total_tests
 		},
 		{
-			title: 'No of Users',
+			title: `No of ${term('users')}`,
 			count: dashboardStats.total_users
 		}
 	]);
@@ -211,7 +214,7 @@
 				<h2
 					class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 				>
-					Dashboard
+					{term('dashboard')}
 				</h2>
 				<TooltipInfo tooltipKey="dashboard" />
 			</div>

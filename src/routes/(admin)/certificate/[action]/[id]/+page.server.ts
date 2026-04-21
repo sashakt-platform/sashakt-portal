@@ -7,6 +7,7 @@ import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { fail } from '@sveltejs/kit';
+import { serverTerms } from '$lib/server/nomenclature';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const user = requireLogin();
@@ -58,6 +59,7 @@ export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		if (params.action === 'edit') {
 			requirePermission(user, PERMISSIONS.UPDATE_CERTIFICATE);
@@ -77,7 +79,7 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: 'Certificate not created. Please check all the details.'
+					message: `${term('certificate')} not created. Please check all the details.`
 				},
 				cookies
 			);
@@ -99,7 +101,9 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message: errorMessage.detail || 'Certificate not created. Please check all the details.'
+						message:
+							errorMessage.detail ||
+							`${term('certificate')} not created. Please check all the details.`
 					},
 					cookies
 				);
@@ -122,7 +126,9 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message: errorMessage.detail || 'Certificate not updated. Please check all the details.'
+						message:
+							errorMessage.detail ||
+							`${term('certificate')} not updated. Please check all the details.`
 					},
 					cookies
 				);
@@ -134,7 +140,7 @@ export const actions: Actions = {
 			'/certificate',
 			{
 				type: 'success',
-				message: 'Certificate saved successfully'
+				message: `${term('certificate')} saved successfully`
 			},
 			cookies
 		);
@@ -145,6 +151,7 @@ export const actions: Actions = {
 		requirePermission(user, PERMISSIONS.DELETE_CERTIFICATE);
 
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		const res = await fetch(`${BACKEND_URL}/certificate/${params.id}`, {
 			method: 'DELETE',
@@ -169,7 +176,7 @@ export const actions: Actions = {
 		throw redirect(
 			303,
 			`/certificate`,
-			{ type: 'success', message: `Certificate Deleted Successfully` },
+			{ type: 'success', message: `${term('certificate')} deleted successfully` },
 			cookies
 		);
 	}

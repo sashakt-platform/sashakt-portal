@@ -35,6 +35,9 @@
 	import QuestionRevision from './QuestionRevision.svelte';
 	import QuestionPreview from './QuestionPreview.svelte';
 	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 	import { dragHandleZone, dragHandle } from 'svelte-dnd-action';
 	import { resolve } from '$app/paths';
 	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
@@ -1572,13 +1575,13 @@
 			<div class="flex flex-col gap-6 lg:w-1/3">
 				<!-- Tag Types -->
 				<div class="flex flex-col gap-2">
-					<Label class="font-semibold">Tag Types</Label>
+					<Label class="font-semibold">{term('tag_types')}</Label>
 					<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 				</div>
 
 				<!-- Tags -->
 				<div class="flex flex-col gap-2">
-					<Label class="font-semibold">Tags</Label>
+					<Label class="font-semibold">{term('tags')}</Label>
 					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>
 

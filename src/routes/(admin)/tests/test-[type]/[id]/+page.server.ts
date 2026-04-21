@@ -8,6 +8,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { serverTerms } from '$lib/server/nomenclature';
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
@@ -226,6 +227,8 @@ export const actions: Actions = {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
 		const is_template = params.type === 'template';
+		const term = await serverTerms(user.organization_id);
+		const subjectKey = is_template ? 'test_template' : 'test';
 
 		// Check permissions based on action and type
 		if (params.id === 'new') {
@@ -244,7 +247,10 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod4(testSchema));
 		if (!form.valid) {
 			setFlash(
-				{ type: 'error', message: 'Test not Created. Please check all the details.' },
+				{
+					type: 'error',
+					message: `${term(subjectKey)} not created. Please check all the details.`
+				},
 				cookies
 			);
 			return fail(400, { form });
@@ -303,7 +309,7 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: `Test not Created. Details: ${errorMessage.detail || response.statusText}`
+					message: `${term(subjectKey)} not created. Details: ${errorMessage.detail || response.statusText}`
 				},
 				cookies
 			);
@@ -313,7 +319,7 @@ export const actions: Actions = {
 			`/tests/test-${form.data.is_template ? 'template' : 'session'}`,
 			{
 				type: 'success',
-				message: `Test ${form.data.is_template ? 'template' : 'session'} saved successfully`
+				message: `${term(form.data.is_template ? 'test_template' : 'test')} saved successfully`
 			},
 			cookies
 		);
@@ -323,6 +329,8 @@ export const actions: Actions = {
 		const token = getSessionTokenCookie();
 		const test_type = params.type === 'template' ? 'template' : 'session';
 		const is_template = params.type === 'template';
+		const term = await serverTerms(user.organization_id);
+		const subjectKey = is_template ? 'test_template' : 'test';
 
 		// Check delete permissions
 		if (is_template) {
@@ -351,7 +359,7 @@ export const actions: Actions = {
 		}
 		redirect(
 			`/tests/test-${test_type}`,
-			{ type: 'success', message: `Test ${test_type} deleted successfully` },
+			{ type: 'success', message: `${term(subjectKey)} deleted successfully` },
 			cookies
 		);
 	},
@@ -360,6 +368,8 @@ export const actions: Actions = {
 		const token = getSessionTokenCookie();
 		const is_template = params.type === 'template';
 		const test_type = params.type === 'template' ? 'template' : 'session';
+		const term = await serverTerms(user.organization_id);
+		const subjectKey = is_template ? 'test_template' : 'test';
 
 		// Check create permissions (cloning creates a new test/template)
 		if (is_template) {
@@ -382,14 +392,14 @@ export const actions: Actions = {
 				`/tests/test-session`,
 				{
 					type: 'error',
-					message: `Failed to clone test. Details: ${errorMessage.detail || response.statusText}`
+					message: `Failed to clone ${term(subjectKey).toLowerCase()}. Details: ${errorMessage.detail || response.statusText}`
 				},
 				cookies
 			);
 		}
 		redirect(
 			`/tests/test-${test_type}`,
-			{ type: 'success', message: `Test ${test_type} cloned successfully` },
+			{ type: 'success', message: `${term(subjectKey)} cloned successfully` },
 			cookies
 		);
 	}

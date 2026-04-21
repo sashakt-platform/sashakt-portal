@@ -7,6 +7,7 @@ import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { error, fail } from '@sveltejs/kit';
+import { serverTerms } from '$lib/server/nomenclature';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const user = requireLogin();
@@ -80,6 +81,7 @@ export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		if (params.action === 'edit') {
 			requirePermission(user, PERMISSIONS.UPDATE_FORM);
@@ -98,7 +100,7 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: 'Form not saved. Please check all the details.'
+					message: `${term('form')} not saved. Please check all the details.`
 				},
 				cookies
 			);
@@ -120,7 +122,9 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message: errorMessage.detail || 'Form not created. Please check all the details.'
+						message:
+							errorMessage.detail ||
+							`${term('form')} not created. Please check all the details.`
 					},
 					cookies
 				);
@@ -133,7 +137,7 @@ export const actions: Actions = {
 				`/forms/edit/${newForm.id}`,
 				{
 					type: 'success',
-					message: 'Form created successfully. Now add fields to your form.'
+					message: `${term('form')} created successfully. Now add fields to your ${term('form').toLowerCase()}.`
 				},
 				cookies
 			);

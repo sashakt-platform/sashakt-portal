@@ -4,13 +4,14 @@
 	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
 	import UserForm from './UserForm.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data }: { data: PageData } = $props();
+	const term = useTerms();
 
-	let title = $state('Create User');
-	if (data.action === 'edit') {
-		title = 'Edit User';
-	}
+	const title = $derived(
+		data.action === 'edit' ? `Edit ${term('user')}` : `Create ${term('user')}`
+	);
 </script>
 
 <div class="mx-auto flex flex-col gap-10 py-8">
@@ -19,7 +20,7 @@
 			<a
 				href={resolve('/users')}
 				class="hover:bg-muted rounded-lg border p-2"
-				aria-label="Back to users"
+				aria-label={`Back to ${term('users').toLowerCase()}`}
 			>
 				<ArrowLeft size={20} />
 			</a>

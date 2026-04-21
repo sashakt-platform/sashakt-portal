@@ -49,13 +49,13 @@
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'user')}
 			<a href={resolve('/users/add/new')}
-				><Button class="font-semibold"><Plus />Create User</Button></a
+				><Button class="font-semibold"><Plus />Create {term('user')}</Button></a
 			>
 		{/if}
 	{/snippet}
 
 	{#snippet filters()}
-		<SearchInput placeholder="Search users..." value={search} />
+		<SearchInput placeholder={`Search ${term('users').toLowerCase()}...`} value={search} />
 	{/snippet}
 
 	{#snippet content()}

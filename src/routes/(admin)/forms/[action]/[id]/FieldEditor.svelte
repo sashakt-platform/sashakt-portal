@@ -14,6 +14,9 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import type { FormField, FieldOption } from './schema.js';
 	import { fieldTypeLabels, fieldTypeCategories, type FormFieldTypeValue } from './schema.js';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	interface Props {
 		field: FormField | null;
@@ -295,7 +298,7 @@
 			<!-- Entity Type Selection -->
 			{#if needsEntityType}
 				<div class="space-y-2 border-t pt-4">
-					<Label>Entity *</Label>
+					<Label>{term('entity')} *</Label>
 					<Select.Root
 						type="single"
 						value={entityTypeId?.toString()}

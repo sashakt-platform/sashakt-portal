@@ -18,6 +18,9 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import type { FormField } from './schema.js';
 	import { fieldTypeLabels, type FormFieldTypeValue } from './schema.js';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	const {
 		data
@@ -284,13 +287,13 @@
 				<div class="flex items-center gap-3">
 					<a
 						href={resolve('/forms/')}
-						aria-label="Back to forms"
+						aria-label={`Back to ${term('forms').toLowerCase()}`}
 						class="text-foreground hover:bg-accent rounded-md p-1.5 transition-colors"
 					>
 						<ArrowLeft class="h-5 w-5" />
 					</a>
 					<h1 class="text-2xl font-bold">
-						{isEditMode ? 'Edit Form' : 'Create Form'}
+						{isEditMode ? `Edit ${term('form')}` : `Create ${term('form')}`}
 					</h1>
 				</div>
 
@@ -319,7 +322,7 @@
 					<div class="grid grid-cols-2 gap-6">
 						<div class="flex flex-col gap-2">
 							<Label class="font-semibold">
-								Form Name
+								{term('form')} Name
 								<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
 							</Label>
 							<Input
@@ -338,13 +341,13 @@
 								type="text"
 								name="description"
 								bind:value={$formData.description}
-								placeholder="Brief description of this form..."
+								placeholder={`Brief description of this ${term('form').toLowerCase()}...`}
 							/>
 						</div>
 					</div>
 
 					<div class="flex items-center gap-3">
-						<Label class="font-semibold">Form Status</Label>
+						<Label class="font-semibold">{term('form')} Status</Label>
 						<span
 							class="text-sm {$formData.is_active
 								? 'text-primary font-medium'

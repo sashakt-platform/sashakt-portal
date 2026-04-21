@@ -83,7 +83,7 @@
 		{#if canCreate(data.user, 'form')}
 			<a href={resolve('/forms/add/new')}>
 				<Button class="font-semibold">
-					<Plus />Create Form
+					<Plus />Create {term('form')}
 				</Button>
 			</a>
 		{/if}
@@ -98,15 +98,17 @@
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<FileText class="text-primary h-7 w-7" />
 					</div>
-					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No forms yet</h2>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+						No {term('forms').toLowerCase()} yet
+					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first form to get started. Forms let you create questions that test takers
-						must answer before starting the test.
+						Create your first {term('form').toLowerCase()} to get started. {term('forms')} let you create
+						questions that test takers must answer before starting the test.
 					</p>
 					{#if canCreate(data.user, 'form')}
 						<div class="mt-6">
 							<a href={resolve('/forms/add/new')}
-								><Button class="font-semibold"><Plus />Create Form</Button></a
+								><Button class="font-semibold"><Plus />Create {term('form')}</Button></a
 							>
 						</div>
 					{/if}
@@ -117,7 +119,7 @@
 
 	{#snippet filters()}
 		<div class="flex items-center justify-between gap-2">
-			<SearchInput placeholder="Search forms..." value={search} />
+			<SearchInput placeholder={`Search ${term('forms').toLowerCase()}...`} value={search} />
 			<Popover.Root bind:open={statusOpen}>
 				<Popover.Trigger>
 					{#snippet child({ props })}

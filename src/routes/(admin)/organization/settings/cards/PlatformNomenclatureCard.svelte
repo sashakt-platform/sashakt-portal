@@ -8,9 +8,24 @@
 
 	let { settings = $bindable() }: { settings: OrganizationSettings } = $props();
 
-	const rows: { key: NomenclatureKey; default: string }[] = (
-		Object.keys(NOMENCLATURE_DEFAULTS) as NomenclatureKey[]
-	).map((key) => ({ key, default: NOMENCLATURE_DEFAULTS[key] }));
+	type ConceptRow = {
+		plural: NomenclatureKey;
+		singular?: NomenclatureKey;
+	};
+
+	const rows: ConceptRow[] = [
+		{ plural: 'dashboard' },
+		{ plural: 'question_bank' },
+		{ plural: 'tag_management' },
+		{ plural: 'tests', singular: 'test' },
+		{ plural: 'tags', singular: 'tag' },
+		{ plural: 'test_templates', singular: 'test_template' },
+		{ plural: 'tag_types', singular: 'tag_type' },
+		{ plural: 'forms', singular: 'form' },
+		{ plural: 'certificates', singular: 'certificate' },
+		{ plural: 'entities', singular: 'entity' },
+		{ plural: 'users', singular: 'user' }
+	];
 
 	let isCustom = $derived(settings.platform_nomenclature.mode === 'custom');
 </script>
@@ -66,26 +81,59 @@
 				<span>Custom</span>
 			</div>
 			<div class="divide-border divide-y">
-				{#each rows as row (row.key)}
-					<div class="grid grid-cols-2 items-center gap-4 px-6 py-3">
-						<span class={['text-sm', isCustom ? 'text-foreground' : 'text-muted-foreground']}>
-							{row.default}
-						</span>
-						<label
-							class={[
-								'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-[10px] border bg-white px-4 shadow-xs focus-within:ring-[3px]',
-								!isCustom && 'opacity-60'
-							]}
-						>
-							<input
-								type="text"
-								maxlength={MAX_NOMENCLATURE_LABEL_LEN}
-								placeholder="Use default"
-								disabled={!isCustom}
-								class="text-foreground placeholder:text-muted-foreground w-full min-w-0 flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
-								bind:value={settings.platform_nomenclature.value[row.key]}
-							/>
-						</label>
+				{#each rows as row (row.plural)}
+					<div class="grid grid-cols-2 items-start gap-4 px-6 py-3">
+						<div class="flex flex-col gap-2 pt-2">
+							<span class={['text-sm', isCustom ? 'text-foreground' : 'text-muted-foreground']}>
+								{NOMENCLATURE_DEFAULTS[row.plural]}
+								{#if row.singular}
+									<span class="text-muted-foreground ml-1 text-xs">(plural)</span>
+								{/if}
+							</span>
+							{#if row.singular}
+								<span
+									class={['text-sm', isCustom ? 'text-foreground' : 'text-muted-foreground']}
+								>
+									{NOMENCLATURE_DEFAULTS[row.singular]}
+									<span class="text-muted-foreground ml-1 text-xs">(singular)</span>
+								</span>
+							{/if}
+						</div>
+
+						<div class="flex flex-col gap-2">
+							<label
+								class={[
+									'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-[10px] border bg-white px-4 shadow-xs focus-within:ring-[3px]',
+									!isCustom && 'opacity-60'
+								]}
+							>
+								<input
+									type="text"
+									maxlength={MAX_NOMENCLATURE_LABEL_LEN}
+									placeholder="Use default"
+									disabled={!isCustom}
+									class="text-foreground placeholder:text-muted-foreground w-full min-w-0 flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
+									bind:value={settings.platform_nomenclature.value[row.plural]}
+								/>
+							</label>
+							{#if row.singular}
+								<label
+									class={[
+										'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-[10px] border bg-white px-4 shadow-xs focus-within:ring-[3px]',
+										!isCustom && 'opacity-60'
+									]}
+								>
+									<input
+										type="text"
+										maxlength={MAX_NOMENCLATURE_LABEL_LEN}
+										placeholder="Use default"
+										disabled={!isCustom}
+										class="text-foreground placeholder:text-muted-foreground w-full min-w-0 flex-1 bg-transparent text-sm outline-none disabled:cursor-not-allowed"
+										bind:value={settings.platform_nomenclature.value[row.singular]}
+									/>
+								</label>
+							{/if}
+						</div>
 					</div>
 				{/each}
 			</div>

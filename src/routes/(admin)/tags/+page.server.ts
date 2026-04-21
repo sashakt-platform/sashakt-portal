@@ -5,6 +5,7 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { error, fail } from '@sveltejs/kit';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { serverTerms } from '$lib/server/nomenclature';
 
 export const load: PageServerLoad = async ({ cookies, url }) => {
 	const user = requireLogin();
@@ -65,13 +66,14 @@ export const actions: Actions = {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.CREATE_TAG);
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		const formData = await request.formData();
 		const name = formData.get('name')?.toString().trim();
 		const description = formData.get('description')?.toString() || null;
 
 		if (!name) {
-			setFlash({ type: 'error', message: 'Tag type name is required.' }, cookies);
+			setFlash({ type: 'error', message: `${term('tag_type')} name is required.` }, cookies);
 			return fail(400);
 		}
 
@@ -85,18 +87,22 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const message = await getErrorMessage(response, 'Failed to create Tag Type.');
+			const message = await getErrorMessage(response, `Failed to create ${term('tag_type')}.`);
 			setFlash({ type: 'error', message }, cookies);
 			return fail(response.status);
 		}
 
-		setFlash({ type: 'success', message: 'Tag Type created successfully!' }, cookies);
+		setFlash(
+			{ type: 'success', message: `${term('tag_type')} created successfully!` },
+			cookies
+		);
 	},
 
 	updateTagType: async ({ request, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.UPDATE_TAG);
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		const formData = await request.formData();
 		const id = formData.get('id');
@@ -104,7 +110,7 @@ export const actions: Actions = {
 		const description = formData.get('description')?.toString() || null;
 
 		if (!id || !name) {
-			setFlash({ type: 'error', message: 'Tag type name is required.' }, cookies);
+			setFlash({ type: 'error', message: `${term('tag_type')} name is required.` }, cookies);
 			return fail(400);
 		}
 
@@ -118,30 +124,34 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const message = await getErrorMessage(response, 'Failed to update Tag Type.');
+			const message = await getErrorMessage(response, `Failed to update ${term('tag_type')}.`);
 			setFlash({ type: 'error', message }, cookies);
 			return fail(response.status);
 		}
 
-		setFlash({ type: 'success', message: 'Tag Type updated successfully!' }, cookies);
+		setFlash(
+			{ type: 'success', message: `${term('tag_type')} updated successfully!` },
+			cookies
+		);
 	},
 
 	createTag: async ({ request, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.CREATE_TAG);
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		const formData = await request.formData();
 		const name = formData.get('name')?.toString().trim();
 		const tag_type_id = Number(formData.get('tag_type_id'));
 
 		if (!name) {
-			setFlash({ type: 'error', message: 'Tag name is required.' }, cookies);
+			setFlash({ type: 'error', message: `${term('tag')} name is required.` }, cookies);
 			return fail(400);
 		}
 
 		if (!Number.isFinite(tag_type_id)) {
-			setFlash({ type: 'error', message: 'Tag type is required.' }, cookies);
+			setFlash({ type: 'error', message: `${term('tag_type')} is required.` }, cookies);
 			return fail(400);
 		}
 
@@ -155,25 +165,26 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const message = await getErrorMessage(response, 'Failed to create Tag.');
+			const message = await getErrorMessage(response, `Failed to create ${term('tag')}.`);
 			setFlash({ type: 'error', message }, cookies);
 			return fail(response.status);
 		}
 
-		setFlash({ type: 'success', message: 'Tag created successfully!' }, cookies);
+		setFlash({ type: 'success', message: `${term('tag')} created successfully!` }, cookies);
 	},
 
 	updateTag: async ({ request, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.UPDATE_TAG);
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		const formData = await request.formData();
 		const id = formData.get('id');
 		const name = formData.get('name')?.toString().trim();
 
 		if (!id || !name) {
-			setFlash({ type: 'error', message: 'Tag name is required.' }, cookies);
+			setFlash({ type: 'error', message: `${term('tag')} name is required.` }, cookies);
 			return fail(400);
 		}
 
@@ -187,24 +198,25 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const message = await getErrorMessage(response, 'Failed to update Tag.');
+			const message = await getErrorMessage(response, `Failed to update ${term('tag')}.`);
 			setFlash({ type: 'error', message }, cookies);
 			return fail(response.status);
 		}
 
-		setFlash({ type: 'success', message: 'Tag updated successfully!' }, cookies);
+		setFlash({ type: 'success', message: `${term('tag')} updated successfully!` }, cookies);
 	},
 
 	deleteTag: async ({ request, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_TAG);
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		const formData = await request.formData();
 		const id = formData.get('id');
 
 		if (!id) {
-			setFlash({ type: 'error', message: 'Tag ID is required.' }, cookies);
+			setFlash({ type: 'error', message: `${term('tag')} ID is required.` }, cookies);
 			return fail(400);
 		}
 
@@ -217,24 +229,25 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const message = await getErrorMessage(response, 'Failed to delete Tag.');
+			const message = await getErrorMessage(response, `Failed to delete ${term('tag')}.`);
 			setFlash({ type: 'error', message }, cookies);
 			return fail(response.status);
 		}
 
-		setFlash({ type: 'success', message: 'Tag deleted successfully!' }, cookies);
+		setFlash({ type: 'success', message: `${term('tag')} deleted successfully!` }, cookies);
 	},
 
 	deleteTagType: async ({ request, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_TAG);
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		const formData = await request.formData();
 		const id = formData.get('id');
 
 		if (!id) {
-			setFlash({ type: 'error', message: 'Tag Type ID is required.' }, cookies);
+			setFlash({ type: 'error', message: `${term('tag_type')} ID is required.` }, cookies);
 			return fail(400);
 		}
 
@@ -247,11 +260,14 @@ export const actions: Actions = {
 		});
 
 		if (!response.ok) {
-			const message = await getErrorMessage(response, 'Failed to delete Tag Type.');
+			const message = await getErrorMessage(response, `Failed to delete ${term('tag_type')}.`);
 			setFlash({ type: 'error', message }, cookies);
 			return fail(response.status);
 		}
 
-		setFlash({ type: 'success', message: 'Tag Type deleted successfully!' }, cookies);
+		setFlash(
+			{ type: 'success', message: `${term('tag_type')} deleted successfully!` },
+			cookies
+		);
 	}
 };

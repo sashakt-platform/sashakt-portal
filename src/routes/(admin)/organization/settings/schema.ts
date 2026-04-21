@@ -85,15 +85,23 @@ const platformNomenclatureSchema = z.object({
 	value: z.object({
 		dashboard: nomenclatureLabelSchema,
 		question_bank: nomenclatureLabelSchema,
-		test_templates: nomenclatureLabelSchema,
-		tests: nomenclatureLabelSchema,
 		tag_management: nomenclatureLabelSchema,
+		tests: nomenclatureLabelSchema,
+		test: nomenclatureLabelSchema,
 		tags: nomenclatureLabelSchema,
+		tag: nomenclatureLabelSchema,
+		test_templates: nomenclatureLabelSchema,
+		test_template: nomenclatureLabelSchema,
 		tag_types: nomenclatureLabelSchema,
+		tag_type: nomenclatureLabelSchema,
 		forms: nomenclatureLabelSchema,
+		form: nomenclatureLabelSchema,
 		certificates: nomenclatureLabelSchema,
+		certificate: nomenclatureLabelSchema,
 		entities: nomenclatureLabelSchema,
-		users: nomenclatureLabelSchema
+		entity: nomenclatureLabelSchema,
+		users: nomenclatureLabelSchema,
+		user: nomenclatureLabelSchema
 	})
 });
 

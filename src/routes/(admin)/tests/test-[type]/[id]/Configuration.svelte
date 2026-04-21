@@ -13,6 +13,9 @@
 	import * as Select from '$lib/components/ui/select';
 	import { resolve } from '$app/paths';
 	import { isFixed, type OrgSettingsPayload } from '$lib/utils/organizationSettings';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	interface CertificateToken {
 		token: string;
@@ -261,16 +264,18 @@
 				</div>
 
 				<div>
-					{@render label('Certificate')}
+					{@render label(term('certificate'))}
 					<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
 						{@render selectTrigger(
 							certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name ||
-								'Select Certificate',
+								`Select ${term('certificate')}`,
 							!!$formData.certificate_id
 						)}
 						<Select.Content>
 							<Select.Group>
-								<Select.Item value="" label="No certificate">No certificate</Select.Item>
+								<Select.Item value="" label={`No ${term('certificate').toLowerCase()}`}>
+									No {term('certificate').toLowerCase()}
+								</Select.Item>
 								{#each certificatesOptions as cert (cert.id)}
 									<Select.Item value={String(cert.id)}>{cert.name}</Select.Item>
 								{/each}

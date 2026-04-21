@@ -3,15 +3,23 @@ import { getContext } from 'svelte';
 export const NOMENCLATURE_DEFAULTS = {
 	dashboard: 'Dashboard',
 	question_bank: 'Question Bank',
-	test_templates: 'Test Templates',
-	tests: 'Tests',
 	tag_management: 'Tag Management',
+	tests: 'Tests',
+	test: 'Test',
 	tags: 'Tags',
+	tag: 'Tag',
+	test_templates: 'Test Templates',
+	test_template: 'Test Template',
 	tag_types: 'Tag Types',
+	tag_type: 'Tag Type',
 	forms: 'Forms',
+	form: 'Form',
 	certificates: 'Certificates',
+	certificate: 'Certificate',
 	entities: 'Entities',
-	users: 'Users'
+	entity: 'Entity',
+	users: 'Users',
+	user: 'User'
 } as const;
 
 export type NomenclatureKey = keyof typeof NOMENCLATURE_DEFAULTS;

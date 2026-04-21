@@ -625,7 +625,7 @@ describe('Test Create/Update Page — save action', () => {
 			} as any);
 
 			expect(setFlash).toHaveBeenCalledWith(
-				{ type: 'error', message: 'Test not Created. Please check all the details.' },
+				{ type: 'error', message: 'Test not created. Please check all the details.' },
 				mockCookies
 			);
 		});

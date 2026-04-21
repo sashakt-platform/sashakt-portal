@@ -1,5 +1,9 @@
 import { BACKEND_URL } from '$env/static/private';
-import { getSessionTokenCookie, organizationCookieName } from '$lib/server/auth.js';
+import {
+	getSessionTokenCookie,
+	organizationCookieName,
+	setOrganizationCookie
+} from '$lib/server/auth.js';
 import { invalidateOrganizationCache } from '$lib/server/organization-cache.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
@@ -76,6 +80,7 @@ export const actions: Actions = {
 		}
 		if (form.data.shortcode && form.data.shortcode !== previousShortcode) {
 			invalidateOrganizationCache(form.data.shortcode);
+			setOrganizationCookie(cookies, form.data.shortcode);
 		}
 
 		throw redirect(

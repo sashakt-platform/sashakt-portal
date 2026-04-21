@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Cookies } from '@sveltejs/kit';
 import { DELETE } from './+server';
 import { BACKEND_URL } from '$env/static/private';
 import { invalidateOrganizationCache } from '$lib/server/organization-cache';
@@ -12,15 +13,26 @@ vi.mock('$lib/server/organization-cache', () => ({
 	invalidateOrganizationCache: vi.fn()
 }));
 
+type DeleteEvent = Parameters<typeof DELETE>[0];
+
 const mockFetch = vi.fn();
-const mockCookies = {
+const mockCookies: Pick<Cookies, 'get'> = {
 	get: vi.fn(() => 'test-org')
 };
+
+function makeDeleteEvent(overrides: Partial<DeleteEvent> = {}): DeleteEvent {
+	return {
+		fetch: mockFetch,
+		cookies: mockCookies as unknown as Cookies,
+		request: new Request('http://localhost', { method: 'DELETE' }),
+		...overrides
+	} as unknown as DeleteEvent;
+}
 
 describe('DELETE /api/organization/logo', () => {
 	beforeEach(() => {
 		mockFetch.mockReset();
-		mockCookies.get.mockReset().mockReturnValue('test-org');
+		vi.mocked(mockCookies.get).mockReset().mockReturnValue('test-org');
 		vi.mocked(invalidateOrganizationCache).mockReset();
 	});
 
@@ -30,7 +42,7 @@ describe('DELETE /api/organization/logo', () => {
 			json: async () => ({})
 		});
 
-		const response = await DELETE({ fetch: mockFetch, cookies: mockCookies } as any);
+		const response = await DELETE(makeDeleteEvent());
 		const body = await response.json();
 
 		expect(response.status).toBe(200);
@@ -53,7 +65,7 @@ describe('DELETE /api/organization/logo', () => {
 			status: 404
 		});
 
-		const response = await DELETE({ fetch: mockFetch, cookies: mockCookies } as any);
+		const response = await DELETE(makeDeleteEvent());
 		const body = await response.json();
 
 		expect(response.status).toBe(404);
@@ -64,7 +76,7 @@ describe('DELETE /api/organization/logo', () => {
 	it('returns 500 error when fetch throws', async () => {
 		mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-		const response = await DELETE({ fetch: mockFetch, cookies: mockCookies } as any);
+		const response = await DELETE(makeDeleteEvent());
 		const body = await response.json();
 
 		expect(response.status).toBe(500);

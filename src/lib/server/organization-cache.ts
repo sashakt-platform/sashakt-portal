@@ -16,7 +16,7 @@ export function getCachedOrganization(shortcode: string): OrgCacheValue | null {
 }
 
 export function setCachedOrganization(shortcode: string, data: OrgCacheValue) {
-	if (orgCache.size >= ORG_CACHE_MAX_SIZE) {
+	if (!orgCache.has(shortcode) && orgCache.size >= ORG_CACHE_MAX_SIZE) {
 		const oldestKey = orgCache.keys().next().value;
 		if (oldestKey !== undefined) orgCache.delete(oldestKey);
 	}

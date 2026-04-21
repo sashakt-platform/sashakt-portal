@@ -45,10 +45,23 @@
 	let fileInput: HTMLInputElement;
 
 	const selectedFileName = $derived($logoFile?.[0]?.name || null);
-	const previewUrl = $derived(browser && $logoFile?.[0] ? URL.createObjectURL($logoFile[0]) : null);
+	let previewUrl = $state<string | null>(null);
 	const logoDisplayName = $derived(
 		selectedFileName ?? (currentLogoUrl ? currentLogoUrl.split('/').pop() : null)
 	);
+
+	$effect(() => {
+		const file = $logoFile?.[0];
+		if (!browser || !file) {
+			previewUrl = null;
+			return;
+		}
+		const url = URL.createObjectURL(file);
+		previewUrl = url;
+		return () => {
+			URL.revokeObjectURL(url);
+		};
+	});
 
 	let copied = $state(false);
 
@@ -104,7 +117,7 @@
 	<div class="flex justify-center px-4 py-8">
 		<div class="w-full max-w-160">
 			<div class="bg-card rounded-xl border shadow-sm">
-				<div class="flex h-23 items-center gap-3.5 border-b border-[#E4E4E4] p-8">
+				<div class="border-border flex h-23 items-center gap-3.5 border-b p-8">
 					<div class="bg-primary/10 flex h-9 w-9 items-center justify-center rounded-lg">
 						<Settings class="text-primary h-5 w-5" />
 					</div>
@@ -127,7 +140,7 @@
 							{#snippet children({ props })}
 								<Form.Label class="font-semibold">Shortcode</Form.Label>
 								<div
-									class="border-input ring-offset-background focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-md border bg-white shadow-xs transition-[color,box-shadow] focus-within:ring-[3px]"
+									class="border-input ring-offset-background bg-card focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-md border shadow-xs transition-[color,box-shadow] focus-within:ring-[3px]"
 								>
 									<span class="text-muted-foreground pl-3 text-sm whitespace-nowrap">
 										{$page.url.host}/
@@ -188,7 +201,7 @@
 									{/if}
 
 									<div
-										class="border-input flex h-9 flex-1 items-center rounded-md border bg-white shadow-xs"
+										class="border-input bg-card flex h-9 flex-1 items-center rounded-md border shadow-xs"
 									>
 										<div class="flex min-w-0 flex-1 items-center gap-2 px-3">
 											<ImageIcon class="text-muted-foreground h-4 w-4 shrink-0" />

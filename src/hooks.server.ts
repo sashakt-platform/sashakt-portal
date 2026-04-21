@@ -42,7 +42,7 @@ const handleOrganization: Handle = async ({ event, resolve }) => {
 			event.locals.organization = null;
 			invalidateOrganizationCache(key);
 		}
-	} catch (err) {
+	} catch {
 		invalidateOrganizationCache(key);
 		event.locals.organization = null;
 	}

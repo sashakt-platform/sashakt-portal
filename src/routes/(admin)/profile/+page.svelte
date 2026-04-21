@@ -42,7 +42,7 @@
 		{data.currentUser?.full_name ?? 'My Profile'}
 	</h1>
 	<div class="flex gap-2">
-		<a href={resolve('/dashboard')}>
+		<a href={resolve('/tests/test-session')}>
 			<Button variant="outline" class="border-primary text-primary border text-sm sm:text-base"
 				>Cancel</Button
 			>

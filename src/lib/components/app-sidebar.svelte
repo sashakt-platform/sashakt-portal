@@ -2,7 +2,6 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
-	import ChartColumnIncreasing from '@lucide/svelte/icons/chart-column-increasing';
 	import FileWarning from '@lucide/svelte/icons/file-warning';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
@@ -22,7 +21,6 @@
 
 	// Menu items
 	const menu_items = [
-		{ title: 'Dashboard', url: '/dashboard', icon: ChartColumnIncreasing },
 		{ title: 'Question Bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
 		{
 			title: 'Test Templates',

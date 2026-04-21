@@ -192,7 +192,7 @@
 		class="sticky right-0 bottom-0 left-0 mt-2 flex w-full border-t-4 bg-white p-3 shadow-md sm:mt-4 sm:p-4"
 	>
 		<div class="flex w-full justify-between gap-2">
-			<a href={resolve('/dashboard')}>
+			<a href={resolve('/tests/test-session')}>
 				<Button variant="outline" class="border-primary text-primary border-1 text-sm sm:text-base"
 					>Cancel</Button
 				>

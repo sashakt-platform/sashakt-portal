@@ -117,9 +117,9 @@ describe('Login Route', () => {
 				} as any);
 				expect.fail('Should have thrown a redirect');
 			} catch (error: any) {
-				// Should redirect to dashboard
+				// Should redirect to tests
 				expect(error.status).toBe(303);
-				expect(error.location).toBe('/dashboard');
+				expect(error.location).toBe('/tests/test-session');
 			}
 
 			// Should set cookies

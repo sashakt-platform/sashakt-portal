@@ -51,7 +51,7 @@
 	const currentMenuUrl = $derived.by(() => {
 		const path = page.url.pathname;
 		const match = menu_items.find((item) => path === item.url || path.startsWith(item.url + '/'));
-		return match?.url ?? menu_items[0].url;
+		return match?.url ?? null;
 	});
 
 	const myOrgChildren = $derived.by(() => {

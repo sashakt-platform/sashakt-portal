@@ -18,31 +18,40 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { useTerms, type NomenclatureKey } from '$lib/nomenclature';
+
+	type MenuItem = {
+		termKey: NomenclatureKey;
+		url: string;
+		icon: typeof FileWarning;
+		entity: string;
+	};
 
 	// Menu items
-	const menu_items = [
-		{ title: 'Question Bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
+	const menu_items: MenuItem[] = [
+		{ termKey: 'question_bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
 		{
-			title: 'Test Templates',
+			termKey: 'test_templates',
 			url: '/tests/test-template',
 			icon: ClipboardList,
 			entity: 'test-template'
 		},
-		{ title: 'Tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
-		{ title: 'Tag Management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
-		{ title: 'Certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
-		{ title: 'Forms', url: '/forms', icon: FileText, entity: 'form' },
-		{ title: 'Entities', url: '/entity', icon: Boxes, entity: 'entity' },
-		{ title: 'Users', url: '/users', icon: User, entity: 'user' }
+		{ termKey: 'tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
+		{ termKey: 'tag_management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
+		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
+		{ termKey: 'forms', url: '/forms', icon: FileText, entity: 'form' },
+		{ termKey: 'entities', url: '/entity', icon: Boxes, entity: 'entity' },
+		{ termKey: 'users', url: '/users', icon: User, entity: 'user' }
 	];
 
 	let { data } = $props();
 	const sidebar = useSidebar();
+	const term = useTerms();
 
-	const currentitem = $derived.by(() => {
+	const currentMenuUrl = $derived.by(() => {
 		const path = page.url.pathname;
 		const match = menu_items.find((item) => path === item.url || path.startsWith(item.url + '/'));
-		return match?.title ?? menu_items[0].title;
+		return match?.url ?? null;
 	});
 
 	const myOrgChildren = $derived.by(() => {
@@ -82,13 +91,13 @@
 	}
 </script>
 
-{#snippet sidebaritems(item: any)}
+{#snippet sidebaritems(item: MenuItem)}
 	<Sidebar.MenuItem class="m-1">
-		<Sidebar.MenuButton isActive={currentitem == item.title} onclick={() => handleMenuClick()}>
+		<Sidebar.MenuButton isActive={currentMenuUrl === item.url} onclick={() => handleMenuClick()}>
 			{#snippet child({ props })}
 				<a href={resolve(item.url)} {...props}>
 					<item.icon />
-					<span>{item.title}</span>
+					<span>{term(item.termKey)}</span>
 				</a>
 			{/snippet}
 		</Sidebar.MenuButton>

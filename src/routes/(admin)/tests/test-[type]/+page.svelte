@@ -25,6 +25,9 @@
 		isStateAdmin,
 		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		data
@@ -91,6 +94,7 @@
 			data?.is_template,
 			data?.test_taker_url,
 			handleDelete,
+			term,
 			{
 				canEdit: canUpdate(data.user, entityType),
 				canDelete: canDelete(data.user, entityType)
@@ -108,11 +112,11 @@
 
 <DeleteDialog
 	bind:action={deleteAction}
-	elementName={data?.is_template ? 'Test template' : 'Test'}
+	elementName={data?.is_template ? term('test_template') : term('test')}
 />
 
 <ListingPageLayout
-	title={data?.is_template ? 'Test Templates' : 'Tests'}
+	title={data?.is_template ? term('test_templates') : term('tests')}
 	subtitle=""
 	showEmptyState={noTestCreatedYet}
 	tooltipKey={data?.is_template ? 'test-templates' : 'tests'}
@@ -120,7 +124,7 @@
 	{#snippet headerActions()}
 		{#if data?.is_template && canCreate(data.user, 'test-template')}
 			<Button class="font-semibold" href={page.url.pathname + '/new'}
-				><Plus />Create Test Template</Button
+				><Plus />Create {term('test_template')}</Button
 			>
 		{:else if !data?.is_template && canCreate(data.user, 'test')}
 			<a href={page.url.pathname + '/new'}
@@ -130,7 +134,7 @@
 				></a
 			>
 			<a href={page.url.pathname + '/convert'}
-				><Button class="font-semibold"><Plus />Create from Template</Button></a
+				><Button class="font-semibold"><Plus />Create from {term('test_template')}</Button></a
 			>
 		{/if}
 	{/snippet}
@@ -145,21 +149,26 @@
 						<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 							<ClipboardList class="text-primary h-7 w-7" />
 						</div>
-						<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No test templates yet</h2>
+						<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+							No {term('test_templates', 'lower')} yet
+						</h2>
 						<p class="mt-2 max-w-md text-center text-sm text-gray-400">
-							Create your first test template to get started. Templates let you define question
-							sets, scoring rules, and test configurations that can be reused across multiple test
-							sessions.
+							Create your first {term('test_template', 'lower')} to get started. {term(
+								'test_templates'
+							)} let you define question sets, scoring rules, and {term('test', 'lower')} configurations
+							that can be reused across multiple {term('test', 'lower')} sessions.
 						</p>
 						{#if canCreate(data.user, 'test-template')}
 							<div class="mt-6">
 								<Button class="font-semibold" href={page.url.pathname + '/new'}
-									><Plus />Create Test Template</Button
+									><Plus />Create {term('test_template')}</Button
 								>
 							</div>
 						{/if}
 					{:else}
-						<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">Create your first test</h2>
+						<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">
+							Create your first {term('test', 'lower')}
+						</h2>
 						<p class="mt-2 text-sm text-gray-400">Choose a method to get started</p>
 
 						{#if canCreate(data.user, 'test')}
@@ -187,10 +196,10 @@
 										<FileSpreadsheet class="text-primary h-6 w-6" />
 									</div>
 									<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
-										Build from Template
+										Build from {term('test_template')}
 									</h3>
 									<p class="mt-1 text-center text-sm text-gray-400">
-										Pick a pre-configured test template and schedule a session.
+										Pick a pre-configured {term('test_template', 'lower')} and schedule a session.
 									</p>
 								</a>
 							</div>
@@ -204,7 +213,9 @@
 	{#snippet filters()}
 		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
 			<SearchInput
-				placeholder={data?.is_template ? 'Search test templates...' : 'Search tests...'}
+				placeholder={data?.is_template
+					? `Search ${term('test_templates', 'lower')}...`
+					: `Search ${term('tests', 'lower')}...`}
 				value={search}
 			/>
 
@@ -246,8 +257,8 @@
 			{currentPage}
 			{pageSize}
 			emptyStateMessage={data?.is_template
-				? 'No test templates found matching your criteria.'
-				: 'No tests found matching your criteria.'}
+				? `No ${term('test_templates', 'lower')} found matching your criteria.`
+				: `No ${term('tests', 'lower')} found matching your criteria.`}
 		/>
 	{/snippet}
 </ListingPageLayout>

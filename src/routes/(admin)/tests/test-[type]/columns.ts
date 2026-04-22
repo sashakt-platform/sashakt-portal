@@ -15,6 +15,7 @@ import {
 	type User
 } from '$lib/utils/permissions.js';
 import { resolve } from '$app/paths';
+import type { NomenclatureKey } from '$lib/nomenclature';
 
 export interface Test {
 	id: string;
@@ -72,26 +73,20 @@ export const createTestColumns = (
 	isTemplate: boolean,
 	testTakerUrl: string,
 	onDelete: (testId: string) => void,
+	term: (key: NomenclatureKey) => string,
 	permissions?: {
 		canEdit?: boolean;
 		canDelete?: boolean;
 	},
 	user?: User | null
 ): ColumnDef<Test>[] => [
-	createSortableColumn(
-		'name',
-		isTemplate ? 'Test Template' : 'Tests',
-		currentSortBy,
-		currentSortOrder,
-		handleSort,
-		{
-			cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
-			meta: { grow: true }
-		}
-	),
+	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
+		meta: { grow: true }
+	}),
 	{
 		accessorKey: 'tags',
-		header: 'Tags',
+		header: term('tags'),
 		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] }),
 		size: 200
 	},
@@ -132,10 +127,10 @@ export const createTestColumns = (
 
 				if (test.link) {
 					customActions.push({
-						label: 'Copy Test Link',
+						label: `Copy ${term('test')} Link`,
 						action: async () => {
 							await navigator.clipboard.writeText(`${testTakerUrl}/test/${test.link}`);
-							toast.success('Test Link Copied');
+							toast.success(`${term('test')} link copied`);
 						},
 						icon: 'copy-link'
 					});
@@ -171,7 +166,7 @@ export const createTestColumns = (
 
 			return renderComponent(DataTableActions, {
 				id: test.id,
-				entityName: isTemplate ? 'Test Template' : 'Tests',
+				entityName: isTemplate ? term('test_template') : term('test'),
 				editUrl: resolve(`${baseUrl}/${test.id}/`),
 				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,

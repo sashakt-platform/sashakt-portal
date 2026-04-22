@@ -12,8 +12,10 @@
 	import Boxes from '@lucide/svelte/icons/boxes';
 	import SearchInput from '$lib/components/SearchInput.svelte';
 	import StatusFilter from '$lib/components/StatusFilter.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.entities?.items || []);
 	const totalItems = $derived(data?.entities?.total || 0);
@@ -47,7 +49,7 @@
 </script>
 
 <ListingPageLayout
-	title="Entities"
+	title={term('entities')}
 	subtitle=""
 	showEmptyState={noEntitiesCreatedYet}
 	tooltipKey="entity-management"
@@ -55,7 +57,7 @@
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'entity')}
 			<a href={resolve('/entity/add/new')}
-				><Button class="font-semibold"><Plus />Create Entity</Button></a
+				><Button class="font-semibold"><Plus />Create {term('entity')}</Button></a
 			>
 		{/if}
 	{/snippet}
@@ -69,15 +71,17 @@
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<Boxes class="text-primary h-7 w-7" />
 					</div>
-					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No entities yet</h2>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+						No {term('entities', 'lower')} yet
+					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first entity to get started. Entities let you define custom data types to
-						organize and manage records.
+						Create your first {term('entity', 'lower')} to get started. {term('entities')} let you define
+						custom data types to organize and manage records.
 					</p>
 					{#if canCreate(data.user, 'entity')}
 						<div class="mt-6">
 							<a href={resolve('/entity/add/new')}
-								><Button class="font-semibold"><Plus />Create Entity</Button></a
+								><Button class="font-semibold"><Plus />Create {term('entity')}</Button></a
 							>
 						</div>
 					{/if}
@@ -88,7 +92,11 @@
 
 	{#snippet filters()}
 		<div class="flex items-center justify-between gap-2">
-			<SearchInput placeholder="Search entities..." value={search} useResolve />
+			<SearchInput
+				placeholder={`Search ${term('entities', 'lower')}...`}
+				value={search}
+				useResolve
+			/>
 			<StatusFilter value={isActive} useResolve />
 		</div>
 	{/snippet}

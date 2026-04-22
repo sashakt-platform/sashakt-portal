@@ -12,6 +12,7 @@
 	import QuestionPaletteCard from './cards/QuestionPaletteCard.svelte';
 	import MarkForReviewCard from './cards/MarkForReviewCard.svelte';
 	import OmrModeCard from './cards/OmrModeCard.svelte';
+	import PlatformNomenclatureCard from './cards/PlatformNomenclatureCard.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -57,6 +58,7 @@
 			<QuestionPaletteCard bind:settings={$formData} />
 			<MarkForReviewCard bind:settings={$formData} />
 			<OmrModeCard bind:settings={$formData} />
+			<PlatformNomenclatureCard bind:settings={$formData} />
 		</div>
 	</div>
 </form>

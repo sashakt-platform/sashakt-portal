@@ -11,9 +11,7 @@
 		type="button"
 		class={[
 			'h-full flex-1 rounded-lg text-sm transition-colors',
-			value
-				? 'bg-background text-primary font-semibold shadow-sm'
-				: 'text-gray-500 font-medium'
+			value ? 'bg-background text-primary font-semibold shadow-sm' : 'font-medium text-gray-500'
 		]}
 		onclick={() => (value = true)}
 	>
@@ -23,9 +21,7 @@
 		type="button"
 		class={[
 			'h-full flex-1 rounded-lg text-sm transition-colors',
-			!value
-				? 'bg-background text-primary font-semibold shadow-sm'
-				: 'text-gray-500 font-medium'
+			!value ? 'bg-background text-primary font-semibold shadow-sm' : 'font-medium text-gray-500'
 		]}
 		onclick={() => (value = false)}
 	>

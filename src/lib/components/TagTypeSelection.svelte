@@ -1,5 +1,8 @@
 <script lang="ts">
 	import Filteration from './Filteration.svelte';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let { tagTypes = $bindable(), ...rest } = $props();
 	let tagTypeList = $state<{ id: string; name: string }[]>([]);
@@ -31,7 +34,8 @@
 	bind:items={tagTypes}
 	itemName="tag_type"
 	bind:itemList={tagTypeList}
-	label="Tag Type"
+	label={term('tag_type')}
+	labelPlural={term('tag_types')}
 	onSearch={loadTagTypes}
 	{isLoading}
 	{...rest}

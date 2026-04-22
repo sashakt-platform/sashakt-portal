@@ -2,18 +2,23 @@
 	import FeatureCard from '../FeatureCard.svelte';
 	import TimePickerPill from '../TimePickerPill.svelte';
 	import type { OrganizationSettings } from '../schema';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let { settings = $bindable() }: { settings: OrganizationSettings } = $props();
 </script>
 
 <FeatureCard
-	title="Test Timings"
-	description="Set when the test starts and how long candidates have to complete it"
+	title={`${term('test')} Timings`}
+	description={`Set when the ${term('test', 'lower')} starts and how long candidates have to complete it`}
 	bind:mode={settings.test_timings.mode}
 >
 	<div class="flex flex-col gap-6">
 		<div class="flex items-center justify-between gap-4">
-			<span class="text-sm font-semibold text-gray-500">Maximum time limit for the test</span>
+			<span class="text-sm font-semibold text-gray-500">
+				Maximum time limit for the {term('test', 'lower')}
+			</span>
 			<label
 				class="border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 w-[176px] items-center rounded-[10px] border bg-white px-4 shadow-xs focus-within:ring-[3px]"
 			>
@@ -33,12 +38,16 @@
 		</div>
 
 		<div class="flex items-center justify-between gap-4">
-			<span class="text-sm font-semibold text-gray-500">Start time for the test</span>
+			<span class="text-sm font-semibold text-gray-500">
+				Start time for the {term('test', 'lower')}
+			</span>
 			<TimePickerPill bind:value={settings.test_timings.value.start_time} />
 		</div>
 
 		<div class="flex items-center justify-between gap-4">
-			<span class="text-sm font-semibold text-gray-500">End time for the test</span>
+			<span class="text-sm font-semibold text-gray-500">
+				End time for the {term('test', 'lower')}
+			</span>
 			<TimePickerPill bind:value={settings.test_timings.value.end_time} />
 		</div>
 	</div>

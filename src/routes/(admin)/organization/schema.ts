@@ -9,7 +9,8 @@ export const editOrganizationSchema = z.object({
 		.string()
 		.min(1, { message: 'Shortcode is required' })
 		.regex(/^[a-z0-9]+$/, {
-			message: 'Shortcode must contain only lowercase letters and numbers, with no spaces or special characters'
+			message:
+				'Shortcode must contain only lowercase letters and numbers, with no spaces or special characters'
 		}),
 	logo: z
 		.union([

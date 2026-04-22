@@ -19,6 +19,9 @@
 	import { getFieldTypeIcon } from './fieldTypeIcons.js';
 	import type { FormField, FieldOption } from './schema.js';
 	import { fieldTypeLabels, type FormFieldTypeValue } from './schema.js';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	interface Props {
 		field: FormField;
@@ -304,7 +307,9 @@
 			<div class="flex flex-col gap-2">
 				<Label class="font-semibold">
 					Database Label
-					<span class="text-muted-foreground font-normal">(Token in certificate & key)</span>
+					<span class="text-muted-foreground font-normal">
+						(Token in {term('certificate', 'lower')} & key)
+					</span>
 				</Label>
 				<Input
 					bind:value={name}
@@ -338,7 +343,7 @@
 		{#if needsEntityType}
 			<div class="grid grid-cols-2 gap-6">
 				<div class="flex flex-col gap-2">
-					<Label class="font-semibold">Entity Type</Label>
+					<Label class="font-semibold">{term('entity')} Type</Label>
 					<Select.Root
 						type="single"
 						value={entityTypeId?.toString()}
@@ -349,8 +354,9 @@
 					>
 						<Select.Trigger class="w-full">
 							{entityTypeId
-								? entityTypes.find((et) => et.id === entityTypeId)?.name || 'Select entity type'
-								: 'Select entity type'}
+								? entityTypes.find((et) => et.id === entityTypeId)?.name ||
+									`Select ${term('entity', 'lower')} type`
+								: `Select ${term('entity', 'lower')} type`}
 						</Select.Trigger>
 						<Select.Content>
 							{#each entityTypes as entityType (entityType.id)}

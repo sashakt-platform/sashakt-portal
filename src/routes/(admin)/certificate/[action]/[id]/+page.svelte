@@ -14,6 +14,9 @@
 	} from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { resolve } from '$app/paths';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	const {
 		data
@@ -56,12 +59,12 @@
 				<a
 					href={resolve('/certificate')}
 					class="hover:bg-muted rounded-lg border p-2"
-					aria-label="Back to certificates"
+					aria-label={`Back to ${term('certificates', 'lower')}`}
 				>
 					<ArrowLeft size={20} />
 				</a>
 				<h2 class="text-2xl font-bold tracking-tight">
-					{certificateData ? 'Edit Certificate' : 'Create Certificate'}
+					{certificateData ? `Edit ${term('certificate')}` : `Create ${term('certificate')}`}
 				</h2>
 			</div>
 			<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>Save</Button>
@@ -73,17 +76,17 @@
 					<span class="bg-brand-subtle shrink-0 rounded-lg p-2">
 						<Settings class="text-primary h-4 w-4 sm:h-5 sm:w-5" />
 					</span>
-					<h3 class="text-base font-semibold sm:text-xl">Certificate Details</h3>
+					<h3 class="text-base font-semibold sm:text-xl">{term('certificate')} Details</h3>
 				</div>
 
 				<div class="grid grid-cols-1 gap-6 p-8 md:grid-cols-2">
 					<div class="flex flex-col gap-2">
-						<Label for="name">Certificate Name</Label>
+						<Label for="name">{term('certificate')} Name</Label>
 						<Input
 							id="name"
 							type="text"
 							name="name"
-							placeholder="Name of this certificate..."
+							placeholder={`Name of this ${term('certificate', 'lower')}...`}
 							bind:value={$formData.name}
 						/>
 						{#if $errors.name}
@@ -96,13 +99,13 @@
 						<Textarea
 							id="description"
 							name="description"
-							placeholder="Brief description of this certificate..."
+							placeholder={`Brief description of this ${term('certificate', 'lower')}...`}
 							bind:value={$formData.description}
 						/>
 					</div>
 
 					<div class="flex flex-col gap-2">
-						<Label for="url">Certificate URL</Label>
+						<Label for="url">{term('certificate')} URL</Label>
 						<Input
 							id="url"
 							type="text"
@@ -116,7 +119,7 @@
 					</div>
 
 					<div class="flex items-center justify-between">
-						<Label for="is_active" class="font-semibold">Certificate Status</Label>
+						<Label for="is_active" class="font-semibold">{term('certificate')} Status</Label>
 						<div class="flex items-center gap-2">
 							<span
 								class="text-sm {$formData.is_active

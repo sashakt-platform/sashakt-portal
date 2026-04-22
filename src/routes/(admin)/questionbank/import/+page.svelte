@@ -13,6 +13,9 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
 	import { resolve } from '$app/paths';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let { data } = $props();
 
@@ -215,7 +218,7 @@
 									}}>Upload More</Button
 								>
 								<a href={resolve('/questionbank')}>
-									<Button>Go to Question Bank</Button>
+									<Button>Go to {term('question_bank')}</Button>
 								</a>
 							</div>
 						{/if}

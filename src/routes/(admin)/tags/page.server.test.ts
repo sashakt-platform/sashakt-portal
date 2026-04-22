@@ -6,6 +6,12 @@ vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://fake-backend.com'
 }));
 
+vi.mock('$lib/server/nomenclature', () => ({
+	serverTerms: vi.fn(
+		async () => (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+	)
+}));
+
 vi.mock('$lib/server/auth', () => ({
 	requireLogin: vi.fn(() => ({ id: 1, organization_id: 10, permissions: ['create_tag'] })),
 	getSessionTokenCookie: vi.fn(() => 'fake-token')

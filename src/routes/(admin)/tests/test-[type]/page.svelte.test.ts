@@ -154,7 +154,7 @@ describe('Test Management Listing Page', () => {
 			render(TestListingPage, { data: baseData(false, []) });
 			// In empty state, the empty state box shows its own CTAs
 			expect(screen.getByText('Build from Scratch')).toBeInTheDocument();
-			expect(screen.getByText('Build from Template')).toBeInTheDocument();
+			expect(screen.getByText('Build from Test Template')).toBeInTheDocument();
 		});
 	});
 

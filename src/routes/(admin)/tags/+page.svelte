@@ -13,8 +13,10 @@
 	import TagTypeDialog from './TagTypeDialog.svelte';
 	import TagDeleteDialog from './TagDeleteDialog.svelte';
 	import { createTagManagementColumns } from './columns';
+	import { useTerms } from '$lib/nomenclature';
 
 	const { data } = $props();
+	const term = useTerms();
 
 	// Permissions
 	const userCanCreate = $derived(canCreate(data.user, 'tag'));
@@ -101,7 +103,7 @@
 
 	// Columns
 	const columns = $derived(
-		createTagManagementColumns(sortBy, sortOrder, handleSort, {
+		createTagManagementColumns(sortBy, sortOrder, handleSort, term, {
 			canEdit: userCanUpdate,
 			canDelete: userCanDelete,
 			canCreate: userCanCreate,
@@ -128,7 +130,7 @@
 <TagTypeDialog bind:open={tagTypeDialogOpen} mode={tagTypeDialogMode} tagType={editingTagType} />
 
 <ListingPageLayout
-	title="Tag Management"
+	title={term('tag_management')}
 	subtitle=""
 	showEmptyState={noTagTypesCreatedYet}
 	tooltipKey="tag-management"
@@ -136,7 +138,7 @@
 	{#snippet headerActions()}
 		{#if userCanCreate}
 			<Button class="font-semibold" onclick={openCreateTagType}>
-				<Plus />Create Tag Type
+				<Plus />Create {term('tag_type')}
 			</Button>
 		{/if}
 	{/snippet}
@@ -150,15 +152,17 @@
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<MessageSquareCode class="text-primary h-7 w-7" />
 					</div>
-					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No tag types yet</h2>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+						No {term('tag_types', 'lower')} yet
+					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first tag type to get started. Tag types let you categorize and filter
-						questions.
+						Create your first {term('tag_type', 'lower')} to get started. {term('tag_types')} let you
+						categorize and filter questions.
 					</p>
 					{#if userCanCreate}
 						<div class="mt-6">
 							<Button class="font-semibold" onclick={openCreateTagType}>
-								<Plus />Create Tag Type
+								<Plus />Create {term('tag_type')}
 							</Button>
 						</div>
 					{/if}
@@ -168,7 +172,11 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<SearchInput placeholder="Search tag types or tags..." value={searchValue} useResolve />
+		<SearchInput
+			placeholder={`Search ${term('tag_types', 'lower')} or ${term('tags', 'lower')}...`}
+			value={searchValue}
+			useResolve
+		/>
 	{/snippet}
 
 	{#snippet content()}

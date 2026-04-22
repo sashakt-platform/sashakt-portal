@@ -9,6 +9,12 @@ vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
 }));
 
+vi.mock('$lib/server/nomenclature', () => ({
+	serverTerms: vi.fn(
+		async () => (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+	)
+}));
+
 vi.mock('$lib/constants', () => ({
 	DEFAULT_PAGE_SIZE: 25
 }));
@@ -621,7 +627,7 @@ describe('Test Create/Update Page — save action', () => {
 			} as any);
 
 			expect(setFlash).toHaveBeenCalledWith(
-				{ type: 'error', message: 'Test not Created. Please check all the details.' },
+				{ type: 'error', message: 'Test not created. Please check all the details.' },
 				mockCookies
 			);
 		});

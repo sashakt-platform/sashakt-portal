@@ -20,8 +20,10 @@
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { canCreate, canUpdate, canDelete, isStateAdmin } from '$lib/utils/permissions.js';
+	import { useTerms } from '$lib/nomenclature';
 
 	const { data } = $props();
+	const term = useTerms();
 	let deleteAction: string | null = $state(null);
 	let filteredTags: Filter[] = $state([]);
 	let filteredStates: Filter[] = $state([]);
@@ -150,7 +152,7 @@
 </form>
 
 <ListingPageLayout
-	title="Question Bank"
+	title={term('question_bank')}
 	subtitle=""
 	showFilters={selectedQuestionIds.length === 0}
 	showEmptyState={noQuestionCreatedYet}

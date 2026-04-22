@@ -16,6 +16,9 @@
 		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
 	import TemplateSelect from './TemplateSelect.svelte';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		formData,
@@ -80,7 +83,7 @@
 		<div class="flex w-full flex-1 flex-col gap-6 lg:w-3/5 lg:pr-8">
 			<div>
 				<Label for="template-name" class="text-sm font-medium text-gray-800">
-					{$formData.is_template ? 'Template Name' : 'Test Name'}
+					{$formData.is_template ? `${term('test_template')} Name` : `${term('test')} Name`}
 					<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
 				</Label>
 				<Input
@@ -100,9 +103,9 @@
 				</Label>
 				<Textarea
 					id="description"
-					placeholder="Brief description of this {$formData.is_template
-						? 'test template'
-						: 'test'}..."
+					placeholder={`Brief description of this ${
+						$formData.is_template ? term('test_template', 'lower') : term('test', 'lower')
+					}...`}
 					class="mt-2 min-h-30"
 					name="description"
 					bind:value={$formData.description}
@@ -116,14 +119,14 @@
 		<!-- Right Column: Tag Types, Tags, State, District, Status -->
 		<div class="flex w-full flex-col gap-5 lg:w-2/5 lg:pl-8">
 			<div>
-				<Label class="text-sm font-semibold text-gray-800">Tag Types</Label>
+				<Label class="text-sm font-semibold text-gray-800">{term('tag_types')}</Label>
 				<div class="mt-2">
 					<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 				</div>
 			</div>
 
 			<div>
-				<Label class="text-sm font-semibold text-gray-800">Tags</Label>
+				<Label class="text-sm font-semibold text-gray-800">{term('tags')}</Label>
 				<div class="mt-2">
 					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>
@@ -152,7 +155,7 @@
 			<hr class="border-border my-4" />
 			<div class="flex items-center justify-between pt-2">
 				<Label class="text-sm font-semibold text-gray-800">
-					{$formData.is_template ? 'Template Status' : 'Test Status'}
+					{$formData.is_template ? `${term('test_template')} Status` : `${term('test')} Status`}
 				</Label>
 				<div class="flex items-center gap-2">
 					<span

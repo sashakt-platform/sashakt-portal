@@ -2,12 +2,17 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import AppSidebar from '$lib/components/app-sidebar.svelte';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
+	import { setContext } from 'svelte';
+	import { NOMENCLATURE_CONTEXT_KEY, resolveAll } from '$lib/nomenclature';
 
 	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
 	import { toast } from 'svelte-sonner';
 
 	let { children, data } = $props();
+
+	const resolvedNomenclature = $derived(resolveAll(data.platformNomenclature));
+	setContext(NOMENCLATURE_CONTEXT_KEY, () => resolvedNomenclature);
 
 	const flash = getFlash(page);
 	$effect(() => {

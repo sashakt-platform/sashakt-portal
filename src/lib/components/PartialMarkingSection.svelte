@@ -82,7 +82,7 @@
 					<button
 						type="button"
 						data-testid="delete-partial-row"
-						class="text-gray-500 hover:text-destructive shrink-0 disabled:cursor-not-allowed disabled:opacity-30"
+						class="hover:text-destructive shrink-0 text-gray-500 disabled:cursor-not-allowed disabled:opacity-30"
 						disabled={partial.correct_answers.length <= 1}
 						onclick={() => {
 							partial = {

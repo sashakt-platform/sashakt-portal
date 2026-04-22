@@ -8,6 +8,9 @@
 	import { createEntitySchema, editEntitySchema, type EntityFormSchema } from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { resolve } from '$app/paths';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	const {
 		data
@@ -40,12 +43,12 @@
 				<a
 					href={resolve('/entity')}
 					class="hover:bg-muted rounded-lg border p-2"
-					aria-label="Back to entities"
+					aria-label={`Back to ${term('entities', 'lower')}`}
 				>
 					<ArrowLeft size={20} />
 				</a>
 				<h2 class="text-2xl font-bold tracking-tight">
-					{isEditMode ? 'Edit Entity' : 'Create Entity'}
+					{isEditMode ? `Edit ${term('entity')}` : `Create ${term('entity')}`}
 				</h2>
 			</div>
 			<Button
@@ -54,7 +57,7 @@
 				onclick={submit}
 				disabled={!$formData.name?.trim()}
 			>
-				{isEditMode ? 'Save Entity' : 'Save Entity'}
+				Save {term('entity')}
 			</Button>
 		</div>
 
@@ -62,12 +65,12 @@
 			<div class="bg-card rounded-2xl border">
 				<div class="grid grid-cols-1 gap-6 p-8 md:grid-cols-1">
 					<div class="flex flex-col gap-2">
-						<Label for="name" class="font-semibold">Entity Name</Label>
+						<Label for="name" class="font-semibold">{term('entity')} Name</Label>
 						<Input
 							id="name"
 							type="text"
 							name="name"
-							placeholder="Name of this entity..."
+							placeholder={`Name of this ${term('entity', 'lower')}...`}
 							bind:value={$formData.name}
 						/>
 						{#if $errors.name}
@@ -80,7 +83,7 @@
 						<Textarea
 							id="description"
 							name="description"
-							placeholder="Brief description of this entity..."
+							placeholder={`Brief description of this ${term('entity', 'lower')}...`}
 							bind:value={$formData.description}
 						/>
 					</div>

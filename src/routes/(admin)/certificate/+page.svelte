@@ -12,8 +12,10 @@
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import SearchInput from '$lib/components/SearchInput.svelte';
 	import StatusFilter from '$lib/components/StatusFilter.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.certificates?.items || []);
 	const totalItems = $derived(data?.certificates?.total || 0);
@@ -47,7 +49,7 @@
 </script>
 
 <ListingPageLayout
-	title="Certificates"
+	title={term('certificates')}
 	subtitle=""
 	showEmptyState={noCertificatesCreatedYet}
 	tooltipKey="certificate-management"
@@ -56,7 +58,7 @@
 		{#if canCreate(data.user, 'certificate')}
 			<a href={resolve('/certificate/add/new')}>
 				<Button class="font-semibold">
-					<Plus />Create Certificate
+					<Plus />Create {term('certificate')}
 				</Button>
 			</a>
 		{/if}
@@ -71,15 +73,17 @@
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<ShieldCheck class="text-primary h-7 w-7" />
 					</div>
-					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No certificates yet</h2>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+						No {term('certificates', 'lower')} yet
+					</h2>
 					<p class="text-muted-foreground mt-2 max-w-sm text-center text-sm">
-						Create your first certificate to get started. Certificates are awarded to candidates
-						after they complete a test.
+						Create your first {term('certificate', 'lower')} to get started. {term('certificates')} are
+						awarded to candidates after they complete a {term('test', 'lower')}.
 					</p>
 					{#if canCreate(data.user, 'certificate')}
 						<div class="mt-6">
 							<a href={resolve('/certificate/add/new')}
-								><Button class="font-semibold"><Plus />Create Certificate</Button></a
+								><Button class="font-semibold"><Plus />Create {term('certificate')}</Button></a
 							>
 						</div>
 					{/if}
@@ -90,7 +94,7 @@
 
 	{#snippet filters()}
 		<div class="flex items-center justify-between gap-2">
-			<SearchInput placeholder="Search certificates..." value={search} />
+			<SearchInput placeholder={`Search ${term('certificates', 'lower')}...`} value={search} />
 			<StatusFilter value={isActive} />
 		</div>
 	{/snippet}

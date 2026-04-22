@@ -11,6 +11,10 @@
 	import { testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 	import { goto } from '$app/navigation';
+	import {
+		applyOrgSettingsToNewTestForm,
+		type OrgSettingsPayload
+	} from '$lib/utils/organizationSettings';
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
@@ -22,6 +26,7 @@
 			user: any;
 			test_taker_url: string;
 			testData: Partial<Infer<FormSchema>> | null;
+			orgSettings: OrgSettingsPayload | null;
 			templates: any;
 			templateParams: any;
 			convertTemplate: boolean;
@@ -65,6 +70,8 @@
 		if (!td) return;
 		$formData.name = (td as any)?.name || '';
 		$formData.description = (td as any)?.description || '';
+		$formData.show_marks =
+			typeof (td as any)?.show_marks === 'boolean' ? (td as any).show_marks : $formData.show_marks;
 		$formData.state_ids =
 			td?.states?.map((state: Filter) => ({
 				id: String(state.id),
@@ -128,6 +135,11 @@
 	}
 
 	populateFormFromTestData(testData);
+
+	// Prefill new (non-template, non-convert) tests with org settings defaults.
+	if (!testData && !data.convertTemplate && data.orgSettings) {
+		applyOrgSettingsToNewTestForm($formData, data.orgSettings);
+	}
 
 	$effect(() => {
 		if (data.convertTemplate && data.testData) {
@@ -275,7 +287,7 @@
 			</div>
 		</div>
 	{:else if currentScreen === typeOfScreen.configuration}
-		<Configuration {formData} />
+		<Configuration {formData} orgSettings={data.orgSettings} />
 	{/if}
 
 	<!-- Bottom Navigation -->

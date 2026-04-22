@@ -67,6 +67,7 @@ export const testSchema = z.object({
 	question_sets: z.array(questionSetSchema).default([]),
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	show_marks: z.boolean().default(true),
 	show_result: z.boolean().default(true),
 	show_question_palette: z.boolean().default(true),
 	bookmark: z.boolean().default(false),

@@ -1,14 +1,15 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import ChartColumnIncreasing from '@lucide/svelte/icons/chart-column-increasing';
+	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import FileWarning from '@lucide/svelte/icons/file-warning';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 	import User from '@lucide/svelte/icons/user';
 	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
-	import Building from '@lucide/svelte/icons/building-2';
-	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
+	import Briefcase from '@lucide/svelte/icons/briefcase';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import { canRead, hasAnyPermission, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
@@ -20,7 +21,6 @@
 
 	// Menu items
 	const menu_items = [
-		{ title: 'Dashboard', url: '/dashboard', icon: ChartColumnIncreasing },
 		{ title: 'Question Bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
 		{
 			title: 'Test Templates',
@@ -44,6 +44,28 @@
 		const match = menu_items.find((item) => path === item.url || path.startsWith(item.url + '/'));
 		return match?.title ?? menu_items[0].title;
 	});
+
+	const myOrgChildren = $derived.by(() => {
+		const children: { title: string; url: string }[] = [];
+		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {
+			children.push({ title: 'Organisation Details', url: '/organization' });
+		}
+		if (
+			hasAnyPermission(data.user, [
+				PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
+				PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
+			])
+		) {
+			children.push({ title: 'Organisation Settings', url: '/organization/settings' });
+		}
+		return children;
+	});
+
+	const isMyOrgActive = $derived(
+		myOrgChildren.some(
+			(c) => page.url.pathname === c.url || page.url.pathname.startsWith(c.url + '/')
+		)
+	);
 
 	function handleMenuClick() {
 		if (sidebar.isMobile) {
@@ -104,25 +126,48 @@
 							{@render sidebaritems(item)}
 						{/if}
 					{/each}
+
+					{#if myOrgChildren.length > 0}
+						<Collapsible.Root open={isMyOrgActive} class="group/collapsible">
+							<Sidebar.MenuItem class="m-1">
+								<Collapsible.Trigger>
+									{#snippet child({ props })}
+										<Sidebar.MenuButton {...props} isActive={isMyOrgActive}>
+											<Briefcase />
+											<span>My Organisation</span>
+											<ChevronRight
+												class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+											/>
+										</Sidebar.MenuButton>
+									{/snippet}
+								</Collapsible.Trigger>
+								<Collapsible.Content>
+									<Sidebar.MenuSub>
+										{#each myOrgChildren as subItem (subItem.url)}
+											<Sidebar.MenuSubItem>
+												<Sidebar.MenuSubButton
+													isActive={page.url.pathname === subItem.url}
+													onclick={() => handleMenuClick()}
+												>
+													{#snippet child({ props })}
+														<a href={subItem.url} {...props}>
+															<span>{subItem.title}</span>
+														</a>
+													{/snippet}
+												</Sidebar.MenuSubButton>
+											</Sidebar.MenuSubItem>
+										{/each}
+									</Sidebar.MenuSub>
+								</Collapsible.Content>
+							</Sidebar.MenuItem>
+						</Collapsible.Root>
+					{/if}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<Sidebar.Menu>
-			<!-- <Sidebar.MenuItem class="m-1"> -->
-			<!-- 	<Sidebar.MenuButton -->
-			<!-- 		isActive={currentitem == 'Settings'} -->
-			<!-- 		onclick={() => handleMenuClick('Settings')} -->
-			<!-- 	> -->
-			<!-- 		{#snippet child({ props })} -->
-			<!-- 			<a href={resolve('/organization')} {...props}> -->
-			<!-- 				<Settings /> -->
-			<!-- 				<span>Settings</span> -->
-			<!-- 			</a> -->
-			<!-- 		{/snippet} -->
-			<!-- 	</Sidebar.MenuButton> -->
-			<!-- </Sidebar.MenuItem> -->
 			<Sidebar.MenuItem class="m-1">
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>
@@ -141,13 +186,6 @@
 						align="end"
 						class="w-(--bits-dropdown-menu-anchor-width)"
 					>
-						{#if hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)}
-							<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/organization'))}>
-								<Building class="mr-2 size-4" />
-								<span>My Organization</span>
-							</DropdownMenu.Item>
-							<DropdownMenu.Separator />
-						{/if}
 						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/profile'))}>
 							<span>My Profile</span>
 						</DropdownMenu.Item>

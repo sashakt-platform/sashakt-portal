@@ -21,8 +21,6 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log('Successfully fetched test link for test_id:', data);
-
 			return json(data);
 		}
 

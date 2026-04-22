@@ -223,4 +223,32 @@ describe('Organization Settings - actions.save', () => {
 			actions.save!(mockEvent({ fetch: vi.fn(), request: await buildRequestWithSettings() }))
 		).rejects.toMatchObject({ status: 403 });
 	});
+
+	it('PUTs platform_nomenclature payload to backend when included in body', async () => {
+		const body = defaultSettings() as Record<string, any>;
+		body.test_timings.value.start_time = '09:00';
+		body.test_timings.value.end_time = '17:00';
+		body.platform_nomenclature = {
+			mode: 'custom',
+			value: { tests: 'Exams', user: 'Member' }
+		};
+
+		const request = new Request('http://localhost', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ ...body, __superform_id: 'x' })
+		});
+		const fetchMock = vi.fn().mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+		try {
+			await actions.save!(mockEvent({ fetch: fetchMock, request }));
+		} catch {
+			/* expected redirect */
+		}
+
+		const sentBody = JSON.parse(fetchMock.mock.calls[0][1].body);
+		expect(sentBody.settings.platform_nomenclature.mode).toBe('custom');
+		expect(sentBody.settings.platform_nomenclature.value.tests).toBe('Exams');
+		expect(sentBody.settings.platform_nomenclature.value.user).toBe('Member');
+	});
 });

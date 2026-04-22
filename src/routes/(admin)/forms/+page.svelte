@@ -99,10 +99,10 @@
 						<FileText class="text-primary h-7 w-7" />
 					</div>
 					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
-						No {term('forms').toLowerCase()} yet
+						No {term('forms', 'lower')} yet
 					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first {term('form').toLowerCase()} to get started. {term('forms')} let you create
+						Create your first {term('form', 'lower')} to get started. {term('forms')} let you create
 						questions that test takers must answer before starting the test.
 					</p>
 					{#if canCreate(data.user, 'form')}
@@ -119,7 +119,7 @@
 
 	{#snippet filters()}
 		<div class="flex items-center justify-between gap-2">
-			<SearchInput placeholder={`Search ${term('forms').toLowerCase()}...`} value={search} />
+			<SearchInput placeholder={`Search ${term('forms', 'lower')}...`} value={search} />
 			<Popover.Root bind:open={statusOpen}>
 				<Popover.Trigger>
 					{#snippet child({ props })}

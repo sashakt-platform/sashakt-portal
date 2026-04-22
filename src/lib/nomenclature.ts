@@ -73,6 +73,42 @@ export function resolveAll(
 export type NomenclatureContext = () => Record<NomenclatureKey, string>;
 
 /**
+ * Casing modifier applied to the resolved label.
+ *
+ * - `'title'` (default) — return the label as stored (Title Case for built-in
+ *   defaults; whatever the admin entered for custom labels).
+ * - `'lower'` — lowercase the resolved label, useful inside sentence-cased copy
+ *   like `` `No ${term('tags', 'lower')} yet` ``.
+ * - `'upper'` — uppercase the label, useful for column-header / chip styling.
+ */
+export type TermCase = 'title' | 'lower' | 'upper';
+
+function applyCase(label: string, casing: TermCase): string {
+	switch (casing) {
+		case 'lower':
+			return label.toLowerCase();
+		case 'upper':
+			return label.toUpperCase();
+		case 'title':
+		default:
+			return label;
+	}
+}
+
+/**
+ * Resolve a label and apply the requested casing. Pure helper — call from any
+ * non-component context (server actions, utility modules) where the
+ * `PlatformNomenclatureSetting` is already available.
+ */
+export function resolveTerm(
+	nomenclature: PlatformNomenclatureSetting,
+	key: NomenclatureKey,
+	casing: TermCase = 'title'
+): string {
+	return applyCase(resolveLabel(nomenclature, key), casing);
+}
+
+/**
  * Capture the nomenclature context at component init time and return a resolver
  * usable anywhere (templates, snippets, derived, effects). The resolver always
  * reads the latest value via the context getter, so labels stay reactive.
@@ -81,16 +117,21 @@ export type NomenclatureContext = () => Record<NomenclatureKey, string>;
  *
  * Use this when looking up multiple keys or when the lookup
  * happens inside templates / snippets.
+ *
+ * Pass `casing` to control how the label renders inline:
+ * `term('tags')` → "Tags", `term('tags', 'lower')` → "tags",
+ * `term('tag_types', 'upper')` → "TAG TYPES".
  */
-export function useTerms(): (key: NomenclatureKey) => string {
+export function useTerms(): (key: NomenclatureKey, casing?: TermCase) => string {
 	const ctx = getContext<NomenclatureContext | undefined>(NOMENCLATURE_CONTEXT_KEY);
-	return (key) => ctx?.()?.[key] ?? NOMENCLATURE_DEFAULTS[key];
+	return (key, casing = 'title') =>
+		applyCase(ctx?.()?.[key] ?? NOMENCLATURE_DEFAULTS[key], casing);
 }
 
 /**
  * Single-key convenience wrapper. Must be called during component initialization
  * For repeated lookups in templates, prefer {@link useTerms}.
  */
-export function useTerm(key: NomenclatureKey): string {
-	return useTerms()(key);
+export function useTerm(key: NomenclatureKey, casing: TermCase = 'title'): string {
+	return useTerms()(key, casing);
 }

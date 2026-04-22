@@ -1,9 +1,10 @@
 import { BACKEND_URL } from '$env/static/private';
 import {
 	defaultNomenclatureSetting,
-	resolveLabel,
+	resolveTerm,
 	type NomenclatureKey,
-	type PlatformNomenclatureSetting
+	type PlatformNomenclatureSetting,
+	type TermCase
 } from '$lib/nomenclature';
 import { getSessionTokenCookie } from './auth';
 
@@ -47,13 +48,14 @@ export async function loadPlatformNomenclature(
 }
 
 /**
- * Returns a `(key) => string` resolver for use inside server actions. Mirrors
- * the client-side `useTerms` pattern but skips the Svelte context.
+ * Returns a `(key, casing?) => string` resolver for use inside server actions.
+ * Mirrors the client-side `useTerms` pattern (including the optional casing
+ * modifier) but skips the Svelte context.
  */
 export async function serverTerms(
 	orgId: number,
 	fetchFn: typeof globalThis.fetch = globalThis.fetch
-): Promise<(key: NomenclatureKey) => string> {
+): Promise<(key: NomenclatureKey, casing?: TermCase) => string> {
 	const nomenclature = await loadPlatformNomenclature(orgId, fetchFn);
-	return (key) => resolveLabel(nomenclature, key);
+	return (key, casing = 'title') => resolveTerm(nomenclature, key, casing);
 }

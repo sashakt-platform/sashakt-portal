@@ -162,7 +162,7 @@
 <div class="flex flex-col gap-4 p-6">
 	<!-- 0. Test Schedule (tests only, not templates) -->
 	{#if !$formData.is_template}
-		<ConfigureBox title="Test Schedule" Icon={Settings} defaultOpen={true}>
+		<ConfigureBox title={`${term('test')} Schedule`} Icon={Settings} defaultOpen={true}>
 			<div class="py-4 md:py-6">
 				<CalendarRange
 					rangeFromLabel="Start Time"
@@ -192,7 +192,7 @@
 					/>
 				</div>
 				<div>
-					{@render label('Test Completion Message')}
+					{@render label(`${term('test')} Completion Message`)}
 					<Textarea
 						name="completion_message"
 						placeholder="E.g., Thank you for completing the assessment. Your results will be shared soon."
@@ -244,11 +244,12 @@
 				{/if}
 
 				<div>
-					{@render label('Candidate Information Form')}
+					{@render label(`Candidate Information ${term('form')}`)}
 					<div class="flex items-center gap-2">
 						<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
 							{@render selectTrigger(
-								formsOptions.find((f) => f.id === $formData.form_id)?.name || 'Select Form',
+								formsOptions.find((f) => f.id === $formData.form_id)?.name ||
+								`Select ${term('form')}`,
 								!!$formData.form_id
 							)}
 							<Select.Content>
@@ -273,8 +274,8 @@
 						)}
 						<Select.Content>
 							<Select.Group>
-								<Select.Item value="" label={`No ${term('certificate').toLowerCase()}`}>
-									No {term('certificate').toLowerCase()}
+								<Select.Item value="" label={`No ${term('certificate', 'lower')}`}>
+									No {term('certificate', 'lower')}
 								</Select.Item>
 								{#each certificatesOptions as cert (cert.id)}
 									<Select.Item value={String(cert.id)}>{cert.name}</Select.Item>
@@ -337,7 +338,7 @@
 		</div>
 	{/snippet}
 	<!-- 2. Test Rules -->
-	<ConfigureBox title="Test Rules" Icon={Settings}>
+	<ConfigureBox title={`${term('test')} Rules`} Icon={Settings}>
 		<div class="flex flex-col lg:flex-row lg:gap-12">
 			<div class="flex flex-col gap-6 py-4 md:py-6 lg:w-1/2">
 				{#if !fixedTestTimings}
@@ -430,7 +431,7 @@
 				</div>
 
 				<div class="flex items-center justify-between">
-					{@render labelTestRules('Show result after test completion')}
+					{@render labelTestRules(`Show result after ${term('test', 'lower')} completion`)}
 					{@render yesNo(
 						$formData.show_result,
 						() => ($formData.show_result = true),
@@ -440,7 +441,7 @@
 
 				{#if !fixedPalette}
 					<div class="flex items-center justify-between">
-						{@render labelTestRules('Show question palette during test')}
+						{@render labelTestRules(`Show question palette during ${term('test', 'lower')}`)}
 						{@render yesNo(
 							$formData.show_question_palette,
 							() => ($formData.show_question_palette = true),
@@ -462,7 +463,7 @@
 
 				{#if !fixedAnswerReview}
 					<div class="flex items-center justify-between">
-						{@render labelTestRules('Show feedback after test completion')}
+						{@render labelTestRules(`Show feedback after ${term('test', 'lower')} completion`)}
 
 						{@render yesNo(
 							$formData.show_feedback_on_completion,
@@ -519,7 +520,7 @@
 						<div class="flex items-start gap-3">
 							<RadioGroup.Item value={MarksLevel.TEST} id="test_level" class="mt-0.5" />
 							<div>
-								<p class="text-sm font-semibold text-gray-800">Test Level Marking</p>
+								<p class="text-sm font-semibold text-gray-800">{term('test')} Level Marking</p>
 								<p class="text-sm text-gray-500">
 									Apply uniform marks across all questions in this test
 								</p>

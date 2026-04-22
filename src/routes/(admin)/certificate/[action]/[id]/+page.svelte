@@ -59,7 +59,7 @@
 				<a
 					href={resolve('/certificate')}
 					class="hover:bg-muted rounded-lg border p-2"
-					aria-label={`Back to ${term('certificates').toLowerCase()}`}
+					aria-label={`Back to ${term('certificates', 'lower')}`}
 				>
 					<ArrowLeft size={20} />
 				</a>
@@ -88,7 +88,7 @@
 							id="name"
 							type="text"
 							name="name"
-							placeholder={`Name of this ${term('certificate').toLowerCase()}...`}
+							placeholder={`Name of this ${term('certificate', 'lower')}...`}
 							bind:value={$formData.name}
 						/>
 						{#if $errors.name}
@@ -101,7 +101,7 @@
 						<Textarea
 							id="description"
 							name="description"
-							placeholder={`Brief description of this ${term('certificate').toLowerCase()}...`}
+							placeholder={`Brief description of this ${term('certificate', 'lower')}...`}
 							bind:value={$formData.description}
 						/>
 					</div>

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		tagType,
@@ -31,7 +34,7 @@
 					type="button"
 					class="text-muted-foreground hover:text-foreground rounded p-1"
 					onclick={() => onEdit?.(tagType)}
-					title="Edit tag type"
+					title={`Edit ${term('tag_type', 'lower')}`}
 				>
 					<Pencil class="h-3.5 w-3.5" />
 				</button>
@@ -41,7 +44,7 @@
 					type="button"
 					class="text-muted-foreground hover:text-destructive rounded p-1"
 					onclick={() => onDelete?.(tagType)}
-					title="Delete tag type"
+					title={`Delete ${term('tag_type', 'lower')}`}
 				>
 					<Trash2 class="h-3.5 w-3.5" />
 				</button>

@@ -207,7 +207,7 @@
 								class="bg-primary hover:bg-primary/90 w-full sm:w-auto"
 								onclick={handleSelectionConfirm}
 							>
-								Add Questions to {$formData.is_template ? 'Template' : 'Test'}
+								Add Questions to {$formData.is_template ? term('test_template') : term('test')}
 							</Button>
 						</div>
 					</div>

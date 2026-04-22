@@ -46,13 +46,11 @@
 		},
 		{
 			title: `Generate ${term('test_templates')}`,
-			description:
-				'Customize test templates to suit diverse requirements, ensuring consistency and ease of use.'
+			description: `Customize ${term('test_templates', 'lower')} to suit diverse requirements, ensuring consistency and ease of use.`
 		},
 		{
 			title: `Create and Assign ${term('tests')}`,
-			description:
-				'Build, schedule, and assign tests seamlessly to streamline the evaluation process.'
+			description: `Build, schedule, and assign ${term('tests', 'lower')} seamlessly to streamline the evaluation process.`
 		},
 		{
 			title: 'Monitor Analytics',
@@ -61,7 +59,7 @@
 		},
 		{
 			title: `${term('user')} Management`,
-			description: 'Add, manage, and oversee user roles to ensure collaboration and control.'
+			description: `Add, manage, and oversee ${term('user', 'lower')} roles to ensure collaboration and control.`
 		}
 	]);
 
@@ -231,7 +229,7 @@
 	</div>
 	<div class="flex flex-col rounded-xl bg-white p-4">
 		<div class="mb-4">
-			<p class="font-semibold">Summary of Test Attempts</p>
+			<p class="font-semibold">Summary of {term('test')} Attempts</p>
 		</div>
 		<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
 			{@render dataBox(

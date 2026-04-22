@@ -72,10 +72,10 @@
 						<Boxes class="text-primary h-7 w-7" />
 					</div>
 					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
-						No {term('entities').toLowerCase()} yet
+						No {term('entities', 'lower')} yet
 					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first {term('entity').toLowerCase()} to get started. {term('entities')} let
+						Create your first {term('entity', 'lower')} to get started. {term('entities')} let
 						you define custom data types to organize and manage records.
 					</p>
 					{#if canCreate(data.user, 'entity')}
@@ -93,7 +93,7 @@
 	{#snippet filters()}
 		<div class="flex items-center justify-between gap-2">
 			<SearchInput
-				placeholder={`Search ${term('entities').toLowerCase()}...`}
+				placeholder={`Search ${term('entities', 'lower')}...`}
 				value={search}
 				useResolve
 			/>

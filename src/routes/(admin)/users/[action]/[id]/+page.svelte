@@ -20,7 +20,7 @@
 			<a
 				href={resolve('/users')}
 				class="hover:bg-muted rounded-lg border p-2"
-				aria-label={`Back to ${term('users').toLowerCase()}`}
+				aria-label={`Back to ${term('users', 'lower')}`}
 			>
 				<ArrowLeft size={20} />
 			</a>

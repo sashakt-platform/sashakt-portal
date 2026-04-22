@@ -137,7 +137,7 @@ export const actions: Actions = {
 				`/forms/edit/${newForm.id}`,
 				{
 					type: 'success',
-					message: `${term('form')} created successfully. Now add fields to your ${term('form').toLowerCase()}.`
+					message: `${term('form')} created successfully. Now add fields to your ${term('form', 'lower')}.`
 				},
 				cookies
 			);

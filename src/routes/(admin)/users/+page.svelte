@@ -55,7 +55,7 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<SearchInput placeholder={`Search ${term('users').toLowerCase()}...`} value={search} />
+		<SearchInput placeholder={`Search ${term('users', 'lower')}...`} value={search} />
 	{/snippet}
 
 	{#snippet content()}

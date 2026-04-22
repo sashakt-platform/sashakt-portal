@@ -74,12 +74,12 @@
 						<ShieldCheck class="text-primary h-7 w-7" />
 					</div>
 					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
-						No {term('certificates').toLowerCase()} yet
+						No {term('certificates', 'lower')} yet
 					</h2>
 					<p class="text-muted-foreground mt-2 max-w-sm text-center text-sm">
-						Create your first {term('certificate').toLowerCase()} to get started. {term(
+						Create your first {term('certificate', 'lower')} to get started. {term(
 							'certificates'
-						)} are awarded to candidates after they complete a {term('test').toLowerCase()}.
+						)} are awarded to candidates after they complete a {term('test', 'lower')}.
 					</p>
 					{#if canCreate(data.user, 'certificate')}
 						<div class="mt-6">
@@ -95,7 +95,7 @@
 
 	{#snippet filters()}
 		<div class="flex items-center justify-between gap-2">
-			<SearchInput placeholder={`Search ${term('certificates').toLowerCase()}...`} value={search} />
+			<SearchInput placeholder={`Search ${term('certificates', 'lower')}...`} value={search} />
 			<StatusFilter value={isActive} />
 		</div>
 	{/snippet}

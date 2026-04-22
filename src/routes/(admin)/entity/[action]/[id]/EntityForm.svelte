@@ -43,7 +43,7 @@
 				<a
 					href={resolve('/entity')}
 					class="hover:bg-muted rounded-lg border p-2"
-					aria-label={`Back to ${term('entities').toLowerCase()}`}
+					aria-label={`Back to ${term('entities', 'lower')}`}
 				>
 					<ArrowLeft size={20} />
 				</a>
@@ -70,7 +70,7 @@
 							id="name"
 							type="text"
 							name="name"
-							placeholder={`Name of this ${term('entity').toLowerCase()}...`}
+							placeholder={`Name of this ${term('entity', 'lower')}...`}
 							bind:value={$formData.name}
 						/>
 						{#if $errors.name}
@@ -83,7 +83,7 @@
 						<Textarea
 							id="description"
 							name="description"
-							placeholder={`Brief description of this ${term('entity').toLowerCase()}...`}
+							placeholder={`Brief description of this ${term('entity', 'lower')}...`}
 							bind:value={$formData.description}
 						/>
 					</div>

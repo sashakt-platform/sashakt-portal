@@ -150,13 +150,13 @@
 							<ClipboardList class="text-primary h-7 w-7" />
 						</div>
 						<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
-							No {term('test_templates').toLowerCase()} yet
+							No {term('test_templates', 'lower')} yet
 						</h2>
 						<p class="mt-2 max-w-md text-center text-sm text-gray-400">
-							Create your first {term('test_template').toLowerCase()} to get started. {term(
+							Create your first {term('test_template', 'lower')} to get started. {term(
 								'test_templates'
-							)} let you define question sets, scoring rules, and {term('test').toLowerCase()} configurations
-							that can be reused across multiple {term('test').toLowerCase()} sessions.
+							)} let you define question sets, scoring rules, and {term('test', 'lower')} configurations
+							that can be reused across multiple {term('test', 'lower')} sessions.
 						</p>
 						{#if canCreate(data.user, 'test-template')}
 							<div class="mt-6">
@@ -167,7 +167,7 @@
 						{/if}
 					{:else}
 						<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">
-							Create your first {term('test').toLowerCase()}
+							Create your first {term('test', 'lower')}
 						</h2>
 						<p class="mt-2 text-sm text-gray-400">Choose a method to get started</p>
 
@@ -199,7 +199,7 @@
 										Build from {term('test_template')}
 									</h3>
 									<p class="mt-1 text-center text-sm text-gray-400">
-										Pick a pre-configured {term('test_template').toLowerCase()} and schedule a session.
+										Pick a pre-configured {term('test_template', 'lower')} and schedule a session.
 									</p>
 								</a>
 							</div>
@@ -214,8 +214,8 @@
 		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
 			<SearchInput
 				placeholder={data?.is_template
-					? `Search ${term('test_templates').toLowerCase()}...`
-					: `Search ${term('tests').toLowerCase()}...`}
+					? `Search ${term('test_templates', 'lower')}...`
+					: `Search ${term('tests', 'lower')}...`}
 				value={search}
 			/>
 
@@ -257,8 +257,8 @@
 			{currentPage}
 			{pageSize}
 			emptyStateMessage={data?.is_template
-				? `No ${term('test_templates').toLowerCase()} found matching your criteria.`
-				: `No ${term('tests').toLowerCase()} found matching your criteria.`}
+				? `No ${term('test_templates', 'lower')} found matching your criteria.`
+				: `No ${term('tests', 'lower')} found matching your criteria.`}
 		/>
 	{/snippet}
 </ListingPageLayout>

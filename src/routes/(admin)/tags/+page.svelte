@@ -153,10 +153,10 @@
 						<MessageSquareCode class="text-primary h-7 w-7" />
 					</div>
 					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
-						No {term('tag_types').toLowerCase()} yet
+						No {term('tag_types', 'lower')} yet
 					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first {term('tag_type').toLowerCase()} to get started. {term(
+						Create your first {term('tag_type', 'lower')} to get started. {term(
 							'tag_types'
 						)} let you categorize and filter questions.
 					</p>
@@ -174,7 +174,7 @@
 
 	{#snippet filters()}
 		<SearchInput
-			placeholder={`Search ${term('tag_types').toLowerCase()} or ${term('tags').toLowerCase()}...`}
+			placeholder={`Search ${term('tag_types', 'lower')} or ${term('tags', 'lower')}...`}
 			value={searchValue}
 			useResolve
 		/>

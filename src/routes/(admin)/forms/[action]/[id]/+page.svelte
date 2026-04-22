@@ -93,7 +93,7 @@
 		if (!isEditMode) {
 			// In create mode, save the form first
 			if (!$formData.name?.trim()) {
-				toast.error('Please enter a form name first');
+				toast.error(`Please enter a ${term('form', 'lower')} name first`);
 				return;
 			}
 			localStorage.setItem('openFieldChooser', 'true');
@@ -287,7 +287,7 @@
 				<div class="flex items-center gap-3">
 					<a
 						href={resolve('/forms/')}
-						aria-label={`Back to ${term('forms').toLowerCase()}`}
+						aria-label={`Back to ${term('forms', 'lower')}`}
 						class="text-foreground hover:bg-accent rounded-md p-1.5 transition-colors"
 					>
 						<ArrowLeft class="h-5 w-5" />
@@ -341,7 +341,7 @@
 								type="text"
 								name="description"
 								bind:value={$formData.description}
-								placeholder={`Brief description of this ${term('form').toLowerCase()}...`}
+								placeholder={`Brief description of this ${term('form', 'lower')}...`}
 							/>
 						</div>
 					</div>

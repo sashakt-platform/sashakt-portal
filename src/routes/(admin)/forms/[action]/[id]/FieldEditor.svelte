@@ -308,8 +308,9 @@
 					>
 						<Select.Trigger class="w-full">
 							{entityTypeId
-								? entityTypes.find((et) => et.id === entityTypeId)?.name || 'Select entity type'
-								: 'Select entity'}
+								? entityTypes.find((et) => et.id === entityTypeId)?.name ||
+									`Select ${term('entity', 'lower')} type`
+								: `Select ${term('entity', 'lower')}`}
 						</Select.Trigger>
 						<Select.Content>
 							{#each entityTypes as entityType (entityType.id)}

@@ -189,11 +189,11 @@
 	const steps = $derived.by(() => [
 		{
 			number: 1,
-			label: convertTemplate ? 'Select Template' : 'Primary Details',
+			label: convertTemplate ? `Select ${term('test_template')}` : 'Primary Details',
 			mode: typeOfScreen.primary
 		},
 		{ number: 2, label: 'Select Questions', mode: typeOfScreen.questions },
-		{ number: 3, label: 'Test Configuration', mode: typeOfScreen.configuration }
+		{ number: 3, label: `${term('test')} Configuration`, mode: typeOfScreen.configuration }
 	]);
 </script>
 

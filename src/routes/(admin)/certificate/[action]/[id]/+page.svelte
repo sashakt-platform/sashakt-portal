@@ -64,9 +64,7 @@
 					<ArrowLeft size={20} />
 				</a>
 				<h2 class="text-2xl font-bold tracking-tight">
-					{certificateData
-						? `Edit ${term('certificate')}`
-						: `Create ${term('certificate')}`}
+					{certificateData ? `Edit ${term('certificate')}` : `Create ${term('certificate')}`}
 				</h2>
 			</div>
 			<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>Save</Button>

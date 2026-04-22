@@ -92,10 +92,7 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		setFlash(
-			{ type: 'success', message: `${term('tag_type')} created successfully!` },
-			cookies
-		);
+		setFlash({ type: 'success', message: `${term('tag_type')} created successfully!` }, cookies);
 	},
 
 	updateTagType: async ({ request, cookies }) => {
@@ -129,10 +126,7 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		setFlash(
-			{ type: 'success', message: `${term('tag_type')} updated successfully!` },
-			cookies
-		);
+		setFlash({ type: 'success', message: `${term('tag_type')} updated successfully!` }, cookies);
 	},
 
 	createTag: async ({ request, cookies }) => {
@@ -265,9 +259,6 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		setFlash(
-			{ type: 'success', message: `${term('tag_type')} deleted successfully!` },
-			cookies
-		);
+		setFlash({ type: 'success', message: `${term('tag_type')} deleted successfully!` }, cookies);
 	}
 };

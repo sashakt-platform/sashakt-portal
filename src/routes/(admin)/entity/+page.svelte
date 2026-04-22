@@ -75,8 +75,8 @@
 						No {term('entities', 'lower')} yet
 					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first {term('entity', 'lower')} to get started. {term('entities')} let
-						you define custom data types to organize and manage records.
+						Create your first {term('entity', 'lower')} to get started. {term('entities')} let you define
+						custom data types to organize and manage records.
 					</p>
 					{#if canCreate(data.user, 'entity')}
 						<div class="mt-6">

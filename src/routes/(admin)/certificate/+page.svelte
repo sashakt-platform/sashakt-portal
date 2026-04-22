@@ -77,9 +77,8 @@
 						No {term('certificates', 'lower')} yet
 					</h2>
 					<p class="text-muted-foreground mt-2 max-w-sm text-center text-sm">
-						Create your first {term('certificate', 'lower')} to get started. {term(
-							'certificates'
-						)} are awarded to candidates after they complete a {term('test', 'lower')}.
+						Create your first {term('certificate', 'lower')} to get started. {term('certificates')} are
+						awarded to candidates after they complete a {term('test', 'lower')}.
 					</p>
 					{#if canCreate(data.user, 'certificate')}
 						<div class="mt-6">

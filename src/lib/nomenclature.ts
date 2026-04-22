@@ -124,8 +124,7 @@ export function resolveTerm(
  */
 export function useTerms(): (key: NomenclatureKey, casing?: TermCase) => string {
 	const ctx = getContext<NomenclatureContext | undefined>(NOMENCLATURE_CONTEXT_KEY);
-	return (key, casing = 'title') =>
-		applyCase(ctx?.()?.[key] ?? NOMENCLATURE_DEFAULTS[key], casing);
+	return (key, casing = 'title') => applyCase(ctx?.()?.[key] ?? NOMENCLATURE_DEFAULTS[key], casing);
 }
 
 /**

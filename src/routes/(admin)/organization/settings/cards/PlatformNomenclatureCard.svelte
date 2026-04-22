@@ -91,9 +91,7 @@
 								{/if}
 							</span>
 							{#if row.singular}
-								<span
-									class={['text-sm', isCustom ? 'text-foreground' : 'text-muted-foreground']}
-								>
+								<span class={['text-sm', isCustom ? 'text-foreground' : 'text-muted-foreground']}>
 									{NOMENCLATURE_DEFAULTS[row.singular]}
 									<span class="text-muted-foreground ml-1 text-xs">(singular)</span>
 								</span>

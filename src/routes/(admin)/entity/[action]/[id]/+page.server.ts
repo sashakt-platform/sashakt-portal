@@ -170,8 +170,7 @@ export const actions: Actions = {
 					{
 						type: 'error',
 						message:
-							errorMessage.detail ||
-							`${term('entity')} not created. Please check all the details.`
+							errorMessage.detail || `${term('entity')} not created. Please check all the details.`
 					},
 					cookies
 				);
@@ -195,8 +194,7 @@ export const actions: Actions = {
 					{
 						type: 'error',
 						message:
-							errorMessage.detail ||
-							`${term('entity')} not updated. Please check all the details.`
+							errorMessage.detail || `${term('entity')} not updated. Please check all the details.`
 					},
 					cookies
 				);

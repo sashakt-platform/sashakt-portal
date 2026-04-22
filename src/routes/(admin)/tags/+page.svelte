@@ -156,9 +156,8 @@
 						No {term('tag_types', 'lower')} yet
 					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first {term('tag_type', 'lower')} to get started. {term(
-							'tag_types'
-						)} let you categorize and filter questions.
+						Create your first {term('tag_type', 'lower')} to get started. {term('tag_types')} let you
+						categorize and filter questions.
 					</p>
 					{#if userCanCreate}
 						<div class="mt-6">

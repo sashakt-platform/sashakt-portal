@@ -123,8 +123,7 @@ export const actions: Actions = {
 					{
 						type: 'error',
 						message:
-							errorMessage.detail ||
-							`${term('form')} not created. Please check all the details.`
+							errorMessage.detail || `${term('form')} not created. Please check all the details.`
 					},
 					cookies
 				);

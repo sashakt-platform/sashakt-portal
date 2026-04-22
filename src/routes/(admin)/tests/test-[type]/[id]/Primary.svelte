@@ -155,9 +155,7 @@
 			<hr class="border-border my-4" />
 			<div class="flex items-center justify-between pt-2">
 				<Label class="text-sm font-semibold text-gray-800">
-					{$formData.is_template
-						? `${term('test_template')} Status`
-						: `${term('test')} Status`}
+					{$formData.is_template ? `${term('test_template')} Status` : `${term('test')} Status`}
 				</Label>
 				<div class="flex items-center gap-2">
 					<span

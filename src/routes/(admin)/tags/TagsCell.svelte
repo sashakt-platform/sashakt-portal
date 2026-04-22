@@ -4,6 +4,9 @@
 	import X from '@lucide/svelte/icons/x';
 	import { enhance } from '$app/forms';
 	import TagChip from './TagChip.svelte';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		tags = [],
@@ -67,7 +70,7 @@
 				<input
 					type="text"
 					name="name"
-					placeholder="Tag name..."
+					placeholder={`${term('tag')} name...`}
 					class="w-24 border-none bg-transparent text-xs font-medium outline-none"
 					autofocus
 					onkeydown={(e) => {
@@ -93,7 +96,7 @@
 			onclick={() => (addingTag = true)}
 		>
 			<Plus class="h-3.5 w-3.5" />
-			Add tag
+			Add {term('tag', 'lower')}
 		</button>
 	{/if}
 </div>

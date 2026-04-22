@@ -102,8 +102,8 @@
 						No {term('forms', 'lower')} yet
 					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first {term('form', 'lower')} to get started. {term('forms')} let you create
-						questions that test takers must answer before starting the test.
+						Create your first {term('form', 'lower')} to get started. {term('forms')} let you create questions
+						that test takers must answer before starting the test.
 					</p>
 					{#if canCreate(data.user, 'form')}
 						<div class="mt-6">

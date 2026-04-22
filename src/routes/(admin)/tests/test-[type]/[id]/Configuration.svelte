@@ -249,7 +249,7 @@
 						<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
 							{@render selectTrigger(
 								formsOptions.find((f) => f.id === $formData.form_id)?.name ||
-								`Select ${term('form')}`,
+									`Select ${term('form')}`,
 								!!$formData.form_id
 							)}
 							<Select.Content>

@@ -67,7 +67,7 @@ vi.mock('./columns.js', () => ({
 	})
 }));
 
-import { canCreate, isStateAdmin, hasAssignedDistricts, canRead } from '$lib/utils/permissions.js';
+import { canCreate, isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 

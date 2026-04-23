@@ -28,6 +28,12 @@ function normalizeSettingsFromBackend(raw: OrganizationSettings): OrganizationSe
 		platform_nomenclature: {
 			mode: raw.platform_nomenclature?.mode ?? 'default',
 			value: fillMissingNomenclatureKeys(raw.platform_nomenclature?.value)
+		},
+		platform_guide: {
+			value: { file_path: raw.platform_guide?.value?.file_path ?? null }
+		},
+		analytics_link: {
+			value: { url: raw.analytics_link?.value?.url ?? null }
 		}
 	};
 }

@@ -88,7 +88,7 @@ describe('Organization Page Server', () => {
 				json: async () => mockOrganization
 			});
 
-			const result = await load({ fetch: mockFetch } as any);
+			const result = await load({ fetch: mockFetch, locals: { user: null } } as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
 				'http://localhost:8000/organization/current',
@@ -108,7 +108,7 @@ describe('Organization Page Server', () => {
 				statusText: 'Not Found'
 			});
 
-			const result = await load({ fetch: mockFetch } as any);
+			const result = await load({ fetch: mockFetch, locals: { user: null } } as any);
 
 			expect(result.currentOrganization).toBeNull();
 		});
@@ -116,7 +116,7 @@ describe('Organization Page Server', () => {
 		it('should return null organization data when fetch throws', async () => {
 			mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-			const result = await load({ fetch: mockFetch } as any);
+			const result = await load({ fetch: mockFetch, locals: { user: null } } as any);
 
 			expect(result.currentOrganization).toBeNull();
 		});
@@ -133,7 +133,7 @@ describe('Organization Page Server', () => {
 				json: async () => mockOrganization
 			});
 
-			const result = await load({ fetch: mockFetch } as any);
+			const result = await load({ fetch: mockFetch, locals: { user: null } } as any);
 
 			expect(result.currentOrganization?.logo).toBe('https://example.com/uploads/logo.png');
 		});
@@ -150,9 +150,39 @@ describe('Organization Page Server', () => {
 				json: async () => mockOrganization
 			});
 
-			const result = await load({ fetch: mockFetch } as any);
+			const result = await load({ fetch: mockFetch, locals: { user: null } } as any);
 
 			expect(result.currentOrganization?.logo).toBeNull();
+		});
+
+		it('should expose platform_guide and analytics_link from settings', async () => {
+			mockFetch
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => ({ name: 'Org', shortcode: 'org', logo: null })
+				})
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => ({
+						settings: {
+							platform_guide: { value: { file_path: 'https://cdn.example.com/uploads/guide.pdf' } },
+							analytics_link: { value: { url: 'https://lookerstudio.google.com/abc' } }
+						}
+					})
+				});
+
+			const result = await load({
+				fetch: mockFetch,
+				locals: { user: { organization_id: 42 } }
+			} as any);
+
+			expect(result.platformGuideUrl).toBe('https://cdn.example.com/uploads/guide.pdf');
+			expect(result.platformGuideFilename).toBe('guide.pdf');
+			expect(result.analyticsLinkUrl).toBe('https://lookerstudio.google.com/abc');
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://localhost:8000/organization/42/settings',
+				expect.objectContaining({ method: 'GET' })
+			);
 		});
 	});
 
@@ -176,7 +206,8 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: makeCookies()
+					cookies: makeCookies(),
+					locals: { user: null }
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {
@@ -221,7 +252,8 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: makeCookies()
+					cookies: makeCookies(),
+					locals: { user: null }
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {
@@ -262,7 +294,8 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: makeCookies()
+					cookies: makeCookies(),
+					locals: { user: null }
 				} as any);
 			} catch (error: any) {
 				// Expected redirect
@@ -291,7 +324,8 @@ describe('Organization Page Server', () => {
 			const result = await actions.save({
 				request: mockRequest,
 				fetch: mockFetch,
-				cookies: makeCookies()
+				cookies: makeCookies(),
+				locals: { user: null }
 			} as any);
 
 			expect(result?.status).toBe(401);
@@ -323,7 +357,8 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies
+					cookies,
+					locals: { user: null }
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {
@@ -332,6 +367,137 @@ describe('Organization Page Server', () => {
 
 			expect(invalidateOrganizationCache).toHaveBeenCalledWith(previousShortcode);
 			expect(invalidateOrganizationCache).toHaveBeenCalledWith(newShortcode);
+		});
+
+		it('should upload platform guide PDF to the platform_guide endpoint', async () => {
+			const pdfFile = new File(['%PDF-1.4 fake'], 'guide.pdf', { type: 'application/pdf' });
+			const formData = new FormData();
+			formData.append('name', 'Org');
+			formData.append('shortcode', 'org');
+			formData.append('platform_guide', pdfFile);
+
+			const mockRequest = new Request('http://localhost', {
+				method: 'POST',
+				body: formData
+			});
+
+			mockFetch
+				// PATCH /organization/current
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ id: 1 }) })
+				// POST /organization/42/platform_guide
+				.mockResolvedValueOnce({ ok: true, json: async () => ({}) })
+				// GET /organization/42/settings (for analytics comparison)
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => ({
+						settings: { analytics_link: { value: { url: null } } }
+					})
+				});
+
+			try {
+				await actions.save({
+					request: mockRequest,
+					fetch: mockFetch,
+					cookies: makeCookies(),
+					locals: { user: { organization_id: 42 } }
+				} as any);
+			} catch {
+				/* expected redirect */
+			}
+
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://localhost:8000/organization/42/platform_guide',
+				expect.objectContaining({
+					method: 'POST',
+					headers: expect.objectContaining({ Authorization: 'Bearer mock-token' })
+				})
+			);
+		});
+
+		it('should PUT settings when analytics_link changed', async () => {
+			const formData = new FormData();
+			formData.append('name', 'Org');
+			formData.append('shortcode', 'org');
+			formData.append('analytics_link', 'https://lookerstudio.google.com/new');
+
+			const mockRequest = new Request('http://localhost', {
+				method: 'POST',
+				body: formData
+			});
+
+			mockFetch
+				// PATCH /organization/current
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ id: 1 }) })
+				// GET /organization/42/settings
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => ({
+						settings: {
+							version: 3,
+							analytics_link: { value: { url: 'https://old.example.com' } }
+						}
+					})
+				})
+				// PUT /organization/42/settings
+				.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+			try {
+				await actions.save({
+					request: mockRequest,
+					fetch: mockFetch,
+					cookies: makeCookies(),
+					locals: { user: { organization_id: 42 } }
+				} as any);
+			} catch {
+				/* expected redirect */
+			}
+
+			const putCall = mockFetch.mock.calls.find(
+				(c) => c[0] === 'http://localhost:8000/organization/42/settings' && c[1].method === 'PUT'
+			);
+			expect(putCall).toBeDefined();
+			const body = JSON.parse(putCall![1].body);
+			expect(body.settings.analytics_link.value.url).toBe('https://lookerstudio.google.com/new');
+		});
+
+		it('should not PUT settings when analytics_link is unchanged', async () => {
+			const formData = new FormData();
+			formData.append('name', 'Org');
+			formData.append('shortcode', 'org');
+			formData.append('analytics_link', 'https://same.example.com');
+
+			const mockRequest = new Request('http://localhost', {
+				method: 'POST',
+				body: formData
+			});
+
+			mockFetch
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ id: 1 }) })
+				.mockResolvedValueOnce({
+					ok: true,
+					json: async () => ({
+						settings: {
+							version: 3,
+							analytics_link: { value: { url: 'https://same.example.com' } }
+						}
+					})
+				});
+
+			try {
+				await actions.save({
+					request: mockRequest,
+					fetch: mockFetch,
+					cookies: makeCookies(),
+					locals: { user: { organization_id: 42 } }
+				} as any);
+			} catch {
+				/* expected redirect */
+			}
+
+			const putCall = mockFetch.mock.calls.find(
+				(c) => c[0] === 'http://localhost:8000/organization/42/settings' && c[1].method === 'PUT'
+			);
+			expect(putCall).toBeUndefined();
 		});
 
 		it('should redirect with success message after successful save', async () => {
@@ -353,7 +519,8 @@ describe('Organization Page Server', () => {
 				await actions.save({
 					request: mockRequest,
 					fetch: mockFetch,
-					cookies: makeCookies()
+					cookies: makeCookies(),
+					locals: { user: null }
 				} as any);
 				expect.fail('Should have thrown redirect');
 			} catch (error: any) {

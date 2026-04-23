@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import FileWarning from '@lucide/svelte/icons/file-warning';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
@@ -14,8 +13,10 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
+	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+	import Download from '@lucide/svelte/icons/download';
+	import LogOut from '@lucide/svelte/icons/log-out';
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
-	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { useTerms, type NomenclatureKey } from '$lib/nomenclature';
@@ -29,17 +30,17 @@
 
 	// Menu items
 	const menu_items: MenuItem[] = [
-		{ termKey: 'question_bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
+		{ termKey: 'tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
 		{
 			termKey: 'test_templates',
 			url: '/tests/test-template',
 			icon: ClipboardList,
 			entity: 'test-template'
 		},
-		{ termKey: 'tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
+		{ termKey: 'question_bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
 		{ termKey: 'tag_management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
-		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
 		{ termKey: 'forms', url: '/forms', icon: FileText, entity: 'form' },
+		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
 		{ termKey: 'entities', url: '/entity', icon: Boxes, entity: 'entity' },
 		{ termKey: 'users', url: '/users', icon: User, entity: 'user' }
 	];
@@ -80,14 +81,6 @@
 		if (sidebar.isMobile) {
 			sidebar.setOpenMobile(false);
 		}
-	}
-
-	// Helper function to handle dropdown menu item navigation
-	function handleDropdownNavigate(url: string) {
-		if (sidebar.isMobile) {
-			sidebar.setOpenMobile(false);
-		}
-		goto(url);
 	}
 </script>
 
@@ -171,38 +164,70 @@
 							</Sidebar.MenuItem>
 						</Collapsible.Root>
 					{/if}
+
+					{#if data.analyticsLinkUrl}
+						<Sidebar.MenuItem class="m-1">
+							<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+								{#snippet child({ props })}
+									<a
+										href={data.analyticsLinkUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										{...props}
+									>
+										<BarChart3 />
+										<span>Analytics</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+					{/if}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<Sidebar.Menu>
-			<Sidebar.MenuItem class="m-1">
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger>
+			{#if data.platformGuideUrl}
+				<Sidebar.MenuItem class="m-1">
+					<Sidebar.MenuButton onclick={() => handleMenuClick()}>
 						{#snippet child({ props })}
-							<Sidebar.MenuButton
-								{...props}
-								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-							>
-								<User />
-								<span>{data.user && data.user.full_name}</span>
-							</Sidebar.MenuButton>
+							<a href={data.platformGuideUrl} target="_blank" rel="noopener noreferrer" {...props}>
+								<Download />
+								<span>Platform Guide PDF</span>
+							</a>
 						{/snippet}
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content
-						side="top"
-						align="end"
-						class="w-(--bits-dropdown-menu-anchor-width)"
-					>
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/profile'))}>
-							<span>My Profile</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/logout'))}>
-							<span>Sign out</span>
-						</DropdownMenu.Item>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+				<Sidebar.Separator class="my-2" />
+			{/if}
+			<Sidebar.MenuItem class="m-1">
+				<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+					{#snippet child({ props })}
+						<a href={resolve('/profile')} {...props}>
+							<User />
+							<span>{data.user && data.user.full_name}</span>
+						</a>
+					{/snippet}
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+			<Sidebar.MenuItem class="m-1">
+				<Sidebar.MenuButton
+					onclick={() => handleMenuClick()}
+					class="text-destructive hover:bg-destructive/10 hover:text-destructive"
+				>
+					{#snippet child({ props })}
+						<a
+							href={resolve('/logout')}
+							data-sveltekit-preload-data="off"
+							data-sveltekit-preload-code="off"
+							{...props}
+						>
+							<LogOut />
+							<span>Logout</span>
+						</a>
+					{/snippet}
+				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Footer>

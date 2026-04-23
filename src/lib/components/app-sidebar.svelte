@@ -14,6 +14,8 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
+	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+	import Download from '@lucide/svelte/icons/download';
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -171,12 +173,47 @@
 							</Sidebar.MenuItem>
 						</Collapsible.Root>
 					{/if}
+
+					{#if data.analyticsLinkUrl}
+						<Sidebar.MenuItem class="m-1">
+							<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+								{#snippet child({ props })}
+									<a
+										href={data.analyticsLinkUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										{...props}
+									>
+										<BarChart3 />
+										<span>Analytics</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+					{/if}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<Sidebar.Menu>
+			{#if data.platformGuideUrl}
+				<Sidebar.MenuItem class="m-1">
+					<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+						{#snippet child({ props })}
+							<a
+								href={data.platformGuideUrl}
+								target="_blank"
+								rel="noopener noreferrer"
+								{...props}
+							>
+								<Download />
+								<span>Platform Guide PDF</span>
+							</a>
+						{/snippet}
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+			{/if}
 			<Sidebar.MenuItem class="m-1">
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger>

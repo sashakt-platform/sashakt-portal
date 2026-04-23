@@ -105,8 +105,20 @@ const platformNomenclatureSchema = z.object({
 	})
 });
 
+const platformGuideSchema = z.object({
+	value: z.object({
+		file_path: z.string().nullable().default(null)
+	})
+});
+
+const analyticsLinkSchema = z.object({
+	value: z.object({
+		url: z.string().nullable().default(null)
+	})
+});
+
 export const organizationSettingsSchema = z.object({
-	version: z.literal(2).default(2),
+	version: z.literal(3).default(3),
 	test_timings: testTimingsSchema,
 	questions_per_page: questionsPerPageSchema,
 	marking_scheme: markingSchemeSchema,
@@ -114,7 +126,9 @@ export const organizationSettingsSchema = z.object({
 	question_palette: questionPaletteSchema,
 	mark_for_review: markForReviewSchema,
 	omr_mode: omrModeSchema,
-	platform_nomenclature: platformNomenclatureSchema
+	platform_nomenclature: platformNomenclatureSchema,
+	platform_guide: platformGuideSchema,
+	analytics_link: analyticsLinkSchema
 });
 
 export type OrganizationSettingsSchema = typeof organizationSettingsSchema;

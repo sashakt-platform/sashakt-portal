@@ -45,7 +45,7 @@ vi.mock('sveltekit-flash-message/server', () => ({
 
 function defaultSettings() {
 	return {
-		version: 1,
+		version: 3,
 		test_timings: {
 			mode: 'fixed',
 			value: { time_limit: 60, start_time: '09:00:00', end_time: '17:00:00' }
@@ -55,7 +55,9 @@ function defaultSettings() {
 		answer_review: { mode: 'fixed', value: { default: 'off' } },
 		question_palette: { mode: 'fixed', value: { default: true } },
 		mark_for_review: { mode: 'fixed', value: { default: true } },
-		omr_mode: { mode: 'fixed', value: { default: false } }
+		omr_mode: { mode: 'fixed', value: { default: false } },
+		platform_guide: { value: { file_path: null } },
+		analytics_link: { value: { url: null } }
 	};
 }
 

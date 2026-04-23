@@ -9,7 +9,7 @@ import { MAX_NOMENCLATURE_LABEL_LEN, NOMENCLATURE_DEFAULTS } from '$lib/nomencla
 
 function validBaseSettings() {
 	return {
-		version: 2,
+		version: 3,
 		test_timings: {
 			mode: 'fixed',
 			value: { time_limit: 60, start_time: '09:00:00', end_time: '17:00:00' }
@@ -23,7 +23,9 @@ function validBaseSettings() {
 		platform_nomenclature: {
 			mode: 'default',
 			value: fillMissingNomenclatureKeys({})
-		}
+		},
+		platform_guide: { value: { file_path: null } },
+		analytics_link: { value: { url: null } }
 	};
 }
 
@@ -96,11 +98,36 @@ describe('organizationSettingsSchema — platform_nomenclature', () => {
 		expect(result.success).toBe(false);
 	});
 
-	it('pins version to literal 2', () => {
+	it('pins version to literal 3', () => {
 		const settings = validBaseSettings();
-		settings.version = 1 as 2; // wrong version
+		settings.version = 2 as 3; // wrong version
 		const result = organizationSettingsSchema.safeParse(settings);
 		expect(result.success).toBe(false);
+	});
+});
+
+describe('organizationSettingsSchema — platform_guide & analytics_link', () => {
+	it('accepts null file_path and null url', () => {
+		const result = organizationSettingsSchema.safeParse(validBaseSettings());
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts a resolved file_path URL and analytics URL', () => {
+		const settings = validBaseSettings();
+		settings.platform_guide = { value: { file_path: 'https://cdn.example.com/guide.pdf' } };
+		settings.analytics_link = { value: { url: 'https://lookerstudio.google.com/abc' } };
+		const result = organizationSettingsSchema.safeParse(settings);
+		expect(result.success).toBe(true);
+	});
+
+	it('rejects payloads missing platform_guide or analytics_link', () => {
+		const s1 = validBaseSettings() as Record<string, unknown>;
+		delete s1.platform_guide;
+		expect(organizationSettingsSchema.safeParse(s1).success).toBe(false);
+
+		const s2 = validBaseSettings() as Record<string, unknown>;
+		delete s2.analytics_link;
+		expect(organizationSettingsSchema.safeParse(s2).success).toBe(false);
 	});
 });
 

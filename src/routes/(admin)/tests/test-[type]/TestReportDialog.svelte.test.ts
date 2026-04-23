@@ -194,7 +194,10 @@ describe('TestReportDialog', () => {
 			renderDialog({ open: true, testId: '42' });
 
 			await waitFor(() => {
-				expect(mockFetch).toHaveBeenCalledWith('/api/test-report?test_id=42');
+				expect(mockFetch).toHaveBeenCalledWith(
+					'/api/test-report?test_id=42',
+					expect.objectContaining({ signal: expect.any(AbortSignal) })
+				);
 			});
 		});
 
@@ -203,7 +206,10 @@ describe('TestReportDialog', () => {
 			renderDialog({ open: true, testId: 'test/id&value' });
 
 			await waitFor(() => {
-				expect(mockFetch).toHaveBeenCalledWith('/api/test-report?test_id=test%2Fid%26value');
+				expect(mockFetch).toHaveBeenCalledWith(
+					'/api/test-report?test_id=test%2Fid%26value',
+					expect.objectContaining({ signal: expect.any(AbortSignal) })
+				);
 			});
 		});
 

@@ -26,21 +26,27 @@
 			error = null;
 			reportData = null;
 
-			fetch(`/api/test-report?test_id=${encodeURIComponent(testId)}`)
+			const controller = new AbortController();
+
+			fetch(`/api/test-report?test_id=${encodeURIComponent(testId)}`, {
+				signal: controller.signal
+			})
 				.then((res) => {
 					if (!res.ok) throw new Error('Failed to load report');
 					return res.json();
 				})
 				.then((data) => {
 					reportData = data;
+					loading = false;
 				})
 				.catch((err) => {
+					if (err?.name === 'AbortError') return;
 					console.error('Failed to fetch test report:', err);
 					error = 'Failed to load report. Please try again.';
-				})
-				.finally(() => {
 					loading = false;
 				});
+
+			return () => controller.abort();
 		}
 	});
 

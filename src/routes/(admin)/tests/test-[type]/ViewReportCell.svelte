@@ -4,6 +4,11 @@
 	let { onClick }: { onClick: () => void } = $props();
 </script>
 
-<Button variant="outline" size="sm" class="text-primary border-primary/40 font-medium" onclick={onClick}>
+<Button
+	variant="outline"
+	size="sm"
+	class="text-primary border-primary/40 font-medium"
+	onclick={onClick}
+>
 	View Report
 </Button>

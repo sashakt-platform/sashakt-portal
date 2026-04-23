@@ -20,6 +20,7 @@ vi.mock('$lib/constants', () => ({
 
 vi.mock('$lib/utils/permissions.js', () => ({
 	canCreate: vi.fn(() => false),
+	canRead: vi.fn(() => false),
 	canUpdate: vi.fn(() => false),
 	canDelete: vi.fn(() => false),
 	isStateAdmin: vi.fn(() => false),

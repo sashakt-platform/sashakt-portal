@@ -20,6 +20,7 @@
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import {
 		canCreate,
+		canRead,
 		canUpdate,
 		canDelete,
 		isStateAdmin,
@@ -128,11 +129,10 @@
 			>
 		{:else if !data?.is_template && canCreate(data.user, 'test')}
 			<a href={page.url.pathname + '/new'}
-				><Button
-					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
-					variant="outline"><Plus />Create Manually</Button
-				></a
+				><Button class="font-semibold"><Plus />Create Manually</Button></a
 			>
+		{/if}
+		{#if !data?.is_template && canRead(data.user, 'test-template')}
 			<a href={page.url.pathname + '/convert'}
 				><Button class="font-semibold"><Plus />Create from {term('test_template')}</Button></a
 			>

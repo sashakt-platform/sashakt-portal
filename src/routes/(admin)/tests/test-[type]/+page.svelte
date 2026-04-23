@@ -14,6 +14,7 @@
 	import TagsSelection from '$lib/components/TagsSelection.svelte';
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	import TestReportDialog from './TestReportDialog.svelte';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
@@ -100,7 +101,8 @@
 				canEdit: canUpdate(data.user, entityType),
 				canDelete: canDelete(data.user, entityType)
 			},
-			data.user
+			data.user,
+			handleViewReport
 		)
 	);
 
@@ -109,12 +111,21 @@
 	let filteredTagtypes: Filter[] = $state([]);
 	let filteredDistricts: Filter[] = $state([]);
 	let deleteAction: string | null = $state(null);
+	let reportDialogOpen = $state(false);
+	let reportTestId: string | null = $state(null);
+
+	function handleViewReport(testId: string) {
+		reportTestId = testId;
+		reportDialogOpen = true;
+	}
 </script>
 
 <DeleteDialog
 	bind:action={deleteAction}
 	elementName={data?.is_template ? term('test_template') : term('test')}
 />
+
+<TestReportDialog bind:open={reportDialogOpen} testId={reportTestId} />
 
 <ListingPageLayout
 	title={data?.is_template ? term('test_templates') : term('tests')}

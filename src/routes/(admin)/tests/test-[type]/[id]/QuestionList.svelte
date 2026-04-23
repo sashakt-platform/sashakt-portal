@@ -21,7 +21,7 @@
 		user = null
 	}: { formData: any; questions: any; questionParams: any; user?: User | null } = $props();
 	let dialogOpen = $state(false);
-	let questionSelectionMode: 'manual' | 'tagBased' = $state('manual');
+	let questionSelectionMode: 'manual' | 'tagBased' = $state('tagBased');
 
 	let totalSelectedCount = $derived(
 		$formData.question_revision_ids.length > 0

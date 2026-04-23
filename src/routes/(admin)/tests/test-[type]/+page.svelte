@@ -129,12 +129,9 @@
 		{:else if !data?.is_template && canCreate(data.user, 'test')}
 			<a href={page.url.pathname + '/new'}
 				><Button
-					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
-					variant="outline"><Plus />Create Manually</Button
+					class="border-primary text-primary-foreground hover:bg-primary/5 bg-primary font-semibold"
+					variant="outline"><Plus />Create New Test</Button
 				></a
-			>
-			<a href={page.url.pathname + '/convert'}
-				><Button class="font-semibold"><Plus />Create from {term('test_template')}</Button></a
 			>
 		{/if}
 	{/snippet}

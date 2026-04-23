@@ -1,8 +1,5 @@
 import { BACKEND_URL } from '$env/static/private';
-import {
-	defaultNomenclatureSetting,
-	type PlatformNomenclatureSetting
-} from '$lib/nomenclature';
+import { defaultNomenclatureSetting, type PlatformNomenclatureSetting } from '$lib/nomenclature';
 import { getSessionTokenCookie } from './auth';
 
 export interface OrganizationLayoutSettings {

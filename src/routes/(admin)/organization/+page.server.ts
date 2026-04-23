@@ -69,11 +69,7 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 		organizationData = null;
 	}
 
-	const settingsBody = await fetchOrganizationSettings(
-		fetch,
-		token,
-		locals.user?.organization_id
-	);
+	const settingsBody = await fetchOrganizationSettings(fetch, token, locals.user?.organization_id);
 	const settings = settingsBody?.settings ?? null;
 	const platformGuideUrl: string | null = settings?.platform_guide?.value?.file_path ?? null;
 	const analyticsLinkUrl: string | null = settings?.analytics_link?.value?.url ?? null;
@@ -145,8 +141,7 @@ export const actions: Actions = {
 			const submitted = (form.data.analytics_link ?? '').trim();
 			const newUrl: string | null = submitted === '' ? null : submitted;
 			const settingsBody = await fetchOrganizationSettings(fetch, token, orgId);
-			const currentUrl: string | null =
-				settingsBody?.settings?.analytics_link?.value?.url ?? null;
+			const currentUrl: string | null = settingsBody?.settings?.analytics_link?.value?.url ?? null;
 			if (settingsBody?.settings && currentUrl !== newUrl) {
 				const nextSettings = {
 					...settingsBody.settings,

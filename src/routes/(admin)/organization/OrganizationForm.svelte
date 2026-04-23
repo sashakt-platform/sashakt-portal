@@ -286,9 +286,7 @@
 									bind:this={pdfInput}
 									hidden
 								/>
-								<div
-									class="border-input bg-card flex h-9 items-center rounded-md border shadow-xs"
-								>
+								<div class="border-input bg-card flex h-9 items-center rounded-md border shadow-xs">
 									<div class="flex min-w-0 flex-1 items-center gap-2 px-3">
 										<FileText class="text-muted-foreground h-4 w-4 shrink-0" />
 										<span

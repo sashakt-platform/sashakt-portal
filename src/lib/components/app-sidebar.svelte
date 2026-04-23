@@ -201,12 +201,7 @@
 				<Sidebar.MenuItem class="m-1">
 					<Sidebar.MenuButton onclick={() => handleMenuClick()}>
 						{#snippet child({ props })}
-							<a
-								href={data.platformGuideUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								{...props}
-							>
+							<a href={data.platformGuideUrl} target="_blank" rel="noopener noreferrer" {...props}>
 								<Download />
 								<span>Platform Guide PDF</span>
 							</a>

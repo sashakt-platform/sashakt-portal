@@ -8,7 +8,13 @@
 	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
 	import Briefcase from '@lucide/svelte/icons/briefcase';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
-	import { canRead, hasAnyPermission, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
+	import {
+		canCreate,
+		canUpdate,
+		hasAnyPermission,
+		hasPermission,
+		PERMISSIONS
+	} from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
@@ -124,7 +130,7 @@
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
 					{#each menu_items as item (item.url)}
-						{#if !item.entity || canRead(data.user, item.entity)}
+						{#if !item.entity || canCreate(data.user, item.entity) || canUpdate(data.user, item.entity)}
 							{@render sidebaritems(item)}
 						{/if}
 					{/each}

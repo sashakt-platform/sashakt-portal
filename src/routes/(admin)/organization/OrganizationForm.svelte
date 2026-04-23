@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import ImageIcon from '@lucide/svelte/icons/image';
+	import FileText from '@lucide/svelte/icons/file-text';
+	import LinkIcon from '@lucide/svelte/icons/link';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import { Button } from '$lib/components/ui/button';
@@ -18,11 +20,20 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let orgData: Partial<Infer<EditOrganizationSchema>> | null = data?.currentOrganization || null;
+	let orgData: Partial<Infer<EditOrganizationSchema>> | null = data?.currentOrganization
+		? { ...data.currentOrganization, analytics_link: data.analyticsLinkUrl ?? '' }
+		: null;
 	let currentLogoUrl = $state<string | null>(data?.currentOrganization?.logo || null);
+	let currentPlatformGuideUrl = $state<string | null>(data?.platformGuideUrl ?? null);
+	let currentPlatformGuideName = $state<string | null>(data?.platformGuideFilename ?? null);
 
 	$effect(() => {
 		currentLogoUrl = data?.currentOrganization?.logo || null;
+	});
+
+	$effect(() => {
+		currentPlatformGuideUrl = data?.platformGuideUrl ?? null;
+		currentPlatformGuideName = data?.platformGuideFilename ?? null;
 	});
 
 	const form = superForm(orgData || data.form, {
@@ -33,6 +44,10 @@
 				fileInput.value = '';
 				fileInput.dispatchEvent(new Event('change', { bubbles: true }));
 			}
+			if (pdfInput) {
+				pdfInput.value = '';
+				pdfInput.dispatchEvent(new Event('change', { bubbles: true }));
+			}
 			if (result.type === 'redirect') {
 				invalidateAll();
 			}
@@ -41,14 +56,19 @@
 
 	const { form: formData, enhance, tainted, submitting } = form;
 	const logoFile = fileProxy(form, 'logo');
+	const platformGuideFile = fileProxy(form, 'platform_guide');
 
 	let fileInput: HTMLInputElement;
+	let pdfInput: HTMLInputElement;
 
 	const selectedFileName = $derived($logoFile?.[0]?.name || null);
 	let previewUrl = $state<string | null>(null);
 	const logoDisplayName = $derived(
 		selectedFileName ?? (currentLogoUrl ? currentLogoUrl.split('/').pop() : null)
 	);
+
+	const selectedPdfName = $derived($platformGuideFile?.[0]?.name || null);
+	const pdfDisplayName = $derived(selectedPdfName ?? currentPlatformGuideName);
 
 	$effect(() => {
 		const file = $logoFile?.[0];
@@ -85,6 +105,21 @@
 			toast.success('Logo deleted successfully');
 		} else {
 			toast.error('Failed to delete logo');
+		}
+	}
+
+	async function deletePlatformGuide() {
+		const res = await fetch('/api/organization/platform_guide', {
+			method: 'DELETE'
+		});
+
+		if (res.ok) {
+			currentPlatformGuideUrl = null;
+			currentPlatformGuideName = null;
+			await invalidateAll();
+			toast.success('Platform guide removed');
+		} else {
+			toast.error('Failed to remove platform guide');
 		}
 	}
 
@@ -234,6 +269,77 @@
 									</div>
 								</div>
 								<p class="text-muted-foreground text-xs">PNG, JPG, WebP, max 2MB</p>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Field {form} name="platform_guide" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label class="font-semibold">Platform guide PDF</Form.Label>
+								<input
+									{...props}
+									type="file"
+									accept="application/pdf"
+									bind:files={$platformGuideFile}
+									bind:this={pdfInput}
+									hidden
+								/>
+								<div
+									class="border-input bg-card flex h-9 items-center rounded-md border shadow-xs"
+								>
+									<div class="flex min-w-0 flex-1 items-center gap-2 px-3">
+										<FileText class="text-muted-foreground h-4 w-4 shrink-0" />
+										<span
+											class={[
+												'truncate text-sm',
+												pdfDisplayName ? 'text-foreground' : 'text-muted-foreground'
+											]}
+										>
+											{pdfDisplayName ?? 'No file selected'}
+										</span>
+									</div>
+									<button
+										type="button"
+										onclick={() => pdfInput.click()}
+										class="text-primary hover:text-primary/80 px-3 text-sm font-medium"
+									>
+										Change
+									</button>
+									{#if currentPlatformGuideUrl && !selectedPdfName}
+										<button
+											type="button"
+											onclick={deletePlatformGuide}
+											class="text-muted-foreground hover:text-destructive pr-3"
+											aria-label="Remove platform guide"
+										>
+											<Trash_2 class="h-4 w-4" />
+										</button>
+									{/if}
+								</div>
+								<p class="text-muted-foreground text-xs">PDF, max 10MB</p>
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+
+					<Form.Field {form} name="analytics_link" class="flex flex-col gap-1.5">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label class="font-semibold">Analytics link</Form.Label>
+								<div
+									class="border-input ring-offset-background bg-card focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-md border shadow-xs transition-[color,box-shadow] focus-within:ring-[3px]"
+								>
+									<LinkIcon class="text-muted-foreground ml-3 h-4 w-4 shrink-0" />
+									<input
+										{...props}
+										type="url"
+										placeholder="https://lookerstudio.google.com/..."
+										class="text-foreground min-w-0 flex-1 bg-transparent px-3 py-1 text-sm outline-none"
+										bind:value={$formData.analytics_link}
+									/>
+								</div>
 							{/snippet}
 						</Form.Control>
 						<Form.FieldErrors />

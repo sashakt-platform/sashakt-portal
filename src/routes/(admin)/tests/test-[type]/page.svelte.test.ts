@@ -135,11 +135,11 @@ describe('Test Management Listing Page', () => {
 			expect(screen.getByText('Create Test Template')).toBeInTheDocument();
 		});
 
-		it('should show "Create Manually" button when user has permission and session items exist', () => {
+		it('should show "Create New Test" button when user has permission and session items exist', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
 			const items = [{ id: '1', name: 'Session A' }];
 			render(TestListingPage, { data: baseData(false, items) });
-			expect(screen.getByText('Create Manually')).toBeInTheDocument();
+			expect(screen.getByText('Create New Test')).toBeInTheDocument();
 		});
 
 		it('should not show create button when user lacks permission', () => {

@@ -9,6 +9,8 @@ vi.mock('$app/navigation', () => ({
 
 vi.mock('$lib/utils/permissions.js', () => ({
 	canRead: vi.fn(() => false),
+	canCreate: vi.fn(() => false),
+	canUpdate: vi.fn(() => false),
 	hasPermission: vi.fn(() => false),
 	hasAnyPermission: vi.fn(() => false),
 	PERMISSIONS: {}

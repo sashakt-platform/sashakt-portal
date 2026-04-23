@@ -45,9 +45,7 @@
 	});
 
 	const total = $derived(
-		reportData
-			? reportData.total_test_submitted + reportData.total_test_not_submitted
-			: 0
+		reportData ? reportData.total_test_submitted + reportData.total_test_not_submitted : 0
 	);
 </script>
 
@@ -61,39 +59,33 @@
 		<div class="flex flex-col gap-2">
 			{#if loading}
 				<div class="flex flex-col gap-2">
-					{#each [1, 2, 3] as _}
+					{#each [1, 2, 3] as n (n)}
 						<div class="bg-muted h-12 animate-pulse rounded-lg"></div>
 					{/each}
 				</div>
 			{:else if error}
 				<p class="text-destructive text-sm">{error}</p>
 			{:else if reportData}
-				<div
-					class="flex items-center justify-between rounded-lg px-4 py-3"
-					style="background: hsla(0, 0%, 94%, 1)"
-				>
+				<div class="bg-muted flex items-center justify-between rounded-lg px-4 py-3">
 					<div class="flex items-center gap-2">
-						<span class="inline-block h-2.5 w-2.5 rounded-full bg-blue-500"></span>
+						<span class="bg-primary inline-block h-2.5 w-2.5 rounded-full"></span>
 						<span class="text-sm font-medium">Total</span>
 					</div>
 					<span class="text-sm font-bold">{total} tests</span>
 				</div>
 
-				<div
-					class="flex items-center justify-between rounded-lg px-4 py-3"
-					style="background: hsla(0, 0%, 94%, 1)"
-				>
+				<div class="bg-muted flex items-center justify-between rounded-lg px-4 py-3">
 					<div class="flex items-center gap-2">
-						<span class="inline-block h-2.5 w-2.5 rounded-full bg-green-500"></span>
+						<span class="bg-success inline-block h-2.5 w-2.5 rounded-full"></span>
 						<span class="text-sm font-medium">Submitted</span>
 					</div>
 					<span class="text-sm font-bold">{reportData.total_test_submitted} tests</span>
 				</div>
 
-				<div class="rounded-lg px-4 py-3" style="background: hsla(0, 0%, 94%, 1)">
+				<div class="bg-muted rounded-lg px-4 py-3">
 					<div class="flex items-center justify-between">
 						<div class="flex items-center gap-2">
-							<span class="inline-block h-2.5 w-2.5 rounded-full bg-orange-400"></span>
+							<span class="bg-warning inline-block h-2.5 w-2.5 rounded-full"></span>
 							<span class="text-sm font-medium">Not submitted</span>
 						</div>
 						<span class="text-sm font-bold">{reportData.total_test_not_submitted} tests</span>
@@ -102,17 +94,21 @@
 					<div class="mt-2 flex flex-col gap-2">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 pl-4">
-								<span class="inline-block h-2 w-2 rounded-full bg-orange-400"></span>
+								<span class="bg-warning inline-block h-2 w-2 rounded-full"></span>
 								<span class="text-muted-foreground text-sm">Active</span>
 							</div>
-							<span class="text-muted-foreground text-sm font-semibold">{reportData.not_submitted_active} tests</span>
+							<span class="text-muted-foreground text-sm font-semibold"
+								>{reportData.not_submitted_active} tests</span
+							>
 						</div>
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 pl-4">
-								<span class="inline-block h-2 w-2 rounded-full bg-orange-400"></span>
+								<span class="bg-warning inline-block h-2 w-2 rounded-full"></span>
 								<span class="text-muted-foreground text-sm">Inactive</span>
 							</div>
-							<span class="text-muted-foreground text-sm font-semibold">{reportData.not_submitted_inactive} tests</span>
+							<span class="text-muted-foreground text-sm font-semibold"
+								>{reportData.not_submitted_inactive} tests</span
+							>
 						</div>
 					</div>
 				</div>

@@ -30,17 +30,17 @@
 
 	// Menu items
 	const menu_items: MenuItem[] = [
-		{ termKey: 'question_bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
+		{ termKey: 'tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
 		{
 			termKey: 'test_templates',
 			url: '/tests/test-template',
 			icon: ClipboardList,
 			entity: 'test-template'
 		},
-		{ termKey: 'tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
+		{ termKey: 'question_bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
 		{ termKey: 'tag_management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
-		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
 		{ termKey: 'forms', url: '/forms', icon: FileText, entity: 'form' },
+		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
 		{ termKey: 'entities', url: '/entity', icon: Boxes, entity: 'entity' },
 		{ termKey: 'users', url: '/users', icon: User, entity: 'user' }
 	];

@@ -125,30 +125,53 @@ export const createTestColumns = (
 			} else {
 				// Add session-specific actions
 
-				if (test.link) {
-					customActions.push({
-						label: `Copy ${term('test')} Link`,
-						action: async () => {
-							await navigator.clipboard.writeText(`${testTakerUrl}/test/${test.link}`);
+				customActions.push({
+					label: `Copy ${term('test')} Link`,
+					action: async () => {
+						try {
+							// ClipboardItem with a Promise preserves the user gesture context
+							// across the async fetch, avoiding NotAllowedError
+							await navigator.clipboard.write([
+								new ClipboardItem({
+									'text/plain': fetch(`/api/test-link?test_id=${test.id}`)
+										.then((res) => {
+											if (!res.ok) throw new Error(`${res.status}`);
+											return res.json();
+										})
+										.then(
+											(data) =>
+												new Blob([`${testTakerUrl}/test/${data.uuid}`], {
+													type: 'text/plain'
+												})
+										)
+								})
+							]);
 							toast.success(`${term('test')} link copied`);
-						},
-						icon: 'copy-link'
-					});
+						} catch (error) {
+							console.error('Failed to copy test link:', error);
+							toast.error('Failed to copy test link');
+						}
+					},
+					icon: 'copy-link'
+				});
 
-					customActions.push({
-						label: 'Download QR',
-						action: async () => {
-							const fileName = `qr-${test.name.replace(/\s+/g, '-').toLowerCase()}`;
-							try {
-								await downloadQRCode(`${testTakerUrl}/test/${test.link}`, fileName);
-							} catch (error) {
-								console.error('Failed to download QR code:', error);
-							}
-						},
-						icon: 'null',
-						inline: true
-					});
-				}
+				customActions.push({
+					label: 'Download QR',
+					action: async () => {
+						const fileName = `qr-${test.name.replace(/\s+/g, '-').toLowerCase()}`;
+						try {
+							const res = await fetch(`/api/test-link?test_id=${test.id}`);
+							if (!res.ok) throw new Error('Failed to fetch link');
+							const data = await res.json();
+							await downloadQRCode(`${testTakerUrl}/test/${data.uuid}`, fileName);
+						} catch (error) {
+							console.error('Failed to download QR code:', error);
+							toast.error('Failed to download QR code');
+						}
+					},
+					icon: 'null',
+					inline: true
+				});
 			}
 
 			// Restrict edit/delete for state/district admins to their jurisdiction

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import X from '@lucide/svelte/icons/x';
 	import * as Popover from '$lib/components/ui/popover';
 	import * as Select from '$lib/components/ui/select';
 
@@ -42,6 +43,11 @@
 		const merged = { ...parsed, ...next };
 		value = format(merged.h, merged.m, merged.p);
 	}
+
+	function clear(event: MouseEvent) {
+		event.stopPropagation();
+		value = null;
+	}
 </script>
 
 <Popover.Root>
@@ -53,7 +59,25 @@
 				class="border-input hover:bg-accent/30 flex h-9 w-[176px] items-center justify-between rounded-full border bg-white px-5 text-sm shadow-xs transition-colors"
 			>
 				<span class={value ? 'text-foreground' : 'text-muted-foreground'}>{display}</span>
-				<ChevronDown class="text-muted-foreground h-4 w-4" />
+				{#if value}
+					<span
+						role="button"
+						tabindex="0"
+						aria-label="Clear time"
+						class="text-muted-foreground hover:text-foreground -mr-1 flex h-4 w-4 items-center justify-center"
+						onclick={clear}
+						onkeydown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								clear(e as unknown as MouseEvent);
+							}
+						}}
+					>
+						<X class="h-4 w-4" />
+					</span>
+				{:else}
+					<ChevronDown class="text-muted-foreground h-4 w-4" />
+				{/if}
 			</button>
 		{/snippet}
 	</Popover.Trigger>

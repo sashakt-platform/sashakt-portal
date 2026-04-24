@@ -103,7 +103,8 @@ export const createTestColumns = (
 					header: 'Status',
 					cell: ({ row }: { row: { original: Test } }) =>
 						renderComponent(TestStatusBadge, { status: row.original.status }),
-					size: 100
+					size: 100,
+					meta: { align: 'center' }
 				} satisfies ColumnDef<Test>
 			]
 		: []),

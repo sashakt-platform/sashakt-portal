@@ -190,11 +190,16 @@ export const createTestColumns = (
 					label: 'Download QR',
 					action: async () => {
 						const fileName = `qr-${test.name.replace(/\s+/g, '-').toLowerCase()}`;
+						const districts = getUserDistrict(user ?? null);
+						const districtName = districts?.map((d) => d.name).join(', ');
 						try {
 							const res = await fetch(`/api/test-link?test_id=${test.id}`);
 							if (!res.ok) throw new Error('Failed to fetch link');
 							const data = await res.json();
-							await downloadQRCode(`${testTakerUrl}/test/${data.uuid}`, fileName);
+							await downloadQRCode(`${testTakerUrl}/test/${data.uuid}`, fileName, [
+								{ label: term('test'), value: test.name },
+								{ label: 'District', value: districtName ?? '' }
+							]);
 						} catch (error) {
 							console.error('Failed to download QR code:', error);
 							toast.error('Failed to download QR code');

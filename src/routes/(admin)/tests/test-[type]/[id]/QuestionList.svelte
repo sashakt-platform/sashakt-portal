@@ -35,6 +35,7 @@
 	}
 
 	const setDefaultTagsRandom = () => {
+		$formData.question_revision_ids = [];
 		if ($formData.random_tag_count.length === 0 && $formData.tag_ids.length > 0) {
 			$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
 				id: tag.id,
@@ -42,6 +43,7 @@
 			}));
 		}
 	};
+	setDefaultTagsRandom();
 
 	const handleRemoveQuestion = (questionId: number) => {
 		// remove from both IDs and question data
@@ -76,23 +78,22 @@
 			onValueChange={(v) => {
 				if (v === 'manual') $formData.random_tag_count = [];
 				if (v === 'tagBased') {
-					$formData.question_revision_ids = [];
 					setDefaultTagsRandom();
 				}
 			}}
 		>
 			<TabsList class="bg-muted rounded-full p-1">
 				<TabsTrigger
-					value="manual"
-					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
-				>
-					Manual Selection
-				</TabsTrigger>
-				<TabsTrigger
 					value="tagBased"
 					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
 				>
 					Auto Selection
+				</TabsTrigger>
+				<TabsTrigger
+					value="manual"
+					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+				>
+					Manual Selection
 				</TabsTrigger>
 			</TabsList>
 		</Tabs>

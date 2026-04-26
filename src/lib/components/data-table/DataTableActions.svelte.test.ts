@@ -232,9 +232,9 @@ describe('DataTableActions', () => {
 					...defaultProps,
 					customActions: [
 						{
-							label: 'Generate QR',
-							href: '/qr-code/1',
-							icon: 'qr-code'
+							label: 'Duplicate Item',
+							href: '/duplicate/1',
+							icon: 'copy'
 						}
 					]
 				}
@@ -243,7 +243,7 @@ describe('DataTableActions', () => {
 			const button = screen.getByRole('button', { name: /Open menu/i });
 			await fireEvent.click(button);
 
-			expect(screen.getByText('Generate QR')).toBeInTheDocument();
+			expect(screen.getByText('Duplicate Item')).toBeInTheDocument();
 		});
 
 		it('should render multiple custom actions', async () => {
@@ -272,7 +272,7 @@ describe('DataTableActions', () => {
 			['file-plus', 'Add File'],
 			['external-link', 'External Link'],
 			['copy', 'Copy'],
-			['qr-code', 'QR Code']
+			['copy-link', 'Copy Link']
 		])('should handle %s icon', async (icon, label) => {
 			render(DataTableActions, {
 				props: {

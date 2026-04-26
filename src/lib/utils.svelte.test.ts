@@ -9,6 +9,16 @@ vi.mock('@svelte-put/qr', () => ({
 import { formatDate, downloadQRCode } from './utils';
 import { createQrPngDataUrl } from '@svelte-put/qr';
 
+// Stub Image so assigning `src` fires `onload` asynchronously — mirrors
+// browser behaviour closely enough to exercise composeQrWithFooter().
+class MockImage {
+	onload: (() => void) | null = null;
+	onerror: ((e: unknown) => void) | null = null;
+	set src(_: string) {
+		queueMicrotask(() => this.onload?.());
+	}
+}
+
 describe('utils', () => {
 	describe('formatDate()', () => {
 		it('should format date string correctly', () => {
@@ -103,6 +113,56 @@ describe('utils', () => {
 			const url = 'https://example.com';
 
 			await expect(downloadQRCode(url)).rejects.toThrow('QR generation failed');
+		});
+
+		it('should render a composed image when footerLines are provided', async () => {
+			const toDataURLSpy = vi.fn().mockReturnValue('data:image/png;base64,composedWithFooter');
+			const fillTextSpy = vi.fn();
+			const measureTextSpy = vi.fn().mockReturnValue({ width: 50 });
+
+			const mockCanvas = {
+				width: 0,
+				height: 0,
+				getContext: vi.fn().mockReturnValue({
+					fillStyle: '',
+					font: '',
+					textAlign: '',
+					textBaseline: '',
+					fillRect: vi.fn(),
+					drawImage: vi.fn(),
+					fillText: fillTextSpy,
+					measureText: measureTextSpy
+				}),
+				toDataURL: toDataURLSpy
+			};
+
+			createElementSpy.mockImplementation((tag: string) =>
+				tag === 'canvas' ? (mockCanvas as unknown as HTMLElement) : mockAnchor
+			);
+
+			const OriginalImage = globalThis.Image;
+			// @ts-expect-error — stubbing global Image for this test only
+			globalThis.Image = MockImage;
+
+			try {
+				await downloadQRCode('https://example.com/test', 'qr-with-footer', [
+					{ label: 'Test', value: 'Demo Test' },
+					{ label: 'District', value: 'Pune' },
+					{ label: 'Empty', value: '' }
+				]);
+
+				expect(mockCanvas.getContext).toHaveBeenCalledWith('2d');
+				expect(toDataURLSpy).toHaveBeenCalledWith('image/png');
+				expect(mockAnchor.href).toBe('data:image/png;base64,composedWithFooter');
+				expect(mockAnchor.download).toBe('qr-with-footer.png');
+				// Empty-value entry is filtered out; only two lines are rendered.
+				const rendered = fillTextSpy.mock.calls.map((call) => call[0]);
+				expect(rendered).toContain('Test: Demo Test');
+				expect(rendered).toContain('District: Pune');
+				expect(rendered.some((line: string) => line.startsWith('Empty:'))).toBe(false);
+			} finally {
+				globalThis.Image = OriginalImage;
+			}
 		});
 	});
 });

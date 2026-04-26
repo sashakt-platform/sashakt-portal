@@ -82,7 +82,7 @@
 <DeleteDialog bind:action={deleteAction} elementName={entityName} />
 
 {#if canEdit || canDelete || customActions.length > 0}
-	<div class="flex items-center gap-1">
+	<div class="flex items-center justify-end gap-1">
 		<!-- INLINE ZONE -->
 		{#if hasInlineActions}
 			{#if canEdit && editInline}

@@ -93,7 +93,8 @@ export const createTestColumns = (
 		accessorKey: 'tags',
 		header: term('tags'),
 		cell: ({ row }) => renderComponent(TagCell, { tags: row.original.tags ?? [] }),
-		size: 200
+		size: 200,
+		meta: { headerClassName: 'min-w-[200px]', cellClassName: 'min-w-[200px]' }
 	},
 	...(!isTemplate
 		? [
@@ -102,7 +103,8 @@ export const createTestColumns = (
 					header: 'Status',
 					cell: ({ row }: { row: { original: Test } }) =>
 						renderComponent(TestStatusBadge, { status: row.original.status }),
-					size: 100
+					size: 100,
+					meta: { align: 'center' }
 				} satisfies ColumnDef<Test>
 			]
 		: []),

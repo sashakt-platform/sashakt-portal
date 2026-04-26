@@ -114,10 +114,14 @@
 		right: 'text-right'
 	} as const;
 
+	function getAlign(column: any): 'left' | 'center' | 'right' | undefined {
+		return column.columnDef.meta?.align ?? (column.id === 'actions' ? 'right' : undefined);
+	}
+
 	function getHeaderClasses(column: any): string {
 		const parts: string[] = [];
 		if (isGrowColumn(column.id)) parts.push('w-1/3');
-		const align = column.columnDef.meta?.align;
+		const align = getAlign(column);
 		if (align) parts.push(alignmentClasses[align]);
 		const headerClassName = column.columnDef.meta?.headerClassName;
 		if (headerClassName) parts.push(headerClassName);
@@ -127,7 +131,7 @@
 	function getCellClasses(column: any, extraClass: string = ''): string {
 		const parts: string[] = [];
 		if (isGrowColumn(column.id)) parts.push('w-1/3 max-w-0 overflow-hidden text-ellipsis');
-		const align = column.columnDef.meta?.align;
+		const align = getAlign(column);
 		if (align) parts.push(alignmentClasses[align]);
 		const cellClassName = column.columnDef.meta?.cellClassName;
 		if (cellClassName) parts.push(cellClassName);

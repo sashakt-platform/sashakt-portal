@@ -15,12 +15,14 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	const search = url.searchParams.get('search') || '';
 	const sortBy = url.searchParams.get('sortBy') || '';
 	const sortOrder = url.searchParams.get('sortOrder') || 'asc';
+	const isActive = url.searchParams.get('isActive') || '';
 
 	const queryParams = new URLSearchParams({
 		page: page.toString(),
 		size: size.toString(),
 		...(search && { name: search }),
-		...(sortBy && { sort_by: sortBy, sort_order: sortOrder })
+		...(sortBy && { sort_by: sortBy, sort_order: sortOrder }),
+		...(isActive && { is_active: isActive })
 	});
 
 	const res = await fetch(`${BACKEND_URL}/form/?${queryParams}`, {
@@ -50,7 +52,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		return {
 			forms: { items: [], total: 0, pages: 0 },
 			totalPages: 0,
-			params: { page, size, search, sortBy, sortOrder }
+			params: { page, size, search, sortBy, sortOrder, isActive }
 		};
 	}
 
@@ -67,6 +69,6 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 	return {
 		forms,
 		totalPages: forms.pages || 0,
-		params: { page, size, search, sortBy, sortOrder }
+		params: { page, size, search, sortBy, sortOrder, isActive }
 	};
 };

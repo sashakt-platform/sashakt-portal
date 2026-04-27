@@ -6,6 +6,12 @@ vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
 }));
 
+vi.mock('$lib/server/nomenclature', () => ({
+	serverTerms: vi.fn(
+		async () => (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+	)
+}));
+
 // Mock supervalidate
 vi.mock('sveltekit-superforms', () => ({
 	superValidate: vi.fn(async () => ({

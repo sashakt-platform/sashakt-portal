@@ -29,6 +29,12 @@ vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://fake-backend'
 }));
 
+vi.mock('$lib/server/nomenclature', () => ({
+	serverTerms: vi.fn(
+		async () => (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+	)
+}));
+
 vi.mock('$lib/constants.js', () => ({
 	DEFAULT_PAGE_SIZE: 25
 }));
@@ -98,7 +104,8 @@ describe('page.server load function', () => {
 				size: 10,
 				search: 'test',
 				sortBy: 'name',
-				sortOrder: 'desc'
+				sortOrder: 'desc',
+				isActive: ''
 			});
 		});
 

@@ -5,6 +5,9 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { enhance } from '$app/forms';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		open = $bindable(false),
@@ -33,7 +36,9 @@
 		}
 	});
 
-	const title = $derived(mode === 'create' ? 'Create Tag Type' : 'Edit Tag Type');
+	const title = $derived(
+		mode === 'create' ? `Create ${term('tag_type')}` : `Edit ${term('tag_type')}`
+	);
 	const buttonText = $derived(mode === 'create' ? 'Save' : 'Save changes');
 	const action = $derived(mode === 'create' ? '?/createTagType' : '?/updateTagType');
 </script>

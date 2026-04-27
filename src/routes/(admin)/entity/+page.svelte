@@ -11,8 +11,11 @@
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 	import Boxes from '@lucide/svelte/icons/boxes';
 	import SearchInput from '$lib/components/SearchInput.svelte';
+	import StatusFilter from '$lib/components/StatusFilter.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.entities?.items || []);
 	const totalItems = $derived(data?.entities?.total || 0);
@@ -22,8 +25,8 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
+	const isActive = $derived(data?.params?.isActive || '');
 
-	// handle sorting
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
 		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
@@ -35,7 +38,6 @@
 		goto(resolve(url.pathname + url.search), { replaceState: false });
 	}
 
-	// create columns for the data table
 	const columns = $derived(
 		createColumns(sortBy, sortOrder, handleSort, {
 			canEdit: canUpdate(data.user, 'entity'),
@@ -43,20 +45,19 @@
 		})
 	);
 
-	const noEntitiesCreatedYet = $derived(totalItems === 0 && !search);
+	const noEntitiesCreatedYet = $derived(totalItems === 0 && !search && isActive === '');
 </script>
 
 <ListingPageLayout
-	title="Entities"
+	title={term('entities')}
 	subtitle=""
 	showEmptyState={noEntitiesCreatedYet}
-	infoLabel="Help: Entity management"
-	infoDescription="This panel displays all entities in the system. You can view records, edit or delete an entity by clicking the three dots next to their entry."
+	tooltipKey="entity-management"
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'entity')}
 			<a href={resolve('/entity/add/new')}
-				><Button class="font-semibold"><Plus />Create Entity</Button></a
+				><Button class="font-semibold"><Plus />Create {term('entity')}</Button></a
 			>
 		{/if}
 	{/snippet}
@@ -70,15 +71,17 @@
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<Boxes class="text-primary h-7 w-7" />
 					</div>
-					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No entities yet</h2>
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+						No {term('entities', 'lower')} yet
+					</h2>
 					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first entity to get started. Entities let you define custom data types to
-						organize and manage records.
+						Create your first {term('entity', 'lower')} to get started. {term('entities')} let you define
+						custom data types to organize and manage records.
 					</p>
 					{#if canCreate(data.user, 'entity')}
 						<div class="mt-6">
 							<a href={resolve('/entity/add/new')}
-								><Button class="font-semibold"><Plus />Create Entity</Button></a
+								><Button class="font-semibold"><Plus />Create {term('entity')}</Button></a
 							>
 						</div>
 					{/if}
@@ -88,7 +91,14 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<SearchInput placeholder="Search entities..." value={search} useResolve />
+		<div class="flex items-center justify-between gap-2">
+			<SearchInput
+				placeholder={`Search ${term('entities', 'lower')}...`}
+				value={search}
+				useResolve
+			/>
+			<StatusFilter value={isActive} useResolve />
+		</div>
 	{/snippet}
 
 	{#snippet content()}

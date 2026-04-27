@@ -9,6 +9,9 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		templates,
@@ -123,7 +126,9 @@
 	</div>
 
 	{#if items.length === 0}
-		<div class="py-16 text-center text-sm text-gray-400">No test templates found.</div>
+		<div class="py-16 text-center text-sm text-gray-400">
+			No {term('test_templates', 'lower')} found.
+		</div>
 	{/if}
 
 	{#each items as template (template.id)}

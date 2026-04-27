@@ -18,6 +18,7 @@
 		itemList = $bindable(),
 		itemName,
 		label = null,
+		labelPlural = null,
 		filteration = false,
 		multiple = true,
 		onSearch = null as ((search: string) => void) | null,
@@ -26,9 +27,13 @@
 	} = $props();
 	let open = $state(false);
 	let searchQuery = $state('');
-	const placeholder = $derived(
-		multiple ? 'Select ' + (label ?? itemName) + 's' : 'Select ' + (label ?? itemName)
-	);
+	const singularLabel = $derived(label ?? itemName);
+	// Caller-supplied plural is preferred; otherwise fall back to `singular + s`.
+	// The naive append fails for custom labels like "Quizzes" (→ "Quizzess"), which
+	// is why nomenclature-aware callers (TagsSelection, TagTypeSelection) pass
+	// `labelPlural` explicitly using `term('plural_key')`.
+	const pluralLabel = $derived(labelPlural ?? singularLabel + 's');
+	const placeholder = $derived(multiple ? 'Select ' + pluralLabel : 'Select ' + singularLabel);
 
 	// Debounced search
 	let searchTimeout: NodeJS.Timeout | undefined;
@@ -88,13 +93,13 @@
 				onSearch('');
 			}
 
-			const url = new URL(page.url);
-			try {
-				url.searchParams.delete(itemName + '_search');
-			} catch (e) {
-				console.error('Failed to update URL on popover close', e);
-			}
 			if (filteration) {
+				const url = new URL(page.url);
+				try {
+					url.searchParams.delete(itemName + '_search');
+				} catch (e) {
+					console.error('Failed to update URL on popover close', e);
+				}
 				url.searchParams.delete(itemName + '_ids');
 				items.map((item: Filter) => {
 					url.searchParams.append(itemName + '_ids', item.id);
@@ -102,8 +107,8 @@
 
 				// reset pagination to first page when filters change
 				url.searchParams.set('page', '1');
+				goto(url, { keepFocus: true, invalidateAll: true });
 			}
-			goto(url, { keepFocus: true, invalidateAll: true });
 		}
 	}}
 >
@@ -117,7 +122,7 @@
 				aria-expanded={open}
 			>
 				{#if multiple}
-					{#if items?.length === 0}
+					{#if !items || items.length === 0}
 						{placeholder}
 					{:else if items?.length < 3}
 						<span class="flex flex-row truncate text-start">
@@ -152,7 +157,7 @@
 	<Popover.Content class="w-fit p-0 ">
 		<Command.Root>
 			<Command.Input
-				placeholder={'Search ' + (label ?? itemName) + 's...'}
+				placeholder={'Search ' + pluralLabel + '...'}
 				oninput={handleSearch}
 				bind:value={searchQuery}
 			/>
@@ -164,7 +169,7 @@
 							Loading...
 						</div>
 					{:else}
-						No {label || itemName} found.
+						No {pluralLabel} found.
 					{/if}
 				</Command.Empty>
 				{#each itemList as item (item.id)}

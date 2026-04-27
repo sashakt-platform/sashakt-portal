@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export const marksSchema = z.object({
-	correct: z.number().int().default(1),
-	wrong: z.number().int().default(0),
-	skipped: z.number().int().default(0),
+	correct: z.number().default(1),
+	wrong: z.number().default(0),
+	skipped: z.number().default(0),
 	partial: z
 		.object({
 			correct_answers: z

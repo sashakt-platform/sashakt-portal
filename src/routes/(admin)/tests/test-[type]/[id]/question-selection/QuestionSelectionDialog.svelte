@@ -13,6 +13,9 @@
 	import { Button } from '$lib/components/ui/button';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import { isStateAdmin, type User } from '$lib/utils/permissions.js';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		open = $bindable(),
@@ -140,7 +143,7 @@
 			<!-- Header -->
 			<Dialog.Header class="border-b px-6 py-5">
 				<Dialog.Title class="text-xl font-bold text-gray-900">
-					Select Questions from the Question Bank
+					Select Questions from the {term('question_bank')}
 				</Dialog.Title>
 				<p class="text-primary text-sm font-medium">
 					{$formData.question_revision_ids?.length || 0} of {questions.total || 0} questions selected
@@ -204,7 +207,7 @@
 								class="bg-primary hover:bg-primary/90 w-full sm:w-auto"
 								onclick={handleSelectionConfirm}
 							>
-								Add Questions to {$formData.is_template ? 'Template' : 'Test'}
+								Add Questions to {$formData.is_template ? term('test_template') : term('test')}
 							</Button>
 						</div>
 					</div>

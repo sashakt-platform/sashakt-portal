@@ -5,7 +5,6 @@
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash_2 from '@lucide/svelte/icons/trash-2';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
-	import QrCode from '@lucide/svelte/icons/qr-code';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Link2 from '@lucide/svelte/icons/link-2';
@@ -69,8 +68,6 @@
 				return FilePlus;
 			case 'copy':
 				return Copy;
-			case 'qr-code':
-				return QrCode;
 			case 'copy-link':
 				return Link2;
 			default:
@@ -82,32 +79,20 @@
 <DeleteDialog bind:action={deleteAction} elementName={entityName} />
 
 {#if canEdit || canDelete || customActions.length > 0}
-	<div class="flex items-center gap-1">
+	<div class="flex items-center justify-end gap-1">
 		<!-- INLINE ZONE -->
 		{#if hasInlineActions}
 			{#if canEdit && editInline}
 				<a href={editUrl}>
 					<Button
-						variant="outline"
+						variant="secondary"
 						size="sm"
-						class="border-brand-light text-primary rounded-lg border font-semibold">Edit</Button
+						class="text-primary bg-brand-light rounded-lg font-semibold">Edit</Button
 					>
 				</a>
 			{/if}
 
-			{#if canDelete && deleteInline}
-				<Button
-					variant="ghost"
-					size="sm"
-					class="bg-red-50 text-red-700 hover:bg-red-100"
-					onclick={handleDelete}
-				>
-					<Trash_2 class="h-4 w-4" />
-					Delete
-				</Button>
-			{/if}
-
-			{#each inlineCustomActions as action}
+			{#each inlineCustomActions as action (action.label)}
 				{@const IconComponent = getIcon(action.icon)}
 				{#if action.href && action.method === 'POST'}
 					<form action={action.href} method="POST" class="inline">
@@ -145,6 +130,18 @@
 					</Button>
 				{/if}
 			{/each}
+
+			{#if canDelete && deleteInline}
+				<Button
+					variant="ghost"
+					size="icon"
+					class="text-destructive"
+					aria-label="Delete"
+					onclick={handleDelete}
+				>
+					<Trash_2 class="h-4 w-4" />
+				</Button>
+			{/if}
 		{/if}
 
 		<!-- OVERFLOW ZONE -->
@@ -174,7 +171,7 @@
 						</DropdownMenu.Item>
 					{/if}
 
-					{#each overflowCustomActions as action}
+					{#each overflowCustomActions as action (action.label)}
 						{#if action.href && action.method === 'POST'}
 							<form action={action.href} method="POST">
 								<DropdownMenu.Item class="cursor-pointer p-0">

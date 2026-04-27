@@ -1,5 +1,6 @@
 <script lang="ts">
-	import Info from '@lucide/svelte/icons/info';
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import Settings from '@lucide/svelte/icons/settings';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
@@ -13,6 +14,9 @@
 	} from './schema.js';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { resolve } from '$app/paths';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	const {
 		data
@@ -30,7 +34,6 @@
 	const {
 		form: formData,
 		enhance,
-		submit,
 		errors
 	} = superForm(certificateData || data.form, {
 		validators: zod4Client(
@@ -43,71 +46,92 @@
 			}
 		}
 	});
+
+	const canSave = $derived(
+		($formData.name?.trim() ?? '') !== '' && ($formData.url?.trim() ?? '') !== ''
+	);
 </script>
 
 <form method="POST" action="?/save" use:enhance>
-	<div class="mx-auto flex h-lvh flex-col gap-6 py-6 md:gap-10 md:py-8">
-		<div class="mx-4 flex flex-row sm:mx-6 md:mx-10">
-			<div class="my-auto flex flex-col">
-				<div class="flex w-full items-center align-middle">
-					<div class="flex flex-row">
-						<h2
-							class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
-						>
-							{certificateData ? 'Edit Certificate' : 'Create Certificate'}
-						</h2>
-						<Info class="my-auto w-4 align-middle text-xs text-gray-600" />
+	<div class="mx-auto flex flex-col gap-10 py-8">
+		<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
+			<div class="flex items-center gap-3">
+				<a
+					href={resolve('/certificate')}
+					class="hover:bg-muted rounded-lg border p-2"
+					aria-label={`Back to ${term('certificates', 'lower')}`}
+				>
+					<ArrowLeft size={20} />
+				</a>
+				<h2 class="text-2xl font-bold tracking-tight">
+					{certificateData ? `Edit ${term('certificate')}` : `Create ${term('certificate')}`}
+				</h2>
+			</div>
+			<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>Save</Button>
+		</div>
+
+		<div class="mx-4 flex flex-col sm:mx-6 md:mx-10">
+			<div class="bg-card rounded-2xl border">
+				<div class="border-border flex items-center gap-5 rounded-t-2xl border-b p-8">
+					<span class="bg-brand-subtle shrink-0 rounded-lg p-2">
+						<Settings class="text-primary h-4 w-4 sm:h-5 sm:w-5" />
+					</span>
+					<h3 class="text-base font-semibold sm:text-xl">{term('certificate')} Details</h3>
+				</div>
+
+				<div class="grid grid-cols-1 gap-6 p-8 md:grid-cols-2">
+					<div class="flex flex-col gap-2">
+						<Label for="name">{term('certificate')} Name</Label>
+						<Input
+							id="name"
+							type="text"
+							name="name"
+							placeholder={`Name of this ${term('certificate', 'lower')}...`}
+							bind:value={$formData.name}
+						/>
+						{#if $errors.name}
+							<span class="text-destructive text-sm">{$errors.name}</span>
+						{/if}
+					</div>
+
+					<div class="flex flex-col gap-2">
+						<Label for="description">Description</Label>
+						<Textarea
+							id="description"
+							name="description"
+							placeholder={`Brief description of this ${term('certificate', 'lower')}...`}
+							bind:value={$formData.description}
+						/>
+					</div>
+
+					<div class="flex flex-col gap-2">
+						<Label for="url">{term('certificate')} URL</Label>
+						<Input
+							id="url"
+							type="text"
+							name="url"
+							bind:value={$formData.url}
+							placeholder="e.g. https://www.example.com"
+						/>
+						{#if $errors.url}
+							<span class="text-destructive text-sm">{$errors.url}</span>
+						{/if}
+					</div>
+
+					<div class="flex items-center justify-between">
+						<Label for="is_active" class="font-semibold">{term('certificate')} Status</Label>
+						<div class="flex items-center gap-2">
+							<span
+								class="text-sm {$formData.is_active
+									? 'text-primary font-semibold'
+									: 'text-muted-foreground'}"
+							>
+								{$formData.is_active ? 'Active' : 'Inactive'}
+							</span>
+							<Switch id="is_active" name="is_active" bind:checked={$formData.is_active} />
+						</div>
 					</div>
 				</div>
-				<Label class="my-auto align-middle text-sm font-extralight"></Label>
-			</div>
-		</div>
-		<div class="mx-4 flex flex-col gap-6 bg-white p-4 sm:mx-6 sm:p-6 md:mx-10 md:gap-10 md:p-9">
-			<div class="flex w-full flex-col gap-2 md:pr-8">
-				<h2 class="font-semibold">Name</h2>
-				<Input type="text" name="name" bind:value={$formData.name} />
-				{#if $errors.name}
-					<span class="text-destructive text-sm">{$errors.name}</span>
-				{/if}
-			</div>
-			<div class="flex w-full flex-col gap-2 md:pr-8">
-				<h2 class="font-semibold">Description</h2>
-				<Textarea name="description" bind:value={$formData.description} />
-			</div>
-			<div class="flex w-full flex-col gap-2 md:pr-8">
-				<h2 class="font-semibold">URL</h2>
-				<Input
-					type="text"
-					name="url"
-					bind:value={$formData.url}
-					placeholder="Enter certificate URL (e.g., https://example.com)"
-				/>
-				{#if $errors.url}
-					<span class="text-destructive text-sm">{$errors.url}</span>
-				{/if}
-			</div>
-			<div class="flex w-full items-center gap-2 md:pr-8">
-				<Switch id="is_active" name="is_active" bind:checked={$formData.is_active} />
-				<Label for="is_active">Is Active?</Label>
-				<Info class="w-4 text-xs text-gray-600" />
-			</div>
-		</div>
-	</div>
-	<div
-		class="sticky right-0 bottom-0 left-0 mt-2 flex w-full border-t-4 bg-white p-3 shadow-md sm:mt-4 sm:p-4"
-	>
-		<div class="flex w-full justify-between gap-2">
-			<a href={resolve('/certificate/')}>
-				<Button variant="outline" class="border-primary text-primary border-1 text-sm sm:text-base"
-					>Cancel</Button
-				>
-			</a>
-			<div class="flex gap-2">
-				<Button
-					class="bg-primary text-sm sm:text-base"
-					onclick={submit}
-					disabled={$formData.name?.trim() === '' || $formData.url?.trim() === ''}>Save</Button
-				>
 			</div>
 		</div>
 	</div>

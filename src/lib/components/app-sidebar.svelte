@@ -1,73 +1,102 @@
 <script lang="ts">
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import ChartColumnIncreasing from '@lucide/svelte/icons/chart-column-increasing';
+	import * as Collapsible from '$lib/components/ui/collapsible/index.js';
 	import FileWarning from '@lucide/svelte/icons/file-warning';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 	import ClipboardCheck from '@lucide/svelte/icons/clipboard-check';
 	import User from '@lucide/svelte/icons/user';
 	import MessageSquareCode from '@lucide/svelte/icons/message-square-code';
-	import Building from '@lucide/svelte/icons/building-2';
-	import { canRead, hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
+	import Briefcase from '@lucide/svelte/icons/briefcase';
+	import ChevronRight from '@lucide/svelte/icons/chevron-right';
+	import {
+		canCreate,
+		canUpdate,
+		hasAnyPermission,
+		hasPermission,
+		PERMISSIONS
+	} from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
-	import Settings from '@lucide/svelte/icons/settings';
+	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
+	import Download from '@lucide/svelte/icons/download';
+	import LogOut from '@lucide/svelte/icons/log-out';
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
-	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { useTerms, type NomenclatureKey } from '$lib/nomenclature';
+
+	type MenuItem = {
+		termKey: NomenclatureKey;
+		url: string;
+		icon: typeof FileWarning;
+		entity: string;
+	};
 
 	// Menu items
-	const menu_items = [
-		{ title: 'Dashboard', url: '/dashboard', icon: ChartColumnIncreasing },
-		{ title: 'Question Bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
+	const menu_items: MenuItem[] = [
+		{ termKey: 'tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
 		{
-			title: 'Test Templates',
+			termKey: 'test_templates',
 			url: '/tests/test-template',
 			icon: ClipboardList,
 			entity: 'test-template'
 		},
-		{ title: 'Tests', url: '/tests/test-session', icon: ClipboardCheck, entity: 'test' },
-		{ title: 'Tag Management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
-		{ title: 'Certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
-		{ title: 'Forms', url: '/forms', icon: FileText, entity: 'form' },
-		{ title: 'Entities', url: '/entity', icon: Boxes, entity: 'entity' },
-		{ title: 'Users', url: '/users', icon: User, entity: 'user' }
+		{ termKey: 'question_bank', url: '/questionbank', icon: FileWarning, entity: 'question' },
+		{ termKey: 'tag_management', url: '/tags', icon: MessageSquareCode, entity: 'tag' },
+		{ termKey: 'forms', url: '/forms', icon: FileText, entity: 'form' },
+		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
+		{ termKey: 'entities', url: '/entity', icon: Boxes, entity: 'entity' },
+		{ termKey: 'users', url: '/users', icon: User, entity: 'user' }
 	];
 
 	let { data } = $props();
 	const sidebar = useSidebar();
+	const term = useTerms();
 
-	const currentitem = $derived.by(() => {
+	const currentMenuUrl = $derived.by(() => {
 		const path = page.url.pathname;
 		const match = menu_items.find((item) => path === item.url || path.startsWith(item.url + '/'));
-		return match?.title ?? menu_items[0].title;
+		return match?.url ?? null;
 	});
+
+	const myOrgChildren = $derived.by(() => {
+		const children: { title: string; url: string }[] = [];
+		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {
+			children.push({ title: 'Organisation Details', url: '/organization' });
+		}
+		if (
+			hasAnyPermission(data.user, [
+				PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
+				PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
+			])
+		) {
+			children.push({ title: 'Organisation Settings', url: '/organization/settings' });
+		}
+		return children;
+	});
+
+	const isMyOrgActive = $derived(
+		myOrgChildren.some(
+			(c) => page.url.pathname === c.url || page.url.pathname.startsWith(c.url + '/')
+		)
+	);
 
 	function handleMenuClick() {
 		if (sidebar.isMobile) {
 			sidebar.setOpenMobile(false);
 		}
 	}
-
-	// Helper function to handle dropdown menu item navigation
-	function handleDropdownNavigate(url: string) {
-		if (sidebar.isMobile) {
-			sidebar.setOpenMobile(false);
-		}
-		goto(url);
-	}
 </script>
 
-{#snippet sidebaritems(item: any)}
+{#snippet sidebaritems(item: MenuItem)}
 	<Sidebar.MenuItem class="m-1">
-		<Sidebar.MenuButton isActive={currentitem == item.title} onclick={() => handleMenuClick()}>
+		<Sidebar.MenuButton isActive={currentMenuUrl === item.url} onclick={() => handleMenuClick()}>
 			{#snippet child({ props })}
 				<a href={resolve(item.url)} {...props}>
 					<item.icon />
-					<span>{item.title}</span>
+					<span>{term(item.termKey)}</span>
 				</a>
 			{/snippet}
 		</Sidebar.MenuButton>
@@ -101,67 +130,110 @@
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
 					{#each menu_items as item (item.url)}
-						{#if !item.entity || canRead(data.user, item.entity)}
+						{#if !item.entity || canCreate(data.user, item.entity) || canUpdate(data.user, item.entity)}
 							{@render sidebaritems(item)}
 						{/if}
 					{/each}
+
+					{#if myOrgChildren.length > 0}
+						<Collapsible.Root open={isMyOrgActive} class="group/collapsible">
+							<Sidebar.MenuItem class="m-1">
+								<Collapsible.Trigger>
+									{#snippet child({ props })}
+										<Sidebar.MenuButton {...props} isActive={isMyOrgActive}>
+											<Briefcase />
+											<span>My Organisation</span>
+											<ChevronRight
+												class="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
+											/>
+										</Sidebar.MenuButton>
+									{/snippet}
+								</Collapsible.Trigger>
+								<Collapsible.Content>
+									<Sidebar.MenuSub>
+										{#each myOrgChildren as subItem (subItem.url)}
+											<Sidebar.MenuSubItem>
+												<Sidebar.MenuSubButton
+													isActive={page.url.pathname === subItem.url}
+													onclick={() => handleMenuClick()}
+												>
+													{#snippet child({ props })}
+														<a href={subItem.url} {...props}>
+															<span>{subItem.title}</span>
+														</a>
+													{/snippet}
+												</Sidebar.MenuSubButton>
+											</Sidebar.MenuSubItem>
+										{/each}
+									</Sidebar.MenuSub>
+								</Collapsible.Content>
+							</Sidebar.MenuItem>
+						</Collapsible.Root>
+					{/if}
+
+					{#if data.analyticsLinkUrl}
+						<Sidebar.MenuItem class="m-1">
+							<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+								{#snippet child({ props })}
+									<a
+										href={data.analyticsLinkUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										{...props}
+									>
+										<BarChart3 />
+										<span>Analytics</span>
+									</a>
+								{/snippet}
+							</Sidebar.MenuButton>
+						</Sidebar.MenuItem>
+					{/if}
 				</Sidebar.Menu>
 			</Sidebar.GroupContent>
 		</Sidebar.Group>
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<Sidebar.Menu>
-			<!-- <Sidebar.MenuItem class="m-1"> -->
-			<!-- 	<Sidebar.MenuButton -->
-			<!-- 		isActive={currentitem == 'Settings'} -->
-			<!-- 		onclick={() => handleMenuClick('Settings')} -->
-			<!-- 	> -->
-			<!-- 		{#snippet child({ props })} -->
-			<!-- 			<a href={resolve('/organization')} {...props}> -->
-			<!-- 				<Settings /> -->
-			<!-- 				<span>Settings</span> -->
-			<!-- 			</a> -->
-			<!-- 		{/snippet} -->
-			<!-- 	</Sidebar.MenuButton> -->
-			<!-- </Sidebar.MenuItem> -->
-			<Sidebar.MenuItem class="m-1">
-				<DropdownMenu.Root>
-					<DropdownMenu.Trigger>
+			{#if data.platformGuideUrl}
+				<Sidebar.MenuItem class="m-1">
+					<Sidebar.MenuButton onclick={() => handleMenuClick()}>
 						{#snippet child({ props })}
-							<Sidebar.MenuButton
-								{...props}
-								class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-							>
-								<User />
-								<span>{data.user && data.user.full_name}</span>
-							</Sidebar.MenuButton>
+							<a href={data.platformGuideUrl} target="_blank" rel="noopener noreferrer" {...props}>
+								<Download />
+								<span>Platform Guide PDF</span>
+							</a>
 						{/snippet}
-					</DropdownMenu.Trigger>
-					<DropdownMenu.Content
-						side="top"
-						align="end"
-						class="w-(--bits-dropdown-menu-anchor-width)"
-					>
-						{#if hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)}
-							<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/organization'))}>
-								<Building class="mr-2 size-4" />
-								<span>My Organization</span>
-							</DropdownMenu.Item>
-							<DropdownMenu.Separator />
-						{/if}
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/profile'))}>
-							<span>My Profile</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item
-							onSelect={() => handleDropdownNavigate(resolve('/profile/password'))}
+					</Sidebar.MenuButton>
+				</Sidebar.MenuItem>
+				<Sidebar.Separator class="my-2" />
+			{/if}
+			<Sidebar.MenuItem class="m-1">
+				<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+					{#snippet child({ props })}
+						<a href={resolve('/profile')} {...props}>
+							<User />
+							<span>{data.user && data.user.full_name}</span>
+						</a>
+					{/snippet}
+				</Sidebar.MenuButton>
+			</Sidebar.MenuItem>
+			<Sidebar.MenuItem class="m-1">
+				<Sidebar.MenuButton
+					onclick={() => handleMenuClick()}
+					class="text-destructive hover:bg-destructive/10 hover:text-destructive"
+				>
+					{#snippet child({ props })}
+						<a
+							href={resolve('/logout')}
+							data-sveltekit-preload-data="off"
+							data-sveltekit-preload-code="off"
+							{...props}
 						>
-							<span>Change Password</span>
-						</DropdownMenu.Item>
-						<DropdownMenu.Item onSelect={() => handleDropdownNavigate(resolve('/logout'))}>
-							<span>Sign out</span>
-						</DropdownMenu.Item>
-					</DropdownMenu.Content>
-				</DropdownMenu.Root>
+							<LogOut />
+							<span>Logout</span>
+						</a>
+					{/snippet}
+				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Footer>

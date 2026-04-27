@@ -1,7 +1,10 @@
 <script lang="ts">
 	import Filteration from './Filteration.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	import type { Filter } from '$lib/types/filters';
+
+	const term = useTerms();
 
 	let { tags = $bindable(), tagTypes = [] as Filter[], ...rest } = $props();
 	let tagList = $state<Filter[]>([]);
@@ -44,7 +47,8 @@
 <Filteration
 	bind:items={tags}
 	itemName="tag"
-	label="Tag"
+	label={term('tag')}
+	labelPlural={term('tags')}
 	bind:itemList={tagList}
 	onSearch={loadTags}
 	{isLoading}

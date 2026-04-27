@@ -4,6 +4,9 @@
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { type Filter } from '$lib/types/filters.js';
 	import TooltipInfo from '$lib/components/TooltipInfo.svelte';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	// lazy-loaded components
 	let DistrictSelection: Component | null = $state(null);
@@ -35,21 +38,19 @@
 	let isLoadingAnalytics = $state(true);
 	let areFiltersLoaded = $state(false);
 
-	const information = [
+	const information = $derived([
 		{
-			title: 'Manage Question Banks',
+			title: `Manage ${term('question_bank')}`,
 			description:
 				'Effortlessly create, edit, and organize question banks to keep everything at your fingertips.'
 		},
 		{
-			title: 'Generate Test Templates',
-			description:
-				'Customize test templates to suit diverse requirements, ensuring consistency and ease of use.'
+			title: `Generate ${term('test_templates')}`,
+			description: `Customize ${term('test_templates', 'lower')} to suit diverse requirements, ensuring consistency and ease of use.`
 		},
 		{
-			title: 'Create and Assign Tests',
-			description:
-				'Build, schedule, and assign tests seamlessly to streamline the evaluation process.'
+			title: `Create and Assign ${term('tests')}`,
+			description: `Build, schedule, and assign ${term('tests', 'lower')} seamlessly to streamline the evaluation process.`
 		},
 		{
 			title: 'Monitor Analytics',
@@ -57,10 +58,10 @@
 				'Gain valuable insights through detailed analytics to track performance and progress.'
 		},
 		{
-			title: 'User Management',
-			description: 'Add, manage, and oversee user roles to ensure collaboration and control.'
+			title: `${term('user')} Management`,
+			description: `Add, manage, and oversee ${term('user', 'lower')} roles to ensure collaboration and control.`
 		}
-	];
+	]);
 
 	const stats_box = $derived([
 		{
@@ -68,11 +69,11 @@
 			count: dashboardStats.total_questions
 		},
 		{
-			title: 'No of Tests',
+			title: `No of ${term('tests')}`,
 			count: dashboardStats.total_tests
 		},
 		{
-			title: 'No of Users',
+			title: `No of ${term('users')}`,
 			count: dashboardStats.total_users
 		}
 	]);
@@ -211,12 +212,9 @@
 				<h2
 					class="mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl"
 				>
-					Dashboard
+					{term('dashboard')}
 				</h2>
-				<TooltipInfo
-					label="Help: Dashboard"
-					description="Dashboard provides a quick overview of your organization’s activity. Shows how many candidates have successfully submitted their tests, and from the non-submitted group, how many are still active versus inactive."
-				/>
+				<TooltipInfo tooltipKey="dashboard" />
 			</div>
 		</div>
 	</div>
@@ -231,7 +229,7 @@
 	</div>
 	<div class="flex flex-col rounded-xl bg-white p-4">
 		<div class="mb-4">
-			<p class="font-semibold">Summary of Test Attempts</p>
+			<p class="font-semibold">Summary of {term('test')} Attempts</p>
 		</div>
 		<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
 			{@render dataBox(

@@ -5,7 +5,7 @@ import { redirect } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
-import { editUserSchema } from './schema.js';
+import { profileSchema } from './schema.js';
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	const token = getSessionTokenCookie();
@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 	}
 
 	return {
-		form: await superValidate(zod4(editUserSchema)),
+		form: await superValidate(zod4(profileSchema)),
 		currentUser: userData
 	};
 };
@@ -42,38 +42,55 @@ export const actions: Actions = {
 	save: async ({ request, fetch, cookies }) => {
 		const token = getSessionTokenCookie();
 
-		const form = await superValidate(request, zod4(editUserSchema));
+		const form = await superValidate(request, zod4(profileSchema));
 		if (!form.valid) {
-			return fail(400, {
-				form
-			});
+			return fail(400, { form });
 		}
 
-		let res: Response;
-		const updateData: any = {
-			full_name: form.data.full_name,
-			email: form.data.email,
-			phone: form.data.phone || ''
-		};
-
-		res = await fetch(`${BACKEND_URL}/users/me`, {
+		const profileRes = await fetch(`${BACKEND_URL}/users/me`, {
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`
 			},
-			body: JSON.stringify(updateData)
+			body: JSON.stringify({
+				full_name: form.data.full_name,
+				email: form.data.email,
+				phone: form.data.phone || ''
+			})
 		});
 
-		if (!res.ok) {
-			return fail(401, { form });
+		if (!profileRes.ok) {
+			return fail(400, { form });
 		}
 
-		await res.json();
+		if (form.data.new_password) {
+			const passwordRes = await fetch(`${BACKEND_URL}/users/me/password`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: JSON.stringify({
+					current_password: form.data.current_password,
+					new_password: form.data.new_password
+				})
+			});
+
+			if (!passwordRes.ok) {
+				let message = 'Unable to update password';
+
+				const error = await passwordRes.json();
+				message = error?.detail?.[0].msg ?? error?.detail ?? message;
+				form.errors = { current_password: [message] };
+				return fail(passwordRes.status === 401 ? 401 : 400, { form });
+			}
+		}
+
 		throw redirect(
 			303,
 			`/profile`,
-			{ type: 'success', message: `Details Updated Successfully` },
+			{ type: 'success', message: 'Profile Updated Successfully' },
 			cookies
 		);
 	}

@@ -1,22 +1,38 @@
 <script lang="ts">
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import { resolve } from '$app/paths';
+	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
 	import UserForm from './UserForm.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data }: { data: PageData } = $props();
+	const term = useTerms();
 
-	let title = $state('Create User');
-	if (data.action === 'edit') {
-		title = 'Edit User';
-	}
+	const title = $derived(
+		data.action === 'edit' ? `Edit ${term('user')}` : `Create ${term('user')}`
+	);
 </script>
 
-<div class="mx-4 flex flex-col py-4 sm:mx-6 md:mx-10">
-	<h2
-		class="my-6 mr-2 w-fit scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 sm:text-3xl md:my-10"
-	>
-		{title}
-	</h2>
-	<div class="bg-white p-4 sm:p-6 md:p-10">
-		<UserForm {data} />
+<div class="mx-auto flex flex-col gap-10 py-8">
+	<div class="mx-4 flex items-center justify-between py-4 sm:mx-6 md:mx-10">
+		<div class="flex items-center gap-3">
+			<a
+				href={resolve('/users')}
+				class="hover:bg-muted rounded-lg border p-2"
+				aria-label={`Back to ${term('users', 'lower')}`}
+			>
+				<ArrowLeft size={20} />
+			</a>
+			<h2 class="text-2xl font-bold tracking-tight">
+				{title}
+			</h2>
+		</div>
+		<Button type="submit" form="user-form" class="bg-primary font-semibold">Save</Button>
+	</div>
+	<div class="mx-4 sm:mx-6 md:mx-10">
+		<div class="bg-card rounded-2xl border p-8">
+			<UserForm {data} />
+		</div>
 	</div>
 </div>

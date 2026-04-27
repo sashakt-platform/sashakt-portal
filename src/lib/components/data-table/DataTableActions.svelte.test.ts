@@ -232,9 +232,9 @@ describe('DataTableActions', () => {
 					...defaultProps,
 					customActions: [
 						{
-							label: 'Generate QR',
-							href: '/qr-code/1',
-							icon: 'qr-code'
+							label: 'Duplicate Item',
+							href: '/duplicate/1',
+							icon: 'copy'
 						}
 					]
 				}
@@ -243,7 +243,7 @@ describe('DataTableActions', () => {
 			const button = screen.getByRole('button', { name: /Open menu/i });
 			await fireEvent.click(button);
 
-			expect(screen.getByText('Generate QR')).toBeInTheDocument();
+			expect(screen.getByText('Duplicate Item')).toBeInTheDocument();
 		});
 
 		it('should render multiple custom actions', async () => {
@@ -272,7 +272,7 @@ describe('DataTableActions', () => {
 			['file-plus', 'Add File'],
 			['external-link', 'External Link'],
 			['copy', 'Copy'],
-			['qr-code', 'QR Code']
+			['copy-link', 'Copy Link']
 		])('should handle %s icon', async (icon, label) => {
 			render(DataTableActions, {
 				props: {
@@ -363,7 +363,7 @@ describe('DataTableActions', () => {
 				}
 			});
 
-			expect(screen.getByText('Delete')).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Delete/i })).toBeInTheDocument();
 			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
 		});
 
@@ -378,9 +378,9 @@ describe('DataTableActions', () => {
 				}
 			});
 
-			const deleteButton = screen.getByText('Delete').closest('button');
+			const deleteButton = screen.getByRole('button', { name: /Delete/i });
 			expect(deleteButton).toBeInTheDocument();
-			await fireEvent.click(deleteButton!);
+			await fireEvent.click(deleteButton);
 
 			expect(onDelete).toHaveBeenCalledTimes(1);
 		});
@@ -457,7 +457,7 @@ describe('DataTableActions', () => {
 
 			// Both Edit and Delete are inline
 			expect(screen.getByText('Edit')).toBeInTheDocument();
-			expect(screen.getByText('Delete')).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: /Delete/i })).toBeInTheDocument();
 			// No overflow dropdown
 			expect(screen.queryByRole('button', { name: /Open menu/i })).not.toBeInTheDocument();
 		});

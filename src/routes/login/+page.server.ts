@@ -57,6 +57,6 @@ export const actions: Actions = {
 		setSessionTokenCookie(cookies, access_token, new Date(Date.now() + accessExpiryMs));
 		setRefreshTokenCookie(cookies, refresh_token);
 
-		throw redirect(303, '/dashboard');
+		throw redirect(303, '/tests/test-session');
 	}
 };

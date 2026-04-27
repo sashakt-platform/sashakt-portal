@@ -8,6 +8,7 @@ import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { fail } from '@sveltejs/kit';
+import { serverTerms } from '$lib/server/nomenclature';
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
@@ -32,6 +33,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		const search = url.searchParams.get('search') || '';
 		const sortBy = url.searchParams.get('sortBy') || '';
 		const sortOrder = url.searchParams.get('sortOrder') || 'asc';
+		const isActiveRaw = url.searchParams.get('isActive')?.toLowerCase();
+		const isActive = isActiveRaw === 'true' || isActiveRaw === 'false' ? isActiveRaw : '';
 
 		const queryParams = new URLSearchParams({
 			page: page.toString(),
@@ -39,7 +42,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			entity_type_id: entityTypeId,
 			...(search && { name: search }),
 			...(sortBy && { sort_by: sortBy }),
-			...(sortBy && { sort_order: sortOrder })
+			...(sortBy && { sort_order: sortOrder }),
+			...(isActive && { is_active: isActive })
 		});
 
 		const entitiesRes = await fetch(`${BACKEND_URL}/entity/?${queryParams}`, {
@@ -66,7 +70,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			entityType,
 			entityTypeId,
 			totalPages: entities?.pages || 0,
-			params: { page, size, search, sortBy, sortOrder }
+			params: { page, size, search, sortBy, sortOrder, isActive }
 		};
 	}
 
@@ -120,6 +124,7 @@ export const actions: Actions = {
 	save: async ({ request, params, cookies }) => {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
+		const term = await serverTerms(user.organization_id);
 
 		if (params.action === 'edit') {
 			requirePermission(user, PERMISSIONS.UPDATE_ENTITY);
@@ -142,7 +147,7 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: 'Entity not saved. Please check all the details.'
+					message: `${term('entity')} not saved. Please check all the details.`
 				},
 				cookies
 			);
@@ -164,7 +169,8 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message: errorMessage.detail || 'Entity not created. Please check all the details.'
+						message:
+							errorMessage.detail || `${term('entity')} not created. Please check all the details.`
 					},
 					cookies
 				);
@@ -187,7 +193,8 @@ export const actions: Actions = {
 				setFlash(
 					{
 						type: 'error',
-						message: errorMessage.detail || 'Entity not updated. Please check all the details.'
+						message:
+							errorMessage.detail || `${term('entity')} not updated. Please check all the details.`
 					},
 					cookies
 				);
@@ -200,7 +207,7 @@ export const actions: Actions = {
 			'/entity',
 			{
 				type: 'success',
-				message: 'Entity saved successfully'
+				message: `${term('entity')} saved successfully`
 			},
 			cookies
 		);
@@ -209,6 +216,7 @@ export const actions: Actions = {
 	delete: async ({ params, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_ENTITY);
+		const term = await serverTerms(user.organization_id);
 
 		const token = getSessionTokenCookie();
 
@@ -236,7 +244,7 @@ export const actions: Actions = {
 		throw redirect(
 			303,
 			`/entity`,
-			{ type: 'success', message: `Entity deleted successfully` },
+			{ type: 'success', message: `${term('entity')} deleted successfully` },
 			cookies
 		);
 	}

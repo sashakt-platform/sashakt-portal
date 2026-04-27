@@ -1,13 +1,13 @@
 import * as Sentry from '@sentry/sveltekit';
 import { redirect, type Handle } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth.js';
+import {
+	getCachedOrganization,
+	invalidateOrganizationCache,
+	setCachedOrganization
+} from '$lib/server/organization-cache.js';
 import { sequence } from '@sveltejs/kit/hooks';
 import { BACKEND_URL } from '$env/static/private';
-
-// simple in-memory cache for organization lookups (per-node)
-const ORG_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
-const ORG_CACHE_MAX_SIZE = 100;
-const orgCache = new Map<string, { data: App.Locals['organization']; expiresAt: number }>();
 
 const handleOrganization: Handle = async ({ event, resolve }) => {
 	const shortcode = event.cookies.get(auth.organizationCookieName);
@@ -17,12 +17,10 @@ const handleOrganization: Handle = async ({ event, resolve }) => {
 		return resolve(event);
 	}
 
-	// check cache
 	const key = String(shortcode);
-	const now = Date.now();
-	const cached = orgCache.get(key);
-	if (cached && cached.expiresAt > now) {
-		event.locals.organization = cached.data;
+	const cached = getCachedOrganization(key);
+	if (cached) {
+		event.locals.organization = cached;
 		return resolve(event);
 	}
 
@@ -39,20 +37,13 @@ const handleOrganization: Handle = async ({ event, resolve }) => {
 		if (res.ok) {
 			const json = await res.json();
 			event.locals.organization = json;
-			// remove oldest entry if cache is full
-			if (orgCache.size >= ORG_CACHE_MAX_SIZE) {
-				const oldestKey = orgCache.keys().next().value;
-				if (oldestKey !== undefined) orgCache.delete(oldestKey);
-			}
-			orgCache.set(key, { data: json, expiresAt: now + ORG_CACHE_TTL });
+			setCachedOrganization(key, json);
 		} else {
 			event.locals.organization = null;
-			// remove any stale cache on non-ok
-			orgCache.delete(key);
+			invalidateOrganizationCache(key);
 		}
-	} catch (err) {
-		// on error, avoid leaving stale cached data; set null for this request
-		orgCache.delete(key);
+	} catch {
+		invalidateOrganizationCache(key);
 		event.locals.organization = null;
 	}
 

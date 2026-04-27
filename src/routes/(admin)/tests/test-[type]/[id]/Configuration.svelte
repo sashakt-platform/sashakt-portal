@@ -12,13 +12,31 @@
 	import { MarksLevel, OmrMode } from './schema';
 	import * as Select from '$lib/components/ui/select';
 	import { resolve } from '$app/paths';
+	import { isFixed, type OrgSettingsPayload } from '$lib/utils/organizationSettings';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	interface CertificateToken {
 		token: string;
 		label: string;
 	}
 
-	let { formData } = $props();
+	let {
+		formData,
+		orgSettings = null
+	}: {
+		formData: any;
+		orgSettings?: OrgSettingsPayload | null;
+	} = $props();
+
+	const fixedTestTimings = $derived(isFixed(orgSettings, 'test_timings'));
+	const fixedPagination = $derived(isFixed(orgSettings, 'questions_per_page'));
+	const fixedMarking = $derived(isFixed(orgSettings, 'marking_scheme'));
+	const fixedAnswerReview = $derived(isFixed(orgSettings, 'answer_review'));
+	const fixedPalette = $derived(isFixed(orgSettings, 'question_palette'));
+	const fixedMarkForReview = $derived(isFixed(orgSettings, 'mark_for_review'));
+	const fixedOmr = $derived(isFixed(orgSettings, 'omr_mode'));
 
 	if (!$formData.marking_scheme) {
 		$formData.marking_scheme = {
@@ -144,7 +162,7 @@
 <div class="flex flex-col gap-4 p-6">
 	<!-- 0. Test Schedule (tests only, not templates) -->
 	{#if !$formData.is_template}
-		<ConfigureBox title="Test Schedule" Icon={Settings} defaultOpen={true}>
+		<ConfigureBox title={`${term('test')} Schedule`} Icon={Settings} defaultOpen={true}>
 			<div class="py-4 md:py-6">
 				<CalendarRange
 					rangeFromLabel="Start Time"
@@ -174,7 +192,7 @@
 					/>
 				</div>
 				<div>
-					{@render label('Test Completion Message')}
+					{@render label(`${term('test')} Completion Message`)}
 					<Textarea
 						name="completion_message"
 						placeholder="E.g., Thank you for completing the assessment. Your results will be shared soon."
@@ -202,33 +220,36 @@
 						</Select.Content>
 					</Select.Root>
 				</div>
-				<div>
-					{@render label('OMR Mode')}
-					<Select.Root type="single" name="omr" bind:value={$formData.omr}>
-						{@render selectTrigger(
-							$formData.omr === OmrMode.NEVER
-								? 'Never'
-								: $formData.omr === OmrMode.ALWAYS
-									? 'Always'
-									: 'Optional',
-							true
-						)}
-						<Select.Content>
-							<Select.Group>
-								<Select.Item value={OmrMode.NEVER} label="Never">Never</Select.Item>
-								<Select.Item value={OmrMode.ALWAYS} label="Always">Always</Select.Item>
-								<Select.Item value={OmrMode.OPTIONAL} label="Optional">Optional</Select.Item>
-							</Select.Group>
-						</Select.Content>
-					</Select.Root>
-				</div>
+				{#if !fixedOmr}
+					<div>
+						{@render label('OMR Mode')}
+						<Select.Root type="single" name="omr" bind:value={$formData.omr}>
+							{@render selectTrigger(
+								$formData.omr === OmrMode.NEVER
+									? 'Never'
+									: $formData.omr === OmrMode.ALWAYS
+										? 'Always'
+										: 'Optional',
+								true
+							)}
+							<Select.Content>
+								<Select.Group>
+									<Select.Item value={OmrMode.NEVER} label="Never">Never</Select.Item>
+									<Select.Item value={OmrMode.ALWAYS} label="Always">Always</Select.Item>
+									<Select.Item value={OmrMode.OPTIONAL} label="Optional">Optional</Select.Item>
+								</Select.Group>
+							</Select.Content>
+						</Select.Root>
+					</div>
+				{/if}
 
 				<div>
-					{@render label('Candidate Information Form')}
+					{@render label(`Candidate Information ${term('form')}`)}
 					<div class="flex items-center gap-2">
 						<Select.Root type="single" name="form_id" bind:value={$formData.form_id}>
 							{@render selectTrigger(
-								formsOptions.find((f) => f.id === $formData.form_id)?.name || 'Select Form',
+								formsOptions.find((f) => f.id === $formData.form_id)?.name ||
+									`Select ${term('form')}`,
 								!!$formData.form_id
 							)}
 							<Select.Content>
@@ -244,16 +265,18 @@
 				</div>
 
 				<div>
-					{@render label('Certificate')}
+					{@render label(term('certificate'))}
 					<Select.Root type="single" name="certificate_id" bind:value={$formData.certificate_id}>
 						{@render selectTrigger(
 							certificatesOptions.find((c) => c.id === $formData.certificate_id)?.name ||
-								'Select Certificate',
+								`Select ${term('certificate')}`,
 							!!$formData.certificate_id
 						)}
 						<Select.Content>
 							<Select.Group>
-								<Select.Item value="" label="No certificate">No certificate</Select.Item>
+								<Select.Item value="" label={`No ${term('certificate', 'lower')}`}>
+									No {term('certificate', 'lower')}
+								</Select.Item>
 								{#each certificatesOptions as cert (cert.id)}
 									<Select.Item value={String(cert.id)}>{cert.name}</Select.Item>
 								{/each}
@@ -315,19 +338,21 @@
 		</div>
 	{/snippet}
 	<!-- 2. Test Rules -->
-	<ConfigureBox title="Test Rules" Icon={Settings}>
+	<ConfigureBox title={`${term('test')} Rules`} Icon={Settings}>
 		<div class="flex flex-col lg:flex-row lg:gap-12">
 			<div class="flex flex-col gap-6 py-4 md:py-6 lg:w-1/2">
-				<div class="flex items-center justify-between">
-					{@render labelTestRules('Maximum time limit for the test')}
-					<Input
-						placeholder="0 minutes"
-						class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
-						type="number"
-						name="time_limit"
-						bind:value={$formData.time_limit}
-					/>
-				</div>
+				{#if !fixedTestTimings}
+					<div class="flex items-center justify-between">
+						{@render labelTestRules('Maximum time limit for the test')}
+						<Input
+							placeholder="0 minutes"
+							class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
+							type="number"
+							name="time_limit"
+							bind:value={$formData.time_limit}
+						/>
+					</div>
+				{/if}
 
 				<div class="flex items-center justify-between">
 					{@render labelTestRules('Shuffle question order per candidate')}
@@ -381,21 +406,32 @@
 					{/if}
 				{/if}
 
-				<div class="flex items-center justify-between">
-					{@render labelTestRules('Questions per page (0 - All questions in a page)')}
-					<Input
-						placeholder="0"
-						class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
-						type="number"
-						name="question_pagination"
-						bind:value={$formData.question_pagination}
-					/>
-				</div>
+				{#if !fixedPagination}
+					<div class="flex items-center justify-between">
+						{@render labelTestRules('Questions per page (0 - All questions in a page)')}
+						<Input
+							placeholder="0"
+							class="w-36 rounded-lg text-center placeholder:font-light placeholder:text-gray-500"
+							type="number"
+							name="question_pagination"
+							bind:value={$formData.question_pagination}
+						/>
+					</div>
+				{/if}
 			</div>
 			<div class="border-gray-200 lg:border-t-0 lg:border-l"></div>
 			<div class="flex flex-col gap-6 lg:w-1/2 lg:py-4">
 				<div class="flex items-center justify-between">
-					{@render labelTestRules('Show result after test completion')}
+					{@render labelTestRules('Show marks to candidate during test')}
+					{@render yesNo(
+						$formData.show_marks,
+						() => ($formData.show_marks = true),
+						() => ($formData.show_marks = false)
+					)}
+				</div>
+
+				<div class="flex items-center justify-between">
+					{@render labelTestRules(`Show result after ${term('test', 'lower')} completion`)}
 					{@render yesNo(
 						$formData.show_result,
 						() => ($formData.show_result = true),
@@ -403,132 +439,143 @@
 					)}
 				</div>
 
-				<div class="flex items-center justify-between">
-					{@render labelTestRules('Show question palette during test')}
-					{@render yesNo(
-						$formData.show_question_palette,
-						() => ($formData.show_question_palette = true),
-						() => ($formData.show_question_palette = false)
-					)}
-				</div>
+				{#if !fixedPalette}
+					<div class="flex items-center justify-between">
+						{@render labelTestRules(`Show question palette during ${term('test', 'lower')}`)}
+						{@render yesNo(
+							$formData.show_question_palette,
+							() => ($formData.show_question_palette = true),
+							() => ($formData.show_question_palette = false)
+						)}
+					</div>
+				{/if}
 
-				<div class="flex items-center justify-between">
-					{@render labelTestRules('Enable mark for review')}
-					{@render yesNo(
-						$formData.bookmark,
-						() => ($formData.bookmark = true),
-						() => ($formData.bookmark = false)
-					)}
-				</div>
+				{#if !fixedMarkForReview}
+					<div class="flex items-center justify-between">
+						{@render labelTestRules('Enable mark for review')}
+						{@render yesNo(
+							$formData.bookmark,
+							() => ($formData.bookmark = true),
+							() => ($formData.bookmark = false)
+						)}
+					</div>
+				{/if}
 
-				<div class="flex items-center justify-between">
-					{@render labelTestRules('Show feedback after test completion')}
+				{#if !fixedAnswerReview}
+					<div class="flex items-center justify-between">
+						{@render labelTestRules(`Show feedback after ${term('test', 'lower')} completion`)}
 
-					{@render yesNo(
-						$formData.show_feedback_on_completion,
-						() => ($formData.show_feedback_on_completion = true),
-						() => ($formData.show_feedback_on_completion = false)
-					)}
-				</div>
+						{@render yesNo(
+							$formData.show_feedback_on_completion,
+							() => ($formData.show_feedback_on_completion = true),
+							() => ($formData.show_feedback_on_completion = false)
+						)}
+					</div>
 
-				<div class="flex items-center justify-between">
-					{@render labelTestRules('Show feedback immediately after each question')}
-					{@render yesNo(
-						$formData.show_feedback_immediately,
-						() => ($formData.show_feedback_immediately = true),
-						() => ($formData.show_feedback_immediately = false)
-					)}
-				</div>
+					<div class="flex items-center justify-between">
+						{@render labelTestRules('Show feedback immediately after each question')}
+						{@render yesNo(
+							$formData.show_feedback_immediately,
+							() => ($formData.show_feedback_immediately = true),
+							() => ($formData.show_feedback_immediately = false)
+						)}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</ConfigureBox>
 
 	<!-- 3. Marking Scheme -->
-	<ConfigureBox title="Marking Scheme" Icon={Settings}>
-		<div class="flex flex-col gap-4 py-4 md:py-6 lg:w-1/2">
-			<RadioGroup.Root bind:value={$formData.marks_level} class="flex flex-col gap-3">
-				<label
-					for="question_level"
-					class={[
-						'flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors',
-						$formData.marks_level === MarksLevel.QUESTION
-							? 'border-primary bg-primary/5'
-							: 'hover:bg-gray-50'
-					]}
-				>
-					<RadioGroup.Item value={MarksLevel.QUESTION} id="question_level" class="mt-0.5" />
-					<div>
-						<p class="text-sm font-semibold text-gray-800">Question Level Marking</p>
-						<p class="text-sm text-gray-500">
-							Each question has its own marks defined individually in the question bank
-						</p>
-					</div>
-				</label>
-
-				<label
-					for="test_level"
-					class={[
-						'flex cursor-pointer flex-col rounded-xl border p-4 transition-colors',
-						$formData.marks_level === MarksLevel.TEST
-							? 'border-primary bg-primary/5'
-							: 'hover:bg-gray-50'
-					]}
-				>
-					<div class="flex items-start gap-3">
-						<RadioGroup.Item value={MarksLevel.TEST} id="test_level" class="mt-0.5" />
+	{#if !fixedMarking}
+		<ConfigureBox title="Marking Scheme" Icon={Settings}>
+			<div class="flex flex-col gap-4 py-4 md:py-6 lg:w-1/2">
+				<RadioGroup.Root bind:value={$formData.marks_level} class="flex flex-col gap-3">
+					<label
+						for="question_level"
+						class={[
+							'flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors',
+							$formData.marks_level === MarksLevel.QUESTION
+								? 'border-primary bg-primary/5'
+								: 'hover:bg-gray-50'
+						]}
+					>
+						<RadioGroup.Item value={MarksLevel.QUESTION} id="question_level" class="mt-0.5" />
 						<div>
-							<p class="text-sm font-semibold text-gray-800">Test Level Marking</p>
+							<p class="text-sm font-semibold text-gray-800">Question Level Marking</p>
 							<p class="text-sm text-gray-500">
-								Apply uniform marks across all questions in this test
+								Each question has its own marks defined individually in the question bank
 							</p>
 						</div>
-					</div>
+					</label>
 
-					{#if $formData.marks_level === MarksLevel.TEST}
-						<div class="flex flex-col gap-6">
-							<div class="mt-4 ml-7 flex flex-col gap-4">
-								<div class="grid grid-cols-3 gap-3">
-									<div class="flex flex-col gap-1">
-										<small class="text-gray-500">Correct</small>
-										<Input
-											class="w-full"
-											type="number"
-											placeholder="0"
-											name="marking_scheme.correct"
-											bind:value={$formData.marking_scheme.correct}
-										/>
-									</div>
-									<div class="flex flex-col gap-1">
-										<small class="text-gray-500">Incorrect</small>
-										<Input
-											class="w-full"
-											type="number"
-											placeholder="0"
-											name="marking_scheme.wrong"
-											bind:value={$formData.marking_scheme.wrong}
-										/>
-									</div>
-									<div class="flex flex-col gap-1">
-										<small class="text-gray-500">No answer</small>
-										<Input
-											class="w-full"
-											type="number"
-											placeholder="0"
-											name="marking_scheme.skipped"
-											bind:value={$formData.marking_scheme.skipped}
-										/>
+					<label
+						for="test_level"
+						class={[
+							'flex cursor-pointer flex-col rounded-xl border p-4 transition-colors',
+							$formData.marks_level === MarksLevel.TEST
+								? 'border-primary bg-primary/5'
+								: 'hover:bg-gray-50'
+						]}
+					>
+						<div class="flex items-start gap-3">
+							<RadioGroup.Item value={MarksLevel.TEST} id="test_level" class="mt-0.5" />
+							<div>
+								<p class="text-sm font-semibold text-gray-800">{term('test')} Level Marking</p>
+								<p class="text-sm text-gray-500">
+									Apply uniform marks across all questions in this test
+								</p>
+							</div>
+						</div>
+
+						{#if $formData.marks_level === MarksLevel.TEST}
+							<div class="flex flex-col gap-6">
+								<div class="mt-4 ml-7 flex flex-col gap-4">
+									<div class="grid grid-cols-3 gap-3">
+										<div class="flex flex-col gap-1">
+											<small class="text-gray-500">Correct</small>
+											<Input
+												class="w-full"
+												type="number"
+												step="any"
+												placeholder="0"
+												name="marking_scheme.correct"
+												bind:value={$formData.marking_scheme.correct}
+											/>
+										</div>
+										<div class="flex flex-col gap-1">
+											<small class="text-gray-500">Incorrect</small>
+											<Input
+												class="w-full"
+												type="number"
+												step="any"
+												placeholder="0"
+												name="marking_scheme.wrong"
+												bind:value={$formData.marking_scheme.wrong}
+											/>
+										</div>
+										<div class="flex flex-col gap-1">
+											<small class="text-gray-500">No answer</small>
+											<Input
+												class="w-full"
+												type="number"
+												step="any"
+												placeholder="0"
+												name="marking_scheme.skipped"
+												bind:value={$formData.marking_scheme.skipped}
+											/>
+										</div>
 									</div>
 								</div>
+								<hr class="border-gray-300" />
+								<PartialMarkingSection
+									bind:partial={$formData.marking_scheme.partial}
+									bordered={false}
+								/>
 							</div>
-							<hr class="border-gray-300" />
-							<PartialMarkingSection
-								bind:partial={$formData.marking_scheme.partial}
-								bordered={false}
-							/>
-						</div>
-					{/if}
-				</label>
-			</RadioGroup.Root>
-		</div>
-	</ConfigureBox>
+						{/if}
+					</label>
+				</RadioGroup.Root>
+			</div>
+		</ConfigureBox>
+	{/if}
 </div>

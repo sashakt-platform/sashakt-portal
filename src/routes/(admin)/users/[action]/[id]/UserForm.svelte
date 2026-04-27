@@ -18,7 +18,11 @@
 	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
-	import { resolve } from '$app/paths';
+	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
+
+	let showPassword = $state(false);
+	let showConfirmPassword = $state(false);
 
 	let { data }: { data: any } = $props();
 
@@ -106,7 +110,7 @@
 	}
 </script>
 
-<form method="POST" use:enhance action="?/save" class="flex flex-col gap-6">
+<form id="user-form" method="POST" use:enhance action="?/save" class="flex flex-col gap-6">
 	{#if $errors._errors && $errors._errors.length > 0}
 		<div class="border-destructive bg-destructive/10 rounded-md border p-4">
 			<h3 class="text-destructive mb-2 text-sm font-medium">Please fix the following errors:</h3>
@@ -117,104 +121,83 @@
 			</ul>
 		</div>
 	{/if}
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-		<Form.Field {form} name="full_name">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>Name</Form.Label>
-					<Input {...props} bind:value={$formData.full_name} />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-		<Form.Field {form} name="email">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>Email</Form.Label>
-					<Input {...props} bind:value={$formData.email} />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-	</div>
-
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-		<Form.Field {form} name="password">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label
-						>Password {isEditMode ? '(Optional - leave blank to keep current)' : ''}</Form.Label
-					>
-					<Input
-						{...props}
-						type="password"
-						bind:value={$formData.password}
-						placeholder={isEditMode ? 'Leave blank to keep current password' : ''}
-					/>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-		<Form.Field {form} name="confirm_password">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label
-						>Confirm Password {isEditMode ? '(Required if password is entered)' : ''}</Form.Label
-					>
-					<Input
-						{...props}
-						type="password"
-						bind:value={$formData.confirm_password}
-						placeholder={isEditMode ? 'Confirm new password if changing' : ''}
-					/>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-	</div>
-
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-		<Form.Field {form} name="phone">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>Phone</Form.Label>
-					<Input {...props} bind:value={$formData.phone} />
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-		<Form.Field {form} name="is_active" class="my-auto">
-			<Form.Control>
-				{#snippet children({ props })}
-					<div class="flex items-center gap-2">
-						<Switch id="is-active" bind:checked={$formData.is_active} />
-						<Form.Label>Is Active?</Form.Label>
-					</div>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-	</div>
-
-	<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-		{#if isSuperAdmin}
-			<Form.Field {form} name="organization_id">
+	<div class="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
+		<div class="flex flex-col gap-6">
+			<Form.Field {form} name="full_name">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label>Organization</Form.Label>
-						<Select.Root type="single" bind:value={$formData.organization_id} name={props.name}>
-							<Select.Trigger {...props}>
-								{#if $formData.organization_id}
-									{data.organizations.find(
-										(organization: any) => organization.id === $formData.organization_id
-									)?.name || 'Select organization'}
+						<Form.Label class="font-semibold">Name</Form.Label>
+						<Input {...props} placeholder="Name of this user..." bind:value={$formData.full_name} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Field {form} name="email">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">Email</Form.Label>
+						<Input {...props} placeholder="Email of this user..." bind:value={$formData.email} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="phone">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">Phone Number</Form.Label>
+						<Input
+							{...props}
+							placeholder="Phone number of this user..."
+							bind:value={$formData.phone}
+						/>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			{#if isSuperAdmin}
+				<Form.Field {form} name="organization_id">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label class="font-semibold">Organization</Form.Label>
+							<Select.Root type="single" bind:value={$formData.organization_id} name={props.name}>
+								<Select.Trigger {...props} class="h-10 w-full gap-2 rounded-full px-4">
+									{#if $formData.organization_id}
+										{data.organizations.find(
+											(organization: any) => organization.id === $formData.organization_id
+										)?.name || 'Select organization'}
+									{:else}
+										Select organization
+									{/if}
+								</Select.Trigger>
+								<Select.Content>
+									{#each data.organizations as organization (organization.id)}
+										<Select.Item value={organization.id} label={organization.name} />
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			{/if}
+			<Form.Field {form} name="role_id">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">Role</Form.Label>
+						<Select.Root type="single" bind:value={$formData.role_id} name={props.name}>
+							<Select.Trigger {...props} class="h-10 w-full gap-2 rounded-full px-4">
+								{#if $formData.role_id}
+									{data.roles.find((role: any) => role.id === $formData.role_id)?.label ||
+										'Select Role'}
 								{:else}
-									Select organization
+									Select Role
 								{/if}
 							</Select.Trigger>
 							<Select.Content>
-								{#each data.organizations as organization (organization.id)}
-									<Select.Item value={organization.id} label={organization.name} />
+								{#each data.roles as role (role.id)}
+									<Select.Item value={role.id} label={role.label} />
 								{/each}
 							</Select.Content>
 						</Select.Root>
@@ -222,63 +205,122 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-		{/if}
-		<Form.Field {form} name="role_id">
-			<Form.Control>
-				{#snippet children({ props })}
-					<Form.Label>Role</Form.Label>
-					<Select.Root type="single" bind:value={$formData.role_id} name={props.name}>
-						<Select.Trigger {...props}>
-							{#if $formData.role_id}
-								{data.roles.find((role: any) => role.id === $formData.role_id)?.label ||
-									'Select role'}
-							{:else}
-								Select role
-							{/if}
-						</Select.Trigger>
-						<Select.Content>
-							{#each data.roles as role (role.id)}
-								<Select.Item value={role.id} label={role.label} />
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				{/snippet}
-			</Form.Control>
-			<Form.FieldErrors />
-		</Form.Field>
-	</div>
 
-	{#if showLocationFields}
-		<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-			{#if !currentUserIsStateAdmin}
-				<Form.Field {form} name="state_ids">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>State</Form.Label>
-							<StateSelection {...props} bind:states={selectedStates} multiple={false} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
-			{/if}
-			{#if !currentUserHasAssignedDistricts}
-				<Form.Field {form} name="district_ids">
-					<Form.Control>
-						{#snippet children({ props })}
-							<Form.Label>District</Form.Label>
-							<DistrictSelection {...props} bind:districts={selectedDistricts} {selectedStates} />
-						{/snippet}
-					</Form.Control>
-					<Form.FieldErrors />
-				</Form.Field>
+			{#if showLocationFields}
+				{#if !currentUserIsStateAdmin}
+					<Form.Field {form} name="state_ids">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label class="font-semibold">State</Form.Label>
+								<StateSelection {...props} bind:states={selectedStates} multiple={false} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				{/if}
+				{#if !currentUserHasAssignedDistricts}
+					<Form.Field {form} name="district_ids">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label class="font-semibold">District</Form.Label>
+								<DistrictSelection {...props} bind:districts={selectedDistricts} {selectedStates} />
+							{/snippet}
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+				{/if}
 			{/if}
 		</div>
-	{/if}
 
-	<div class="flex justify-end gap-4 pt-6">
-		<Button variant="outline" type="button">
-			<a href={resolve('/users')} class="block">Cancel</a>
-		</Button>
-		<Form.Button>Save</Form.Button>
+		<div class="flex flex-col gap-6">
+			<Form.Field {form} name="password">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">
+							Password{isEditMode ? ' (Optional - leave blank to keep current)' : ''}
+						</Form.Label>
+						<div class="relative">
+							<Input
+								{...props}
+								type={showPassword ? 'text' : 'password'}
+								bind:value={$formData.password}
+								placeholder={isEditMode ? 'Leave blank to keep current password' : 'Enter password'}
+								class="pr-10"
+							/>
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon"
+								class="text-muted-foreground absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2"
+								onclick={() => (showPassword = !showPassword)}
+								aria-label={showPassword ? 'Hide password' : 'Show password'}
+							>
+								{#if showPassword}
+									<Eye size={16} />
+								{:else}
+									<EyeOff size={16} />
+								{/if}
+							</Button>
+						</div>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="confirm_password">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="font-semibold">
+							Confirm Password{isEditMode ? ' (Required if password is entered)' : ''}
+						</Form.Label>
+						<div class="relative">
+							<Input
+								{...props}
+								type={showConfirmPassword ? 'text' : 'password'}
+								bind:value={$formData.confirm_password}
+								placeholder={isEditMode ? 'Confirm new password if changing' : 'Re-enter password'}
+								class="pr-10"
+							/>
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon"
+								class="text-muted-foreground absolute top-1/2 right-1 h-7 w-7 -translate-y-1/2"
+								onclick={() => (showConfirmPassword = !showConfirmPassword)}
+								aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+							>
+								{#if showConfirmPassword}
+									<Eye size={16} />
+								{:else}
+									<EyeOff size={16} />
+								{/if}
+							</Button>
+						</div>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="is_active">
+				<Form.Control>
+					{#snippet children({ props })}
+						<div class="flex items-center justify-between">
+							<Form.Label class="font-semibold">User Status</Form.Label>
+							<div class="flex items-center gap-2">
+								<span
+									class="text-sm {$formData.is_active
+										? 'text-primary font-semibold'
+										: 'text-muted-foreground'}"
+								>
+									{$formData.is_active ? 'Active' : 'Inactive'}
+								</span>
+								<Switch {...props} bind:checked={$formData.is_active} />
+							</div>
+						</div>
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+		</div>
 	</div>
 </form>

@@ -11,8 +11,11 @@
 	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import SearchInput from '$lib/components/SearchInput.svelte';
+	import StatusFilter from '$lib/components/StatusFilter.svelte';
+	import { useTerms } from '$lib/nomenclature';
 
 	let { data } = $props();
+	const term = useTerms();
 
 	const tableData = $derived(data?.certificates?.items || []);
 	const totalItems = $derived(data?.certificates?.total || 0);
@@ -22,6 +25,7 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
+	const isActive = $derived(data?.params?.isActive || '');
 
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
@@ -31,7 +35,7 @@
 		url.searchParams.set('sortOrder', newSortOrder);
 		url.searchParams.set('page', '1');
 
-		goto(url.toString(), { replaceState: false });
+		goto(url, { replaceState: false });
 	}
 
 	const columns = $derived(
@@ -41,21 +45,20 @@
 		})
 	);
 
-	const noCertificatesCreatedYet = $derived(totalItems === 0 && !search);
+	const noCertificatesCreatedYet = $derived(totalItems === 0 && !search && isActive === '');
 </script>
 
 <ListingPageLayout
-	title="Certificates"
+	title={term('certificates')}
 	subtitle=""
 	showEmptyState={noCertificatesCreatedYet}
-	infoLabel="Help: Certificate management"
-	infoDescription="This panel displays all certificates in the system. You can edit or delete a certificate by clicking the three dots next to it."
+	tooltipKey="certificate-management"
 >
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'certificate')}
 			<a href={resolve('/certificate/add/new')}>
 				<Button class="font-semibold">
-					<Plus />Create Certificate
+					<Plus />Create {term('certificate')}
 				</Button>
 			</a>
 		{/if}
@@ -70,15 +73,17 @@
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<ShieldCheck class="text-primary h-7 w-7" />
 					</div>
-					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">No certificates yet</h2>
-					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
-						Create your first certificate to get started. Certificates are awarded to candidates
-						after they complete a test.
+					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+						No {term('certificates', 'lower')} yet
+					</h2>
+					<p class="text-muted-foreground mt-2 max-w-sm text-center text-sm">
+						Create your first {term('certificate', 'lower')} to get started. {term('certificates')} are
+						awarded to candidates after they complete a {term('test', 'lower')}.
 					</p>
 					{#if canCreate(data.user, 'certificate')}
 						<div class="mt-6">
 							<a href={resolve('/certificate/add/new')}
-								><Button class="font-semibold"><Plus />Create Certificate</Button></a
+								><Button class="font-semibold"><Plus />Create {term('certificate')}</Button></a
 							>
 						</div>
 					{/if}
@@ -88,7 +93,10 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<SearchInput placeholder="Search certificates..." value={search} />
+		<div class="flex items-center justify-between gap-2">
+			<SearchInput placeholder={`Search ${term('certificates', 'lower')}...`} value={search} />
+			<StatusFilter value={isActive} />
+		</div>
 	{/snippet}
 
 	{#snippet content()}

@@ -11,6 +11,9 @@
 	import type { User } from '$lib/utils/permissions.js';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import SectionedQuestionSets from './SectionedQuestionSets.svelte';
+	import { useTerms } from '$lib/nomenclature';
+
+	const term = useTerms();
 
 	let {
 		formData,
@@ -19,7 +22,7 @@
 		user = null
 	}: { formData: any; questions: any; questionParams: any; user?: User | null } = $props();
 	let dialogOpen = $state(false);
-	let questionSelectionMode: 'manual' | 'tagBased' = $state('manual');
+	let questionSelectionMode: 'manual' | 'tagBased' = $state('tagBased');
 	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
 	const sectionedQuestionCount = $derived(
 		($formData.question_sets || []).reduce(
@@ -45,7 +48,11 @@
 				: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
 
-	if (!isSectionedTest && $formData.random_tag_count.length > 0 && $formData.question_revision_ids.length === 0) {
+	if (
+		!isSectionedTest &&
+		$formData.random_tag_count.length > 0 &&
+		$formData.question_revision_ids.length === 0
+	) {
 		questionSelectionMode = 'tagBased';
 	}
 
@@ -82,7 +89,9 @@
 				<p class="font-semibold">Select Questions</p>
 				<p class="text-sm text-gray-500">
 					{#if isSectionedTest}
-						Review the sectioned questions included in this {$formData.is_template ? 'template' : 'test'}.
+						Review the sectioned questions included in this {$formData.is_template
+							? 'template'
+							: 'test'}.
 					{:else}
 						Choose questions to include in this {$formData.is_template ? 'template' : 'test'}.
 					{/if}
@@ -93,8 +102,10 @@
 		{#if isSectionedTest}
 			<div class="text-right text-sm text-gray-500">
 				<div>
-					{sectionedQuestionCount} {sectionedQuestionCount === 1 ? 'question' : 'questions'} across
-					{sectionCount} {sectionCount === 1 ? 'section' : 'sections'}
+					{sectionedQuestionCount}
+					{sectionedQuestionCount === 1 ? 'question' : 'questions'} across
+					{sectionCount}
+					{sectionCount === 1 ? 'section' : 'sections'}
 				</div>
 				{#if totalAttemptLimit < sectionedQuestionCount}
 					<div>Answer up to {totalAttemptLimit} across all sections</div>
@@ -152,10 +163,8 @@
 							const url = new URL(page.url);
 							url.searchParams.delete('state_ids');
 							goto(url, { keepFocus: true, invalidateAll: true });
-						}}
+						}}>Select from {term('question_bank')}</Button
 					>
-						Select from Question Bank
-					</Button>
 				</div>
 			{:else}
 				<div class="mb-4 flex items-center justify-between">

@@ -12,7 +12,8 @@ export const entityTypeSchema = z.object({
 	id: z.number(),
 	name: z.string(),
 	description: z.string().optional(),
-	modified_date: z.string()
+	modified_date: z.string(),
+	total_records: z.number().optional().default(0)
 });
 
 export type EntityType = z.infer<typeof entityTypeSchema>;
@@ -29,7 +30,18 @@ export const createColumns = (
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
 		meta: { grow: true }
 	}),
-	createSortableColumn('description', 'Description', currentSortBy, currentSortOrder, handleSort),
+	{
+		accessorKey: 'description',
+		header: 'Description',
+		enableSorting: false
+	},
+	{
+		accessorKey: 'total_records',
+		header: 'NO. OF RECORDS',
+		enableSorting: false,
+		size: 130,
+		meta: { align: 'center' }
+	},
 	createSortableColumn('modified_date', 'Updated', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
 		size: 160
@@ -37,6 +49,7 @@ export const createColumns = (
 	createActionsColumn<EntityType>('Entity', '/entity', {
 		...permissions,
 		editInline: true,
+		deleteInline: true,
 		customActions: (row) => [
 			{
 				label: 'View Records',

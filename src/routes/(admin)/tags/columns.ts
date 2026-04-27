@@ -3,6 +3,7 @@ import { createSortableColumn } from '$lib/components/data-table/column-helpers'
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import TagTypeCell from './TagTypeCell.svelte';
 import TagsCell from './TagsCell.svelte';
+import type { NomenclatureKey } from '$lib/nomenclature';
 
 export interface TagType {
 	id: number | string;
@@ -15,6 +16,7 @@ export const createTagManagementColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
 	handleSort: (columnId: string) => void,
+	term: (key: NomenclatureKey) => string,
 	callbacks: {
 		canEdit: boolean;
 		canDelete: boolean;
@@ -28,23 +30,30 @@ export const createTagManagementColumns = (
 		onDeleteTag: (tagId: number | string, tagName: string) => void;
 	}
 ): ColumnDef<TagType>[] => [
-	createSortableColumn<TagType>('name', 'Tag Types', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) =>
-			renderComponent(TagTypeCell, {
-				tagType: row.original,
-				canEdit: callbacks.canEdit,
-				canDelete: callbacks.canDelete,
-				onEdit: callbacks.onEditTagType,
-				onDelete: callbacks.onDeleteTagType
-			}),
-		meta: {
-			cellClassName: 'whitespace-normal align-top border-r w-2/5',
-			headerClassName: 'border-r w-2/5'
+	createSortableColumn<TagType>(
+		'name',
+		term('tag_types'),
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) =>
+				renderComponent(TagTypeCell, {
+					tagType: row.original,
+					canEdit: callbacks.canEdit,
+					canDelete: callbacks.canDelete,
+					onEdit: callbacks.onEditTagType,
+					onDelete: callbacks.onDeleteTagType
+				}),
+			meta: {
+				cellClassName: 'whitespace-normal align-top border-r w-2/5',
+				headerClassName: 'border-r w-2/5'
+			}
 		}
-	}),
+	),
 	{
 		id: 'tags',
-		header: 'Tags',
+		header: term('tags'),
 		enableSorting: false,
 		cell: ({ row }) =>
 			renderComponent(TagsCell, {

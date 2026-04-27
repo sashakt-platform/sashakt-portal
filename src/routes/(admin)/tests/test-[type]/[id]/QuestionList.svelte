@@ -32,10 +32,11 @@
 	// Optional: auto-select mode on load when tags exist
 	if ($formData.random_tag_count.length > 0 && $formData.question_revision_ids.length === 0) {
 		questionSelectionMode = 'tagBased';
+	} else if ($formData.question_revision_ids.length > 0) {
+		questionSelectionMode = 'manual';
 	}
 
 	const setDefaultTagsRandom = () => {
-		$formData.question_revision_ids = [];
 		if ($formData.random_tag_count.length === 0 && $formData.tag_ids.length > 0) {
 			$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
 				id: tag.id,
@@ -78,6 +79,7 @@
 			onValueChange={(v) => {
 				if (v === 'manual') $formData.random_tag_count = [];
 				if (v === 'tagBased') {
+					$formData.question_revision_ids = [];
 					setDefaultTagsRandom();
 				}
 			}}

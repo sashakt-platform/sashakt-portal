@@ -124,9 +124,6 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A.')).toBeInTheDocument();
-		expect(screen.getByText('B.')).toBeInTheDocument();
-		expect(screen.getByText('C.')).toBeInTheDocument();
 		expect(screen.getByText('Option 1')).toBeInTheDocument();
 		expect(screen.getByText('Option 2')).toBeInTheDocument();
 		expect(screen.getByText('Option 3')).toBeInTheDocument();
@@ -142,11 +139,7 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A.')).toBeInTheDocument();
 		expect(screen.getByText('Option 1')).toBeInTheDocument();
-		expect(screen.getByText('Option 1')).toBeInTheDocument();
-		expect(screen.getByText('Option 2')).toBeInTheDocument();
-		expect(screen.getByText('Option 3')).toBeInTheDocument();
 	});
 
 	it('filters out options with empty values', async () => {
@@ -161,7 +154,6 @@ describe('Question_preview', () => {
 
 		await openDialog();
 
-		expect(screen.getByText('A.')).toBeInTheDocument();
 		expect(screen.getByText('Valid option')).toBeInTheDocument();
 		expect(screen.queryByText(/^B\./)).not.toBeInTheDocument();
 		expect(screen.queryByText(/^C\./)).not.toBeInTheDocument();

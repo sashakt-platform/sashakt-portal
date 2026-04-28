@@ -35,9 +35,9 @@
 </script>
 
 <div class="flex h-full w-full flex-col gap-4 overflow-auto">
-	<div class="rounded-lg border border-dashed bg-gray-50 p-4">
+	<div class="bg-background rounded-lg border border-dashed p-4">
 		<p class="text-sm font-medium">Section membership can't be edited in portal yet.</p>
-		<p class="mt-2 text-sm text-gray-500">
+		<p class="text-muted-foreground mt-2 text-sm">
 			You can still update the rest of this {isTemplate ? 'test template' : 'test session'}.
 		</p>
 	</div>
@@ -48,45 +48,49 @@
 				<div class="min-w-0">
 					<div class="flex flex-wrap items-center gap-2">
 						<p class="text-base font-semibold">{questionSet.title}</p>
-						<span class="text-xs text-gray-500">Section {questionSet.display_order}</span>
-						<span class="text-xs text-gray-500">
-							{getQuestionCount(questionSet)} {getQuestionCount(questionSet) === 1 ? 'question' : 'questions'}
+						<span class="text-muted-foreground text-xs">Section {questionSet.display_order}</span>
+						<span class="text-muted-foreground text-xs">
+							{getQuestionCount(questionSet)}
+							{getQuestionCount(questionSet) === 1 ? 'question' : 'questions'}
 						</span>
 					</div>
 					{#if questionSet.description}
-						<RichText content={questionSet.description} class="mt-1 text-sm text-gray-500 [&_p]:m-0" />
+						<RichText
+							content={questionSet.description}
+							class="text-muted-foreground mt-1 text-sm [&_p]:m-0"
+						/>
 					{/if}
 				</div>
-				<div class="text-sm text-gray-500">
+				<div class="text-muted-foreground text-sm">
 					Attempt limit: {questionSet.max_questions_allowed_to_attempt}
 				</div>
 			</div>
 
 			<div class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-				<div class="rounded-md bg-gray-50 p-3">
-					<p class="font-medium text-gray-700">Marking Scheme</p>
-					<p class="mt-1 text-gray-500">{formatMarkingScheme(questionSet)}</p>
+				<div class="bg-background rounded-md p-3">
+					<p class="text-muted-foreground font-medium">Marking Scheme</p>
+					<p class="text-muted-foreground mt-1">{formatMarkingScheme(questionSet)}</p>
 				</div>
-				<div class="rounded-md bg-gray-50 p-3">
-					<p class="font-medium text-gray-700">Question Selection</p>
-					<p class="mt-1 text-gray-500">
+				<div class="bg-background rounded-md p-3">
+					<p class="text-muted-foreground font-medium">Question Selection</p>
+					<p class="text-muted-foreground mt-1">
 						Questions in this section are read-only in portal for now.
 					</p>
 				</div>
 			</div>
 
 			<div class="mt-4">
-				<p class="text-sm font-medium text-gray-700">Questions</p>
+				<p class="text-foregroun text-sm font-medium">Questions</p>
 				{#if questionSet.question_revisions.length > 0}
 					<div class="mt-2 space-y-2">
 						{#each questionSet.question_revisions as question, index (question.id)}
 							<div class="rounded-md border px-3 py-2">
-								<div class="flex gap-2 text-sm text-gray-900">
+								<div class="text-foreground flex gap-2 text-sm">
 									<span class="shrink-0">{index + 1}.</span>
 									<RichText content={question.question_text} class="min-w-0 flex-1 [&_p]:m-0" />
 								</div>
 								{#if question.tags && question.tags.length > 0}
-									<p class="mt-1 text-xs text-gray-500">
+									<p class="text-muted-foreground mt-1 text-xs">
 										Tags: {question.tags.map((tag) => tag.name).join(', ')}
 									</p>
 								{/if}
@@ -94,7 +98,7 @@
 						{/each}
 					</div>
 				{:else}
-					<p class="mt-2 text-sm text-gray-500">No questions available for preview.</p>
+					<p class="text-foreground mt-2 text-sm">No questions available for preview.</p>
 				{/if}
 			</div>
 		</div>

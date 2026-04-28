@@ -273,7 +273,7 @@
 			>
 				<RichText
 					content={data.questionText}
-					class="min-w-0 flex-1 text-base/normal font-medium text-gray-900 [&_p]:m-0"
+					class="text-foreground min-w-0 flex-1 text-base/normal font-medium [&_p]:m-0"
 				/>
 				{#if data.isMandatory}
 					<span class="text-destructive ml-0.5">*</span>

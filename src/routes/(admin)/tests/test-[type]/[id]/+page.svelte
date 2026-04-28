@@ -69,6 +69,20 @@
 		}
 	});
 
+	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
+	const totalQuestionCount = $derived(
+		isSectionedTest
+			? ($formData.question_sets || []).reduce(
+					(total, questionSet) =>
+						total +
+						(questionSet.question_revisions?.length ||
+							questionSet.question_revision_ids?.length ||
+							0),
+					0
+				)
+			: $formData.question_revision_ids.length
+	);
+
 	function populateFormFromTestData(td: typeof testData) {
 		if (!td) return;
 		$formData.name = (td as any)?.name || '';
@@ -165,7 +179,7 @@
 			(currentScreen === typeOfScreen.configuration &&
 				$formData.random_questions &&
 				($formData.no_of_random_questions ?? 0) <= 0) ||
-			($formData.no_of_random_questions ?? 0) > ($formData.question_revision_ids ?? []).length
+			($formData.no_of_random_questions ?? 0) > totalQuestionCount
 	);
 
 	function handlePrevious() {

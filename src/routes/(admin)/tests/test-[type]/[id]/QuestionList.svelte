@@ -1,4 +1,5 @@
 <script lang="ts">
+	import FileQuestionIcon from '@lucide/svelte/icons/file-question';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import QuestionSelectionDialog from './question-selection/QuestionSelectionDialog.svelte';
 	import SelectedQuestionsList from './question-selection/SelectedQuestionsList.svelte';
@@ -9,7 +10,7 @@
 	import type { Filter } from '$lib/types/filters';
 	import type { User } from '$lib/utils/permissions.js';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
-	import FileQuestionIcon from '@lucide/svelte/icons/file-question';
+	import SectionedQuestionSets from './SectionedQuestionSets.svelte';
 	import { useTerms } from '$lib/nomenclature';
 
 	const term = useTerms();
@@ -22,15 +23,36 @@
 	}: { formData: any; questions: any; questionParams: any; user?: User | null } = $props();
 	let dialogOpen = $state(false);
 	let questionSelectionMode: 'manual' | 'tagBased' = $state('tagBased');
-
-	let totalSelectedCount = $derived(
-		$formData.question_revision_ids.length > 0
-			? $formData.question_revision_ids.length
-			: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
+	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
+	const sectionedQuestionCount = $derived(
+		($formData.question_sets || []).reduce(
+			(sum, questionSet) =>
+				sum +
+				(questionSet.question_revisions?.length || questionSet.question_revision_ids?.length || 0),
+			0
+		)
+	);
+	const sectionCount = $derived(($formData.question_sets || []).length);
+	const totalAttemptLimit = $derived(
+		($formData.question_sets || []).reduce(
+			(sum, questionSet) => sum + Number(questionSet.max_questions_allowed_to_attempt ?? 0),
+			0
+		)
 	);
 
-	// Optional: auto-select mode on load when tags exist
-	if ($formData.random_tag_count.length > 0 && $formData.question_revision_ids.length === 0) {
+	let totalSelectedCount = $derived(
+		isSectionedTest
+			? sectionedQuestionCount
+			: $formData.question_revision_ids.length > 0
+				? $formData.question_revision_ids.length
+				: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
+	);
+
+	if (
+		!isSectionedTest &&
+		$formData.random_tag_count.length > 0 &&
+		$formData.question_revision_ids.length === 0
+	) {
 		questionSelectionMode = 'tagBased';
 	}
 
@@ -44,7 +66,6 @@
 	};
 
 	const handleRemoveQuestion = (questionId: number) => {
-		// remove from both IDs and question data
 		$formData.question_revision_ids = $formData.question_revision_ids.filter(
 			(id: number) => id !== questionId
 		);
@@ -54,10 +75,11 @@
 	};
 </script>
 
-<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
+{#if !isSectionedTest}
+	<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
+{/if}
 
 <div class="overflow-hidden rounded-xl border bg-white shadow-sm">
-	<!-- Card header -->
 	<div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
 		<div class="flex items-center gap-4">
 			<div class="bg-primary/10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
@@ -65,49 +87,73 @@
 			</div>
 			<div>
 				<p class="font-semibold">Select Questions</p>
-				<p class="text-sm text-gray-500">Choose questions to include in this template</p>
+				<p class="text-muted-foreground text-sm">
+					{#if isSectionedTest}
+						Review the sectioned questions included in this {$formData.is_template
+							? 'template'
+							: 'test'}.
+					{:else}
+						Choose questions to include in this {$formData.is_template ? 'template' : 'test'}.
+					{/if}
+				</p>
 			</div>
 		</div>
 
-		<!-- Pill toggle -->
-		<Tabs
-			bind:value={questionSelectionMode}
-			class="w-fit"
-			onValueChange={(v) => {
-				if (v === 'manual') $formData.random_tag_count = [];
-				if (v === 'tagBased') {
-					$formData.question_revision_ids = [];
-					setDefaultTagsRandom();
-				}
-			}}
-		>
-			<TabsList class="bg-muted rounded-full p-1">
-				<TabsTrigger
-					value="manual"
-					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
-				>
-					Manual Selection
-				</TabsTrigger>
-				<TabsTrigger
-					value="tagBased"
-					class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
-				>
-					Auto Selection
-				</TabsTrigger>
-			</TabsList>
-		</Tabs>
+		{#if isSectionedTest}
+			<div class="text-muted-foreground text-right text-sm">
+				<div>
+					{sectionedQuestionCount}
+					{sectionedQuestionCount === 1 ? 'question' : 'questions'} across
+					{sectionCount}
+					{sectionCount === 1 ? 'section' : 'sections'}
+				</div>
+				{#if totalAttemptLimit < sectionedQuestionCount}
+					<div>Answer up to {totalAttemptLimit} across all sections</div>
+				{/if}
+			</div>
+		{:else}
+			<Tabs
+				bind:value={questionSelectionMode}
+				class="w-fit"
+				onValueChange={(v) => {
+					if (v === 'manual') $formData.random_tag_count = [];
+					if (v === 'tagBased') {
+						$formData.question_revision_ids = [];
+						setDefaultTagsRandom();
+					}
+				}}
+			>
+				<TabsList class="bg-muted rounded-full p-1">
+					<TabsTrigger
+						value="manual"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
+					>
+						Manual Selection
+					</TabsTrigger>
+					<TabsTrigger
+						value="tagBased"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
+					>
+						Auto Selection
+					</TabsTrigger>
+				</TabsList>
+			</Tabs>
+		{/if}
 	</div>
 
-	<!-- Divider -->
 	<div class="border-t"></div>
 
-	<!-- Card body -->
 	<div class="flex min-h-96 flex-col p-5">
-		{#if questionSelectionMode === 'manual'}
+		{#if isSectionedTest}
+			<SectionedQuestionSets
+				questionSets={$formData.question_sets || []}
+				isTemplate={$formData.is_template}
+			/>
+		{:else if questionSelectionMode === 'manual'}
 			{#if $formData.question_revision_ids.length === 0}
 				<div class="my-auto flex flex-col items-center justify-center py-16 text-center">
 					<p class="text-lg font-bold">No questions yet</p>
-					<p class="mt-1 text-sm text-gray-500">
+					<p class="text-muted-foreground mt-1 text-sm">
 						Add the relevant questions to your test {$formData.is_template ? 'template' : ''}.
 					</p>
 					<Button
@@ -142,7 +188,7 @@
 			{/if}
 		{:else if questionSelectionMode === 'tagBased'}
 			<div class="flex flex-col items-center gap-4 py-8 text-center">
-				<p class="text-sm text-gray-600">
+				<p class="text-muted-foreground text-sm">
 					Select tags and specify how many questions to randomly pull from each.<br />
 					Questions will be drawn from the question bank at test creation time.
 				</p>
@@ -158,15 +204,13 @@
 				</p>
 
 				<div class="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border bg-gray-50">
-					<!-- Table header -->
 					<div
-						class="grid grid-cols-2 bg-gray-100 px-6 py-4 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+						class="text-muted-foreground grid grid-cols-2 bg-gray-100 px-6 py-4 text-xs font-semibold tracking-wide uppercase"
 					>
 						<div>Tags</div>
 						<div>No. of Questions</div>
 					</div>
 
-					<!-- Tag rows -->
 					{#each $formData.random_tag_count as tag (tag.id)}
 						<div class="grid grid-cols-2 items-center gap-4 border-t bg-white px-6 py-4">
 							<span

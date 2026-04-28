@@ -87,7 +87,7 @@
 			</div>
 			<div>
 				<p class="font-semibold">Select Questions</p>
-				<p class="text-sm text-gray-500">
+				<p class="text-muted-foreground text-sm">
 					{#if isSectionedTest}
 						Review the sectioned questions included in this {$formData.is_template
 							? 'template'
@@ -100,7 +100,7 @@
 		</div>
 
 		{#if isSectionedTest}
-			<div class="text-right text-sm text-gray-500">
+			<div class="text-muted-foreground text-right text-sm">
 				<div>
 					{sectionedQuestionCount}
 					{sectionedQuestionCount === 1 ? 'question' : 'questions'} across
@@ -126,13 +126,13 @@
 				<TabsList class="bg-muted rounded-full p-1">
 					<TabsTrigger
 						value="manual"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
 					>
 						Manual Selection
 					</TabsTrigger>
 					<TabsTrigger
 						value="tagBased"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
 					>
 						Auto Selection
 					</TabsTrigger>
@@ -153,7 +153,7 @@
 			{#if $formData.question_revision_ids.length === 0}
 				<div class="my-auto flex flex-col items-center justify-center py-16 text-center">
 					<p class="text-lg font-bold">No questions yet</p>
-					<p class="mt-1 text-sm text-gray-500">
+					<p class="text-muted-foreground mt-1 text-sm">
 						Add the relevant questions to your test {$formData.is_template ? 'template' : ''}.
 					</p>
 					<Button
@@ -188,7 +188,7 @@
 			{/if}
 		{:else if questionSelectionMode === 'tagBased'}
 			<div class="flex flex-col items-center gap-4 py-8 text-center">
-				<p class="text-sm text-gray-600">
+				<p class="text-muted-foreground text-sm">
 					Select tags and specify how many questions to randomly pull from each.<br />
 					Questions will be drawn from the question bank at test creation time.
 				</p>
@@ -205,7 +205,7 @@
 
 				<div class="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border bg-gray-50">
 					<div
-						class="grid grid-cols-2 bg-gray-100 px-6 py-4 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+						class="text-muted-foreground grid grid-cols-2 bg-gray-100 px-6 py-4 text-xs font-semibold tracking-wide uppercase"
 					>
 						<div>Tags</div>
 						<div>No. of Questions</div>

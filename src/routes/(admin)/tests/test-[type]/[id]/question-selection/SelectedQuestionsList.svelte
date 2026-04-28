@@ -69,7 +69,7 @@
 			</div>
 
 			<!-- Question text -->
-			<RichText content={question.question_text} class="text-sm text-gray-800 [&_p]:m-0" />
+			<RichText content={question.question_text} class="text-foreground text-sm [&_p]:m-0" />
 
 			<!-- Eye preview -->
 			<div class="flex justify-center">

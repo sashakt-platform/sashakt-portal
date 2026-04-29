@@ -139,7 +139,10 @@ export const actions: Actions = {
 
 			if (!response.ok) {
 				const errorMessage = await response.json();
-				const detail = errorMessage.detail || 'Question not Created. Please check all the details.';
+				const detail =
+					errorMessage.detail?.[0]?.msg ||
+					errorMessage.detail ||
+					'Question not Created. Please check all the details.';
 				setFlash({ type: 'error', message: detail }, cookies);
 				return fail(response.status, { form, errorMessage: detail });
 			}
@@ -227,14 +230,10 @@ export const actions: Actions = {
 
 			if (!response.ok) {
 				const errorMessage = await response.json();
-				setFlash(
-					{
-						type: 'error',
-						message: `Failed to update question: ${errorMessage.detail || response.statusText}`
-					},
-					cookies
-				);
-				return fail(500, { form });
+				const detail = errorMessage.detail?.[0]?.msg || errorMessage.detail || response.statusText;
+				const msg = `Failed to update question: ${detail}`;
+				setFlash({ type: 'error', message: msg }, cookies);
+				return fail(response.status, { form });
 			}
 
 			// Transform tag_ids array into the required format

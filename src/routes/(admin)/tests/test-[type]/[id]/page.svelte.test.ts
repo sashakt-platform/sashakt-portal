@@ -92,7 +92,8 @@ function setupSuperFormMock(overrides: Partial<typeof defaultFormValues> = {}) {
 	return formStore;
 }
 
-function baseData(overrides: Record<string, any> = {}) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function baseData(overrides: Record<string, any> = {}): any {
 	return {
 		form: {},
 		testData: null,
@@ -109,6 +110,10 @@ function baseData(overrides: Record<string, any> = {}) {
 		},
 		user: { id: 1, permissions: [] },
 		test_taker_url: 'http://test-taker.example.com',
+		orgSettings: null,
+		templates: { items: [], total: 0, pages: 0 },
+		templateParams: {},
+		convertTemplate: false,
 		...overrides
 	};
 }
@@ -236,7 +241,7 @@ describe('Test Create/Update Page', () => {
 				name: 'Test Name',
 				description: 'Test Desc',
 				no_of_random_questions: 5,
-				question_revision_ids: [1, 2]
+				question_revision_ids: [1, 2] as any
 			});
 			render(TestCreatePage, { data: baseData() });
 
@@ -248,7 +253,7 @@ describe('Test Create/Update Page', () => {
 				name: 'Test Name',
 				description: 'Test Desc',
 				no_of_random_questions: 2,
-				question_revision_ids: [1, 2]
+				question_revision_ids: [1, 2] as any
 			});
 			render(TestCreatePage, { data: baseData() });
 
@@ -426,6 +431,144 @@ describe('Test Create/Update Page', () => {
 					question_revision_ids: [101]
 				})
 			]);
+		});
+	});
+
+	// ── Full happy-path flow ──────────────────────────────────────────────────
+
+	describe('full happy-path flow — name + tags + manual questions → save', () => {
+		it('saves successfully when name, tags and manual questions are all set', async () => {
+			// Cast to any: tag_ids/question_revision_ids are inferred as never[] in defaultFormValues
+			setupSuperFormMock({
+				name: 'Governance Assessment',
+				description: 'Test description',
+				tag_ids: [{ id: '10', name: 'Science' }] as any,
+				question_revision_ids: [101, 102, 103] as any
+			});
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			await fireEvent.click(getBottomNextButton()); // Save
+
+			expect(mockSubmit).toHaveBeenCalledOnce();
+		});
+
+		it('form store contains tags and question IDs when Save is triggered', async () => {
+			const formStore = setupSuperFormMock({
+				name: 'Governance Assessment',
+				tag_ids: [
+					{ id: '10', name: 'Science' },
+					{ id: '11', name: 'Maths' }
+				] as any,
+				question_revision_ids: [101, 102] as any
+			});
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			await fireEvent.click(getBottomNextButton()); // Save
+
+			const stored = get(formStore);
+			expect(stored.tag_ids).toEqual([
+				{ id: '10', name: 'Science' },
+				{ id: '11', name: 'Maths' }
+			]);
+			expect(stored.question_revision_ids).toEqual([101, 102]);
+			expect(mockSubmit).toHaveBeenCalledOnce();
+		});
+
+		it('Next is enabled on step 1 when name and tags are set', () => {
+			setupSuperFormMock({
+				name: 'My Test',
+				tag_ids: [{ id: '5', name: 'History' }] as any
+			});
+			render(TestCreatePage, { data: baseData() });
+
+			expect(getBottomNextButton()).not.toBeDisabled();
+		});
+
+		it('Next is not disabled on step 2 when manual questions are selected', async () => {
+			setupSuperFormMock({
+				name: 'My Test',
+				tag_ids: [{ id: '5', name: 'History' }] as any,
+				question_revision_ids: [201, 202] as any
+			});
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+
+			expect(getBottomNextButton()).not.toBeDisabled();
+		});
+	});
+
+	// ── Edit mode — no changes ────────────────────────────────────────────────
+
+	describe('edit mode — existing test with tags and questions, no changes', () => {
+		function makeTestData(overrides: Record<string, any> = {}) {
+			return {
+				id: '42',
+				name: 'Existing Governance Test',
+				description: 'An existing test description',
+				question_revisions: [{ id: 101 }, { id: 102 }, { id: 103 }],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [
+					{ id: '10', name: 'Science' },
+					{ id: '11', name: 'Maths' }
+				],
+				random_tag_counts: [],
+				...overrides
+			};
+		}
+
+		it('can navigate through all steps and save without making any changes', async () => {
+			// populateFormFromTestData will write name/tags/question_ids into the store
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData({ testData: makeTestData() }) });
+
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			await fireEvent.click(getBottomNextButton()); // Save
+
+			expect(mockSubmit).toHaveBeenCalledOnce();
+		});
+
+		it('initialises superForm with testData (not the blank form)', () => {
+			setupSuperFormMock();
+			const testData = makeTestData();
+			render(TestCreatePage, { data: baseData({ testData }) });
+
+			expect(superForm).toHaveBeenCalledWith(testData, expect.any(Object));
+		});
+
+		it('populates tag_ids and question_revision_ids from testData into the form store', () => {
+			const formStore = setupSuperFormMock();
+			render(TestCreatePage, { data: baseData({ testData: makeTestData() }) });
+
+			const stored = get(formStore);
+			expect(stored.tag_ids).toEqual([
+				{ id: '10', name: 'Science' },
+				{ id: '11', name: 'Maths' }
+			]);
+			expect(stored.question_revision_ids).toEqual([101, 102, 103]);
+		});
+
+		it('Next button is enabled on step 1 because testData has a non-empty name', () => {
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData({ testData: makeTestData() }) });
+
+			expect(getBottomNextButton()).not.toBeDisabled();
+		});
+
+		it('Next button is enabled on step 2 because existing questions satisfy the count', async () => {
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData({ testData: makeTestData() }) });
+
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+
+			expect(getBottomNextButton()).not.toBeDisabled();
 		});
 	});
 });

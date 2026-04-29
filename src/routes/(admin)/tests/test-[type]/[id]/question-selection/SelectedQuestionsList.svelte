@@ -3,6 +3,7 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import TagChip from '$lib/components/ui/tag-chip/TagChip.svelte';
 	import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
+	import RichText from '$lib/components/RichText.svelte';
 
 	type QuestionRevision = {
 		id: number;
@@ -68,7 +69,7 @@
 			</div>
 
 			<!-- Question text -->
-			<p class="text-sm text-gray-800">{question.question_text}</p>
+			<RichText content={question.question_text} class="text-foreground text-sm [&_p]:m-0" />
 
 			<!-- Eye preview -->
 			<div class="flex justify-center">

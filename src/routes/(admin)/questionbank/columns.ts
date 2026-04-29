@@ -5,10 +5,10 @@ import {
 	createSelectionColumn
 } from '$lib/components/data-table/column-helpers';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
-import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
 import { QUESTION_TYPE_LABELS } from '$lib/types/question';
+import QuestionTextCell from './QuestionTextCell.svelte';
 
 export interface Question {
 	id: string;
@@ -32,7 +32,7 @@ export const createQuestionColumns = (
 ): ColumnDef<Question>[] => [
 	...(enableSelection ? [createSelectionColumn<Question>()] : []),
 	createSortableColumn('question_text', 'Questions', currentSortBy, currentSortOrder, handleSort, {
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.question_text }),
+		cell: ({ row }) => renderComponent(QuestionTextCell, { value: row.original.question_text }),
 		meta: { grow: true }
 	}),
 	{

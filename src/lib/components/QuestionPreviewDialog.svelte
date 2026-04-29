@@ -9,6 +9,7 @@
 	import MediaDisplay from '$lib/components/MediaDisplay.svelte';
 	import type { TMedia } from '$lib/types/media';
 	import { QuestionTypeEnum } from '$lib/types/question';
+	import RichText from '$lib/components/RichText.svelte';
 	import Flag from '@lucide/svelte/icons/flag';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Monitor from '@lucide/svelte/icons/monitor';
@@ -197,7 +198,9 @@
 				<div class="flex items-start gap-4 px-4 py-3">
 					<span class="text-foreground w-5 shrink-0 text-sm font-semibold">{item.key}</span>
 					<div class="flex-1">
-						<span class="text-foreground text-sm">{item.value}</span>
+						<span class="text-foreground text-sm"
+							><RichText content={item.value} as="span" class="[&_p]:m-0 [&_p]:inline" /></span
+						>
 						{#if mediaMap[item.id]}
 							<MediaDisplay media={mediaMap[item.id]} />
 						{/if}
@@ -268,7 +271,10 @@
 			<p
 				class="text-foreground my-2 pt-4 font-[Open_Sans] text-[14px] leading-[140%] font-semibold tracking-[0px]"
 			>
-				{data.questionText}
+				<RichText
+					content={data.questionText}
+					class="text-foreground min-w-0 flex-1 text-base/normal font-medium [&_p]:m-0"
+				/>
 				{#if data.isMandatory}
 					<span class="text-destructive ml-0.5">*</span>
 				{/if}
@@ -278,7 +284,7 @@
 		{/if}
 
 		{#if data.instructions}
-			<p class="text-muted-foreground mb-3 text-xs">{data.instructions}</p>
+			<RichText content={data.instructions} class="text-muted-foreground mt-2 text-sm [&_p]:m-0" />
 		{/if}
 
 		<MediaDisplay {media} />
@@ -304,7 +310,7 @@
 							>
 								<RadioGroup.Item value={opt.key} id={uid} class="mt-0.5 shrink-0" />
 								<div class="flex flex-col gap-2">
-									<span>{opt.value}</span>
+									<RichText content={opt.value} class="min-w-0 flex-1 [&_p]:m-0" />
 									{#if optionMediaMap[opt.id as number]}
 										<MediaDisplay media={optionMediaMap[opt.id as number]} />
 									{/if}
@@ -333,7 +339,7 @@
 							class="mt-0.5 shrink-0"
 						/>
 						<div class="flex flex-col gap-2">
-							<span>{opt.value}</span>
+							<RichText content={opt.value} class="min-w-0 flex-1 [&_p]:m-0" />
 							{#if optionMediaMap[opt.id as number]}
 								<MediaDisplay media={optionMediaMap[opt.id as number]} />
 							{/if}
@@ -366,7 +372,7 @@
 								{#each matrixRows as row (row.id)}
 									<tr class="border-b last:border-b-0">
 										<td class="text-foreground px-4 py-3 text-sm font-medium">
-											{row.value}
+											<RichText content={row.value} class="[&_p]:m-0" />
 										</td>
 										{#each matrixColumns as col (col.id)}
 											<td class="px-4 py-3 text-center">

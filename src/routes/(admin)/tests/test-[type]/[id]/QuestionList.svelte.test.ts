@@ -217,4 +217,80 @@ describe('QuestionList', () => {
 			expect(screen.getByText('Auto Selection')).toBeInTheDocument();
 		});
 	});
+
+	describe('auto selection — tags carried over from Primary screen', () => {
+		it('defaults to Auto Selection mode when tags were selected and no explicit question IDs exist', () => {
+			const formData = makeFormData({
+				tag_ids: [{ id: '1', name: 'Science' }],
+				question_revision_ids: [],
+				random_tag_count: []
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			expect(screen.getByText('Auto Selection')).toBeInTheDocument();
+			expect(screen.queryByText('No questions yet')).not.toBeInTheDocument();
+		});
+
+		it('populates the auto-selection table with tag names from tag_ids', () => {
+			const formData = makeFormData({
+				tag_ids: [
+					{ id: '1', name: 'Science' },
+					{ id: '2', name: 'Maths' }
+				],
+				question_revision_ids: [],
+				random_tag_count: []
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			expect(screen.getByText('Science')).toBeInTheDocument();
+			expect(screen.getByText('Maths')).toBeInTheDocument();
+		});
+
+		it('shows the "Tags" and "No. of Questions" column headers when tags are present', () => {
+			const formData = makeFormData({
+				tag_ids: [{ id: '3', name: 'History' }],
+				question_revision_ids: [],
+				random_tag_count: []
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			expect(screen.getByText('Tags')).toBeInTheDocument();
+			expect(screen.getByText('No. of Questions')).toBeInTheDocument();
+		});
+
+		it('shows the auto-selection description text', () => {
+			const formData = makeFormData({
+				tag_ids: [{ id: '1', name: 'Science' }],
+				question_revision_ids: [],
+				random_tag_count: []
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			expect(
+				screen.getByText(/Select tags and specify how many questions to randomly pull from each/)
+			).toBeInTheDocument();
+		});
+
+		it('uses Manual Selection mode when explicit question IDs exist, even if tags are set', () => {
+			const formData = makeFormData({
+				tag_ids: [{ id: '1', name: 'Science' }],
+				question_revision_ids: [101, 102],
+				question_revisions: [
+					{ id: 101, question_text: 'Q1', tags: [] },
+					{ id: 102, question_text: 'Q2', tags: [] }
+				],
+				random_tag_count: []
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			// Manual mode shows the question count header, not the auto-selection description
+			expect(screen.queryByText(/Select tags and specify/)).not.toBeInTheDocument();
+			expect(screen.getByText(/2 questions added/)).toBeInTheDocument();
+		});
+	});
 });

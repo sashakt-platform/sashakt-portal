@@ -71,6 +71,7 @@
 
 	const {
 		form: formData,
+		errors,
 		enhance,
 		submit
 	} = superForm(questionData || data.form, {
@@ -861,6 +862,11 @@
 											placeholder="e.g. 200"
 											bind:value={$formData.subjective_answer_min_length}
 										/>
+										{#if $errors.subjective_answer_min_length}
+											<p class="text-destructive text-sm">
+												{$errors.subjective_answer_min_length}
+											</p>
+										{/if}
 									</div>
 									<div class="flex flex-1 flex-col gap-1.5">
 										<Label for="subjective-limit" class="text-sm font-medium">

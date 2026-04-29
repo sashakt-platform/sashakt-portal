@@ -47,6 +47,14 @@ export const questionSchema = z.object({
 	block_ids: z.array(z.string()).default([]),
 	tag_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	is_active: z.boolean().default(true)
-});
+}).refine(
+	(data) => {
+		const min = data.subjective_answer_min_length;
+		const max = data.subjective_answer_limit;
+		if (min != null && max != null) return min < max;
+		return true;
+	},
+	{ message: 'Minimum characters must be less than maximum characters', path: ['subjective_answer_min_length'] }
+);
 
 export type FormSchema = typeof questionSchema;

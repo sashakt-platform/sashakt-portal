@@ -233,7 +233,7 @@ export const actions: Actions = {
 				const detail = errorMessage.detail?.[0]?.msg || errorMessage.detail || response.statusText;
 				const msg = `Failed to update question: ${detail}`;
 				setFlash({ type: 'error', message: msg }, cookies);
-				return fail(response.status, { form });
+				return fail(response.status, { form, errorMessage: msg });
 			}
 
 			// Transform tag_ids array into the required format

@@ -48,17 +48,7 @@
 				: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
 
-	if (
-		!isSectionedTest &&
-		$formData.random_tag_count.length > 0 &&
-		$formData.question_revision_ids.length === 0
-	) {
-		questionSelectionMode = 'tagBased';
-	} else if ($formData.question_revision_ids.length > 0) {
-		questionSelectionMode = 'manual';
-	}
-
-	const setDefaultTagsRandom = () => {
+	const initializeRandomTags = () => {
 		if ($formData.random_tag_count.length === 0 && $formData.tag_ids.length > 0) {
 			$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
 				id: tag.id,
@@ -66,7 +56,17 @@
 			}));
 		}
 	};
-	setDefaultTagsRandom();
+
+	if (!isSectionedTest) {
+		// If there are explicit question ids, prefer manual mode
+		if ($formData.question_revision_ids.length > 0) {
+			questionSelectionMode = 'manual';
+		} else {
+			// Otherwise initialize/random-tag defaults and use tag-based mode if any tags exist
+			questionSelectionMode = 'tagBased';
+			initializeRandomTags();
+		}
+	}
 
 	const handleRemoveQuestion = (questionId: number) => {
 		$formData.question_revision_ids = $formData.question_revision_ids.filter(
@@ -122,7 +122,7 @@
 					if (v === 'manual') $formData.random_tag_count = [];
 					if (v === 'tagBased') {
 						$formData.question_revision_ids = [];
-						setDefaultTagsRandom();
+						initializeRandomTags();
 					}
 				}}
 			>

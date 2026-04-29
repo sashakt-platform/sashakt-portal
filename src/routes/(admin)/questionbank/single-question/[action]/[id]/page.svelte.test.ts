@@ -390,8 +390,8 @@ describe('Single Question Page - Subjective Question Type', () => {
 				data: { ...baseData, questionData: subjectiveQuestionData } as any
 			});
 
-			expect(screen.getByText('Maximum character limit')).toBeInTheDocument();
-			expect(screen.getByText('characters')).toBeInTheDocument();
+			expect(screen.getByText('Minimum Characters')).toBeInTheDocument();
+			expect(screen.getByText('Maximum Characters')).toBeInTheDocument();
 		});
 
 		it('should display prefilled character limit value', () => {
@@ -399,7 +399,7 @@ describe('Single Question Page - Subjective Question Type', () => {
 				data: { ...baseData, questionData: subjectiveQuestionData } as any
 			});
 
-			const limitInput = screen.getByPlaceholderText('e.g., 500');
+			const limitInput = screen.getByPlaceholderText('e.g. 1000');
 			expect(limitInput).toHaveValue(50);
 		});
 
@@ -408,7 +408,9 @@ describe('Single Question Page - Subjective Question Type', () => {
 				data: { ...baseData, questionData: subjectiveQuestionData } as any
 			});
 
-			expect(screen.getByText(/Leave empty for unlimited/i)).toBeInTheDocument();
+			expect(
+				screen.getByText(/Recommended characters: 200-1000 for short answers/i)
+			).toBeInTheDocument();
 		});
 	});
 
@@ -453,7 +455,7 @@ describe('Single Question Page - Subjective Question Type', () => {
 				data: { ...baseData, questionData: subjectiveQuestionData } as any
 			});
 
-			const limitInput = screen.getByPlaceholderText('e.g., 500');
+			const limitInput = screen.getByPlaceholderText('e.g. 1000');
 			await fireEvent.input(limitInput, { target: { value: '1000' } });
 			expect(limitInput).toHaveValue(1000);
 		});
@@ -463,9 +465,46 @@ describe('Single Question Page - Subjective Question Type', () => {
 				data: { ...baseData, questionData: subjectiveQuestionData } as any
 			});
 
-			const limitInput = screen.getByPlaceholderText('e.g., 500');
+			const limitInput = screen.getByPlaceholderText('e.g. 1000');
 			await fireEvent.input(limitInput, { target: { value: '' } });
 			expect(limitInput).toHaveValue(null);
+		});
+
+		it('should allow editing minimum character length', async () => {
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: subjectiveQuestionData } as any
+			});
+
+			const minInput = screen.getByPlaceholderText('e.g. 200');
+			await fireEvent.input(minInput, { target: { value: '100' } });
+			expect(minInput).toHaveValue(100);
+		});
+
+		it('should display prefilled minimum character length value', () => {
+			const dataWithMinLength = {
+				...subjectiveQuestionData,
+				subjective_answer_min_length: 150
+			};
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: dataWithMinLength } as any
+			});
+
+			const minInput = screen.getByPlaceholderText('e.g. 200');
+			expect(minInput).toHaveValue(150);
+		});
+
+		it('should allow clearing minimum character length', async () => {
+			const dataWithMinLength = {
+				...subjectiveQuestionData,
+				subjective_answer_min_length: 150
+			};
+			render(SingleQuestionPage, {
+				data: { ...baseData, questionData: dataWithMinLength } as any
+			});
+
+			const minInput = screen.getByPlaceholderText('e.g. 200');
+			await fireEvent.input(minInput, { target: { value: '' } });
+			expect(minInput).toHaveValue(null);
 		});
 
 		it('should display prefilled instructions for subjective question', () => {

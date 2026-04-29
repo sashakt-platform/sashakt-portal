@@ -37,6 +37,7 @@ export const questionSchema = z.object({
 		.union([z.array(z.number()), z.number(), z.record(z.string(), z.array(z.number()))])
 		.default([]),
 	subjective_answer_limit: z.coerce.number().int().positive().nullable().optional(),
+	subjective_answer_min_length: z.coerce.number().int().positive().nullable().optional(),
 	is_mandatory: z.boolean().default(false),
 	marking_scheme: marksSchema,
 	solution: z.string().nullable().optional(),

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+	import Info from '@lucide/svelte/icons/info';
 	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
@@ -847,30 +848,37 @@
 					</div>
 					<div class="p-6">
 						{#if $formData.question_type === QuestionTypeEnum.Subjective}
-							<div class="flex flex-col gap-2">
-								<div class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
-									<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-										<Label for="subjective-limit" class="text-sm font-medium sm:w-48">
-											Maximum character limit
+							<div class="rounded-lg border p-4">
+								<div class="flex flex-col gap-4 sm:flex-row">
+									<div class="flex flex-1 flex-col gap-1.5">
+										<Label for="subjective-min-length" class="text-sm font-medium">
+											Minimum Characters
 										</Label>
-										<div class="flex items-center gap-2">
-											<Input
-												id="subjective-limit"
-												type="number"
-												min="1"
-												max="10000"
-												placeholder="e.g., 500"
-												class="w-32"
-												bind:value={$formData.subjective_answer_limit}
-											/>
-											<span class="text-sm text-gray-500">characters</span>
-										</div>
+										<Input
+											id="subjective-min-length"
+											type="number"
+											min="1"
+											placeholder="e.g. 200"
+											bind:value={$formData.subjective_answer_min_length}
+										/>
 									</div>
-									<p class="text-xs text-gray-500">
-										Leave empty for unlimited. Recommended: 200-1000 characters for short answers,
-										1000-5000 for essays.
-									</p>
+									<div class="flex flex-1 flex-col gap-1.5">
+										<Label for="subjective-limit" class="text-sm font-medium">
+											Maximum Characters
+										</Label>
+										<Input
+											id="subjective-limit"
+											type="number"
+											min="1"
+											placeholder="e.g. 1000"
+											bind:value={$formData.subjective_answer_limit}
+										/>
+									</div>
 								</div>
+								<p class="text-muted-foreground mt-3 flex items-center gap-1.5 text-xs">
+									<Info class="size-4 shrink-0" />
+									Recommended characters: 200-1000 for short answers, 1000-5000 for essays.
+								</p>
 							</div>
 						{:else if $formData.question_type === QuestionTypeEnum.SingleChoice || $formData.question_type === QuestionTypeEnum.MultiChoice}
 							<div class="flex flex-col gap-6 overflow-y-scroll scroll-auto">

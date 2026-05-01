@@ -48,15 +48,7 @@
 				: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
 
-	if (
-		!isSectionedTest &&
-		$formData.random_tag_count.length > 0 &&
-		$formData.question_revision_ids.length === 0
-	) {
-		questionSelectionMode = 'tagBased';
-	}
-
-	const setDefaultTagsRandom = () => {
+	const initializeRandomTags = () => {
 		if ($formData.random_tag_count.length === 0 && $formData.tag_ids.length > 0) {
 			$formData.random_tag_count = $formData.tag_ids.map((tag: Filter) => ({
 				id: tag.id,
@@ -64,6 +56,17 @@
 			}));
 		}
 	};
+
+	if (!isSectionedTest) {
+		// If there are explicit question ids, prefer manual mode
+		if ($formData.question_revision_ids.length > 0) {
+			questionSelectionMode = 'manual';
+		} else {
+			// Otherwise initialize/random-tag defaults and use tag-based mode if any tags exist
+			questionSelectionMode = 'tagBased';
+			initializeRandomTags();
+		}
+	}
 
 	const handleRemoveQuestion = (questionId: number) => {
 		$formData.question_revision_ids = $formData.question_revision_ids.filter(
@@ -119,22 +122,22 @@
 					if (v === 'manual') $formData.random_tag_count = [];
 					if (v === 'tagBased') {
 						$formData.question_revision_ids = [];
-						setDefaultTagsRandom();
+						initializeRandomTags();
 					}
 				}}
 			>
 				<TabsList class="bg-muted rounded-full p-1">
 					<TabsTrigger
-						value="manual"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
-					>
-						Manual Selection
-					</TabsTrigger>
-					<TabsTrigger
 						value="tagBased"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
 					>
 						Auto Selection
+					</TabsTrigger>
+					<TabsTrigger
+						value="manual"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+					>
+						Manual Selection
 					</TabsTrigger>
 				</TabsList>
 			</Tabs>

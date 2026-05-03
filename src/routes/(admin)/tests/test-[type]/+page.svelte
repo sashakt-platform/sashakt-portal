@@ -276,7 +276,7 @@
 		<div class="flex items-center gap-2">
 			<span class="text-muted-foreground text-xs">Show:</span>
 			<div class="border-border flex w-fit rounded-md border p-0.5">
-				{#each [{ value: 'all', label: 'All' }, { value: 'true', label: 'Mine' }, { value: 'false', label: 'Shared' }] as option}
+				{#each [{ value: 'all', label: 'All' }, { value: 'true', label: 'Mine' }, { value: 'false', label: 'Shared' }] as option (option.value)}
 					<button
 						type="button"
 						onclick={() => selectMyTestsFilter(option.value as 'all' | 'true' | 'false')}

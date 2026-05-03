@@ -22,6 +22,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	const search = url.searchParams.get('search') || '';
 	const sortBy = url.searchParams.get('sortBy') || '';
 	const sortOrder = url.searchParams.get('sortOrder') || 'asc';
+	const myTests = url.searchParams.get('my_tests') ?? '';
 
 	const tagIdsList = url.searchParams.getAll('tag_ids') || [];
 	const tagParams =
@@ -50,7 +51,8 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 		size: size.toString(),
 		...(search && { name: search }),
 		...(sortBy && { sort_by: sortBy }),
-		...(sortOrder && { sort_order: sortOrder })
+		...(sortOrder && { sort_order: sortOrder }),
+		...(myTests !== '' && { my_tests: myTests })
 	});
 
 	// add tag and state params if they exist
@@ -86,7 +88,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 			questions: [],
 			is_template: is_template,
 			test_taker_url: TEST_TAKER_URL,
-			params: { page, size, search, sortBy, sortOrder }
+			params: { page, size, search, sortBy, sortOrder, myTests }
 		};
 	}
 
@@ -110,6 +112,6 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 		questions,
 		is_template: is_template,
 		test_taker_url: TEST_TAKER_URL,
-		params: { page, size, search, sortBy, sortOrder }
+		params: { page, size, search, sortBy, sortOrder, myTests }
 	};
 };

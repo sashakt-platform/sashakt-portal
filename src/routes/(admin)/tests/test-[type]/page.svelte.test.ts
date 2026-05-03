@@ -388,4 +388,94 @@ describe('Test Management Listing Page', () => {
 			});
 		});
 	});
+
+	// ────────────────────────────────────────────────────────────────────────
+	describe('my_tests segmented control', () => {
+		const withItems = () => baseData(false, [{ id: '1', name: 'Test A' }]);
+
+		beforeEach(() => {
+			(page as any).url = new URL('http://localhost/tests/test-session');
+		});
+
+		// ── Rendering ────────────────────────────────────────────────────────
+		it('renders the "Show:" label', () => {
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByText('Show:')).toBeInTheDocument();
+		});
+
+		it('renders all three filter buttons', () => {
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Mine' })).toBeInTheDocument();
+			expect(screen.getByRole('button', { name: 'Shared' })).toBeInTheDocument();
+		});
+
+		// ── Active state ─────────────────────────────────────────────────────
+		it('"All" button is active when no my_tests param is set', () => {
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByRole('button', { name: 'All' })).toHaveClass('bg-muted');
+		});
+
+		it('"Mine" button is active when my_tests=true', () => {
+			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=true');
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByRole('button', { name: 'Mine' })).toHaveClass('bg-muted');
+		});
+
+		it('"Shared" button is active when my_tests=false', () => {
+			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=false');
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByRole('button', { name: 'Shared' })).toHaveClass('bg-muted');
+		});
+
+		it('"All" button is not active when my_tests=true', () => {
+			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=true');
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByRole('button', { name: 'All' })).not.toHaveClass('bg-muted');
+		});
+
+		it('"Mine" button is not active when no my_tests param is set', () => {
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByRole('button', { name: 'Mine' })).not.toHaveClass('bg-muted');
+		});
+
+		// ── Click navigation ─────────────────────────────────────────────────
+		it('clicking "Mine" sets my_tests=true in the URL', async () => {
+			render(TestListingPage, { data: withItems() });
+			await fireEvent.click(screen.getByRole('button', { name: 'Mine' }));
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('my_tests')).toBe('true');
+		});
+
+		it('clicking "Shared" sets my_tests=false in the URL', async () => {
+			render(TestListingPage, { data: withItems() });
+			await fireEvent.click(screen.getByRole('button', { name: 'Shared' }));
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('my_tests')).toBe('false');
+		});
+
+		it('clicking "All" removes my_tests from the URL', async () => {
+			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=true');
+			render(TestListingPage, { data: withItems() });
+			await fireEvent.click(screen.getByRole('button', { name: 'All' }));
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.has('my_tests')).toBe(false);
+		});
+
+		it('resets page to 1 when a filter option is clicked', async () => {
+			render(TestListingPage, { data: withItems() });
+			await fireEvent.click(screen.getByRole('button', { name: 'Mine' }));
+			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
+			expect(calledUrl.searchParams.get('page')).toBe('1');
+		});
+
+		it('calls goto with keepFocus: true and invalidateAll: true', async () => {
+			render(TestListingPage, { data: withItems() });
+			await fireEvent.click(screen.getByRole('button', { name: 'Mine' }));
+			expect(goto).toHaveBeenCalledWith(expect.any(URL), {
+				keepFocus: true,
+				invalidateAll: true
+			});
+		});
+	});
 });

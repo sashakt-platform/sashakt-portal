@@ -53,14 +53,27 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
+	const myTests = $derived(page.url.searchParams.get('my_tests'));
 
 	const hasActiveFilters = $derived(
 		search ||
 			page.url.searchParams.getAll('tag_ids').length > 0 ||
 			page.url.searchParams.getAll('state_ids').length > 0 ||
 			page.url.searchParams.getAll('tag_type_ids').length > 0 ||
-			page.url.searchParams.getAll('district_ids').length > 0
+			page.url.searchParams.getAll('district_ids').length > 0 ||
+			myTests !== null
 	);
+
+	function selectMyTestsFilter(value: 'all' | 'true' | 'false') {
+		const url = new URL(page.url);
+		if (value === 'all') {
+			url.searchParams.delete('my_tests');
+		} else {
+			url.searchParams.set('my_tests', value);
+		}
+		url.searchParams.set('page', '1');
+		goto(url, { keepFocus: true, invalidateAll: true });
+	}
 	const noTestCreatedYet = $derived(totalItems === 0 && !hasActiveFilters);
 
 	// handle sorting
@@ -255,6 +268,24 @@
 				<div>
 					<TagsSelection bind:tags={filteredTags} filteration={true} tagTypes={filteredTagtypes} />
 				</div>
+			</div>
+		</div>
+
+		<div class="flex items-center gap-2">
+			<span class="text-muted-foreground text-xs">Show:</span>
+			<div class="border-border flex w-fit rounded-md border p-0.5">
+				{#each [{ value: 'all', label: 'All' }, { value: 'true', label: 'Mine' }, { value: 'false', label: 'Shared' }] as option}
+					<button
+						type="button"
+						onclick={() => selectMyTestsFilter(option.value as 'all' | 'true' | 'false')}
+						class="rounded-sm px-2 py-0.5 text-xs font-medium transition-colors
+							{(option.value === 'all' && myTests === null) || myTests === option.value
+							? 'bg-muted text-foreground shadow-sm'
+							: 'text-muted-foreground hover:text-foreground'}"
+					>
+						{option.label}
+					</button>
+				{/each}
 			</div>
 		</div>
 	{/snippet}

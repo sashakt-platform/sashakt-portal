@@ -395,19 +395,50 @@ describe('Test Management Listing Page', () => {
 
 		beforeEach(() => {
 			(page as any).url = new URL('http://localhost/tests/test-session');
+			vi.mocked(isStateAdmin).mockReturnValue(true);
 		});
 
 		// ── Rendering ────────────────────────────────────────────────────────
-		it('renders the "Show:" label', () => {
+		it('renders the "Show:" label for session mode', () => {
 			render(TestListingPage, { data: withItems() });
 			expect(screen.getByText('Show:')).toBeInTheDocument();
 		});
 
-		it('renders all three filter buttons', () => {
+		it('renders all three filter buttons for session mode', () => {
 			render(TestListingPage, { data: withItems() });
 			expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
 			expect(screen.getByRole('button', { name: 'Mine' })).toBeInTheDocument();
 			expect(screen.getByRole('button', { name: 'Shared' })).toBeInTheDocument();
+		});
+
+		it('does not render the segmented control for template mode', () => {
+			vi.mocked(isStateAdmin).mockReturnValue(true);
+			render(TestListingPage, {
+				data: baseData(true, [{ id: '1', name: 'Template A' }])
+			});
+			expect(screen.queryByText('Show:')).not.toBeInTheDocument();
+			expect(screen.queryByRole('button', { name: 'Mine' })).not.toBeInTheDocument();
+		});
+
+		it('does not render the segmented control when user is not scoped to any location', () => {
+			vi.mocked(isStateAdmin).mockReturnValue(false);
+			vi.mocked(hasAssignedDistricts).mockReturnValue(false);
+			render(TestListingPage, { data: withItems() });
+			expect(screen.queryByText('Show:')).not.toBeInTheDocument();
+		});
+
+		it('renders the segmented control when user is a state admin', () => {
+			vi.mocked(isStateAdmin).mockReturnValue(true);
+			vi.mocked(hasAssignedDistricts).mockReturnValue(false);
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByText('Show:')).toBeInTheDocument();
+		});
+
+		it('renders the segmented control when user has assigned districts', () => {
+			vi.mocked(isStateAdmin).mockReturnValue(false);
+			vi.mocked(hasAssignedDistricts).mockReturnValue(true);
+			render(TestListingPage, { data: withItems() });
+			expect(screen.getByText('Show:')).toBeInTheDocument();
 		});
 
 		// ── Active state ─────────────────────────────────────────────────────

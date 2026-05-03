@@ -39,6 +39,7 @@
 			is_template: boolean;
 			tests: any;
 			params: any;
+			user: any;
 		};
 	} = $props();
 
@@ -271,6 +272,7 @@
 			</div>
 		</div>
 
+		{#if !data?.is_template && (isStateAdmin(data.user) || hasAssignedDistricts(data.user))}
 		<div class="flex items-center gap-2">
 			<span class="text-muted-foreground text-xs">Show:</span>
 			<div class="border-border flex w-fit rounded-md border p-0.5">
@@ -288,6 +290,7 @@
 				{/each}
 			</div>
 		</div>
+		{/if}
 	{/snippet}
 
 	{#snippet content()}

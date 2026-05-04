@@ -272,7 +272,8 @@ describe('DataTableActions', () => {
 			['file-plus', 'Add File'],
 			['external-link', 'External Link'],
 			['copy', 'Copy'],
-			['copy-link', 'Copy Link']
+			['copy-link', 'Copy Link'],
+			['chart-column-decreasing', 'View Report']
 		])('should handle %s icon', async (icon, label) => {
 			render(DataTableActions, {
 				props: {
@@ -478,6 +479,75 @@ describe('DataTableActions', () => {
 			await fireEvent.click(actionButton!);
 
 			expect(customAction).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe('View Report action', () => {
+		const viewReportProps = {
+			...defaultProps,
+			canEdit: false,
+			canDelete: false,
+			customActions: [
+				{
+					label: 'View Report',
+					action: vi.fn(),
+					icon: 'chart-column-decreasing'
+				}
+			]
+		};
+
+		it('renders a "View Report" item in the overflow menu', async () => {
+			render(DataTableActions, { props: viewReportProps });
+
+			await fireEvent.click(screen.getByRole('button', { name: /Open menu/i }));
+
+			expect(screen.getByText('View Report')).toBeInTheDocument();
+		});
+
+		it('calls the action exactly once when clicked', async () => {
+			const onViewReport = vi.fn();
+			render(DataTableActions, {
+				props: {
+					...viewReportProps,
+					customActions: [{ label: 'View Report', action: onViewReport, icon: 'chart-column-decreasing' }]
+				}
+			});
+
+			await fireEvent.click(screen.getByRole('button', { name: /Open menu/i }));
+			await fireEvent.click(screen.getByText('View Report'));
+
+			expect(onViewReport).toHaveBeenCalledTimes(1);
+		});
+
+		it('does not call the action before any interaction', async () => {
+			const onViewReport = vi.fn();
+			render(DataTableActions, {
+				props: {
+					...viewReportProps,
+					customActions: [{ label: 'View Report', action: onViewReport, icon: 'chart-column-decreasing' }]
+				}
+			});
+
+			expect(onViewReport).not.toHaveBeenCalled();
+		});
+
+		it('calls the action again on a second click', async () => {
+			const onViewReport = vi.fn();
+			render(DataTableActions, {
+				props: {
+					...viewReportProps,
+					customActions: [{ label: 'View Report', action: onViewReport, icon: 'chart-column-decreasing' }]
+				}
+			});
+
+			const menuButton = screen.getByRole('button', { name: /Open menu/i });
+			await fireEvent.click(menuButton);
+			await fireEvent.click(screen.getByText('View Report'));
+
+			await fireEvent.click(menuButton);
+			await fireEvent.click(screen.getByText('View Report'));
+
+			expect(onViewReport).toHaveBeenCalledTimes(2);
 		});
 	});
 

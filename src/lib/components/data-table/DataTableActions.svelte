@@ -8,6 +8,7 @@
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Copy from '@lucide/svelte/icons/copy';
 	import Link2 from '@lucide/svelte/icons/link-2';
+	import ChartColumnDecreasing from '@lucide/svelte/icons/chart-column-decreasing';
 
 	interface CustomAction {
 		label: string;
@@ -70,6 +71,8 @@
 				return Copy;
 			case 'copy-link':
 				return Link2;
+			case 'chart-column-decreasing':
+				return ChartColumnDecreasing;
 			default:
 				return undefined;
 		}
@@ -164,12 +167,6 @@
 							</DropdownMenu.Item>
 						</a>
 					{/if}
-					{#if canDelete && !deleteInline}
-						<DropdownMenu.Item onclick={handleDelete}>
-							<Trash_2 />
-							Delete
-						</DropdownMenu.Item>
-					{/if}
 
 					{#each overflowCustomActions as action (action.label)}
 						{#if action.href && action.method === 'POST'}
@@ -209,6 +206,13 @@
 							</DropdownMenu.Item>
 						{/if}
 					{/each}
+
+					{#if canDelete && !deleteInline}
+						<DropdownMenu.Item onclick={handleDelete}>
+							<Trash_2 />
+							Delete
+						</DropdownMenu.Item>
+					{/if}
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 		{/if}

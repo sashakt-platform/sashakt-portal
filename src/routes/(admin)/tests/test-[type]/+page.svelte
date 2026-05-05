@@ -142,7 +142,7 @@
 		{:else if !data?.is_template && canCreate(data.user, 'test')}
 			<a href={page.url.pathname + '/new'}>
 				<Button class="font-semibold">
-					<Plus />{canReadTestTemplate ? 'Create Manually' : 'Create New Test'}
+					<Plus />{canReadTestTemplate ? 'Create Manually' : `Create New ${term('test')}`}
 				</Button>
 			</a>
 		{/if}

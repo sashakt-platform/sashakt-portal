@@ -6,7 +6,6 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
-import ViewReportCell from './ViewReportCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import TestStatusBadge from '$lib/components/data-table/TestStatusBadge.svelte';
 import {
@@ -112,21 +111,6 @@ export const createTestColumns = (
 		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
 		size: 160
 	}),
-	...(!isTemplate
-		? [
-				{
-					id: 'test_report',
-					header: 'Test Report',
-					size: 160,
-					enableSorting: false,
-					enableHiding: false,
-					cell: ({ row }: { row: { original: Test } }) =>
-						renderComponent(ViewReportCell, {
-							onClick: () => onViewReport?.(row.original.id)
-						})
-				} as ColumnDef<Test>
-			]
-		: []),
 	{
 		id: 'actions',
 		size: 240,
@@ -209,6 +193,12 @@ export const createTestColumns = (
 					},
 					icon: 'null',
 					inline: true
+				});
+
+				customActions.push({
+					label: 'View Report',
+					action: () => onViewReport?.(test.id),
+					icon: 'chart-column-decreasing'
 				});
 			}
 

@@ -28,6 +28,7 @@
 		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
+	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 
 	const term = useTerms();
 
@@ -65,7 +66,7 @@
 			myTests !== null
 	);
 
-	function selectMyTestsFilter(value: 'all' | 'true' | 'false') {
+	function selectMyTestsFilter(value: string) {
 		const url = new URL(page.url);
 		if (value === 'all') {
 			url.searchParams.delete('my_tests');
@@ -273,23 +274,16 @@
 		</div>
 
 		{#if !data?.is_template && (isStateAdmin(data.user) || hasAssignedDistricts(data.user))}
-		<div class="flex items-center gap-2">
-			<span class="text-muted-foreground text-xs">Show:</span>
-			<div class="border-border flex w-fit rounded-md border p-0.5">
-				{#each [{ value: 'all', label: 'All' }, { value: 'true', label: 'Mine' }, { value: 'false', label: 'Shared' }] as option (option.value)}
-					<button
-						type="button"
-						onclick={() => selectMyTestsFilter(option.value as 'all' | 'true' | 'false')}
-						class="rounded-sm px-2 py-0.5 text-xs font-medium transition-colors
-							{(option.value === 'all' && myTests === null) || myTests === option.value
-							? 'bg-muted text-foreground shadow-sm'
-							: 'text-muted-foreground hover:text-foreground'}"
-					>
-						{option.label}
-					</button>
-				{/each}
+			<div class="flex items-center gap-2">
+				<span class="text-muted-foreground text-xs">Show:</span>
+				<Tabs value={myTests ?? 'all'} onValueChange={selectMyTestsFilter} class="w-fit">
+					<TabsList class="h-auto p-0.5">
+						<TabsTrigger value="all" class="px-2 py-0.5 text-xs">All</TabsTrigger>
+						<TabsTrigger value="true" class="px-2 py-0.5 text-xs">Mine</TabsTrigger>
+						<TabsTrigger value="false" class="px-2 py-0.5 text-xs">Shared</TabsTrigger>
+					</TabsList>
+				</Tabs>
 			</div>
-		</div>
 		{/if}
 	{/snippet}
 

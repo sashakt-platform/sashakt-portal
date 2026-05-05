@@ -406,9 +406,9 @@ describe('Test Management Listing Page', () => {
 
 		it('renders all three filter buttons for session mode', () => {
 			render(TestListingPage, { data: withItems() });
-			expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
-			expect(screen.getByRole('button', { name: 'Mine' })).toBeInTheDocument();
-			expect(screen.getByRole('button', { name: 'Shared' })).toBeInTheDocument();
+			expect(screen.getByRole('tab', { name: 'All' })).toBeInTheDocument();
+			expect(screen.getByRole('tab', { name: 'Mine' })).toBeInTheDocument();
+			expect(screen.getByRole('tab', { name: 'Shared' })).toBeInTheDocument();
 		});
 
 		it('does not render the segmented control for template mode', () => {
@@ -417,7 +417,7 @@ describe('Test Management Listing Page', () => {
 				data: baseData(true, [{ id: '1', name: 'Template A' }])
 			});
 			expect(screen.queryByText('Show:')).not.toBeInTheDocument();
-			expect(screen.queryByRole('button', { name: 'Mine' })).not.toBeInTheDocument();
+			expect(screen.queryByRole('tab', { name: 'Mine' })).not.toBeInTheDocument();
 		});
 
 		it('does not render the segmented control when user is not scoped to any location', () => {
@@ -444,43 +444,43 @@ describe('Test Management Listing Page', () => {
 		// ── Active state ─────────────────────────────────────────────────────
 		it('"All" button is active when no my_tests param is set', () => {
 			render(TestListingPage, { data: withItems() });
-			expect(screen.getByRole('button', { name: 'All' })).toHaveClass('bg-muted');
+			expect(screen.getByRole('tab', { name: 'All' })).toHaveAttribute('data-state', 'active');
 		});
 
 		it('"Mine" button is active when my_tests=true', () => {
 			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=true');
 			render(TestListingPage, { data: withItems() });
-			expect(screen.getByRole('button', { name: 'Mine' })).toHaveClass('bg-muted');
+			expect(screen.getByRole('tab', { name: 'Mine' })).toHaveAttribute('data-state', 'active');
 		});
 
 		it('"Shared" button is active when my_tests=false', () => {
 			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=false');
 			render(TestListingPage, { data: withItems() });
-			expect(screen.getByRole('button', { name: 'Shared' })).toHaveClass('bg-muted');
+			expect(screen.getByRole('tab', { name: 'Shared' })).toHaveAttribute('data-state', 'active');
 		});
 
 		it('"All" button is not active when my_tests=true', () => {
 			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=true');
 			render(TestListingPage, { data: withItems() });
-			expect(screen.getByRole('button', { name: 'All' })).not.toHaveClass('bg-muted');
+			expect(screen.getByRole('tab', { name: 'All' })).toHaveAttribute('data-state', 'inactive');
 		});
 
 		it('"Mine" button is not active when no my_tests param is set', () => {
 			render(TestListingPage, { data: withItems() });
-			expect(screen.getByRole('button', { name: 'Mine' })).not.toHaveClass('bg-muted');
+			expect(screen.getByRole('tab', { name: 'Mine' })).toHaveAttribute('data-state', 'inactive');
 		});
 
 		// ── Click navigation ─────────────────────────────────────────────────
 		it('clicking "Mine" sets my_tests=true in the URL', async () => {
 			render(TestListingPage, { data: withItems() });
-			await fireEvent.click(screen.getByRole('button', { name: 'Mine' }));
+			await fireEvent.click(screen.getByRole('tab', { name: 'Mine' }));
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
 			expect(calledUrl.searchParams.get('my_tests')).toBe('true');
 		});
 
 		it('clicking "Shared" sets my_tests=false in the URL', async () => {
 			render(TestListingPage, { data: withItems() });
-			await fireEvent.click(screen.getByRole('button', { name: 'Shared' }));
+			await fireEvent.click(screen.getByRole('tab', { name: 'Shared' }));
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
 			expect(calledUrl.searchParams.get('my_tests')).toBe('false');
 		});
@@ -488,21 +488,21 @@ describe('Test Management Listing Page', () => {
 		it('clicking "All" removes my_tests from the URL', async () => {
 			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=true');
 			render(TestListingPage, { data: withItems() });
-			await fireEvent.click(screen.getByRole('button', { name: 'All' }));
+			await fireEvent.click(screen.getByRole('tab', { name: 'All' }));
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
 			expect(calledUrl.searchParams.has('my_tests')).toBe(false);
 		});
 
 		it('resets page to 1 when a filter option is clicked', async () => {
 			render(TestListingPage, { data: withItems() });
-			await fireEvent.click(screen.getByRole('button', { name: 'Mine' }));
+			await fireEvent.click(screen.getByRole('tab', { name: 'Mine' }));
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
 			expect(calledUrl.searchParams.get('page')).toBe('1');
 		});
 
 		it('calls goto with keepFocus: true and invalidateAll: true', async () => {
 			render(TestListingPage, { data: withItems() });
-			await fireEvent.click(screen.getByRole('button', { name: 'Mine' }));
+			await fireEvent.click(screen.getByRole('tab', { name: 'Mine' }));
 			expect(goto).toHaveBeenCalledWith(expect.any(URL), {
 				keepFocus: true,
 				invalidateAll: true

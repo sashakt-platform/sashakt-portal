@@ -86,6 +86,7 @@
 
 	// create columns
 	const entityType = $derived(data?.is_template ? 'test-template' : 'test');
+	const canReadTestTemplate = $derived(canRead(data.user, 'test-template'));
 	const columns = $derived(
 		createTestColumns(
 			sortBy,
@@ -139,11 +140,13 @@
 				><Plus />Create {term('test_template')}</Button
 			>
 		{:else if !data?.is_template && canCreate(data.user, 'test')}
-			<a href={page.url.pathname + '/new'}
-				><Button class="font-semibold"><Plus />Create Manually</Button></a
-			>
+			<a href={page.url.pathname + '/new'}>
+				<Button class="font-semibold">
+					<Plus />{canReadTestTemplate ? 'Create Manually' : 'Create New Test'}
+				</Button>
+			</a>
 		{/if}
-		{#if !data?.is_template && canRead(data.user, 'test-template')}
+		{#if !data?.is_template && canReadTestTemplate}
 			<a href={page.url.pathname + '/convert'}
 				><Button class="font-semibold"><Plus />Create from {term('test_template')}</Button></a
 			>

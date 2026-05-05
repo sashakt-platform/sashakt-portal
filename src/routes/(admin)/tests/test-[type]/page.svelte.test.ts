@@ -67,7 +67,7 @@ vi.mock('./columns.js', () => ({
 	})
 }));
 
-import { canCreate, isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions.js';
+import { canCreate, canRead, isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 
@@ -136,11 +136,20 @@ describe('Test Management Listing Page', () => {
 			expect(screen.getByText('Create Test Template')).toBeInTheDocument();
 		});
 
-		it('should show "Create Manually" button when user has permission and session items exist', () => {
+		it('should show "Create Manually" when user can create and can read test templates', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
+			vi.mocked(canRead).mockReturnValue(true);
 			const items = [{ id: '1', name: 'Session A' }];
 			render(TestListingPage, { data: baseData(false, items) });
 			expect(screen.getByText('Create Manually')).toBeInTheDocument();
+		});
+
+		it('should show "Create New Test" when user can create but cannot read test templates', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			vi.mocked(canRead).mockReturnValue(false);
+			const items = [{ id: '1', name: 'Session A' }];
+			render(TestListingPage, { data: baseData(false, items) });
+			expect(screen.getByText('Create New Test')).toBeInTheDocument();
 		});
 
 		it('should not show create button when user lacks permission', () => {

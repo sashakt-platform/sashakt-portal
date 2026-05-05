@@ -8,7 +8,7 @@
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import { testSchema, type FormSchema } from './schema';
+	import { getQuestionSetMandatoryLimitError, testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 	import { goto } from '$app/navigation';
 	import {
@@ -70,6 +70,9 @@
 	});
 
 	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
+	const questionSetMandatoryLimitError = $derived(
+		getQuestionSetMandatoryLimitError($formData.question_sets)
+	);
 	const totalQuestionCount = $derived(
 		isSectionedTest
 			? ($formData.question_sets || []).reduce(
@@ -179,7 +182,8 @@
 			(currentScreen === typeOfScreen.configuration &&
 				$formData.random_questions &&
 				($formData.no_of_random_questions ?? 0) <= 0) ||
-			($formData.no_of_random_questions ?? 0) > totalQuestionCount
+			($formData.no_of_random_questions ?? 0) > totalQuestionCount ||
+			(currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
 	);
 
 	function handlePrevious() {
@@ -304,6 +308,13 @@
 			</div>
 		</div>
 	{:else if currentScreen === typeOfScreen.configuration}
+		{#if questionSetMandatoryLimitError}
+			<div
+				class="mx-4 mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-8 md:mx-10"
+			>
+				{questionSetMandatoryLimitError}
+			</div>
+		{/if}
 		<Configuration {formData} orgSettings={data.orgSettings} />
 	{/if}
 

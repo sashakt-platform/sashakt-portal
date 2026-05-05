@@ -16,6 +16,7 @@ const questionPreviewSchema = z
 	.object({
 		id: z.number(),
 		question_text: z.string().default(''),
+		is_mandatory: z.boolean().default(false),
 		tags: z.array(z.object({ name: z.string() })).default([])
 	})
 	.passthrough();
@@ -31,7 +32,40 @@ export const questionSetSchema = z
 		question_revision_ids: z.array(z.number()).default([]),
 		question_revisions: z.array(questionPreviewSchema).default([])
 	})
-	.passthrough();
+	.passthrough()
+	.superRefine((questionSet, ctx) => {
+		const mandatoryQuestionCount = getMandatoryQuestionCount(questionSet);
+		if (mandatoryQuestionCount > questionSet.max_questions_allowed_to_attempt) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['max_questions_allowed_to_attempt'],
+				message: `Question set '${questionSet.title}' has ${mandatoryQuestionCount} mandatory question(s), but only ${questionSet.max_questions_allowed_to_attempt} question(s) can be attempted.`
+			});
+		}
+	});
+
+type QuestionSetForMandatoryLimit = {
+	title: string;
+	max_questions_allowed_to_attempt: number;
+	question_revisions?: Array<{ is_mandatory?: boolean }>;
+};
+
+export function getMandatoryQuestionCount(questionSet: QuestionSetForMandatoryLimit) {
+	return (questionSet.question_revisions ?? []).filter((question) => question.is_mandatory).length;
+}
+
+export function getQuestionSetMandatoryLimitError(
+	questionSets: QuestionSetForMandatoryLimit[] = []
+) {
+	for (const questionSet of questionSets) {
+		const mandatoryQuestionCount = getMandatoryQuestionCount(questionSet);
+		if (mandatoryQuestionCount > questionSet.max_questions_allowed_to_attempt) {
+			return `Question set '${questionSet.title}' has ${mandatoryQuestionCount} mandatory question(s), but only ${questionSet.max_questions_allowed_to_attempt} question(s) can be attempted.`;
+		}
+	}
+
+	return null;
+}
 
 export const testSchema = z.object({
 	name: z.string(),

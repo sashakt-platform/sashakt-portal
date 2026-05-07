@@ -273,7 +273,7 @@
 			</div>
 		</div>
 
-		{#if !data?.is_template && (isStateAdmin(data.user) || hasAssignedDistricts(data.user))}
+		{#if !data?.is_template}
 			<div class="flex items-center gap-2">
 				<span class="text-muted-foreground text-xs">Show:</span>
 				<Tabs value={myTests ?? 'all'} onValueChange={selectMyTestsFilter} class="w-fit">

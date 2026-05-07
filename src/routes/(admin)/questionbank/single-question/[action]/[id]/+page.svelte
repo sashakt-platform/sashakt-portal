@@ -165,17 +165,10 @@
 			) {
 				$formData.options = [];
 			} else if ($formData.question_type === QuestionTypeEnum.MatrixMatch) {
-				// Only include items that have content (text, existing media, or staged media)
-				const rowsWithContent = matrixLeftItems.filter((item) =>
-					hasContent(item.value, item.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
-				);
-				const colsWithContent = matrixRightItems.filter((item) =>
-					hasContent(item.value, item.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
-				);
 				$formData.options = {
 					rows: {
 						label: matrixRowLabel,
-						items: rowsWithContent.map(({ id, key, value }) => {
+						items: matrixAnswerRowItems.map(({ id, key, value }) => {
 							const media = stripMediaUrl(optionMediaMap[id]);
 							return {
 								id,
@@ -187,7 +180,7 @@
 					},
 					columns: {
 						label: matrixColLabel,
-						items: colsWithContent.map(({ id, key, value }) => {
+						items: matrixAnswerColItems.map(({ id, key, value }) => {
 							const media = stripMediaUrl(optionMediaMap[id]);
 							return {
 								id,
@@ -198,7 +191,13 @@
 						})
 					}
 				};
-				$formData.correct_answer = matrixMatches;
+				const contentRowIds = new Set(matrixAnswerRowItems.map((item) => String(item.id)));
+				const contentColIds = new Set(matrixAnswerColItems.map((item) => item.id));
+				$formData.correct_answer = Object.fromEntries(
+					Object.entries(matrixMatches)
+						.filter(([key]) => contentRowIds.has(key))
+						.map(([key, ids]) => [key, ids.filter((id) => contentColIds.has(id))])
+				);
 			} else if ($formData.question_type === QuestionTypeEnum.MatrixRating) {
 				$formData.options = {
 					rows: {
@@ -342,6 +341,16 @@
 		}
 	}
 	const isMultiChoice = $derived(totalOptions.filter((o) => o.correct_answer).length > 1);
+	const matrixAnswerRowItems = $derived(
+		matrixLeftItems.filter((item) =>
+			hasContent(item.value, item.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
+		)
+	);
+	const matrixAnswerColItems = $derived(
+		matrixRightItems.filter((item) =>
+			hasContent(item.value, item.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
+		)
+	);
 
 	// Media state
 	let questionMedia = $state<TMedia | null>(questionData?.media ?? null);
@@ -663,16 +672,9 @@
 		}
 
 		if (type === QuestionTypeEnum.MatrixMatch) {
-			// Filter to items that have content (text or media)
-			const leftWithContent = matrixLeftItems.filter((i) =>
-				hasContent(i.value, i.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
-			);
-			const rightWithContent = matrixRightItems.filter((i) =>
-				hasContent(i.value, i.id, optionMediaMap, stagedOptionFiles, stagedOptionUrls)
-			);
 			// Need at least 2 items on each side, and all content items must have matches
-			const allMatched = leftWithContent.every((i) => matrixMatches[String(i.id)]?.length);
-			return leftWithContent.length < 2 || rightWithContent.length < 2 || !allMatched;
+			const allMatched = matrixAnswerRowItems.every((i) => matrixMatches[String(i.id)]?.length);
+			return matrixAnswerRowItems.length < 2 || matrixAnswerColItems.length < 2 || !allMatched;
 		}
 
 		if (type === QuestionTypeEnum.MatrixRating) {
@@ -1350,7 +1352,7 @@
 										<thead>
 											<tr>
 												<th class="px-4 py-3 text-left"></th>
-												{#each matrixRightItems as rightItem (rightItem.id)}
+												{#each matrixAnswerColItems as rightItem (rightItem.id)}
 													<th class="text-primary px-4 py-3 text-center text-sm font-semibold"
 														>{rightItem.key}</th
 													>
@@ -1358,12 +1360,12 @@
 											</tr>
 										</thead>
 										<tbody>
-											{#each matrixLeftItems as leftItem (leftItem.key)}
+											{#each matrixAnswerRowItems as leftItem (leftItem.key)}
 												<tr class="border-border border-t">
 													<td class="text-primary px-4 py-4 text-sm font-semibold"
 														>{leftItem.key}</td
 													>
-													{#each matrixRightItems as rightItem (rightItem.id)}
+													{#each matrixAnswerColItems as rightItem (rightItem.id)}
 														{@const checked = (matrixMatches[String(leftItem.id)] ?? []).includes(
 															rightItem.id
 														)}

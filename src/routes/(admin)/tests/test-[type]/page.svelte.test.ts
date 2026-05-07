@@ -420,11 +420,11 @@ describe('Test Management Listing Page', () => {
 			expect(screen.queryByRole('tab', { name: 'Mine' })).not.toBeInTheDocument();
 		});
 
-		it('does not render the segmented control when user is not scoped to any location', () => {
+		it('also renders the segmented control when user is not scoped to any location', () => {
 			vi.mocked(isStateAdmin).mockReturnValue(false);
 			vi.mocked(hasAssignedDistricts).mockReturnValue(false);
 			render(TestListingPage, { data: withItems() });
-			expect(screen.queryByText('Show:')).not.toBeInTheDocument();
+			expect(screen.queryByText('Show:')).toBeInTheDocument();
 		});
 
 		it('renders the segmented control when user is a state admin', () => {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Infer } from 'sveltekit-superforms';
-	import type { FormSchema } from './schema';
+	import { getMandatoryQuestionCount, type FormSchema } from './schema';
 	import RichText from '$lib/components/RichText.svelte';
 
 	type QuestionSet = Infer<FormSchema>['question_sets'][number];
@@ -63,6 +63,11 @@
 				</div>
 				<div class="text-muted-foreground text-sm">
 					Attempt limit: {questionSet.max_questions_allowed_to_attempt}
+					{#if getMandatoryQuestionCount(questionSet) > questionSet.max_questions_allowed_to_attempt}
+						<p class="mt-1 text-xs text-red-600">
+							{getMandatoryQuestionCount(questionSet)} mandatory question(s) exceed this attempt limit.
+						</p>
+					{/if}
 				</div>
 			</div>
 

@@ -653,6 +653,48 @@ describe('Test Create/Update Page — save action', () => {
 
 			expect(mockFetch).not.toHaveBeenCalled();
 		});
+
+		it('blocks sectioned tests when mandatory questions exceed the attempt limit', async () => {
+			const form = {
+				valid: true,
+				errors: {},
+				data: {
+					...mockValidFormData,
+					question_sets: [
+						{
+							id: 10,
+							title: 'Physics',
+							description: 'Section A',
+							display_order: 1,
+							max_questions_allowed_to_attempt: 1,
+							marking_scheme: { correct: 4, wrong: -1, skipped: 0 },
+							question_revision_ids: [1, 2],
+							question_revisions: [
+								{ id: 1, question_text: 'What is velocity?', is_mandatory: true, tags: [] },
+								{ id: 2, question_text: 'What is force?', is_mandatory: true, tags: [] }
+							]
+						}
+					]
+				}
+			};
+			(superValidate as any).mockResolvedValue(form);
+
+			const result = await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies
+			} as any);
+
+			const expectedMessage =
+				"Question set 'Physics' has 2 mandatory question(s), but only 1 question(s) can be attempted.";
+			expect(result).toEqual({ status: 400, data: { form } });
+			expect(form.errors).toEqual({ _errors: [expectedMessage] });
+			expect(setFlash).toHaveBeenCalledWith(
+				{ type: 'error', message: expectedMessage },
+				mockCookies
+			);
+			expect(mockFetch).not.toHaveBeenCalled();
+		});
 	});
 
 	// ── Create (id=new) ──────────────────────────────────────────────────────

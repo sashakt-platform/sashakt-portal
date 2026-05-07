@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { testSchema } from './schema';
+import { getQuestionSetMandatoryLimitError, testSchema } from './schema';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
@@ -250,6 +250,23 @@ export const actions: Actions = {
 				{
 					type: 'error',
 					message: `${term(subjectKey)} not created. Please check all the details.`
+				},
+				cookies
+			);
+			return fail(400, { form });
+		}
+		const questionSetMandatoryLimitError = getQuestionSetMandatoryLimitError(
+			form.data.question_sets
+		);
+		if (questionSetMandatoryLimitError) {
+			form.errors = {
+				...form.errors,
+				_errors: [questionSetMandatoryLimitError]
+			};
+			setFlash(
+				{
+					type: 'error',
+					message: questionSetMandatoryLimitError
 				},
 				cookies
 			);

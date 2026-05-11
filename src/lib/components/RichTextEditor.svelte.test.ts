@@ -18,6 +18,8 @@ const { mockChain, mockEditorInstance, editorCallbacks } = vi.hoisted(() => {
 		toggleOrderedList: vi.fn().mockReturnThis(),
 		setColor: vi.fn().mockReturnThis(),
 		setHighlight: vi.fn().mockReturnThis(),
+		setLink: vi.fn().mockReturnThis(),
+		unsetLink: vi.fn().mockReturnThis(),
 		run: vi.fn()
 	};
 
@@ -59,6 +61,8 @@ describe('RichTextEditor', () => {
 		mockChain.toggleOrderedList.mockReturnThis();
 		mockChain.setColor.mockReturnThis();
 		mockChain.setHighlight.mockReturnThis();
+		mockChain.setLink.mockReturnThis();
+		mockChain.unsetLink.mockReturnThis();
 		MockEditor.mockImplementation(function (opts: Record<string, unknown>) {
 			editorCallbacks.onTransaction = opts.onTransaction as typeof editorCallbacks.onTransaction;
 			return mockEditorInstance;
@@ -88,14 +92,9 @@ describe('RichTextEditor', () => {
 			expect(screen.getByTitle('Ordered List')).toBeInTheDocument();
 		});
 
-		it('renders two color picker inputs (text color and highlight)', () => {
+		it('renders one color picker input (highlight)', () => {
 			const { container } = render(RichTextEditor);
-			expect(container.querySelectorAll('input[type="color"]')).toHaveLength(2);
-		});
-
-		it('renders the Text Color label', () => {
-			render(RichTextEditor);
-			expect(screen.getByTitle('Text Color')).toBeInTheDocument();
+			expect(container.querySelectorAll('input[type="color"]')).toHaveLength(1);
 		});
 
 		it('renders the Highlight Color label', () => {
@@ -195,7 +194,93 @@ describe('RichTextEditor', () => {
 		});
 	});
 
-	// 6. Cleanup ───────────────────────────────────────────────────────────────
+	// 6. Link ─────────────────────────────────────────────────────────────────
+
+	describe('link', () => {
+		it('renders the Link toolbar button', () => {
+			render(RichTextEditor);
+			expect(screen.getByTitle('Link')).toBeInTheDocument();
+		});
+
+		it('shows the URL input bar when Link button is clicked and no link is active', async () => {
+			render(RichTextEditor);
+			await fireEvent.click(screen.getByTitle('Link'));
+			expect(screen.getByPlaceholderText('https://example.com')).toBeInTheDocument();
+		});
+
+		it('hides the URL input bar by default', () => {
+			render(RichTextEditor);
+			expect(screen.queryByPlaceholderText('https://example.com')).not.toBeInTheDocument();
+		});
+
+		it('calls setLink with the entered href when Apply is clicked', async () => {
+			render(RichTextEditor);
+			await fireEvent.click(screen.getByTitle('Link'));
+
+			await fireEvent.input(screen.getByPlaceholderText('https://example.com'), {
+				target: { value: 'https://example.com' }
+			});
+			await fireEvent.click(screen.getByText('Apply'));
+
+			expect(mockChain.setLink).toHaveBeenCalledWith({ href: 'https://example.com' });
+			expect(mockChain.run).toHaveBeenCalled();
+		});
+
+		it('calls setLink and hides input bar when Enter is pressed in the URL input', async () => {
+			render(RichTextEditor);
+			await fireEvent.click(screen.getByTitle('Link'));
+
+			const input = screen.getByPlaceholderText('https://example.com');
+			await fireEvent.input(input, { target: { value: 'https://example.com' } });
+			await fireEvent.keyDown(input, { key: 'Enter' });
+
+			expect(mockChain.setLink).toHaveBeenCalledWith({ href: 'https://example.com' });
+			expect(screen.queryByPlaceholderText('https://example.com')).not.toBeInTheDocument();
+		});
+
+		it('hides the URL input bar without calling setLink when Cancel is clicked', async () => {
+			render(RichTextEditor);
+			await fireEvent.click(screen.getByTitle('Link'));
+			await fireEvent.click(screen.getByText('Cancel'));
+
+			expect(mockChain.setLink).not.toHaveBeenCalled();
+			expect(screen.queryByPlaceholderText('https://example.com')).not.toBeInTheDocument();
+		});
+
+		it('hides the URL input bar without calling setLink when Escape is pressed', async () => {
+			render(RichTextEditor);
+			await fireEvent.click(screen.getByTitle('Link'));
+
+			const input = screen.getByPlaceholderText('https://example.com');
+			await fireEvent.keyDown(input, { key: 'Escape' });
+
+			expect(mockChain.setLink).not.toHaveBeenCalled();
+			expect(screen.queryByPlaceholderText('https://example.com')).not.toBeInTheDocument();
+		});
+
+		it('calls unsetLink when Link button is clicked and a link is active', async () => {
+			render(RichTextEditor);
+
+			mockEditorInstance.isActive.mockImplementation((name: string) => name === 'link');
+			editorCallbacks.onTransaction?.({ editor: mockEditorInstance });
+
+			await waitFor(() => expect(screen.getByTitle('Link')).toHaveClass('bg-accent'));
+
+			await fireEvent.click(screen.getByTitle('Link'));
+			expect(mockChain.unsetLink).toHaveBeenCalled();
+			expect(mockChain.run).toHaveBeenCalled();
+		});
+
+		it('does not call setLink when Apply is clicked with an empty URL', async () => {
+			render(RichTextEditor);
+			await fireEvent.click(screen.getByTitle('Link'));
+			await fireEvent.click(screen.getByText('Apply'));
+
+			expect(mockChain.setLink).not.toHaveBeenCalled();
+		});
+	});
+
+	// 7. Cleanup ───────────────────────────────────────────────────────────────
 
 	describe('cleanup', () => {
 		it('destroys the editor instance when the component is unmounted', () => {

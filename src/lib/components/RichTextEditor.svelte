@@ -3,15 +3,14 @@
 	import { Editor } from '@tiptap/core';
 	import StarterKit from '@tiptap/starter-kit';
 	import Placeholder from '@tiptap/extension-placeholder';
-	import { TextStyle } from '@tiptap/extension-text-style';
-	import Color from '@tiptap/extension-color';
 	import Highlight from '@tiptap/extension-highlight';
+	import Link from '@tiptap/extension-link';
 	import BoldIcon from '@lucide/svelte/icons/bold';
 	import ItalicIcon from '@lucide/svelte/icons/italic';
 	import ListIcon from '@lucide/svelte/icons/list';
 	import ListOrderedIcon from '@lucide/svelte/icons/list-ordered';
-	import BaselineIcon from '@lucide/svelte/icons/baseline';
 	import HighlighterIcon from '@lucide/svelte/icons/highlighter';
+	import LinkIcon from '@lucide/svelte/icons/link';
 
 	let {
 		value = $bindable(null),
@@ -28,9 +27,10 @@
 		italic: false,
 		bulletList: false,
 		orderedList: false,
-		color: '#000000',
-		highlight: '#ffffff'
+		highlight: '#ffffff',
+		link: false
 	});
+	let linkInput = $state({ open: false, href: '' });
 
 	$effect(() => {
 		if (!editorEl) return;
@@ -40,9 +40,8 @@
 			extensions: [
 				StarterKit,
 				Placeholder.configure({ placeholder }),
-				TextStyle,
-				Color,
-				Highlight.configure({ multicolor: true })
+				Highlight.configure({ multicolor: true }),
+				Link.configure({ openOnClick: false })
 			],
 			content: untrack(() => value ?? ''),
 			editorProps: {
@@ -59,9 +58,8 @@
 				editorState.italic = e.isActive('italic');
 				editorState.bulletList = e.isActive('bulletList');
 				editorState.orderedList = e.isActive('orderedList');
-				editorState.color = (e.getAttributes('textStyle').color as string) ?? '#000000';
-				editorState.highlight =
-					(e.getAttributes('highlight').color as string) ?? '#ffffff';
+				editorState.highlight = (e.getAttributes('highlight').color as string) ?? '#ffffff';
+				editorState.link = e.isActive('link');
 			}
 		});
 
@@ -91,21 +89,48 @@
 		];
 	}
 
-	function applyColor(e: Event) {
-		const color = (e.target as HTMLInputElement).value;
-		editor?.chain().focus().setColor(color).run();
-	}
-
 	function applyHighlight(e: Event) {
 		const color = (e.target as HTMLInputElement).value;
 		editor?.chain().focus().setHighlight({ color }).run();
 	}
+
+	function toggleLink() {
+		if (editorState.link) {
+			editor?.chain().focus().unsetLink().run();
+			return;
+		}
+		linkInput.href = '';
+		linkInput.open = true;
+	}
+
+	function applyLink() {
+		const href = linkInput.href.trim();
+		if (href) {
+			editor?.chain().focus().setLink({ href }).run();
+		}
+		linkInput.open = false;
+		linkInput.href = '';
+	}
+
+	function cancelLink() {
+		linkInput.open = false;
+		linkInput.href = '';
+	}
+
+	function handleLinkKeydown(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			applyLink();
+		} else if (e.key === 'Escape') {
+			cancelLink();
+		}
+	}
 </script>
 
 <div
-	class="rounded-md border border-input bg-background focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
+	class="border-input bg-background focus-within:border-ring focus-within:ring-ring/50 rounded-md border focus-within:ring-[3px]"
 >
-	<div class="flex items-center gap-0.5 border-b border-border px-2 py-1.5">
+	<div class="border-border flex items-center gap-0.5 border-b px-2 py-1.5">
 		<button
 			type="button"
 			class={toolbarBtn(editorState.bold)}
@@ -122,7 +147,7 @@
 		>
 			<ItalicIcon class="h-4 w-4" />
 		</button>
-		<div class="mx-1 h-4 w-px bg-border"></div>
+		<div class="bg-border mx-1 h-4 w-px"></div>
 		<button
 			type="button"
 			class={toolbarBtn(editorState.bulletList)}
@@ -139,27 +164,11 @@
 		>
 			<ListOrderedIcon class="h-4 w-4" />
 		</button>
-		<div class="mx-1 h-4 w-px bg-border"></div>
-		<!-- Text color -->
-		<label class="relative cursor-pointer" title="Text Color">
-			<span class={toolbarBtn(false)}>
-				<BaselineIcon class="h-4 w-4 text-muted-foreground" />
-				<span
-					class="absolute right-1 bottom-1 left-1 h-[3px] rounded-full"
-					style="background-color: {editorState.color}"
-				></span>
-			</span>
-			<input
-				type="color"
-				class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-				value={editorState.color}
-				onchange={applyColor}
-			/>
-		</label>
+		<div class="bg-border mx-1 h-4 w-px"></div>
 		<!-- Highlight color -->
 		<label class="relative cursor-pointer" title="Highlight Color">
 			<span class={toolbarBtn(false)}>
-				<HighlighterIcon class="h-4 w-4 text-muted-foreground" />
+				<HighlighterIcon class="text-muted-foreground h-4 w-4" />
 				<span
 					class="absolute right-1 bottom-1 left-1 h-[3px] rounded-full"
 					style="background-color: {editorState.highlight}"
@@ -172,7 +181,39 @@
 				onchange={applyHighlight}
 			/>
 		</label>
+		<div class="bg-border mx-1 h-4 w-px"></div>
+		<!-- Link -->
+		<button type="button" class={toolbarBtn(editorState.link)} onclick={toggleLink} title="Link">
+			<LinkIcon class="h-4 w-4" />
+		</button>
 	</div>
+
+	{#if linkInput.open}
+		<div class="border-border flex items-center gap-2 border-b px-3 py-1.5">
+			<LinkIcon class="text-muted-foreground h-3.5 w-3.5 shrink-0" />
+			<input
+				type="url"
+				bind:value={linkInput.href}
+				placeholder="https://example.com"
+				class="placeholder:text-muted-foreground flex-1 bg-transparent text-sm outline-none"
+				onkeydown={handleLinkKeydown}
+			/>
+			<button
+				type="button"
+				onclick={applyLink}
+				class="text-primary text-xs font-medium hover:underline"
+			>
+				Apply
+			</button>
+			<button
+				type="button"
+				onclick={cancelLink}
+				class="text-muted-foreground hover:text-foreground text-xs"
+			>
+				Cancel
+			</button>
+		</div>
+	{/if}
 
 	<div bind:this={editorEl}></div>
 </div>
@@ -199,5 +240,11 @@
 
 	:global(.ProseMirror li) {
 		margin-top: 0.25rem;
+	}
+
+	:global(.ProseMirror a) {
+		color: hsl(var(--primary));
+		text-decoration: underline;
+		cursor: pointer;
 	}
 </style>

@@ -31,7 +31,8 @@
 		bulletList: false,
 		orderedList: false,
 		highlight: '#ffffff',
-		link: false
+		link: false,
+		heading: 0 as 0 | 1 | 2 | 3
 	});
 	let linkInput = $state({ open: false, href: '' });
 
@@ -65,6 +66,8 @@
 				editorState.orderedList = e.isActive('orderedList');
 				editorState.highlight = (e.getAttributes('highlight').color as string) ?? '#ffffff';
 				editorState.link = e.isActive('link');
+				editorState.heading =
+					([1, 2, 3] as const).find((l) => e.isActive('heading', { level: l })) ?? 0;
 			}
 		});
 
@@ -92,6 +95,15 @@
 			'rounded p-1 transition-colors hover:bg-accent',
 			active ? 'bg-accent text-foreground' : 'text-muted-foreground'
 		];
+	}
+
+	function setHeading(e: Event) {
+		const level = Number((e.target as HTMLSelectElement).value) as 0 | 1 | 2 | 3;
+		if (level === 0) {
+			editor?.chain().focus().setParagraph().run();
+		} else {
+			editor?.chain().focus().setHeading({ level }).run();
+		}
 	}
 
 	function applyHighlight(e: Event) {
@@ -136,6 +148,18 @@
 	class="border-input bg-background focus-within:border-ring focus-within:ring-ring/50 rounded-md border focus-within:ring-[3px]"
 >
 	<div class="border-border flex items-center gap-0.5 border-b px-2 py-1.5">
+		<select
+			value={editorState.heading}
+			onchange={setHeading}
+			title="Heading"
+			class="text-muted-foreground hover:bg-accent focus:outline-none cursor-pointer rounded border-0 bg-transparent px-1.5 py-0.5 text-xs"
+		>
+			<option value={0}>Normal</option>
+			<option value={1}>H1</option>
+			<option value={2}>H2</option>
+			<option value={3}>H3</option>
+		</select>
+		<div class="bg-border mx-1 h-4 w-px"></div>
 		<button
 			type="button"
 			class={toolbarBtn(editorState.bold)}
@@ -259,5 +283,26 @@
 		color: hsl(var(--primary));
 		text-decoration: underline;
 		cursor: pointer;
+	}
+
+	:global(.ProseMirror h1) {
+		font-size: 1.5rem;
+		font-weight: 700;
+		line-height: 1.375;
+		margin-top: 0.5rem;
+	}
+
+	:global(.ProseMirror h2) {
+		font-size: 1.25rem;
+		font-weight: 600;
+		line-height: 1.375;
+		margin-top: 0.5rem;
+	}
+
+	:global(.ProseMirror h3) {
+		font-size: 1.125rem;
+		font-weight: 600;
+		line-height: 1.375;
+		margin-top: 0.25rem;
 	}
 </style>

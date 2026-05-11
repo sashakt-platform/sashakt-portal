@@ -21,6 +21,8 @@ const { mockChain, mockEditorInstance, editorCallbacks } = vi.hoisted(() => {
 		setHighlight: vi.fn().mockReturnThis(),
 		setLink: vi.fn().mockReturnThis(),
 		unsetLink: vi.fn().mockReturnThis(),
+		setHeading: vi.fn().mockReturnThis(),
+		setParagraph: vi.fn().mockReturnThis(),
 		run: vi.fn()
 	};
 
@@ -65,6 +67,8 @@ describe('RichTextEditor', () => {
 		mockChain.setHighlight.mockReturnThis();
 		mockChain.setLink.mockReturnThis();
 		mockChain.unsetLink.mockReturnThis();
+		mockChain.setHeading.mockReturnThis();
+		mockChain.setParagraph.mockReturnThis();
 		MockEditor.mockImplementation(function (opts: Record<string, unknown>) {
 			editorCallbacks.onTransaction = opts.onTransaction as typeof editorCallbacks.onTransaction;
 			return mockEditorInstance;
@@ -294,7 +298,44 @@ describe('RichTextEditor', () => {
 		});
 	});
 
-	// 7. Cleanup ───────────────────────────────────────────────────────────────
+	// 7. Heading ──────────────────────────────────────────────────────────────
+
+	describe('heading', () => {
+		it('renders the heading select dropdown', () => {
+			render(RichTextEditor);
+			expect(screen.getByTitle('Heading')).toBeInTheDocument();
+		});
+
+		it('calls setHeading with level 1 when H1 is selected', async () => {
+			render(RichTextEditor);
+			await fireEvent.change(screen.getByTitle('Heading'), { target: { value: '1' } });
+			expect(mockChain.setHeading).toHaveBeenCalledWith({ level: 1 });
+			expect(mockChain.run).toHaveBeenCalled();
+		});
+
+		it('calls setParagraph when Normal (0) is selected', async () => {
+			render(RichTextEditor);
+			await fireEvent.change(screen.getByTitle('Heading'), { target: { value: '0' } });
+			expect(mockChain.setParagraph).toHaveBeenCalled();
+			expect(mockChain.run).toHaveBeenCalled();
+		});
+
+		it('reflects active heading level 2 in dropdown value via onTransaction', async () => {
+			render(RichTextEditor);
+
+			(mockEditorInstance.isActive as any).mockImplementation(
+				(name: string, attrs?: { level?: number }) =>
+					name === 'heading' && attrs?.level === 2
+			);
+			editorCallbacks.onTransaction?.({ editor: mockEditorInstance });
+
+			await waitFor(() => {
+				expect((screen.getByTitle('Heading') as HTMLSelectElement).value).toBe('2');
+			});
+		});
+	});
+
+	// 9. Cleanup ───────────────────────────────────────────────────────────────
 
 	describe('cleanup', () => {
 		it('destroys the editor instance when the component is unmounted', () => {

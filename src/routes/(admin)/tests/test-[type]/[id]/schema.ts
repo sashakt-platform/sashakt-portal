@@ -97,6 +97,7 @@ export const testSchema = z.object({
 	is_template: z.boolean().default(false),
 	template_id: z.string().nullable().optional(),
 	tag_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	tag_type_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	question_revision_ids: z.array(z.number()).default([]),
 	question_sets: z.array(questionSetSchema).default([]),
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),

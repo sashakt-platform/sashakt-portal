@@ -107,6 +107,16 @@
 				id: String(tag.id),
 				name: tag.name
 			})) || [];
+		const tagTypeMap = new Map<string, { id: string; name: string }>();
+		(td?.tags as any[])?.forEach((tag: any) => {
+			if (tag?.tag_type?.id) {
+				tagTypeMap.set(String(tag.tag_type.id), {
+					id: String(tag.tag_type.id),
+					name: tag.tag_type.name
+				});
+			}
+		});
+		$formData.tag_type_ids = Array.from(tagTypeMap.values());
 		$formData.question_revision_ids =
 			td?.question_revisions?.map((q: { id: number }) => q.id) || [];
 		$formData.question_revisions = td?.question_revisions || [];

@@ -36,7 +36,11 @@
 		selectedTemplateId?: string | null;
 	} = $props();
 	let selectedStates = $derived($formData.state_ids || []);
-	let selectedTagTypes: { id: string; name: string }[] = $state([]);
+	let selectedTagTypes: { id: string; name: string }[] = $state($formData.tag_type_ids || []);
+
+	$effect(() => {
+		$formData.tag_type_ids = selectedTagTypes;
+	});
 
 	// for State admins, auto-assign their state
 	$effect(() => {

@@ -287,6 +287,8 @@ export const actions: Actions = {
 		// question_revisions is a client-side mirror for UI rendering (full objects with
 		// media URLs). The backend uses question_revision_ids; strip the heavy field.
 		delete transformedFormData.question_revisions;
+		// tag_type_ids is UI-only state for filtering the tag picker; never sent to the backend.
+		delete transformedFormData.tag_type_ids;
 
 		if (isSectionedTest) {
 			delete transformedFormData.question_revision_ids;

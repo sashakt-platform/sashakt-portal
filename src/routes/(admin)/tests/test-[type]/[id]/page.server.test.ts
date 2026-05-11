@@ -95,6 +95,7 @@ const mockValidFormData = {
 	question_pagination: 0,
 	template_id: null,
 	tag_ids: [{ id: 'tag1', name: 'Tag 1' }],
+	tag_type_ids: [{ id: 'type1', name: 'Subject' }],
 	question_revision_ids: [1, 2],
 	question_sets: [],
 	state_ids: [{ id: 'state1', name: 'State 1' }],
@@ -939,6 +940,63 @@ describe('Test Create/Update Page — save action', () => {
 					question_revision_ids: [1]
 				})
 			]);
+		});
+
+		it('strips tag_type_ids from the POST body on create', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body).not.toHaveProperty('tag_type_ids');
+		});
+
+		it('strips tag_type_ids from the PUT body on update', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body).not.toHaveProperty('tag_type_ids');
+		});
+
+		it('still sends tag_ids as plain id strings when tag_type_ids is present', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body.tag_ids).toEqual(['tag1']);
+		});
+
+		it('still sends state_ids and district_ids as plain id strings when tag_type_ids is present', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body.state_ids).toEqual(['state1']);
+			expect(body.district_ids).toEqual(['district1']);
 		});
 
 		it('converts empty string start_time to null', async () => {

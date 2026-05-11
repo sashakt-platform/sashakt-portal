@@ -1931,6 +1931,152 @@ describe('Single Question Page - Matrix Match Question Type', () => {
 			expect(screen.getByDisplayValue('Column B')).toBeInTheDocument();
 		});
 	});
+
+	describe('Matrix Match Empty Row/Column Filtering', () => {
+		it('should not show empty rows in the answer selector table', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match the following',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [
+									{ id: 1, key: 'A', value: 'India' },
+									{ id: 2, key: 'B', value: 'France' },
+									{ id: 3, key: 'C', value: '' }
+								]
+							},
+							columns: {
+								label: 'Column B',
+								items: [
+									{ id: 10, key: '1', value: 'New Delhi' },
+									{ id: 11, key: '2', value: 'Paris' }
+								]
+							}
+						},
+						correct_answer: { '1': [10], '2': [11] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+
+			const checkboxes = screen.getAllByRole('checkbox');
+			expect(checkboxes.length).toBe(4);
+		});
+
+		it('should not show empty columns in the answer selector table', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match the following',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [
+									{ id: 1, key: 'A', value: 'India' },
+									{ id: 2, key: 'B', value: 'France' }
+								]
+							},
+							columns: {
+								label: 'Column B',
+								items: [
+									{ id: 10, key: '1', value: 'New Delhi' },
+									{ id: 11, key: '2', value: 'Paris' },
+									{ id: 12, key: '3', value: '' }
+								]
+							}
+						},
+						correct_answer: { '1': [10], '2': [11] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+
+			const checkboxes = screen.getAllByRole('checkbox');
+			expect(checkboxes.length).toBe(4);
+		});
+
+		it('should enable Save when all content rows have matches, even if correct_answer has stale entries for empty rows', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match the following',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [
+									{ id: 1, key: 'A', value: 'India' },
+									{ id: 2, key: 'B', value: 'France' },
+									{ id: 3, key: 'C', value: '' }
+								]
+							},
+							columns: {
+								label: 'Column B',
+								items: [
+									{ id: 10, key: '1', value: 'New Delhi' },
+									{ id: 11, key: '2', value: 'Paris' }
+								]
+							}
+						},
+
+						correct_answer: { '1': [10], '2': [11], '3': [10] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+
+			expect(screen.getByRole('button', { name: /Save/i })).toBeEnabled();
+		});
+
+		it('should disable Save when a content row has no match, even if an empty row has a stale match', () => {
+			render(SingleQuestionPage, {
+				data: {
+					...baseData,
+					questionData: {
+						question_text: 'Match the following',
+						question_type: QuestionTypeEnum.MatrixMatch,
+						options: {
+							rows: {
+								label: 'Column A',
+								items: [
+									{ id: 1, key: 'A', value: 'India' },
+									{ id: 2, key: 'B', value: 'France' },
+									{ id: 3, key: 'C', value: '' }
+								]
+							},
+							columns: {
+								label: 'Column B',
+								items: [
+									{ id: 10, key: '1', value: 'New Delhi' },
+									{ id: 11, key: '2', value: 'Paris' }
+								]
+							}
+						},
+
+						correct_answer: { '1': [10], '3': [11] },
+						is_mandatory: false,
+						is_active: true,
+						marking_scheme: { correct: 1, wrong: 0, skipped: 0 }
+					}
+				} as any
+			});
+
+			expect(screen.getByRole('button', { name: /Save/i })).toBeDisabled();
+		});
+	});
 });
 
 describe('Single Question Page - Media', () => {
@@ -2213,11 +2359,15 @@ describe('Single Question Page - Matrix Key Scheme', () => {
 				btn.textContent?.includes('Add Row')
 			)!;
 			await fireEvent.click(addRowButton);
-			// New right item key '3' appears in the correct answers table header
-			const keyElements = Array.from(container.querySelectorAll('th')).filter(
+
+			const allInputs = screen.getAllByRole('textbox');
+			const newRightInput = allInputs[allInputs.length - 1];
+			await fireEvent.input(newRightInput, { target: { value: 'Option 3' } });
+
+			const thElements = Array.from(container.querySelectorAll('th')).filter(
 				(el) => el.textContent?.trim() === '3'
 			);
-			expect(keyElements.length).toBeGreaterThanOrEqual(1);
+			expect(thElements.length).toBeGreaterThanOrEqual(1);
 		});
 
 		it('should use left item ID as correct_answer key when match is toggled', async () => {

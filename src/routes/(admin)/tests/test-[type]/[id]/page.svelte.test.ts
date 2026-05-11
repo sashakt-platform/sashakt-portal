@@ -56,6 +56,7 @@ const defaultFormValues = {
 	state_ids: [],
 	district_ids: [],
 	tag_ids: [],
+	tag_type_ids: [],
 	marking_scheme: { correct: 1, wrong: 0, skipped: 0 },
 	marks_level: 'question',
 	shuffle: false,
@@ -569,6 +570,134 @@ describe('Test Create/Update Page', () => {
 			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
 
 			expect(getBottomNextButton()).not.toBeDisabled();
+		});
+	});
+
+	// ── tag_type_ids population ───────────────────────────────────────────────
+
+	describe('populateFormFromTestData — tag_type_ids', () => {
+		it('derives tag_type_ids from tags with nested tag_type objects', () => {
+			const formStore = setupSuperFormMock();
+			const testData = {
+				id: '42',
+				name: 'Test',
+				description: '',
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [
+					{ id: '1', name: 'Physics', tag_type: { id: '10', name: 'Subject' } },
+					{ id: '2', name: 'Algebra', tag_type: { id: '20', name: 'Topic' } }
+				],
+				random_tag_counts: []
+			};
+			render(TestCreatePage, { data: baseData({ testData }) });
+
+			const stored = get(formStore);
+			expect(stored.tag_type_ids).toEqual([
+				{ id: '10', name: 'Subject' },
+				{ id: '20', name: 'Topic' }
+			]);
+		});
+
+		it('deduplicates tag_type_ids when multiple tags share the same tag_type', () => {
+			const formStore = setupSuperFormMock();
+			const testData = {
+				id: '42',
+				name: 'Test',
+				description: '',
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [
+					{ id: '1', name: 'Physics', tag_type: { id: '10', name: 'Subject' } },
+					{ id: '2', name: 'Chemistry', tag_type: { id: '10', name: 'Subject' } }
+				],
+				random_tag_counts: []
+			};
+			render(TestCreatePage, { data: baseData({ testData }) });
+
+			const stored = get(formStore);
+			expect(stored.tag_type_ids).toHaveLength(1);
+			expect(stored.tag_type_ids).toEqual([{ id: '10', name: 'Subject' }]);
+		});
+
+		it('produces empty tag_type_ids when tags have no tag_type field', () => {
+			const formStore = setupSuperFormMock();
+			const testData = {
+				id: '42',
+				name: 'Test',
+				description: '',
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [
+					{ id: '1', name: 'Physics' },
+					{ id: '2', name: 'Algebra' }
+				],
+				random_tag_counts: []
+			};
+			render(TestCreatePage, { data: baseData({ testData }) });
+
+			expect(get(formStore).tag_type_ids).toEqual([]);
+		});
+
+		it('produces empty tag_type_ids when tags array is empty', () => {
+			const formStore = setupSuperFormMock();
+			const testData = {
+				id: '42',
+				name: 'Test',
+				description: '',
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [],
+				random_tag_counts: []
+			};
+			render(TestCreatePage, { data: baseData({ testData }) });
+
+			expect(get(formStore).tag_type_ids).toEqual([]);
+		});
+
+		it('defaults tag_type_ids to empty array for a new test (no testData)', () => {
+			const formStore = setupSuperFormMock();
+			render(TestCreatePage, { data: baseData({ testData: null }) });
+
+			expect(get(formStore).tag_type_ids).toEqual([]);
+		});
+
+		it('tag_type_ids persists in the form store after navigating to step 2 and back', async () => {
+			const formStore = setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			const testData = {
+				id: '42',
+				name: 'Test',
+				description: 'Desc',
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [{ id: '1', name: 'Physics', tag_type: { id: '10', name: 'Subject' } }],
+				random_tag_counts: []
+			};
+			render(TestCreatePage, { data: baseData({ testData }) });
+
+			// tag_type_ids set from testData
+			expect(get(formStore).tag_type_ids).toEqual([{ id: '10', name: 'Subject' }]);
+
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+
+			// Still intact in the store on step 2
+			expect(get(formStore).tag_type_ids).toEqual([{ id: '10', name: 'Subject' }]);
+
+			const prevButtons = screen.getAllByText('Previous');
+			await fireEvent.click(prevButtons[prevButtons.length - 1]); // step 2 → step 1
+
+			// Still intact after returning to step 1
+			expect(get(formStore).tag_type_ids).toEqual([{ id: '10', name: 'Subject' }]);
 		});
 	});
 });

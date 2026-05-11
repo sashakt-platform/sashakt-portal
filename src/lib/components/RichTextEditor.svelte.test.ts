@@ -14,6 +14,7 @@ const { mockChain, mockEditorInstance, editorCallbacks } = vi.hoisted(() => {
 		focus: vi.fn().mockReturnThis(),
 		toggleBold: vi.fn().mockReturnThis(),
 		toggleItalic: vi.fn().mockReturnThis(),
+		toggleUnderline: vi.fn().mockReturnThis(),
 		toggleBulletList: vi.fn().mockReturnThis(),
 		toggleOrderedList: vi.fn().mockReturnThis(),
 		setColor: vi.fn().mockReturnThis(),
@@ -57,6 +58,7 @@ describe('RichTextEditor', () => {
 		mockChain.focus.mockReturnThis();
 		mockChain.toggleBold.mockReturnThis();
 		mockChain.toggleItalic.mockReturnThis();
+		mockChain.toggleUnderline.mockReturnThis();
 		mockChain.toggleBulletList.mockReturnThis();
 		mockChain.toggleOrderedList.mockReturnThis();
 		mockChain.setColor.mockReturnThis();
@@ -85,6 +87,11 @@ describe('RichTextEditor', () => {
 		it('renders the Bullet List toolbar button', () => {
 			render(RichTextEditor);
 			expect(screen.getByTitle('Bullet List')).toBeInTheDocument();
+		});
+
+		it('renders the Underline toolbar button', () => {
+			render(RichTextEditor);
+			expect(screen.getByTitle('Underline')).toBeInTheDocument();
 		});
 
 		it('renders the Ordered List toolbar button', () => {
@@ -133,6 +140,13 @@ describe('RichTextEditor', () => {
 			render(RichTextEditor);
 			await fireEvent.click(screen.getByTitle('Italic'));
 			expect(mockChain.toggleItalic).toHaveBeenCalled();
+			expect(mockChain.run).toHaveBeenCalled();
+		});
+
+		it('calls toggleUnderline when Underline button is clicked', async () => {
+			render(RichTextEditor);
+			await fireEvent.click(screen.getByTitle('Underline'));
+			expect(mockChain.toggleUnderline).toHaveBeenCalled();
 			expect(mockChain.run).toHaveBeenCalled();
 		});
 

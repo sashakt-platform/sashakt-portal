@@ -74,6 +74,7 @@
 		"@tiptap/extension-link": "^3.22.5",
 		"@tiptap/extension-placeholder": "^3.22.5",
 		"@tiptap/extension-text-style": "^3.22.5",
+		"@tiptap/extension-underline": "^3.22.5",
 		"@tiptap/starter-kit": "^3.22.5",
 		"svelte-dnd-action": "^0.9.69",
 		"svelte-headless-table": "^0.18.3"

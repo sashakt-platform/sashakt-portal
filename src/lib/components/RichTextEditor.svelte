@@ -5,8 +5,10 @@
 	import Placeholder from '@tiptap/extension-placeholder';
 	import Highlight from '@tiptap/extension-highlight';
 	import Link from '@tiptap/extension-link';
+	import Underline from '@tiptap/extension-underline';
 	import BoldIcon from '@lucide/svelte/icons/bold';
 	import ItalicIcon from '@lucide/svelte/icons/italic';
+	import UnderlineIcon from '@lucide/svelte/icons/underline';
 	import ListIcon from '@lucide/svelte/icons/list';
 	import ListOrderedIcon from '@lucide/svelte/icons/list-ordered';
 	import HighlighterIcon from '@lucide/svelte/icons/highlighter';
@@ -25,6 +27,7 @@
 	let editorState = $state({
 		bold: false,
 		italic: false,
+		underline: false,
 		bulletList: false,
 		orderedList: false,
 		highlight: '#ffffff',
@@ -41,7 +44,8 @@
 				StarterKit,
 				Placeholder.configure({ placeholder }),
 				Highlight.configure({ multicolor: true }),
-				Link.configure({ openOnClick: false })
+				Link.configure({ openOnClick: false }),
+				Underline
 			],
 			content: untrack(() => value ?? ''),
 			editorProps: {
@@ -56,6 +60,7 @@
 			onTransaction({ editor: e }) {
 				editorState.bold = e.isActive('bold');
 				editorState.italic = e.isActive('italic');
+				editorState.underline = e.isActive('underline');
 				editorState.bulletList = e.isActive('bulletList');
 				editorState.orderedList = e.isActive('orderedList');
 				editorState.highlight = (e.getAttributes('highlight').color as string) ?? '#ffffff';
@@ -146,6 +151,14 @@
 			title="Italic"
 		>
 			<ItalicIcon class="h-4 w-4" />
+		</button>
+		<button
+			type="button"
+			class={toolbarBtn(editorState.underline)}
+			onclick={() => editor?.chain().focus().toggleUnderline().run()}
+			title="Underline"
+		>
+			<UnderlineIcon class="h-4 w-4" />
 		</button>
 		<div class="bg-border mx-1 h-4 w-px"></div>
 		<button

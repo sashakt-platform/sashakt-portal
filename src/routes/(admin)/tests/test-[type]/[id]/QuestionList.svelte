@@ -220,12 +220,12 @@
 					<div>
 						<Input
 							type="number"
-							placeholder="0"
+							placeholder="e.g. 5"
 							class="w-full rounded-lg border bg-white text-center"
 							value={tag.count}
 							oninput={handleInput}
 						/>
-						{#if tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)}
+						{#if tag.count !== undefined && tag.count <= 0}
 							<small class="mt-1 block text-red-400">Enter a positive integer</small>
 						{/if}
 					</div>

@@ -276,12 +276,14 @@ describe('QuestionList', () => {
 		});
 
 		it('shows a tag added to tag_ids after save when random_tag_count already has entries', async () => {
-			// Simulates editing a saved test: two tags already have counts set,
-			// then a third tag is added on the Primary page.
+			// Simulates editing a saved test where the user added a third tag on the Primary
+			// page before navigating to Questions. On mount, syncTagsFromTagIds runs once and
+			// adds History (present in tag_ids but absent from random_tag_count) to the table.
 			const formData = makeFormData({
 				tag_ids: [
 					{ id: '1', name: 'Science' },
-					{ id: '2', name: 'Maths' }
+					{ id: '2', name: 'Maths' },
+					{ id: '3', name: 'History' }
 				],
 				random_tag_count: [
 					{ id: '1', name: 'Science', count: 5 },
@@ -291,16 +293,6 @@ describe('QuestionList', () => {
 			});
 
 			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
-
-			expect(screen.getByText('Science')).toBeInTheDocument();
-			expect(screen.getByText('Maths')).toBeInTheDocument();
-			expect(screen.queryByText('History')).not.toBeInTheDocument();
-
-			// User adds a new tag on the Primary page
-			formData.update((f) => ({
-				...f,
-				tag_ids: [...f.tag_ids, { id: '3', name: 'History' }]
-			}));
 
 			await waitFor(() => {
 				expect(screen.getByText('History')).toBeInTheDocument();

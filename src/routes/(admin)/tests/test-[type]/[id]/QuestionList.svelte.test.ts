@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/svelte';
+import { render, screen, waitFor } from '@testing-library/svelte';
 import { writable } from 'svelte/store';
 import { describe, expect, it, vi } from 'vitest';
 import QuestionList from './QuestionList.svelte';
@@ -273,6 +273,42 @@ describe('QuestionList', () => {
 			expect(
 				screen.getByText(/Select tags and specify how many questions to randomly pull from each/)
 			).toBeInTheDocument();
+		});
+
+		it('shows a tag added to tag_ids after save when random_tag_count already has entries', async () => {
+			// Simulates editing a saved test: two tags already have counts set,
+			// then a third tag is added on the Primary page.
+			const formData = makeFormData({
+				tag_ids: [
+					{ id: '1', name: 'Science' },
+					{ id: '2', name: 'Maths' }
+				],
+				random_tag_count: [
+					{ id: '1', name: 'Science', count: 5 },
+					{ id: '2', name: 'Maths', count: 3 }
+				],
+				question_revision_ids: []
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			expect(screen.getByText('Science')).toBeInTheDocument();
+			expect(screen.getByText('Maths')).toBeInTheDocument();
+			expect(screen.queryByText('History')).not.toBeInTheDocument();
+
+			// User adds a new tag on the Primary page
+			formData.update((f) => ({
+				...f,
+				tag_ids: [...f.tag_ids, { id: '3', name: 'History' }]
+			}));
+
+			await waitFor(() => {
+				expect(screen.getByText('History')).toBeInTheDocument();
+			});
+
+			// Existing tags and their counts remain untouched
+			expect(screen.getByText('Science')).toBeInTheDocument();
+			expect(screen.getByText('Maths')).toBeInTheDocument();
 		});
 
 		it('uses Manual Selection mode when explicit question IDs exist, even if tags are set', () => {

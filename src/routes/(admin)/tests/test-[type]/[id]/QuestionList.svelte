@@ -89,7 +89,7 @@
 	<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
 {/if}
 
-<div class="overflow-hidden rounded-xl border bg-white shadow-sm">
+<div class="overflow-hidden rounded-xl border bg-card shadow-sm">
 	<div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
 		<div class="flex items-center gap-4">
 			<div class="bg-primary/10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
@@ -136,13 +136,13 @@
 				<TabsList class="bg-muted rounded-full p-1">
 					<TabsTrigger
 						value="tagBased"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-muted-foreground data-[state=active]:font-semibold data-[state=active]:shadow"
 					>
 						Auto Selection
 					</TabsTrigger>
 					<TabsTrigger
 						value="manual"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-gray-500 data-[state=active]:font-semibold data-[state=active]:shadow"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-muted-foreground data-[state=active]:font-semibold data-[state=active]:shadow"
 					>
 						Manual Selection
 					</TabsTrigger>
@@ -213,18 +213,18 @@
 					{totalSelectedCount === 1 ? 'question' : 'questions'}
 				</p>
 
-				<div class="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border bg-gray-50">
+				<div class="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border bg-background">
 					<div
-						class="text-muted-foreground grid grid-cols-2 bg-gray-100 px-6 py-4 text-xs font-semibold tracking-wide uppercase"
+						class="text-muted-foreground grid grid-cols-2 bg-muted px-6 py-4 text-xs font-semibold tracking-wide uppercase"
 					>
 						<div>Tags</div>
 						<div>No. of Questions</div>
 					</div>
 
 					{#each $formData.random_tag_count as tag (tag.id)}
-						<div class="grid grid-cols-2 items-center gap-4 border-t bg-white px-6 py-4">
+						<div class="grid grid-cols-2 items-center gap-4 border-t bg-card px-6 py-4">
 							<span
-								class="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700"
+								class="inline-flex w-fit items-center rounded-full bg-muted px-3 py-1 text-sm text-foreground"
 							>
 								{tag.name}
 							</span>
@@ -232,11 +232,11 @@
 								<Input
 									type="number"
 									placeholder="e.g. 5"
-									class="w-full rounded-lg border bg-white text-center"
+									class="w-full rounded-lg border bg-card text-center"
 									bind:value={tag.count}
 								/>
 								{#if tag.count !== undefined && tag.count <= 0}
-									<small class="mt-1 block text-red-400">Enter a positive integer</small>
+									<small class="mt-1 block text-destructive">Enter a positive integer</small>
 								{/if}
 							</div>
 						</div>

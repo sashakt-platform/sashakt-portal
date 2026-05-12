@@ -68,6 +68,13 @@
 		}
 	}
 
+	const remainingTags = $derived(
+		($formData.tag_ids as Filter[]).filter(
+			(t: Filter) =>
+				!($formData.random_tag_count as Array<{ id: string }>).some((r) => r.id === t.id)
+		)
+	);
+
 	const handleRemoveQuestion = (questionId: number) => {
 		$formData.question_revision_ids = $formData.question_revision_ids.filter(
 			(id: number) => id !== questionId
@@ -200,7 +207,32 @@
 				</div>
 			</div>
 
-			{#if $formData.random_tag_count.length > 0}
+			{#snippet tagCountRow(
+				tag: { id: string; name: string; count?: number },
+				handleInput: (e: Event) => void
+			)}
+				<div class="grid grid-cols-2 items-center gap-4 border-t bg-white px-6 py-4">
+					<span
+						class="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700"
+					>
+						{tag.name}
+					</span>
+					<div>
+						<Input
+							type="number"
+							placeholder="0"
+							class="w-full rounded-lg border bg-white text-center"
+							value={tag.count}
+							oninput={handleInput}
+						/>
+						{#if tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)}
+							<small class="mt-1 block text-red-400">Enter a positive integer</small>
+						{/if}
+					</div>
+				</div>
+			{/snippet}
+
+			{#if $formData.random_tag_count.length > 0 || remainingTags.length > 0}
 				<p class="text-primary mb-4 text-center text-sm font-semibold">
 					{totalSelectedCount}
 					{totalSelectedCount === 1 ? 'question' : 'questions'}
@@ -215,24 +247,19 @@
 					</div>
 
 					{#each $formData.random_tag_count as tag (tag.id)}
-						<div class="grid grid-cols-2 items-center gap-4 border-t bg-white px-6 py-4">
-							<span
-								class="inline-flex w-fit items-center rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700"
-							>
-								{tag.name}
-							</span>
-							<div>
-								<Input
-									type="number"
-									placeholder="0"
-									class="w-full rounded-lg border bg-white text-center"
-									bind:value={tag.count}
-								/>
-								{#if tag.count && (isNaN(Number(tag.count)) || Number(tag.count) <= 0)}
-									<small class="mt-1 block text-red-400">Enter a positive integer</small>
-								{/if}
-							</div>
-						</div>
+						{@render tagCountRow(tag, (e) => {
+							tag.count = Number((e.currentTarget as HTMLInputElement).value);
+						})}
+					{/each}
+
+					{#each remainingTags as tag (tag.id)}
+						{@render tagCountRow(tag, (e) => {
+							const count = Number((e.currentTarget as HTMLInputElement).value);
+							$formData.random_tag_count = [
+								...$formData.random_tag_count,
+								{ id: tag.id, name: tag.name, count }
+							];
+						})}
 					{/each}
 				</div>
 			{/if}

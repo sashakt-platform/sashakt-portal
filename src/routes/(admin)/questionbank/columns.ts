@@ -8,7 +8,7 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
 import { QUESTION_TYPE_LABELS } from '$lib/types/question';
-import QuestionTextCell from './QuestionTextCell.svelte';
+import QuestionTextCell from '$lib/components/data-table/QuestionTextCell.svelte';
 
 export interface Question {
 	id: string;

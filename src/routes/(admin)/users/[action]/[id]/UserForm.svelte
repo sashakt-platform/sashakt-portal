@@ -69,6 +69,18 @@
 		return label.includes('state') || label.includes('test');
 	});
 
+	const isSelectedRoleStateAdmin = $derived.by(() => {
+		const label =
+			data.roles.find((role: any) => role.id === $formData.role_id)?.label?.toLowerCase() ?? '';
+		return label.includes('state');
+	});
+
+	$effect(() => {
+		if (isSelectedRoleStateAdmin) {
+			selectedDistricts = [];
+		}
+	});
+
 	// if state admin is creating a user with state admin or test admin role,
 	// then we should auto-assign current state admin's state and state admin's districts
 	$effect(() => {
@@ -218,7 +230,7 @@
 						<Form.FieldErrors />
 					</Form.Field>
 				{/if}
-				{#if !currentUserHasAssignedDistricts}
+				{#if !currentUserHasAssignedDistricts && !isSelectedRoleStateAdmin}
 					<Form.Field {form} name="district_ids">
 						<Form.Control>
 							{#snippet children({ props })}

@@ -25,7 +25,8 @@
 		canUpdate,
 		canDelete,
 		isStateAdmin,
-		hasAssignedDistricts
+		hasAssignedDistricts,
+		hasLocation
 	} from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
 
@@ -234,13 +235,10 @@
 			/>
 
 			<div class="flex flex-1 flex-wrap items-start justify-end gap-2">
-				{#if !isStateAdmin(data.user)}
+				{#if !hasLocation(data.user)}
 					<div>
 						<StateSelection bind:states={filteredStates} filteration={true} />
 					</div>
-				{/if}
-
-				{#if !hasAssignedDistricts(data.user)}
 					<div>
 						<DistrictSelection
 							bind:districts={filteredDistricts}
@@ -248,9 +246,8 @@
 							filteration={true}
 						/>
 					</div>
+					<div class="mx-4 w-px self-stretch bg-gray-300"></div>
 				{/if}
-
-				<div class="mx-4 w-px self-stretch bg-gray-300"></div>
 
 				<div>
 					<TagTypeSelection bind:tagTypes={filteredTagtypes} filteration={true} />

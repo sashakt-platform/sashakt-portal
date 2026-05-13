@@ -19,15 +19,7 @@
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
-	import {
-		canCreate,
-		canRead,
-		canUpdate,
-		canDelete,
-		isStateAdmin,
-		hasAssignedDistricts,
-		hasLocation
-	} from '$lib/utils/permissions.js';
+	import { canCreate, canRead, canUpdate, canDelete, hasLocation } from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
 
 	const term = useTerms();

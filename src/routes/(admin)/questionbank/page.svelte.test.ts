@@ -69,12 +69,13 @@ vi.mock('./columns', () => ({
 }));
 
 import { hasLocation } from '$lib/utils/permissions.js';
+import { type Question } from './columns';
 
-const baseData = (items: any[] = []) => ({
+const baseData = (items: Partial<Question>[] = []) => ({
 	questions: { items, total: items.length, pages: items.length > 0 ? 1 : 0 },
 	params: { page: 1, size: 25, search: '', sortBy: '', sortOrder: 'asc' },
 	user: { id: 1, permissions: [] }
-});
+}) as any;
 
 describe('Question Bank Listing Page', () => {
 	beforeEach(() => {

@@ -28,6 +28,7 @@
 		hasAssignedDistricts
 	} from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
+	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 
 	const term = useTerms();
 
@@ -39,6 +40,7 @@
 			is_template: boolean;
 			tests: any;
 			params: any;
+			user: any;
 		};
 	} = $props();
 
@@ -53,14 +55,27 @@
 	const search = $derived(data?.params?.search || '');
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
+	const myTests = $derived(page.url.searchParams.get('my_tests'));
 
 	const hasActiveFilters = $derived(
 		search ||
 			page.url.searchParams.getAll('tag_ids').length > 0 ||
 			page.url.searchParams.getAll('state_ids').length > 0 ||
 			page.url.searchParams.getAll('tag_type_ids').length > 0 ||
-			page.url.searchParams.getAll('district_ids').length > 0
+			page.url.searchParams.getAll('district_ids').length > 0 ||
+			myTests !== null
 	);
+
+	function selectMyTestsFilter(value: string) {
+		const url = new URL(page.url);
+		if (value === 'all') {
+			url.searchParams.delete('my_tests');
+		} else {
+			url.searchParams.set('my_tests', value);
+		}
+		url.searchParams.set('page', '1');
+		goto(url, { keepFocus: true, invalidateAll: true });
+	}
 	const noTestCreatedYet = $derived(totalItems === 0 && !hasActiveFilters);
 
 	// handle sorting
@@ -260,6 +275,19 @@
 				</div>
 			</div>
 		</div>
+
+		{#if !data?.is_template}
+			<div class="flex items-center gap-2">
+				<span class="text-muted-foreground text-xs">Show:</span>
+				<Tabs value={myTests ?? 'all'} onValueChange={selectMyTestsFilter} class="w-fit">
+					<TabsList class="h-auto p-0.5">
+						<TabsTrigger value="all" class="px-2 py-0.5 text-xs">All</TabsTrigger>
+						<TabsTrigger value="true" class="px-2 py-0.5 text-xs">Mine</TabsTrigger>
+						<TabsTrigger value="false" class="px-2 py-0.5 text-xs">Shared</TabsTrigger>
+					</TabsList>
+				</Tabs>
+			</div>
+		{/if}
 	{/snippet}
 
 	{#snippet content()}

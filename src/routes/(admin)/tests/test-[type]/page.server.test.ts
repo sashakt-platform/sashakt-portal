@@ -222,6 +222,42 @@ describe('Test Management Listing — load()', () => {
 			expect(callUrl).toContain('tag_type_ids=6');
 		});
 
+		it('should forward my_tests=true when set', async () => {
+			mockSuccessfulFetch();
+			await load({
+				params: { type: 'session' },
+				url: makeUrl('/tests/test-session', 'my_tests=true'),
+				cookies: mockCookies
+			} as any);
+
+			const callUrl: string = mockFetch.mock.calls[0][0];
+			expect(callUrl).toContain('my_tests=true');
+		});
+
+		it('should forward my_tests=false when set', async () => {
+			mockSuccessfulFetch();
+			await load({
+				params: { type: 'session' },
+				url: makeUrl('/tests/test-session', 'my_tests=false'),
+				cookies: mockCookies
+			} as any);
+
+			const callUrl: string = mockFetch.mock.calls[0][0];
+			expect(callUrl).toContain('my_tests=false');
+		});
+
+		it('should omit my_tests from API call when not in URL', async () => {
+			mockSuccessfulFetch();
+			await load({
+				params: { type: 'session' },
+				url: makeUrl('/tests/test-session'),
+				cookies: mockCookies
+			} as any);
+
+			const callUrl: string = mockFetch.mock.calls[0][0];
+			expect(callUrl).not.toContain('my_tests');
+		});
+
 		it('should send Bearer token in Authorization header', async () => {
 			mockSuccessfulFetch();
 			await load({
@@ -307,8 +343,20 @@ describe('Test Management Listing — load()', () => {
 				size: 10,
 				search: 'quiz',
 				sortBy: 'name',
-				sortOrder: 'desc'
+				sortOrder: 'desc',
+				myTests: ''
 			});
+		});
+
+		it('should return myTests in params when my_tests is set', async () => {
+			mockSuccessfulFetch();
+			const result = (await load({
+				params: { type: 'session' },
+				url: makeUrl('/tests/test-session', 'my_tests=true'),
+				cookies: mockCookies
+			} as any)) as any;
+
+			expect(result.params.myTests).toBe('true');
 		});
 	});
 

@@ -189,6 +189,11 @@
 			(currentScreen === typeOfScreen.primary &&
 				!convertTemplate &&
 				($formData.name ?? '').trim() === '') ||
+			(currentScreen === typeOfScreen.questions &&
+				!isSectionedTest &&
+				($formData.question_revision_ids?.length ?? 0) === 0 &&
+				($formData.random_tag_count?.length ?? 0) > 0 &&
+				($formData.random_tag_count ?? []).some((t) => !t.count)) ||
 			(currentScreen === typeOfScreen.configuration &&
 				$formData.random_questions &&
 				($formData.no_of_random_questions ?? 0) <= 0) ||

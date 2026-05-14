@@ -69,6 +69,18 @@
 		return label.includes('state') || label.includes('test');
 	});
 
+	const isSelectedRoleStateAdmin = $derived.by(() => {
+		const label =
+			data.roles.find((role: any) => role.id === $formData.role_id)?.label?.toLowerCase() ?? '';
+		return label.includes('state');
+	});
+
+	$effect(() => {
+		if (isSelectedRoleStateAdmin) {
+			selectedDistricts = [];
+		}
+	});
+
 	// if state admin is creating a user with state admin or test admin role,
 	// then we should auto-assign current state admin's state and state admin's districts
 	$effect(() => {
@@ -207,28 +219,34 @@
 			</Form.Field>
 
 			{#if showLocationFields}
-				{#if !currentUserIsStateAdmin}
-					<Form.Field {form} name="state_ids">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label class="font-semibold">State</Form.Label>
-								<StateSelection {...props} bind:states={selectedStates} multiple={false} />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				{/if}
-				{#if !currentUserHasAssignedDistricts}
-					<Form.Field {form} name="district_ids">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label class="font-semibold">District</Form.Label>
-								<DistrictSelection {...props} bind:districts={selectedDistricts} {selectedStates} />
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				{/if}
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+					{#if !currentUserIsStateAdmin}
+						<Form.Field {form} name="state_ids">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label class="font-semibold">State</Form.Label>
+									<StateSelection {...props} bind:states={selectedStates} multiple={false} />
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+					{/if}
+					{#if !currentUserHasAssignedDistricts && !isSelectedRoleStateAdmin}
+						<Form.Field {form} name="district_ids">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Form.Label class="font-semibold">District</Form.Label>
+									<DistrictSelection
+										{...props}
+										bind:districts={selectedDistricts}
+										{selectedStates}
+									/>
+								{/snippet}
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+					{/if}
+				</div>
 			{/if}
 		</div>
 

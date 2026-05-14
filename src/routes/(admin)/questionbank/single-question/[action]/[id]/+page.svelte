@@ -34,7 +34,7 @@
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import QuestionRevision from './QuestionRevision.svelte';
 	import QuestionPreview from './QuestionPreview.svelte';
-	import { isStateAdmin, getUserState, type User } from '$lib/utils/permissions.js';
+	import { isStateAdmin, getUserState, type User, hasLocation } from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
 
 	const term = useTerms();
@@ -1588,7 +1588,7 @@
 				</div>
 
 				<!-- State -->
-				{#if !isStateAdmin(data.user)}
+				{#if !hasLocation(data.user)}
 					<div class="flex flex-col gap-2">
 						<Label class="font-semibold">State</Label>
 						<StateSelection bind:states={$formData.state_ids} />

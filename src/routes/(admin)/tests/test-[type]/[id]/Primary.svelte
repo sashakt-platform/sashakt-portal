@@ -13,7 +13,8 @@
 		getUserState,
 		type User,
 		getUserDistrict,
-		hasAssignedDistricts
+		hasAssignedDistricts,
+		hasLocation
 	} from '$lib/utils/permissions.js';
 	import TemplateSelect from './TemplateSelect.svelte';
 	import { useTerms } from '$lib/nomenclature';
@@ -135,25 +136,20 @@
 					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>
 			</div>
-			{#if !isStateAdmin(user) || !hasAssignedDistricts(user)}
+			{#if !hasLocation(user)}
 				<hr class="border-border my-4" />
-				{#if !isStateAdmin(user)}
-					<div>
-						<Label class="text-sm font-semibold text-gray-800">State</Label>
-						<div class="mt-2">
-							<StateSelection bind:states={$formData.state_ids} />
-						</div>
+				<div>
+					<Label class="text-sm font-semibold text-gray-800">State</Label>
+					<div class="mt-2">
+						<StateSelection bind:states={$formData.state_ids} />
 					</div>
-				{/if}
-
-				{#if !hasAssignedDistricts(user)}
-					<div>
-						<Label class="text-sm font-semibold text-gray-800">District</Label>
-						<div class="mt-2">
-							<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
-						</div>
+				</div>
+				<div>
+					<Label class="text-sm font-semibold text-gray-800">District</Label>
+					<div class="mt-2">
+						<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
 					</div>
-				{/if}
+				</div>
 			{/if}
 
 			<hr class="border-border my-4" />

@@ -24,7 +24,8 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	canUpdate: vi.fn(() => false),
 	canDelete: vi.fn(() => false),
 	isStateAdmin: vi.fn(() => false),
-	hasAssignedDistricts: vi.fn(() => false)
+	hasAssignedDistricts: vi.fn(() => false),
+	hasLocation: vi.fn(() => false)
 }));
 
 vi.mock('$lib/components/data-table/index.js', () => ({
@@ -33,17 +34,21 @@ vi.mock('$lib/components/data-table/index.js', () => ({
 	DataTable: vi.fn((_, props: any) => void props?.columns)
 }));
 
-vi.mock('$lib/components/StateSelection.svelte', () => ({
-	default: function MockStateSelection() {
-		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
-	}
+const { mockStateSelection, mockDistrictSelection } = vi.hoisted(() => ({
+	mockStateSelection: vi.fn().mockImplementation(() => ({
+		$$set: vi.fn(),
+		$destroy: vi.fn(),
+		$on: vi.fn()
+	})),
+	mockDistrictSelection: vi.fn().mockImplementation(() => ({
+		$$set: vi.fn(),
+		$destroy: vi.fn(),
+		$on: vi.fn()
+	}))
 }));
 
-vi.mock('$lib/components/DistrictSelection.svelte', () => ({
-	default: function MockDistrictSelection() {
-		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
-	}
-}));
+vi.mock('$lib/components/StateSelection.svelte', () => ({ default: mockStateSelection }));
+vi.mock('$lib/components/DistrictSelection.svelte', () => ({ default: mockDistrictSelection }));
 
 vi.mock('$lib/components/TagsSelection.svelte', () => ({
 	default: function MockTagsSelection() {
@@ -67,7 +72,7 @@ vi.mock('./columns.js', () => ({
 	})
 }));
 
-import { canCreate, canRead, isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions.js';
+import { canCreate, canRead, hasLocation } from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 
@@ -189,16 +194,31 @@ describe('Test Management Listing Page', () => {
 			expect(screen.getByPlaceholderText('Search tests...')).toBeInTheDocument();
 		});
 
-		it('should call isStateAdmin to determine state filter visibility', () => {
-			vi.mocked(isStateAdmin).mockReturnValue(false);
+		it('should show state and district filters when user has no location assigned', () => {
+			vi.mocked(hasLocation).mockReturnValue(false);
+			mockStateSelection.mockClear();
+			mockDistrictSelection.mockClear();
 			render(TestListingPage, { data: withItems(false) });
-			expect(isStateAdmin).toHaveBeenCalled();
+			expect(mockStateSelection).toHaveBeenCalled();
+			expect(mockDistrictSelection).toHaveBeenCalled();
 		});
 
-		it('should call hasAssignedDistricts to determine district filter visibility', () => {
-			vi.mocked(hasAssignedDistricts).mockReturnValue(false);
+		it('should hide state and district filters when user has a state assigned', () => {
+			vi.mocked(hasLocation).mockReturnValue(true);
+			mockStateSelection.mockClear();
+			mockDistrictSelection.mockClear();
 			render(TestListingPage, { data: withItems(false) });
-			expect(hasAssignedDistricts).toHaveBeenCalled();
+			expect(mockStateSelection).not.toHaveBeenCalled();
+			expect(mockDistrictSelection).not.toHaveBeenCalled();
+		});
+
+		it('should hide state and district filters when user has districts assigned', () => {
+			vi.mocked(hasLocation).mockReturnValue(true);
+			mockStateSelection.mockClear();
+			mockDistrictSelection.mockClear();
+			render(TestListingPage, { data: withItems(false) });
+			expect(mockStateSelection).not.toHaveBeenCalled();
+			expect(mockDistrictSelection).not.toHaveBeenCalled();
 		});
 	});
 

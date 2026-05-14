@@ -11,6 +11,7 @@ import {
 	requireAnyPermission,
 	isStateAdmin,
 	getUserState,
+	hasLocation,
 	PERMISSIONS,
 	type User
 } from './permissions';
@@ -257,6 +258,80 @@ describe('permissions', () => {
 		it('should return null when user.states is undefined', () => {
 			const userWithoutStates = { ...mockUser, states: undefined } as User;
 			expect(getUserState(userWithoutStates)).toBeNull();
+		});
+	});
+
+	describe('hasLocation()', () => {
+		const userWithState: User = {
+			id: 10,
+			username: 'stateuser',
+			email: 'state@example.com',
+			permissions: [],
+			states: [{ id: 1, name: 'Maharashtra' }],
+			districts: []
+		} as User;
+
+		const userWithDistrict: User = {
+			id: 11,
+			username: 'districtuser',
+			email: 'district@example.com',
+			permissions: [],
+			states: [],
+			districts: [{ id: 1, name: 'Pune' }]
+		} as User;
+
+		const userWithBoth: User = {
+			id: 12,
+			username: 'bothuser',
+			email: 'both@example.com',
+			permissions: [],
+			states: [{ id: 1, name: 'Maharashtra' }],
+			districts: [{ id: 1, name: 'Pune' }]
+		} as User;
+
+		const userWithNoLocation: User = {
+			id: 13,
+			username: 'nolocation',
+			email: 'noloc@example.com',
+			permissions: [],
+			states: [],
+			districts: []
+		} as User;
+
+		it('should return false when user is null', () => {
+			expect(hasLocation(null)).toBe(false);
+		});
+
+		it('should return false when user has no states and no districts', () => {
+			expect(hasLocation(userWithNoLocation)).toBe(false);
+		});
+
+		it('should return true when user has one state assigned', () => {
+			expect(hasLocation(userWithState)).toBe(true);
+		});
+
+		it('should return true when user has multiple states assigned', () => {
+			const userWithMultipleStates = {
+				...userWithState,
+				states: [
+					{ id: 1, name: 'Maharashtra' },
+					{ id: 2, name: 'Gujarat' }
+				]
+			} as User;
+			expect(hasLocation(userWithMultipleStates)).toBe(true);
+		});
+
+		it('should return true when user has a district assigned', () => {
+			expect(hasLocation(userWithDistrict)).toBe(true);
+		});
+
+		it('should return true when user has both states and districts assigned', () => {
+			expect(hasLocation(userWithBoth)).toBe(true);
+		});
+
+		it('should return false when states and districts are undefined', () => {
+			const userWithoutLocationFields = { ...mockUser, states: undefined, districts: undefined } as User;
+			expect(hasLocation(userWithoutLocationFields)).toBe(false);
 		});
 	});
 });

@@ -29,6 +29,14 @@ export function hasAssignedDistricts(user: User | null): boolean {
 }
 
 /**
+ * Check if user has any assigned locations.
+ */
+export function hasLocation(user: User | null): boolean {
+	if (!user) return false;
+	return (user.states?.length ?? 0) > 0 || (user.districts?.length ?? 0) > 0;
+}
+
+/**
  * Get the user's assigned state (for State admins)
  * Returns the first state if user has states assigned, null otherwise
  */

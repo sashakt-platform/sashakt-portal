@@ -22,7 +22,8 @@ vi.mock('$lib/components/StateSelection.svelte', () => ({
 
 vi.mock('$lib/utils/permissions.js', () => ({
 	isStateAdmin: vi.fn(() => false),
-	getUserState: vi.fn(() => null)
+	getUserState: vi.fn(() => null),
+	hasLocation: vi.fn(() => false)
 }));
 
 const baseForm = {

@@ -19,7 +19,7 @@
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
-	import { canCreate, canUpdate, canDelete, isStateAdmin } from '$lib/utils/permissions.js';
+	import { canCreate, canUpdate, canDelete, hasLocation } from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
 
 	const { data } = $props();
@@ -230,7 +230,7 @@
 			<SearchInput placeholder="Search questions" value={search} />
 
 			<div class="flex flex-1 flex-wrap items-start justify-end gap-2">
-				{#if !isStateAdmin(data.user)}
+				{#if !hasLocation(data.user)}
 					<div>
 						<StateSelection bind:states={filteredStates} filteration={true} />
 					</div>

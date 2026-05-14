@@ -6,7 +6,7 @@ describe('User Schema Validation', () => {
 		const validUserData = {
 			full_name: 'John Doe',
 			email: 'john@example.com',
-			phone: '1234567890',
+			phone: '9876543210',
 			organization_id: 1,
 			role_id: 1,
 			state_ids: [1, 2],
@@ -79,6 +79,50 @@ describe('User Schema Validation', () => {
 				const { phone, ...dataWithoutPhone } = validUserData;
 				const result = createUserSchema.safeParse(dataWithoutPhone);
 				expect(result.success).toBe(true);
+			});
+
+			it('should accept a valid 10-digit Indian mobile number', () => {
+				const result = createUserSchema.safeParse({
+					...validUserData,
+					phone: '9876543210'
+				});
+				expect(result.success).toBe(true);
+			});
+
+			it('should reject phone numbers shorter than 10 digits', () => {
+				const result = createUserSchema.safeParse({
+					...validUserData,
+					phone: '987654321'
+				});
+				expect(result.success).toBe(false);
+			});
+
+			it('should reject phone numbers longer than 10 digits', () => {
+				const result = createUserSchema.safeParse({
+					...validUserData,
+					phone: '98765432101'
+				});
+				expect(result.success).toBe(false);
+			});
+
+			it('should reject phone numbers containing non-digit characters', () => {
+				const result = createUserSchema.safeParse({
+					...validUserData,
+					phone: '98765-4321'
+				});
+				expect(result.success).toBe(false);
+				if (!result.success) {
+					const phoneError = result.error.issues.find((i) => i.path[0] === 'phone');
+					expect(phoneError?.message).toContain('10-digit');
+				}
+			});
+
+			it('should reject phone numbers with a country-code prefix', () => {
+				const result = createUserSchema.safeParse({
+					...validUserData,
+					phone: '+919876543210'
+				});
+				expect(result.success).toBe(false);
 			});
 
 			it('should default state_ids to empty array', () => {
@@ -203,7 +247,7 @@ describe('User Schema Validation', () => {
 		const validEditData = {
 			full_name: 'John Doe',
 			email: 'john@example.com',
-			phone: '1234567890',
+			phone: '9876543210',
 			organization_id: 1,
 			role_id: 1,
 			state_ids: [1, 2],

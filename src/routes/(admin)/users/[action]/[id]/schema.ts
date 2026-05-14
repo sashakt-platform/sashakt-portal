@@ -1,11 +1,14 @@
 import { z } from 'zod';
-import { PASSWORD_MIN } from '$lib/constants';
+import { PASSWORD_MIN, PHONE_ERROR, PHONE_REGEX } from '$lib/constants';
 
 // Base schema for common fields
 const baseUserSchema = z.object({
 	full_name: z.string().min(1, { error: 'Full name is required' }),
 	email: z.email({ error: 'Invalid email address' }),
-	phone: z.string().optional(),
+	phone: z
+		.string()
+		.optional()
+		.refine((val) => !val || PHONE_REGEX.test(val), { error: PHONE_ERROR }),
 	organization_id: z.coerce.number().min(1, { error: 'Organization is required' }),
 	role_id: z.coerce.number().min(1, { error: 'Role is required' }),
 	state_ids: z.array(z.coerce.number()).default([]),

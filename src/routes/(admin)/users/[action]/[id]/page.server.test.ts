@@ -270,7 +270,7 @@ describe('User CRUD Route', () => {
 					full_name: 'New User',
 					email: 'new@example.com',
 					password: 'password123',
-					phone: '1234567890',
+					phone: '9876543210',
 					organization_id: '1',
 					role_id: '1',
 					is_active: 'true'
@@ -306,7 +306,7 @@ describe('User CRUD Route', () => {
 					full_name: 'New User',
 					email: 'new@example.com',
 					password: 'password123',
-					phone: '1234567890',
+					phone: '9876543210',
 					organization_id: '1',
 					role_id: '2',
 					is_active: 'true',
@@ -422,7 +422,7 @@ describe('User CRUD Route', () => {
 				body: new URLSearchParams({
 					full_name: 'Updated User',
 					email: 'updated@example.com',
-					phone: '1234567890',
+					phone: '9876543210',
 					organization_id: '1',
 					role_id: '1',
 					is_active: 'true'

@@ -10,6 +10,7 @@
 	import type { Filter } from '$lib/types/filters';
 	import {
 		hasPermission,
+		isSuperAdmin,
 		PERMISSIONS,
 		isStateAdmin,
 		getUserState,
@@ -30,11 +31,7 @@
 	const isEditMode = data.action === 'edit';
 	const schema = isEditMode ? editUserSchema : createUserSchema;
 
-	// check if current user is Super Admin by checking organization management permissions
-	const isSuperAdmin =
-		hasPermission(data.currentUser, PERMISSIONS.CREATE_ORGANIZATION) ||
-		hasPermission(data.currentUser, PERMISSIONS.UPDATE_ORGANIZATION) ||
-		hasPermission(data.currentUser, PERMISSIONS.DELETE_ORGANIZATION);
+	const isSuperAdminUser = isSuperAdmin(data.currentUser);
 
 	const form = superForm(userData || data.form, {
 		applyAction: 'never',
@@ -105,7 +102,7 @@
 	});
 
 	// for non-Super Admins, automatically set organization_id to current user's organization
-	if (!isSuperAdmin && data.currentUser?.organization_id && !isEditMode) {
+	if (!isSuperAdminUser && data.currentUser?.organization_id && !isEditMode) {
 		$formData.organization_id = data.currentUser.organization_id.toString();
 	}
 </script>
@@ -156,7 +153,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			{#if isSuperAdmin}
+			{#if isSuperAdminUser}
 				<Form.Field {form} name="organization_id">
 					<Form.Control>
 						{#snippet children({ props })}

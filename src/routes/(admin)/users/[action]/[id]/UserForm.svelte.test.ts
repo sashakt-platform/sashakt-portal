@@ -30,41 +30,9 @@ vi.mock('$lib/components/DistrictSelection.svelte', () => ({
 }));
 
 // Mock permissions
-vi.mock('$lib/utils/permissions.js', () => ({
-	hasPermission: vi.fn((user, permission) => {
-		if (
-			permission === 'create_organization' ||
-			permission === 'update_organization' ||
-			permission === 'delete_organization'
-		) {
-			return user?.permissions?.includes(permission);
-		}
-		return false;
-	}),
-	PERMISSIONS: {
-		CREATE_ORGANIZATION: 'create_organization',
-		UPDATE_ORGANIZATION: 'update_organization',
-		DELETE_ORGANIZATION: 'delete_organization'
-	},
-	isStateAdmin: vi.fn((user) => {
-		return user?.states?.length === 1;
-	}),
-	hasAssignedDistricts: vi.fn((user) => {
-		return Array.isArray(user?.districts) && user.districts.length > 0;
-	}),
-	getUserState: vi.fn((user) => {
-		if (!user || !user.states || user.states.length === 0) {
-			return null;
-		}
-		return user.states[0];
-	}),
-	getUserDistrict: vi.fn((user) => {
-		if (!user || !user.districts || user.districts.length === 0) {
-			return null;
-		}
-		return user.districts;
-	})
-}));
+vi.mock('$lib/utils/permissions.js', async (importOriginal) => {
+	return await importOriginal();
+});
 
 describe('UserForm Component', () => {
 	const mockRoles = [

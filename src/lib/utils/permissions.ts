@@ -175,6 +175,14 @@ export function canDelete(user: User | null, entity: keyof typeof ENTITY_PERMISS
 	return hasPermission(user, permissions.delete);
 }
 
+export function isOwnEntity(
+	user: User | null,
+	entityCreatedById: string | number | null | undefined
+): boolean {
+	if (!user || entityCreatedById == null) return false;
+	return String(user.id) === String(entityCreatedById);
+}
+
 /**
  * Entity-specific permission mappings
  */

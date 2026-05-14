@@ -13,6 +13,7 @@ import {
 	hasAssignedDistricts,
 	getUserState,
 	getUserDistrict,
+	isOwnEntity,
 	type User
 } from '$lib/utils/permissions.js';
 import { resolve } from '$app/paths';
@@ -22,6 +23,7 @@ import type { TestStatus } from '$lib/types/test.js';
 export interface Test {
 	id: string;
 	name: string;
+	created_by_id?: string | number | null;
 	tags?: Array<{ name: string; tag_type?: { name: string } }>;
 	modified_date: string;
 	is_template: boolean;
@@ -215,6 +217,8 @@ export const createTestColumns = (
 				isRestricted = !canStateAdminAccessTest(user, test);
 			}
 
+			const isNotOwner = !isOwnEntity(user ?? null, test.created_by_id);
+
 			return renderComponent(DataTableActions, {
 				id: test.id,
 				entityName: isTemplate ? term('test_template') : term('test'),
@@ -222,8 +226,8 @@ export const createTestColumns = (
 				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,
 				onDelete: () => onDelete(test.id),
-				canEdit: (permissions?.canEdit ?? true) && !isRestricted,
-				canDelete: (permissions?.canDelete ?? true) && !isRestricted,
+				canEdit: (permissions?.canEdit ?? true) && !isRestricted && !isNotOwner,
+				canDelete: (permissions?.canDelete ?? true) && !isRestricted && !isNotOwner,
 				editInline: true
 			});
 		}

@@ -6,7 +6,7 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { createUserSchema, editUserSchema } from './schema';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { redirect } from 'sveltekit-flash-message/server';
-import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { requirePermission, isSuperAdmin, PERMISSIONS } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const user = requireLogin();
@@ -136,12 +136,7 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod4(schema));
 
 		// For non-Super Admins, automatically set organization_id to current user's organization
-		const isSuperAdmin =
-			user.permissions?.includes(PERMISSIONS.CREATE_ORGANIZATION) ||
-			user.permissions?.includes(PERMISSIONS.UPDATE_ORGANIZATION) ||
-			user.permissions?.includes(PERMISSIONS.DELETE_ORGANIZATION);
-
-		if (!isSuperAdmin && user.organization_id) {
+		if (!isSuperAdmin(user) && user.organization_id) {
 			form.data.organization_id = user.organization_id;
 		}
 

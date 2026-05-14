@@ -61,17 +61,13 @@ vi.mock('$lib/server/auth.js', () => ({
 }));
 
 // Mock permissions
-vi.mock('$lib/utils/permissions.js', () => ({
-	requirePermission: vi.fn(),
-	PERMISSIONS: {
-		CREATE_USER: 'create_user',
-		UPDATE_USER: 'update_user',
-		DELETE_USER: 'delete_user',
-		CREATE_ORGANIZATION: 'create_organization',
-		UPDATE_ORGANIZATION: 'update_organization',
-		DELETE_ORGANIZATION: 'delete_organization'
-	}
-}));
+vi.mock('$lib/utils/permissions.js', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('$lib/utils/permissions.js')>();
+	return {
+		...actual,
+		requirePermission: vi.fn()
+	};
+});
 
 // Mock flash message redirect
 vi.mock('sveltekit-flash-message/server', () => ({

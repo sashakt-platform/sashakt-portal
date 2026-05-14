@@ -163,6 +163,18 @@ export const PERMISSIONS = {
 /**
  * Check if user can perform CRUD operations on an entity
  */
+export function isSuperAdmin(user: User | null): boolean {
+	return hasAnyPermission(user, [
+		PERMISSIONS.CREATE_ORGANIZATION,
+		PERMISSIONS.UPDATE_ORGANIZATION,
+		PERMISSIONS.DELETE_ORGANIZATION
+	]);
+}
+
+export function isSystemAdmin(user: User | null): boolean {
+	return hasPermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
+}
+
 export function canCreate(user: User | null, entity: keyof typeof ENTITY_PERMISSIONS): boolean {
 	const permissions = ENTITY_PERMISSIONS[entity];
 	return hasPermission(user, permissions.create);
@@ -181,6 +193,16 @@ export function canUpdate(user: User | null, entity: keyof typeof ENTITY_PERMISS
 export function canDelete(user: User | null, entity: keyof typeof ENTITY_PERMISSIONS): boolean {
 	const permissions = ENTITY_PERMISSIONS[entity];
 	return hasPermission(user, permissions.delete);
+}
+
+export function isOwnEntity(
+	user: User | null,
+	entityCreatedById: string | number | null | undefined
+): boolean {
+	if (!user) return false;
+	if (isSuperAdmin(user) || isSystemAdmin(user)) return true;
+	if (entityCreatedById == null) return false;
+	return String(user.id) === String(entityCreatedById);
 }
 
 /**

@@ -1,11 +1,14 @@
-import { PASSWORD_MIN } from '$lib/constants';
+import { PASSWORD_MIN, PHONE_ERROR, PHONE_REGEX } from '$lib/constants';
 import { z } from 'zod';
 
 export const profileSchema = z
 	.object({
 		full_name: z.string().min(1, { error: 'Full name is required' }),
 		email: z.email({ error: 'Invalid email address' }),
-		phone: z.string().optional(),
+		phone: z
+			.string()
+			.optional()
+			.refine((val) => !val || PHONE_REGEX.test(val), { error: PHONE_ERROR }),
 		role_label: z.string().optional(),
 		current_password: z.string().optional(),
 		new_password: z.string().optional(),

@@ -58,13 +58,13 @@
 			count?: number;
 		}>;
 		const tagIds = $formData.tag_ids as Filter[];
-		const tagIdSet = new Set(tagIds.map((t) => t.id));
-		const kept = current.filter((t) => tagIdSet.has(t.id));
+		const tagIdMap = new Map(tagIds.map((t) => [t.id, t.name]));
+		const kept = current
+			.filter((t) => tagIdMap.has(t.id))
+			.map((t) => ({ ...t, name: tagIdMap.get(t.id) as string }));
 		const keptIds = new Set(kept.map((t) => t.id));
 		const added = tagIds.filter((t) => !keptIds.has(t.id));
-		if (kept.length !== current.length || added.length > 0) {
-			$formData.random_tag_count = [...kept, ...added.map((t) => ({ id: t.id, name: t.name }))];
-		}
+		$formData.random_tag_count = [...kept, ...added.map((t) => ({ id: t.id, name: t.name }))];
 	};
 
 	if (!isSectionedTest) {

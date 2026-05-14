@@ -10,6 +10,9 @@ import {
 	requirePermission,
 	requireAnyPermission,
 	isStateAdmin,
+	isSuperAdmin,
+	isSystemAdmin,
+	isOwnEntity,
 	getUserState,
 	PERMISSIONS,
 	type User
@@ -221,6 +224,105 @@ describe('permissions', () => {
 		it('should return false when user.states is undefined', () => {
 			const userWithoutStates = { ...mockUser, states: undefined } as User;
 			expect(isStateAdmin(userWithoutStates)).toBe(false);
+		});
+	});
+
+	describe('isSuperAdmin()', () => {
+		it('should return true when user has CREATE_ORGANIZATION', () => {
+			const user = { ...mockUser, permissions: [PERMISSIONS.CREATE_ORGANIZATION] } as User;
+			expect(isSuperAdmin(user)).toBe(true);
+		});
+
+		it('should return true when user has UPDATE_ORGANIZATION', () => {
+			const user = { ...mockUser, permissions: [PERMISSIONS.UPDATE_ORGANIZATION] } as User;
+			expect(isSuperAdmin(user)).toBe(true);
+		});
+
+		it('should return true when user has DELETE_ORGANIZATION', () => {
+			const user = { ...mockUser, permissions: [PERMISSIONS.DELETE_ORGANIZATION] } as User;
+			expect(isSuperAdmin(user)).toBe(true);
+		});
+
+		it('should return true when user has all three org permissions', () => {
+			const user = {
+				...mockUser,
+				permissions: [
+					PERMISSIONS.CREATE_ORGANIZATION,
+					PERMISSIONS.UPDATE_ORGANIZATION,
+					PERMISSIONS.DELETE_ORGANIZATION
+				]
+			} as User;
+			expect(isSuperAdmin(user)).toBe(true);
+		});
+
+		it('should return false when user has none of the org permissions', () => {
+			expect(isSuperAdmin(mockUser)).toBe(false);
+		});
+
+		it('should return false when user is null', () => {
+			expect(isSuperAdmin(null)).toBe(false);
+		});
+	});
+
+	describe('isSystemAdmin()', () => {
+		it('should return true when user has UPDATE_MY_ORGANIZATION', () => {
+			const user = { ...mockUser, permissions: [PERMISSIONS.UPDATE_MY_ORGANIZATION] } as User;
+			expect(isSystemAdmin(user)).toBe(true);
+		});
+
+		it('should return false when user does not have UPDATE_MY_ORGANIZATION', () => {
+			expect(isSystemAdmin(mockUser)).toBe(false);
+		});
+
+		it('should return false when user is null', () => {
+			expect(isSystemAdmin(null)).toBe(false);
+		});
+	});
+
+	describe('isOwnEntity()', () => {
+		const owner = { ...mockUser, id: '42' } as User;
+		const otherUser = { ...mockUser, id: '99' } as User;
+		const superAdminUser = {
+			...mockUser,
+			id: '99',
+			permissions: [PERMISSIONS.CREATE_ORGANIZATION]
+		} as User;
+		const systemAdminUser = {
+			...mockUser,
+			id: '99',
+			permissions: [PERMISSIONS.UPDATE_MY_ORGANIZATION]
+		} as User;
+
+		it('should return true when user.id matches entityCreatedById (both strings)', () => {
+			expect(isOwnEntity(owner, '42')).toBe(true);
+		});
+
+		it('should return true when user.id matches entityCreatedById (string vs number)', () => {
+			expect(isOwnEntity(owner, 42)).toBe(true);
+		});
+
+		it('should return false when user.id does not match entityCreatedById', () => {
+			expect(isOwnEntity(otherUser, '42')).toBe(false);
+		});
+
+		it('should return false when entityCreatedById is null', () => {
+			expect(isOwnEntity(owner, null)).toBe(false);
+		});
+
+		it('should return false when entityCreatedById is undefined', () => {
+			expect(isOwnEntity(owner, undefined)).toBe(false);
+		});
+
+		it('should return false when user is null', () => {
+			expect(isOwnEntity(null, '42')).toBe(false);
+		});
+
+		it('should return true for a super admin even when entity belongs to a different user', () => {
+			expect(isOwnEntity(superAdminUser, '42')).toBe(true);
+		});
+
+		it('should return true for a system admin even when entity belongs to a different user', () => {
+			expect(isOwnEntity(systemAdminUser, '42')).toBe(true);
 		});
 	});
 

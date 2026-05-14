@@ -48,21 +48,22 @@
 				: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
 
-	// Adds tags from tag_ids that are not yet in random_tag_count, preserving existing counts.
-	// Called once on mount and when switching back to tagBased — not reactive.
+	// Syncs random_tag_count with tag_ids: drops entries whose tag was removed,
+	// appends new tags, and preserves existing counts. Called on mount and when
+	// switching back to tagBased — not reactive.
 	const syncTagsFromTagIds = () => {
 		const current = $formData.random_tag_count as Array<{
 			id: string;
 			name: string;
 			count?: number;
 		}>;
-		const currentIds = new Set(current.map((t) => t.id));
-		const added = ($formData.tag_ids as Filter[]).filter((t: Filter) => !currentIds.has(t.id));
-		if (added.length > 0) {
-			$formData.random_tag_count = [
-				...current,
-				...added.map((t: Filter) => ({ id: t.id, name: t.name }))
-			];
+		const tagIds = $formData.tag_ids as Filter[];
+		const tagIdSet = new Set(tagIds.map((t) => t.id));
+		const kept = current.filter((t) => tagIdSet.has(t.id));
+		const keptIds = new Set(kept.map((t) => t.id));
+		const added = tagIds.filter((t) => !keptIds.has(t.id));
+		if (kept.length !== current.length || added.length > 0) {
+			$formData.random_tag_count = [...kept, ...added.map((t) => ({ id: t.id, name: t.name }))];
 		}
 	};
 
@@ -89,7 +90,7 @@
 	<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
 {/if}
 
-<div class="overflow-hidden rounded-xl border bg-card shadow-sm">
+<div class="bg-card overflow-hidden rounded-xl border shadow-sm">
 	<div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
 		<div class="flex items-center gap-4">
 			<div class="bg-primary/10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
@@ -136,13 +137,13 @@
 				<TabsList class="bg-muted rounded-full p-1">
 					<TabsTrigger
 						value="tagBased"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-muted-foreground data-[state=active]:font-semibold data-[state=active]:shadow"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
 					>
 						Auto Selection
 					</TabsTrigger>
 					<TabsTrigger
 						value="manual"
-						class="data-[state=active]:bg-background data-[state=active]:text-primary rounded-full px-4 py-1.5 text-sm text-muted-foreground data-[state=active]:font-semibold data-[state=active]:shadow"
+						class="data-[state=active]:bg-background data-[state=active]:text-primary text-muted-foreground rounded-full px-4 py-1.5 text-sm data-[state=active]:font-semibold data-[state=active]:shadow"
 					>
 						Manual Selection
 					</TabsTrigger>
@@ -213,18 +214,18 @@
 					{totalSelectedCount === 1 ? 'question' : 'questions'}
 				</p>
 
-				<div class="mx-auto w-full max-w-2xl overflow-hidden rounded-xl border bg-background">
+				<div class="bg-background mx-auto w-full max-w-2xl overflow-hidden rounded-xl border">
 					<div
-						class="text-muted-foreground grid grid-cols-2 bg-muted px-6 py-4 text-xs font-semibold tracking-wide uppercase"
+						class="text-muted-foreground bg-muted grid grid-cols-2 px-6 py-4 text-xs font-semibold tracking-wide uppercase"
 					>
 						<div>Tags</div>
 						<div>No. of Questions</div>
 					</div>
 
 					{#each $formData.random_tag_count as tag (tag.id)}
-						<div class="grid grid-cols-2 items-center gap-4 border-t bg-card px-6 py-4">
+						<div class="bg-card grid grid-cols-2 items-center gap-4 border-t px-6 py-4">
 							<span
-								class="inline-flex w-fit items-center rounded-full bg-muted px-3 py-1 text-sm text-foreground"
+								class="bg-muted text-foreground inline-flex w-fit items-center rounded-full px-3 py-1 text-sm"
 							>
 								{tag.name}
 							</span>
@@ -232,11 +233,11 @@
 								<Input
 									type="number"
 									placeholder="e.g. 5"
-									class="w-full rounded-lg border bg-card text-center"
+									class="bg-card w-full rounded-lg border text-center"
 									bind:value={tag.count}
 								/>
 								{#if tag.count !== undefined && tag.count <= 0}
-									<small class="mt-1 block text-destructive">Enter a positive integer</small>
+									<small class="text-destructive mt-1 block">Enter a positive integer</small>
 								{/if}
 							</div>
 						</div>

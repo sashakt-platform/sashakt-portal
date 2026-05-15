@@ -6,6 +6,7 @@ import {
 } from '$lib/components/data-table/column-helpers';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import QuestionPreviewCell from '$lib/components/QuestionPreviewCell.svelte';
+import QuestionTextCell from '$lib/components/data-table/QuestionTextCell.svelte';
 
 export interface QuestionForSelection {
 	id: number;
@@ -34,7 +35,10 @@ export const createQuestionSelectionColumns = (
 		currentSortBy,
 		currentSortOrder,
 		handleSort,
-		{ meta: { grow: true } }
+		{
+			cell: ({ row }) => renderComponent(QuestionTextCell, { value: row.original.question_text }),
+			meta: { grow: true }
+		}
 	),
 	{
 		id: 'answers',

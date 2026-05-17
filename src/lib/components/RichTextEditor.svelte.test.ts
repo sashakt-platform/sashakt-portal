@@ -335,7 +335,45 @@ describe('RichTextEditor', () => {
 		});
 	});
 
-	// 9. Cleanup ───────────────────────────────────────────────────────────────
+	// 9. View source ──────────────────────────────────────────────────────────
+
+	describe('view source', () => {
+		it('renders the View source button', () => {
+			render(RichTextEditor);
+			expect(screen.getByTitle('View source')).toBeInTheDocument();
+		});
+
+		it('shows a pre element with raw HTML when View source is clicked', async () => {
+			mockEditorInstance.getHTML.mockReturnValue('<p>Hello</p>');
+			render(RichTextEditor, { value: '<p>Hello</p>' });
+
+			await fireEvent.click(screen.getByTitle('View source'));
+
+			const pre = document.querySelector('pre');
+			expect(pre).toBeInTheDocument();
+			expect(pre?.textContent).toBe('<p>Hello</p>');
+		});
+
+		it('shows empty string in pre when value is null', async () => {
+			render(RichTextEditor, { value: null });
+
+			await fireEvent.click(screen.getByTitle('View source'));
+
+			expect(document.querySelector('pre')?.textContent).toBe('');
+		});
+
+		it('hides the pre element when View source is clicked again', async () => {
+			render(RichTextEditor, { value: '<p>Hello</p>' });
+
+			await fireEvent.click(screen.getByTitle('View source'));
+			expect(document.querySelector('pre')).toBeInTheDocument();
+
+			await fireEvent.click(screen.getByTitle('View source'));
+			expect(document.querySelector('pre')).not.toBeInTheDocument();
+		});
+	});
+
+	// 10. Cleanup ──────────────────────────────────────────────────────────────
 
 	describe('cleanup', () => {
 		it('destroys the editor instance when the component is unmounted', () => {

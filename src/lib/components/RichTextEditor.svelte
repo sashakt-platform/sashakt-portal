@@ -14,6 +14,7 @@
 	import HighlighterIcon from '@lucide/svelte/icons/highlighter';
 	import LinkIcon from '@lucide/svelte/icons/link';
 	import InfoIcon from '@lucide/svelte/icons/info';
+	import Code2Icon from '@lucide/svelte/icons/code-2';
 
 	let {
 		value = $bindable(null),
@@ -37,6 +38,7 @@
 	});
 	let linkInput = $state({ open: false, href: '' });
 	let mathHintOpen = $state(false);
+	let sourceOpen = $state(false);
 
 	$effect(() => {
 		if (!editorEl) return;
@@ -235,6 +237,14 @@
 		>
 			<InfoIcon class="h-4 w-4" />
 		</button>
+		<button
+			type="button"
+			class={toolbarBtn(sourceOpen)}
+			onclick={() => (sourceOpen = !sourceOpen)}
+			title="View source"
+		>
+			<Code2Icon class="h-4 w-4" />
+		</button>
 	</div>
 
 	{#if mathHintOpen}
@@ -273,7 +283,10 @@
 		</div>
 	{/if}
 
-	<div bind:this={editorEl}></div>
+	{#if sourceOpen}
+		<pre class="text-muted-foreground min-h-24 overflow-auto whitespace-pre-wrap break-all px-3 py-2 text-sm font-mono">{value ?? ''}</pre>
+	{/if}
+	<div bind:this={editorEl} class:hidden={sourceOpen}></div>
 </div>
 
 <style>

@@ -13,6 +13,7 @@
 	import ListOrderedIcon from '@lucide/svelte/icons/list-ordered';
 	import HighlighterIcon from '@lucide/svelte/icons/highlighter';
 	import LinkIcon from '@lucide/svelte/icons/link';
+	import InfoIcon from '@lucide/svelte/icons/info';
 
 	let {
 		value = $bindable(null),
@@ -35,6 +36,7 @@
 		heading: 0 as 0 | 1 | 2 | 3
 	});
 	let linkInput = $state({ open: false, href: '' });
+	let mathHintOpen = $state(false);
 
 	$effect(() => {
 		if (!editorEl) return;
@@ -223,7 +225,26 @@
 		<button type="button" class={toolbarBtn(editorState.link)} onclick={toggleLink} title="Link">
 			<LinkIcon class="h-4 w-4" />
 		</button>
+		<div class="flex-1"></div>
+		<!-- Math hint toggle -->
+		<button
+			type="button"
+			class={toolbarBtn(mathHintOpen)}
+			onclick={() => (mathHintOpen = !mathHintOpen)}
+			title="Math formula syntax"
+		>
+			<InfoIcon class="h-4 w-4" />
+		</button>
 	</div>
+
+	{#if mathHintOpen}
+		<div class="border-border bg-muted/40 flex items-start gap-2 border-b px-3 py-2 text-xs">
+			<InfoIcon class="text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0" />
+			<p class="text-muted-foreground">
+				For math formulas, use <code class="bg-muted rounded px-1">\(x^2 + y^2\)</code>
+			</p>
+		</div>
+	{/if}
 
 	{#if linkInput.open}
 		<div class="border-border flex items-center gap-2 border-b px-3 py-1.5">

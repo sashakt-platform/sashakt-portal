@@ -22,6 +22,9 @@
 	import { canCreate, canRead, canUpdate, canDelete, hasLocation } from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
+	import BatchActionsToolbar from '$lib/components/data-table/BatchActionsToolbar.svelte';
+	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 
 	const term = useTerms();
 
@@ -95,6 +98,15 @@
 	// create columns
 	const entityType = $derived(data?.is_template ? 'test-template' : 'test');
 	const canReadTestTemplate = $derived(canRead(data.user, 'test-template'));
+
+	// batch selection state
+	let selectedTests: Test[] = $state([]);
+	let selectedTestIds: string[] = $state([]);
+	let batchDeleteMode = $state(false);
+	let clearTableSelection = $state(false);
+
+	const enableSelection = $derived(!noTestCreatedYet && canDelete(data.user, entityType));
+
 	const columns = $derived(
 		createTestColumns(
 			sortBy,
@@ -111,7 +123,8 @@
 				canDelete: canDelete(data.user, entityType)
 			},
 			data.user,
-			handleViewReport
+			handleViewReport,
+			enableSelection
 		)
 	);
 
@@ -127,21 +140,86 @@
 		reportTestId = testId;
 		reportDialogOpen = true;
 	}
+
+	const handleSelectionChange = (selectedRows: Test[], selectedRowIds: string[]) => {
+		selectedTests = selectedRows;
+		selectedTestIds = selectedRowIds;
+	};
+
+	const handleBatchAction = (actionId: string) => {
+		if (actionId === 'delete') {
+			batchDeleteMode = true;
+		}
+	};
+
+	const handleBatchDeleteConfirm = () => {
+		const form = document.getElementById('batch-delete-form') as HTMLFormElement;
+		if (form) form.requestSubmit();
+	};
+
+	const handleBatchDeleteCancel = () => {
+		batchDeleteMode = false;
+	};
+
+	const handleClearSelection = () => {
+		selectedTests = [];
+		selectedTestIds = [];
+		batchDeleteMode = false;
+		clearTableSelection = true;
+		setTimeout(() => {
+			clearTableSelection = false;
+		}, 0);
+	};
 </script>
 
 <DeleteDialog
 	bind:action={deleteAction}
 	elementName={data?.is_template ? term('test_template') : term('test')}
+	batchMode={batchDeleteMode}
+	selectedCount={selectedTestIds.length}
+	selectedItems={selectedTests}
+	onBatchConfirm={handleBatchDeleteConfirm}
+	onBatchCancel={handleBatchDeleteCancel}
 />
 
 <TestReportDialog bind:open={reportDialogOpen} testId={reportTestId} />
+
+<form
+	id="batch-delete-form"
+	method="POST"
+	action="?/batchDelete"
+	style="display: none;"
+	use:enhance={() => {
+		return async ({ result }) => {
+			batchDeleteMode = false;
+			handleClearSelection();
+			await invalidateAll();
+			if (result.type === 'failure') {
+				console.error('Batch delete failed');
+			}
+		};
+	}}
+>
+	<input type="hidden" name="testIds" value={JSON.stringify(selectedTestIds)} />
+</form>
 
 <ListingPageLayout
 	title={data?.is_template ? term('test_templates') : term('tests')}
 	subtitle=""
 	showEmptyState={noTestCreatedYet}
+	showFilters={selectedTestIds.length === 0}
 	tooltipKey={data?.is_template ? 'test-templates' : 'tests'}
 >
+	{#snippet toolbar()}
+		<BatchActionsToolbar
+			selectedCount={selectedTestIds.length}
+			selectedRows={selectedTests}
+			selectedRowIds={selectedTestIds}
+			onAction={handleBatchAction}
+			onClearSelection={handleClearSelection}
+		/>
+	{/snippet}
+
 	{#snippet headerActions()}
 		{#if data?.is_template && canCreate(data.user, 'test-template')}
 			<Button class="font-semibold" href={page.url.pathname + '/new'}
@@ -290,6 +368,10 @@
 			emptyStateMessage={data?.is_template
 				? `No ${term('test_templates', 'lower')} found matching your criteria.`
 				: `No ${term('tests', 'lower')} found matching your criteria.`}
+			{enableSelection}
+			onSelectionChange={handleSelectionChange}
+			getRowId={(row) => row.id}
+			clearSelection={clearTableSelection}
 		/>
 	{/snippet}
 </ListingPageLayout>

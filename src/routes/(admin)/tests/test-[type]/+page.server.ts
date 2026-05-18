@@ -1,9 +1,10 @@
-import type { PageServerLoad } from './$types.js';
+import type { PageServerLoad, Actions } from './$types.js';
 import { BACKEND_URL, TEST_TAKER_URL } from '$env/static/private';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, url, cookies }) => {
 	const user = requireLogin();
@@ -114,4 +115,61 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 		test_taker_url: TEST_TAKER_URL,
 		params: { page, size, search, sortBy, sortOrder, myTests }
 	};
+};
+
+export const actions: Actions = {
+	batchDelete: async ({ request, cookies, params }) => {
+		const user = requireLogin();
+		const is_template = params.type === 'template';
+		requirePermission(
+			user,
+			is_template ? PERMISSIONS.DELETE_TEST_TEMPLATE : PERMISSIONS.DELETE_TEST
+		);
+		const token = getSessionTokenCookie();
+		const formData = await request.formData();
+
+		try {
+			const response = await fetch(`${BACKEND_URL}/test/`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: formData.get('testIds')
+			});
+
+			if (!response.ok) {
+				const errorMessage = await response.json();
+				setFlash(
+					{
+						type: 'error',
+						message: `Failed to delete ${is_template ? 'test templates' : 'tests'}: ${errorMessage.detail?.[0]?.msg || response.statusText}`
+					},
+					cookies
+				);
+				return fail(500);
+			}
+
+			const deleteResponse = await response.json();
+			setFlash(
+				{
+					type: deleteResponse.delete_failure_list ? 'error' : 'success',
+					message: `Deletion complete: ${deleteResponse.delete_success_count} successful, ${deleteResponse.delete_failure_list?.length || 0} failed.`
+				},
+				cookies
+			);
+		} catch (error) {
+			console.error('Batch delete error:', error);
+			setFlash(
+				{
+					type: 'error',
+					message: `Failed to delete ${is_template ? 'test templates' : 'tests'}`
+				},
+				cookies
+			);
+			return fail(500);
+		}
+
+		return { success: true };
+	}
 };

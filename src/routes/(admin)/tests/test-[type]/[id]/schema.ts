@@ -73,6 +73,7 @@ export const testSchema = z.object({
 	is_active: z.boolean().default(true),
 	start_time: z.string().nullable().optional(),
 	end_time: z.string().nullable().optional(),
+	pause_timer_when_inactive: z.boolean().default(false),
 	time_limit: z.number().nullable().optional(),
 	marks_level: z.enum(Object.values(MarksLevel)).nullable().default(MarksLevel.QUESTION),
 	marks: z.number().nullable().optional(),

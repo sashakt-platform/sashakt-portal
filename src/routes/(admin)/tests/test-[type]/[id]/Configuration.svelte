@@ -355,6 +355,15 @@
 				{/if}
 
 				<div class="flex items-center justify-between">
+					{@render labelTestRules('Pause timer when candidate leaves the test window')}
+					{@render yesNo(
+						$formData.pause_timer_when_inactive,
+						() => ($formData.pause_timer_when_inactive = true),
+						() => ($formData.pause_timer_when_inactive = false)
+					)}
+				</div>
+
+				<div class="flex items-center justify-between">
 					{@render labelTestRules('Shuffle question order per candidate')}
 					<div class="bg-muted flex rounded-xl p-1">
 						<button

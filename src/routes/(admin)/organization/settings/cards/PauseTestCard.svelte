@@ -15,7 +15,7 @@
 	bind:mode={settings.pause_test.mode}
 >
 	<div class="flex items-center justify-between gap-4">
-		<span class="text-sm font-semibold text-gray-500">Pause Test</span>
+		<span class="text-sm font-semibold text-muted-foreground">Pause {term('test')}</span>
 		<OnOffToggle bind:value={settings.pause_test.value.default} />
 	</div>
 </FeatureCard>

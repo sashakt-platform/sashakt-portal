@@ -191,12 +191,13 @@
 	style="display: none;"
 	use:enhance={() => {
 		return async ({ result }) => {
+			if (result.type === 'failure') {
+				console.error('Batch delete failed');
+				return;
+			}
 			batchDeleteMode = false;
 			handleClearSelection();
 			await invalidateAll();
-			if (result.type === 'failure') {
-				console.error('Batch delete failed');
-			}
 		};
 	}}
 >

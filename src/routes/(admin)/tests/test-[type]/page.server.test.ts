@@ -581,6 +581,15 @@ describe('Test Management Listing — batchDelete action', () => {
 			);
 		});
 
+		it('sets a success flash when delete_failure_list is an empty array', async () => {
+			mockBackendSuccess(2, []);
+			await actions.batchDelete(makeEvent('session', ['id1', 'id2']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				mockCookies
+			);
+		});
+
 		it('flash message includes the failure count when some deletions fail', async () => {
 			mockBackendSuccess(2, ['f1', 'f2']);
 			await actions.batchDelete(makeEvent('session', ['id1', 'id2', 'id3', 'id4']) as any);

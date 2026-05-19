@@ -153,7 +153,7 @@ export const actions: Actions = {
 			const deleteResponse = await response.json();
 			setFlash(
 				{
-					type: deleteResponse.delete_failure_list ? 'error' : 'success',
+					type: (deleteResponse.delete_failure_list?.length ?? 0) > 0 ? 'error' : 'success',
 					message: `Deletion complete: ${deleteResponse.delete_success_count} successful, ${deleteResponse.delete_failure_list?.length || 0} failed.`
 				},
 				cookies

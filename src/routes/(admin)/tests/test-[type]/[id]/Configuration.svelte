@@ -37,6 +37,7 @@
 	const fixedPalette = $derived(isFixed(orgSettings, 'question_palette'));
 	const fixedMarkForReview = $derived(isFixed(orgSettings, 'mark_for_review'));
 	const fixedOmr = $derived(isFixed(orgSettings, 'omr_mode'));
+	const fixedPauseTest = $derived(isFixed(orgSettings, 'pause_test'));
 
 	if (!$formData.marking_scheme) {
 		$formData.marking_scheme = {
@@ -354,14 +355,16 @@
 					</div>
 				{/if}
 
-				<div class="flex items-center justify-between">
-					{@render labelTestRules('Pause timer when candidate leaves the test window')}
-					{@render yesNo(
-						$formData.pause_timer_when_inactive,
-						() => ($formData.pause_timer_when_inactive = true),
-						() => ($formData.pause_timer_when_inactive = false)
-					)}
-				</div>
+				{#if !fixedPauseTest}
+					<div class="flex items-center justify-between">
+						{@render labelTestRules('Pause timer when candidate leaves the test window')}
+						{@render yesNo(
+							$formData.pause_timer_when_inactive,
+							() => ($formData.pause_timer_when_inactive = true),
+							() => ($formData.pause_timer_when_inactive = false)
+						)}
+					</div>
+				{/if}
 
 				<div class="flex items-center justify-between">
 					{@render labelTestRules('Shuffle question order per candidate')}

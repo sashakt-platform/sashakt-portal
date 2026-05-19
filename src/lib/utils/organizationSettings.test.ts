@@ -19,6 +19,7 @@ function settings(overrides: Partial<OrgSettingsPayload> = {}): OrgSettingsPaylo
 		question_palette: { mode: 'fixed', value: { default: true } },
 		mark_for_review: { mode: 'fixed', value: { default: true } },
 		omr_mode: { mode: 'fixed', value: { default: false } },
+		pause_test: { mode: 'fixed', value: { default: false } },
 		...overrides
 	};
 }

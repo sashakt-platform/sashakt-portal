@@ -46,6 +46,10 @@ export type OrgSettingsPayload = {
 		mode: OrgSettingMode;
 		value: { default: boolean };
 	};
+	pause_test: {
+		mode: OrgSettingMode;
+		value: { default: boolean };
+	};
 };
 
 type Feature = keyof Omit<OrgSettingsPayload, 'version'>;
@@ -67,6 +71,7 @@ export function isDisabled(settings: OrgSettingsPayload | null, feature: Feature
 		case 'omr_mode':
 		case 'question_palette':
 		case 'mark_for_review':
+		case 'pause_test':
 			return value.default === false;
 		case 'answer_review':
 			return value.default === 'off';
@@ -122,6 +127,7 @@ export function applyOrgSettingsToNewTestForm(
 
 	formData.show_question_palette = settings.question_palette.value.default;
 	formData.bookmark = settings.mark_for_review.value.default;
+	formData.pause_timer_when_inactive = settings.pause_test.value.default;
 
 	const omrMode = settings.omr_mode.mode;
 	const omrDefault = settings.omr_mode.value.default;

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { load } from './+page.server';
+import { load, actions } from './+page.server';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { setFlash } from 'sveltekit-flash-message/server';
+import { fail } from '@sveltejs/kit';
 
 vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000',
@@ -24,8 +25,14 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	requirePermission: vi.fn(),
 	PERMISSIONS: {
 		READ_TEST: 'read_test',
-		READ_TEST_TEMPLATE: 'read_test_template'
+		READ_TEST_TEMPLATE: 'read_test_template',
+		DELETE_TEST: 'delete_test',
+		DELETE_TEST_TEMPLATE: 'delete_test_template'
 	}
+}));
+
+vi.mock('@sveltejs/kit', () => ({
+	fail: vi.fn((status: number) => ({ status, type: 'failure' }))
 }));
 
 vi.mock('sveltekit-flash-message/server', () => ({
@@ -447,6 +454,201 @@ describe('Test Management Listing — load()', () => {
 
 			expect(result.questions).toEqual([]);
 			expect(result.tests).toBeDefined(); // page still loads
+		});
+	});
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+describe('Test Management Listing — batchDelete action', () => {
+	const mockFetch = vi.fn();
+
+	beforeEach(() => {
+		global.fetch = mockFetch;
+		mockFetch.mockClear();
+		vi.clearAllMocks();
+	});
+
+	function makeRequest(testIds: string[]) {
+		return {
+			formData: vi.fn().mockResolvedValue({
+				get: vi.fn((key: string) => (key === 'testIds' ? JSON.stringify(testIds) : null))
+			})
+		};
+	}
+
+	function makeEvent(type: 'session' | 'template', testIds: string[]) {
+		return { request: makeRequest(testIds), cookies: mockCookies, params: { type } };
+	}
+
+	function mockBackendSuccess(successCount: number, failureList: string[] | null = null) {
+		mockFetch.mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({
+				delete_success_count: successCount,
+				delete_failure_list: failureList
+			})
+		});
+	}
+
+	function mockBackendError(msg = 'Something went wrong') {
+		mockFetch.mockResolvedValueOnce({
+			ok: false,
+			statusText: 'Internal Server Error',
+			json: async () => ({ detail: [{ msg }] })
+		});
+	}
+
+	describe('Permissions', () => {
+		it('requires DELETE_TEST permission for session type', async () => {
+			mockBackendSuccess(1);
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			expect(requirePermission).toHaveBeenCalledWith(expect.anything(), PERMISSIONS.DELETE_TEST);
+		});
+
+		it('requires DELETE_TEST_TEMPLATE permission for template type', async () => {
+			mockBackendSuccess(1);
+			await actions.batchDelete(makeEvent('template', ['id1']) as any);
+			expect(requirePermission).toHaveBeenCalledWith(
+				expect.anything(),
+				PERMISSIONS.DELETE_TEST_TEMPLATE
+			);
+		});
+	});
+
+	describe('API call', () => {
+		it('calls DELETE /test/ endpoint', async () => {
+			mockBackendSuccess(2);
+			await actions.batchDelete(makeEvent('session', ['id1', 'id2']) as any);
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://localhost:8000/test/',
+				expect.objectContaining({ method: 'DELETE' })
+			);
+		});
+
+		it('sends test IDs as the request body', async () => {
+			mockBackendSuccess(2);
+			await actions.batchDelete(makeEvent('session', ['id1', 'id2']) as any);
+			const [, opts] = mockFetch.mock.calls[0];
+			expect(opts.body).toBe(JSON.stringify(['id1', 'id2']));
+		});
+
+		it('sends Bearer token in Authorization header', async () => {
+			mockBackendSuccess(1);
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			const [, opts] = mockFetch.mock.calls[0];
+			expect(opts.headers.Authorization).toBe('Bearer mock-token');
+		});
+
+		it('sends Content-Type: application/json header', async () => {
+			mockBackendSuccess(1);
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			const [, opts] = mockFetch.mock.calls[0];
+			expect(opts.headers['Content-Type']).toBe('application/json');
+		});
+	});
+
+	describe('Success response', () => {
+		it('returns { success: true } when all deletions succeed', async () => {
+			mockBackendSuccess(3);
+			const result = await actions.batchDelete(makeEvent('session', ['a', 'b', 'c']) as any);
+			expect(result).toEqual({ success: true });
+		});
+
+		it('sets a success flash when delete_failure_list is null', async () => {
+			mockBackendSuccess(2);
+			await actions.batchDelete(makeEvent('session', ['id1', 'id2']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				mockCookies
+			);
+		});
+
+		it('flash message includes the success count', async () => {
+			mockBackendSuccess(3);
+			await actions.batchDelete(makeEvent('session', ['a', 'b', 'c']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ message: expect.stringContaining('3') }),
+				mockCookies
+			);
+		});
+
+		it('sets an error flash when delete_failure_list is non-empty', async () => {
+			mockBackendSuccess(2, ['failed-id']);
+			await actions.batchDelete(makeEvent('session', ['id1', 'id2', 'id3']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'error' }),
+				mockCookies
+			);
+		});
+
+		it('sets a success flash when delete_failure_list is an empty array', async () => {
+			mockBackendSuccess(2, []);
+			await actions.batchDelete(makeEvent('session', ['id1', 'id2']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'success' }),
+				mockCookies
+			);
+		});
+
+		it('flash message includes the failure count when some deletions fail', async () => {
+			mockBackendSuccess(2, ['f1', 'f2']);
+			await actions.batchDelete(makeEvent('session', ['id1', 'id2', 'id3', 'id4']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ message: expect.stringContaining('2') }),
+				mockCookies
+			);
+		});
+	});
+
+	describe('Error handling — backend returns non-ok response', () => {
+		it('returns fail(500) when backend returns a non-ok response', async () => {
+			mockBackendError();
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			expect(fail).toHaveBeenCalledWith(500);
+		});
+
+		it('sets an error flash when backend returns a non-ok response', async () => {
+			mockBackendError('Cannot delete');
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'error' }),
+				mockCookies
+			);
+		});
+
+		it('error flash message mentions the endpoint that failed', async () => {
+			mockBackendError('Cannot delete');
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ message: expect.stringContaining('Failed') }),
+				mockCookies
+			);
+		});
+
+		it('error flash uses template wording for template type', async () => {
+			mockBackendError();
+			await actions.batchDelete(makeEvent('template', ['id1']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'error' }),
+				mockCookies
+			);
+		});
+	});
+
+	describe('Error handling — network error', () => {
+		it('returns fail(500) on a network error', async () => {
+			mockFetch.mockRejectedValueOnce(new Error('Network failure'));
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			expect(fail).toHaveBeenCalledWith(500);
+		});
+
+		it('sets an error flash on a network error', async () => {
+			mockFetch.mockRejectedValueOnce(new Error('Network failure'));
+			await actions.batchDelete(makeEvent('session', ['id1']) as any);
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'error' }),
+				mockCookies
+			);
 		});
 	});
 });

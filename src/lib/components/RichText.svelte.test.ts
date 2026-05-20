@@ -64,6 +64,18 @@ describe('RichText', () => {
 			expect(container.querySelector('.rich-text')?.textContent).toBe('');
 			expect(container.querySelector('.rich-text')?.children.length).toBe(0);
 		});
+
+		it('preserves HTML structure and LaTeX delimiters in imported question content', () => {
+			const { container } = render(RichText, {
+				content: '<p>The moment is \\(Ni^{2+}\\)</p>'
+			});
+
+			expect(container.querySelector('p')).toBeInTheDocument();
+
+			expect(container.querySelector('.rich-text')?.textContent).toContain('The moment is');
+
+			expect(container.querySelector('.rich-text')?.innerHTML).toContain('\\(Ni^{2+}\\)');
+		});
 	});
 
 	describe('MathJax typesetting', () => {

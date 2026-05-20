@@ -73,6 +73,13 @@ const omrModeSchema = z.object({
 	})
 });
 
+const pauseTestSchema = z.object({
+	mode: modeSchema,
+	value: z.object({
+		default: z.boolean().default(false)
+	})
+});
+
 const nomenclatureLabelSchema = z
 	.string()
 	.max(MAX_NOMENCLATURE_LABEL_LEN, {
@@ -118,7 +125,7 @@ const analyticsLinkSchema = z.object({
 });
 
 export const organizationSettingsSchema = z.object({
-	version: z.literal(3).default(3),
+	version: z.literal(4).default(4),
 	test_timings: testTimingsSchema,
 	questions_per_page: questionsPerPageSchema,
 	marking_scheme: markingSchemeSchema,
@@ -126,6 +133,7 @@ export const organizationSettingsSchema = z.object({
 	question_palette: questionPaletteSchema,
 	mark_for_review: markForReviewSchema,
 	omr_mode: omrModeSchema,
+	pause_test: pauseTestSchema,
 	platform_nomenclature: platformNomenclatureSchema,
 	platform_guide: platformGuideSchema,
 	analytics_link: analyticsLinkSchema

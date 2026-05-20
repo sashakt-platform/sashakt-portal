@@ -3,8 +3,8 @@
 	import CalendarRange from '$lib/components/CalendarRange.svelte';
 	import Check from '@lucide/svelte/icons/check';
 	import Copy from '@lucide/svelte/icons/copy';
-	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import ConfigureBox from './ConfigureBox.svelte';
+	import RichTextEditor from '$lib/components/RichTextEditor.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import PartialMarkingSection from '$lib/components/PartialMarkingSection.svelte';
@@ -185,19 +185,15 @@
 			<div class="flex flex-col gap-6">
 				<div>
 					{@render label('Pre-test Guidelines')}
-					<Textarea
-						name="start_instructions"
+					<RichTextEditor
 						placeholder="E.g., Ensure stable internet. Read each question carefully..."
-						class="min-h-25 border-gray-300 placeholder:font-light placeholder:text-gray-500"
 						bind:value={$formData.start_instructions}
 					/>
 				</div>
 				<div>
 					{@render label(`${term('test')} Completion Message`)}
-					<Textarea
-						name="completion_message"
+					<RichTextEditor
 						placeholder="E.g., Thank you for completing the assessment. Your results will be shared soon."
-						class="min-h-25 border-gray-300 placeholder:font-light placeholder:text-gray-500"
 						bind:value={$formData.completion_message}
 					/>
 				</div>

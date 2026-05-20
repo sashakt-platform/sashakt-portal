@@ -7,8 +7,10 @@ import { loginSchema } from './schema';
 import {
 	setSessionTokenCookie,
 	setRefreshTokenCookie,
-	resolveOrganization
+	resolveOrganization,
+	validateSessionToken
 } from '$lib/server/auth.js';
+import { isSuperAdmin } from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ url, fetch, cookies, locals }) => {
 	const organizationData = await resolveOrganization(
@@ -57,6 +59,9 @@ export const actions: Actions = {
 		setSessionTokenCookie(cookies, access_token, new Date(Date.now() + accessExpiryMs));
 		setRefreshTokenCookie(cookies, refresh_token);
 
-		throw redirect(303, '/tests/test-session');
+		const { user } = await validateSessionToken(access_token);
+		const destination = isSuperAdmin(user) ? '/organisations' : '/tests/test-session';
+
+		throw redirect(303, destination);
 	}
 };

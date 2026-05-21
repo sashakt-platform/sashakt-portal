@@ -11,7 +11,12 @@ vi.mock('$app/state', () => ({
 }));
 
 vi.mock('$app/navigation', () => ({
-	goto: vi.fn()
+	goto: vi.fn(),
+	invalidateAll: vi.fn()
+}));
+
+vi.mock('$app/forms', () => ({
+	enhance: vi.fn(() => () => {})
 }));
 
 vi.mock('$lib/constants', () => ({
@@ -26,6 +31,10 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	isStateAdmin: vi.fn(() => false),
 	hasAssignedDistricts: vi.fn(() => false),
 	hasLocation: vi.fn(() => false)
+}));
+
+vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
+	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
 }));
 
 vi.mock('$lib/components/data-table/index.js', () => ({
@@ -62,17 +71,28 @@ vi.mock('$lib/components/TagTypeSelection.svelte', () => ({
 	}
 }));
 
-// Shared ref populated inside the mock factory so sort tests can call handleSort directly.
-const sortRef = vi.hoisted(() => ({ handleSort: null as ((col: string) => void) | null }));
+// Shared ref populated inside the mock factory so sort/batch tests can inspect captured args.
+const sortRef = vi.hoisted(() => ({
+	handleSort: null as ((col: string) => void) | null,
+	enableSelection: undefined as boolean | undefined
+}));
 
 vi.mock('./columns.js', () => ({
 	createTestColumns: vi.fn((...args: any[]) => {
 		sortRef.handleSort = args[2];
+		sortRef.enableSelection = args[12]; // 13th arg (index 12)
 		return [];
 	})
 }));
 
-import { canCreate, canRead, hasLocation, isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions.js';
+import {
+	canCreate,
+	canRead,
+	canDelete,
+	hasLocation,
+	isStateAdmin,
+	hasAssignedDistricts
+} from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 
@@ -536,6 +556,40 @@ describe('Test Management Listing Page', () => {
 				keepFocus: true,
 				invalidateAll: true
 			});
+		});
+	});
+
+	// ────────────────────────────────────────────────────────────────────────
+	describe('Batch delete — enableSelection passed to createTestColumns', () => {
+		async function renderAndCapture(is_template = false, canDeleteResult = false) {
+			sortRef.enableSelection = undefined;
+			vi.mocked(canDelete).mockReturnValue(canDeleteResult);
+			render(TestListingPage, {
+				data: baseData(is_template, [{ id: '1', name: 'Test A' }])
+			});
+			await waitFor(() => {
+				if (sortRef.enableSelection === undefined) throw new Error('enableSelection not captured');
+			});
+		}
+
+		it('passes enableSelection=false when user cannot delete tests', async () => {
+			await renderAndCapture(false, false);
+			expect(sortRef.enableSelection).toBe(false);
+		});
+
+		it('passes enableSelection=true when user can delete tests and tests exist', async () => {
+			await renderAndCapture(false, true);
+			expect(sortRef.enableSelection).toBe(true);
+		});
+
+		it('passes enableSelection=false when user cannot delete test templates', async () => {
+			await renderAndCapture(true, false);
+			expect(sortRef.enableSelection).toBe(false);
+		});
+
+		it('passes enableSelection=true when user can delete test templates and templates exist', async () => {
+			await renderAndCapture(true, true);
+			expect(sortRef.enableSelection).toBe(true);
 		});
 	});
 });

@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { toast } from 'svelte-sonner';
-import { createSortableColumn } from '$lib/components/data-table/column-helpers';
+import { createSortableColumn, createSelectionColumn } from '$lib/components/data-table/column-helpers';
 import { downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
@@ -84,8 +84,10 @@ export const createTestColumns = (
 		canDelete?: boolean;
 	},
 	user?: User | null,
-	onViewReport?: (testId: string) => void
+	onViewReport?: (testId: string) => void,
+	enableSelection: boolean = false
 ): ColumnDef<Test>[] => [
+	...(enableSelection ? [createSelectionColumn<Test>()] : []),
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort, {
 		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
 		meta: { grow: true }

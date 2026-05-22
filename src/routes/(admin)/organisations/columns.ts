@@ -49,6 +49,6 @@ export const createColumns = (
 		enableSorting: false,
 		enableHiding: false,
 		size: 130,
-		cell: ({ row }) => renderComponent(ManageButton, { shortcode: row.original.shortcode })
+		cell: ({ row }) => renderComponent(ManageButton, { id: row.original.id })
 	}
 ];

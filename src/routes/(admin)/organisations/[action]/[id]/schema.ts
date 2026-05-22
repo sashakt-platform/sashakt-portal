@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const createOrganisationSchema = z.object({
+export const organisationSchema = z.object({
 	name: z.string().min(1, { error: 'Organisation name is required' }),
 	shortcode: z
 		.string()
@@ -11,4 +11,4 @@ export const createOrganisationSchema = z.object({
 	logo: z.string().optional().nullable()
 });
 
-export type CreateOrganisationSchema = typeof createOrganisationSchema;
+export type OrganisationSchema = typeof organisationSchema;

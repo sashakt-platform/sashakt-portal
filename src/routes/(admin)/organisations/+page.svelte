@@ -64,7 +64,7 @@
 <ListingPageLayout title="Select Organisation" subtitle="">
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'organization')}
-			<a href={resolve('/organisations/create')}>
+			<a href={resolve('/organisations/add/new')}>
 				<Button class="font-semibold"><Plus />Add Organisation</Button>
 			</a>
 		{/if}

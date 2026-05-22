@@ -1,8 +1,7 @@
 import { BACKEND_URL } from '$env/static/private';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants.js';
-import { getSessionTokenCookie, requireLogin, setOrganizationCookie } from '$lib/server/auth';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
-import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ url }) => {
 	const user = requireLogin();
@@ -46,13 +45,3 @@ export const load = async ({ url }) => {
 	};
 };
 
-export const actions = {
-	manage: async ({ request, cookies }) => {
-		const formData = await request.formData();
-		const shortcode = formData.get('shortcode');
-		if (typeof shortcode === 'string' && shortcode) {
-			setOrganizationCookie(cookies, shortcode);
-		}
-		redirect(303, '/dashboard');
-	}
-};

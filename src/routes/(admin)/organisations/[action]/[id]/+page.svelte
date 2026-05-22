@@ -10,7 +10,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import { createOrganisationSchema } from './schema.js';
+	import { organisationSchema } from './schema.js';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import { toast } from 'svelte-sonner';
@@ -23,10 +23,12 @@
 		errors,
 		submitting
 	} = superForm(data.form, {
-		validators: zod4Client(createOrganisationSchema),
+		validators: zod4Client(organisationSchema),
 		dataType: 'json'
 	});
 
+	const isEdit = $derived(data.action === 'edit');
+	const pageTitle = $derived(isEdit ? 'Edit Organisation' : 'Add Organisation');
 	const portalUrl = $derived(`${page.url.origin}/${$formData.shortcode || 'shortcode'}`);
 
 	function copyPortalUrl() {
@@ -49,7 +51,7 @@
 <form method="POST" action="?/save" use:enhance>
 	<div class="bg-muted/40 min-h-screen">
 		<header
-			class="bg-background border-border sticky top-0 z-10 flex h-23 items-center justify-between gap-[14px] border-b p-8"
+			class="bg-background border-border sticky top-0 z-10 flex h-23 items-center justify-between gap-3.5 border-b p-8"
 		>
 			<div class="flex items-center gap-3">
 				<a
@@ -60,7 +62,7 @@
 					<ArrowLeft size={20} />
 				</a>
 				<h1 class="font-sans text-[24px] leading-[140%] font-bold tracking-[0px]">
-					Add Organisation
+					{pageTitle}
 				</h1>
 			</div>
 			<div class="flex gap-2">
@@ -70,7 +72,7 @@
 						variant="outline"
 						class="border-primary text-primary border text-sm sm:text-base"
 					>
-						Previous
+						Cancel
 					</Button>
 				</a>
 				<Button

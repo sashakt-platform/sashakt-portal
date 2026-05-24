@@ -20,6 +20,7 @@
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
+	import Building2 from '@lucide/svelte/icons/building-2';
 	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
 	import Download from '@lucide/svelte/icons/download';
 	import LogOut from '@lucide/svelte/icons/log-out';
@@ -49,6 +50,7 @@
 		{ termKey: 'forms', url: '/forms', icon: FileText, entity: 'form' },
 		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
 		{ termKey: 'entities', url: '/entity', icon: Boxes, entity: 'entity' },
+		{ termKey: 'organisations', url: '/organisations', icon: Building2, entity: 'organization' },
 		{ termKey: 'users', url: '/users', icon: User, entity: 'user' }
 	];
 
@@ -133,7 +135,7 @@
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
 					{#each menu_items as item (item.url)}
-						{#if (!item.entity || canCreate(data.user, item.entity) || canUpdate(data.user, item.entity)) && (!superAdmin || item.entity === 'user')}
+						{#if (!item.entity || canCreate(data.user, item.entity) || canUpdate(data.user, item.entity)) && (!superAdmin || item.entity === 'user' || item.entity === 'organization')}
 							{@render sidebaritems(item)}
 						{/if}
 					{/each}

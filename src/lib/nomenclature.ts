@@ -18,6 +18,7 @@ export const NOMENCLATURE_DEFAULTS = {
 	certificate: 'Certificate',
 	entities: 'Entities',
 	entity: 'Entity',
+	organisations: 'Organisations',
 	users: 'Users',
 	user: 'User'
 } as const;

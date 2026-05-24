@@ -23,7 +23,7 @@ function customSetting(
 
 describe('nomenclature', () => {
 	describe('constants', () => {
-		it('exposes the 19 expected keys', () => {
+		it('exposes the 20 expected keys', () => {
 			const keys = Object.keys(NOMENCLATURE_DEFAULTS).sort();
 			expect(keys).toEqual(
 				[
@@ -34,6 +34,7 @@ describe('nomenclature', () => {
 					'entity',
 					'form',
 					'forms',
+					'organisations',
 					'question_bank',
 					'tag',
 					'tag_management',

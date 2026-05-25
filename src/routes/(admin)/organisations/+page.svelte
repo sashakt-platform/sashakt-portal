@@ -61,7 +61,7 @@
 	const columns = $derived(createColumns(sortBy, sortOrder, handleSort));
 </script>
 
-<ListingPageLayout title="Select Organisation" subtitle="">
+<ListingPageLayout title="Select Organisation" subtitle="" tooltipKey="organisations">
 	{#snippet headerActions()}
 		{#if canCreate(data.user, 'organization')}
 			<a href={resolve('/organisations/add/new')}>

@@ -7,7 +7,7 @@
 </script>
 
 <a href={resolve(`/organisations/edit/${id}`)}>
-	<Button variant="outline" class="border-primary text-primary gap-1 border text-sm">
+	<Button variant="outline" class="border-primary text-primary bg-primary/10 gap-1 border text-sm">
 		Manage
 		<ChevronRight size={14} />
 	</Button>

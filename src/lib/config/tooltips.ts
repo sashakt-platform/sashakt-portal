@@ -104,6 +104,15 @@ export const TOOLTIPS = {
 				text: 'This panel displays all records for this entity type. You can edit or delete an existing record by clicking the three dots next to their entry.'
 			}
 		]
+	},
+	organisations: {
+		label: 'Help: Organisations',
+		items: [
+			{
+				question: 'What is Organisations',
+				text: 'This panel displays all organisations in the system.'
+			}
+		]
 	}
 } as const satisfies Record<string, TooltipConfig>;
 

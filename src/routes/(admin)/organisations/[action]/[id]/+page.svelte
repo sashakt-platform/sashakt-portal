@@ -32,8 +32,10 @@
 	const portalUrl = $derived(`${page.url.origin}/${$formData.shortcode || 'shortcode'}`);
 
 	function copyPortalUrl() {
-		navigator.clipboard.writeText(portalUrl);
-		toast.success('Portal URL copied!');
+		navigator.clipboard.writeText(portalUrl).then(
+			() => toast.success('Portal URL copied!'),
+			() => toast.error('Failed to copy URL. Please copy it manually.')
+		);
 	}
 
 	let logoFileName = $state('');

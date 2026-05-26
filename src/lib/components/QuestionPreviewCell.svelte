@@ -3,6 +3,8 @@
 	import QuestionPreviewDialog from '$lib/components/QuestionPreviewDialog.svelte';
 	import type { QuestionPreviewData } from '$lib/components/QuestionPreviewDialog.svelte';
 
+	import type { TMedia } from '$lib/types/media';
+
 	const { question }: { question: any } = $props();
 
 	let open = $state(false);
@@ -24,6 +26,32 @@
 		'columns' in (options as object);
 
 	const opts = $derived(question.options);
+	const optionMediaMap = $derived.by(() => {
+		const map: Record<number, TMedia | null> = {};
+		if (Array.isArray(opts)) {
+			for (const opt of opts) {
+				if (opt.media) map[opt.id] = opt.media;
+			}
+		} else if (isMatrixOptions(opts)) {
+			for (const item of opts.rows.items as Array<{
+				id: number;
+				key: string;
+				value: string;
+				media?: TMedia | null;
+			}>) {
+				if (item.media) map[item.id] = item.media;
+			}
+			for (const item of opts.columns.items as Array<{
+				id: number;
+				key: string;
+				value: string;
+				media?: TMedia | null;
+			}>) {
+				if (item.media) map[item.id] = item.media;
+			}
+		}
+		return map;
+	});
 
 	const previewData: QuestionPreviewData = $derived({
 		questionText: question.question_text || '',
@@ -33,6 +61,7 @@
 		markingScheme: question.marking_scheme,
 		isMandatory: question.is_mandatory || false,
 		media: question.media || null,
+		optionMediaMap,
 		matrix: isMatrixOptions(opts)
 			? {
 					rows: opts.rows.items,

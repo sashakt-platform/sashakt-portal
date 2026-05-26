@@ -138,6 +138,15 @@ describe('QuestionPreviewCell', () => {
 		expect(screen.getByRole('img', { name: /test image/i })).toBeInTheDocument();
 	});
 
+	it('does not throw when matrix options lack items arrays', async () => {
+		const question = makeQuestion({
+			question_type: 'matrix-match',
+			options: { rows: { label: 'Col 1' }, columns: { label: 'Col 2' } }
+		});
+		render(QuestionPreviewCell, { props: { question } });
+		await expect(openPreview()).resolves.not.toThrow();
+	});
+
 	it('does not show media elements when no media is attached', async () => {
 		render(QuestionPreviewCell, { props: { question: makeQuestion() } });
 		await openPreview();

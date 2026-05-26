@@ -18,12 +18,18 @@
 			items: { id: number; key: string; value: string }[];
 			input_type?: 'number' | 'text';
 		};
-	} =>
-		options !== null &&
-		typeof options === 'object' &&
-		!Array.isArray(options) &&
-		'rows' in (options as object) &&
-		'columns' in (options as object);
+	} => {
+		if (options === null || typeof options !== 'object' || Array.isArray(options)) return false;
+		const o = options as Record<string, unknown>;
+		return (
+			typeof o.rows === 'object' &&
+			o.rows !== null &&
+			Array.isArray((o.rows as Record<string, unknown>).items) &&
+			typeof o.columns === 'object' &&
+			o.columns !== null &&
+			Array.isArray((o.columns as Record<string, unknown>).items)
+		);
+	};
 
 	const opts = $derived(question.options);
 	const optionMediaMap = $derived.by(() => {

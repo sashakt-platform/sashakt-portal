@@ -11,7 +11,7 @@ import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import TestStatusBadge from '$lib/components/data-table/TestStatusBadge.svelte';
-import { getUserState, getUserDistrict, isOwnEntity, type User } from '$lib/utils/permissions.js';
+import { getUserDistrict, isOwnEntity, type User } from '$lib/utils/permissions.js';
 import { resolve } from '$app/paths';
 import type { NomenclatureKey } from '$lib/nomenclature';
 import type { TestStatus } from '$lib/types/test.js';

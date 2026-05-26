@@ -11,14 +11,7 @@ import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import TestStatusBadge from '$lib/components/data-table/TestStatusBadge.svelte';
-import {
-	isStateAdmin,
-	hasAssignedDistricts,
-	getUserState,
-	getUserDistrict,
-	isOwnEntity,
-	type User
-} from '$lib/utils/permissions.js';
+import { getUserState, getUserDistrict, isOwnEntity, type User } from '$lib/utils/permissions.js';
 import { resolve } from '$app/paths';
 import type { NomenclatureKey } from '$lib/nomenclature';
 import type { TestStatus } from '$lib/types/test.js';
@@ -207,19 +200,6 @@ export const createTestColumns = (
 					action: () => onViewReport?.(test.id),
 					icon: 'chart-column-decreasing'
 				});
-			}
-
-			// Restrict edit/delete for state/district admins to their jurisdiction
-			let isRestricted = false;
-
-			// Check district admin FIRST (has both state and districts)
-			// Then fall back to state admin (has state but no districts)
-			if (hasAssignedDistricts(user)) {
-				// District admin can only edit/delete tests assigned to their district
-				isRestricted = !canDistrictAdminAccessTest(user, test);
-			} else if (isStateAdmin(user)) {
-				// State admin can only edit/delete tests assigned to their state
-				isRestricted = !canStateAdminAccessTest(user, test);
 			}
 
 			const isOwner = isOwnEntity(user ?? null, test.created_by_id);

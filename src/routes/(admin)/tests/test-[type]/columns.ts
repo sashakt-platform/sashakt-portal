@@ -29,42 +29,6 @@ export interface Test {
 	status: TestStatus;
 }
 
-/**
- * Check if a state admin can edit/delete this test
- * Test must be assigned ONLY to their state (not shared with other states)
- */
-function canStateAdminAccessTest(user: User | null, test: Test): boolean {
-	const userState = getUserState(user);
-	if (!userState) return false;
-
-	// Test must have exactly 1 state assigned, and it must be user's state
-	if (!test.states || test.states.length !== 1) return false;
-
-	return String(test.states[0].id) === String(userState.id);
-}
-
-/**
- * Check if a district admin can edit/delete this test
- * Test must be assigned ONLY to their state AND ONLY to their district(s)
- */
-function canDistrictAdminAccessTest(user: User | null, test: Test): boolean {
-	const userState = getUserState(user);
-	const userDistricts = getUserDistrict(user);
-
-	if (!userState || !userDistricts || userDistricts.length === 0) return false;
-
-	// Test must have exactly 1 state assigned, and it must be user's state
-	if (!test.states || test.states.length !== 1) return false;
-	if (String(test.states[0].id) !== String(userState.id)) return false;
-
-	// Test must have districts assigned
-	if (!test.districts || test.districts.length === 0) return false;
-
-	// All test districts must be within user's assigned districts
-	const userDistrictIds = userDistricts.map((d) => String(d.id));
-	return test.districts.every((district) => userDistrictIds.includes(String(district.id)));
-}
-
 export const createTestColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,

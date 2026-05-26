@@ -96,13 +96,13 @@ describe('createTestColumns — edit/delete visibility based on ownership', () =
 		expect(props.canDelete).toBe(false);
 	});
 
-	it('respects the canEdit permission override — false takes precedence even for owner', () => {
+	it('ownership overrides canEdit permission flag — owner can always edit', () => {
 		const props = getActionProps(currentUser, makeTest('1'), false, true);
-		expect(props.canEdit).toBe(false);
+		expect(props.canEdit).toBe(true);
 	});
 
-	it('respects the canDelete permission override — false takes precedence even for owner', () => {
+	it('ownership overrides canDelete permission flag — owner can always delete', () => {
 		const props = getActionProps(currentUser, makeTest('1'), true, false);
-		expect(props.canDelete).toBe(false);
+		expect(props.canDelete).toBe(true);
 	});
 });

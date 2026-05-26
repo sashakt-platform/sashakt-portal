@@ -1,6 +1,9 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { toast } from 'svelte-sonner';
-import { createSortableColumn, createSelectionColumn } from '$lib/components/data-table/column-helpers';
+import {
+	createSortableColumn,
+	createSelectionColumn
+} from '$lib/components/data-table/column-helpers';
 import { downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
@@ -219,7 +222,7 @@ export const createTestColumns = (
 				isRestricted = !canStateAdminAccessTest(user, test);
 			}
 
-			const isNotOwner = !isOwnEntity(user ?? null, test.created_by_id);
+			const isOwner = isOwnEntity(user ?? null, test.created_by_id);
 
 			return renderComponent(DataTableActions, {
 				id: test.id,
@@ -228,8 +231,8 @@ export const createTestColumns = (
 				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,
 				onDelete: () => onDelete(test.id),
-				canEdit: (permissions?.canEdit ?? true) && !isRestricted && !isNotOwner,
-				canDelete: (permissions?.canDelete ?? true) && !isRestricted && !isNotOwner,
+				canEdit: isOwner,
+				canDelete: isOwner,
 				editInline: true
 			});
 		}

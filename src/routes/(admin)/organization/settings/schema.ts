@@ -125,7 +125,7 @@ const analyticsLinkSchema = z.object({
 });
 
 export const organizationSettingsSchema = z.object({
-	version: z.literal(4).default(4),
+	version: z.literal(5).default(5),
 	test_timings: testTimingsSchema,
 	questions_per_page: questionsPerPageSchema,
 	marking_scheme: markingSchemeSchema,

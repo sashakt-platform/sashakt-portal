@@ -9,7 +9,7 @@ import { MAX_NOMENCLATURE_LABEL_LEN, NOMENCLATURE_DEFAULTS } from '$lib/nomencla
 
 function validBaseSettings() {
 	return {
-		version: 4,
+		version: 5,
 		test_timings: {
 			mode: 'fixed',
 			value: { time_limit: 60, start_time: '09:00:00', end_time: '17:00:00' }
@@ -99,9 +99,9 @@ describe('organizationSettingsSchema — platform_nomenclature', () => {
 		expect(result.success).toBe(false);
 	});
 
-	it('pins version to literal 4', () => {
+	it('pins version to literal 5', () => {
 		const settings = validBaseSettings();
-		settings.version = 2 as 4; // wrong version
+		settings.version = 2 as 5; // wrong version
 		const result = organizationSettingsSchema.safeParse(settings);
 		expect(result.success).toBe(false);
 	});

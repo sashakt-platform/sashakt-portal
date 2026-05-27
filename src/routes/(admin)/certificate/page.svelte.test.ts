@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import CertificatePage from './+page.svelte';
@@ -18,7 +18,12 @@ const baseData = {
 };
 
 vi.mock('$app/navigation', () => ({
-	goto: vi.fn()
+	goto: vi.fn(),
+	invalidateAll: vi.fn()
+}));
+
+vi.mock('$app/forms', () => ({
+	enhance: vi.fn(() => () => {})
 }));
 
 vi.mock('$lib/utils/permissions.js', () => ({
@@ -92,5 +97,60 @@ describe('CertificatePage', () => {
 		});
 		expect(screen.queryByText('Certificate A')).not.toBeInTheDocument();
 		expect(screen.getByText(/No certificates yet/i)).toBeInTheDocument();
+	});
+});
+
+describe('CertificatePage – bulk delete feature', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('mounts a hidden batch-delete form in the DOM', () => {
+		const { container } = render(CertificatePage, { data: baseData });
+		expect(container.querySelector('#batch-delete-form')).toBeInTheDocument();
+	});
+
+	it('hidden batch-delete form posts to the batchDelete action', () => {
+		const { container } = render(CertificatePage, { data: baseData });
+		const form = container.querySelector('#batch-delete-form') as HTMLFormElement;
+		expect(form.getAttribute('action')).toBe('?/batchDelete');
+		expect(form.getAttribute('method')).toBe('POST');
+	});
+
+	it('includes a hidden certificateIds input inside the batch-delete form', () => {
+		const { container } = render(CertificatePage, { data: baseData });
+		const input = container.querySelector('#batch-delete-form input[name="certificateIds"]');
+		expect(input).toBeInTheDocument();
+		expect(input).toHaveAttribute('type', 'hidden');
+	});
+
+	it('renders a "Select all" checkbox and one per-row checkbox when certificates exist', () => {
+		render(CertificatePage, { data: baseData });
+		expect(screen.getByLabelText('Select all')).toBeInTheDocument();
+		expect(screen.getAllByLabelText('Select row')).toHaveLength(2);
+	});
+
+	it('does not render selection checkboxes when the certificate list is empty', () => {
+		render(CertificatePage, {
+			data: {
+				...baseData,
+				certificates: { items: [], total: 0, pages: 0 }
+			}
+		});
+		expect(screen.queryByLabelText('Select all')).not.toBeInTheDocument();
+		expect(screen.queryAllByLabelText('Select row')).toHaveLength(0);
+	});
+
+	it('shows the search filter when no certificates are selected', () => {
+		render(CertificatePage, { data: baseData });
+		expect(screen.getByPlaceholderText('Search certificates...')).toBeInTheDocument();
+	});
+
+	it('initial certificateIds value is an empty JSON array', () => {
+		const { container } = render(CertificatePage, { data: baseData });
+		const input = container.querySelector(
+			'#batch-delete-form input[name="certificateIds"]'
+		) as HTMLInputElement;
+		expect(input.value).toBe('[]');
 	});
 });

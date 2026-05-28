@@ -2,7 +2,8 @@ import { z } from 'zod';
 import type { ColumnDef } from '@tanstack/table-core';
 import {
 	createSortableColumn,
-	createActionsColumn
+	createActionsColumn,
+	createSelectionColumn
 } from '$lib/components/data-table/column-helpers';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
@@ -39,11 +40,13 @@ export const createEntityColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
 	handleSort: (columnId: string) => void,
+	enableSelection: boolean = false,
 	permissions?: {
 		canEdit?: boolean;
 		canDelete?: boolean;
 	}
 ): ColumnDef<Entity>[] => [
+	...(enableSelection ? [createSelectionColumn<Entity>()] : []),
 	createSortableColumn('name', 'Name', currentSortBy, currentSortOrder, handleSort),
 	createSortableColumn<Entity>(
 		'state' as keyof Entity,

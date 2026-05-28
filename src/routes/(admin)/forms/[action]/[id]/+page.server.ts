@@ -367,16 +367,16 @@ export const actions: Actions = {
 		});
 
 		if (!res.ok) {
-			const errorMessage = await res.json();
-			throw redirect(
-				303,
-				'/forms',
-				{
-					type: 'error',
-					message: `${errorMessage.detail || res.statusText}`
-				},
-				cookies
-			);
+			let detail = res.statusText;
+			try {
+				const errorMessage = await res.json();
+				detail = errorMessage.detail || res.statusText;
+			} catch {}
+			const message =
+				res.status === 500
+					? 'This form has fields. Please delete all form fields before deleting this form.'
+					: detail;
+			throw redirect(303, '/forms', { type: 'error', message }, cookies);
 		}
 
 		throw redirect(

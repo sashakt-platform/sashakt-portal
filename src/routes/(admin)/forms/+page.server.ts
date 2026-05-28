@@ -1,9 +1,10 @@
 import { BACKEND_URL } from '$env/static/private';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants.js';
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { setFlash } from 'sveltekit-flash-message/server';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ cookies, url }) => {
 	const user = requireLogin();
@@ -71,4 +72,51 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		totalPages: forms.pages || 0,
 		params: { page, size, search, sortBy, sortOrder, isActive }
 	};
+};
+
+export const actions: Actions = {
+	batchDelete: async ({ request, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_FORM);
+		const token = getSessionTokenCookie();
+		const formData = await request.formData();
+
+		try {
+			const response = await fetch(`${BACKEND_URL}/form/`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: formData.get('formIds')
+			});
+
+			if (!response.ok) {
+				const errorMessage = await response.json();
+				setFlash(
+					{
+						type: 'error',
+						message: `Failed to delete forms: ${errorMessage.detail || response.statusText}`
+					},
+					cookies
+				);
+				return fail(500);
+			}
+
+			const deleteResponse = await response.json();
+			setFlash(
+				{
+					type: deleteResponse.delete_failure_list ? 'error' : 'success',
+					message: `Deletion complete: ${deleteResponse.delete_success_count} successful, ${deleteResponse.delete_failure_list?.length || 0} failed.`
+				},
+				cookies
+			);
+		} catch (error) {
+			console.error('Batch delete error:', error);
+			setFlash({ type: 'error', message: 'Failed to delete forms' }, cookies);
+			return fail(500);
+		}
+
+		return { success: true };
+	}
 };

@@ -92,22 +92,28 @@ export const actions: Actions = {
 			});
 
 			if (!response.ok) {
-				const errorMessage = await response.json();
-				setFlash(
-					{
-						type: 'error',
-						message: `Failed to delete forms: ${errorMessage.detail || response.statusText}`
-					},
-					cookies
-				);
+				let message = 'Some forms have fields. Please delete all form fields before deleting these forms.';
+				if (response.status !== 500) {
+					try {
+						const errorMessage = await response.json();
+						message = `Failed to delete forms: ${errorMessage.detail || response.statusText}`;
+					} catch {
+						message = `Failed to delete forms: ${response.statusText}`;
+					}
+				}
+				setFlash({ type: 'error', message }, cookies);
 				return fail(500);
 			}
 
 			const deleteResponse = await response.json();
+			const failCount = deleteResponse.delete_failure_list?.length || 0;
 			setFlash(
 				{
-					type: deleteResponse.delete_failure_list ? 'error' : 'success',
-					message: `Deletion complete: ${deleteResponse.delete_success_count} successful, ${deleteResponse.delete_failure_list?.length || 0} failed.`
+					type: failCount > 0 ? 'error' : 'success',
+					message:
+						failCount > 0
+							? `${deleteResponse.delete_success_count} forms deleted. ${failCount} forms could not be deleted because they have fields. Please delete all form fields first.`
+							: `Deletion complete: ${deleteResponse.delete_success_count} deleted successfully.`
 				},
 				cookies
 			);

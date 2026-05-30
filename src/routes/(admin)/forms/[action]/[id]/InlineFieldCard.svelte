@@ -302,7 +302,7 @@
 		<div class="grid grid-cols-2 gap-6">
 			<div class="flex flex-col gap-2">
 				<Label class="font-semibold">Field Label</Label>
-				<Input bind:value={label} placeholder="Enter a label" onblur={debouncedSave} />
+				<Input bind:value={label} placeholder="Enter a label" onblur={saveField} />
 			</div>
 			<div class="flex flex-col gap-2">
 				<Label class="font-semibold">
@@ -315,7 +315,7 @@
 					bind:value={name}
 					placeholder="Enter database label"
 					oninput={() => (nameManuallyEdited = true)}
-					onblur={debouncedSave}
+					onblur={saveField}
 				/>
 			</div>
 		</div>
@@ -326,7 +326,7 @@
 				<Input
 					bind:value={placeholder}
 					placeholder="Enter placeholder text for the input field"
-					onblur={debouncedSave}
+					onblur={saveField}
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
@@ -334,7 +334,7 @@
 				<Input
 					bind:value={helpText}
 					placeholder="Enter placeholder text for the input field"
-					onblur={debouncedSave}
+					onblur={saveField}
 				/>
 			</div>
 		</div>
@@ -442,7 +442,7 @@
 										bind:value={minLength}
 										placeholder="Enter minimum length"
 										min="0"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 								<div class="flex flex-col gap-2">
@@ -452,7 +452,7 @@
 										bind:value={maxLength}
 										placeholder="Enter maximum length"
 										min="0"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 							</div>
@@ -466,7 +466,7 @@
 										type="number"
 										bind:value={minValue}
 										placeholder="Enter minimum value"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 								<div class="flex flex-col gap-2">
@@ -475,7 +475,7 @@
 										type="number"
 										bind:value={maxValue}
 										placeholder="Enter maximum value"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 							</div>
@@ -487,7 +487,7 @@
 								<Input
 									bind:value={customErrorMessage}
 									placeholder="Enter error message for the input field"
-									onblur={debouncedSave}
+									onblur={saveField}
 								/>
 							</div>
 							<div class="flex flex-col gap-2">
@@ -495,7 +495,7 @@
 									Pattern
 									<span class="text-muted-foreground font-normal">(Regex)</span>
 								</Label>
-								<Input bind:value={pattern} placeholder="e.g. ^[a-zA-Z]+$" onblur={debouncedSave} />
+								<Input bind:value={pattern} placeholder="e.g. ^[a-zA-Z]+$" onblur={saveField} />
 							</div>
 						</div>
 					</div>

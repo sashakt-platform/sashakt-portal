@@ -98,7 +98,7 @@
 
 				<div class="flex flex-col gap-6 p-8">
 					<div class="flex flex-col gap-2">
-						<Label for="name">Organisation Name</Label>
+						<Label for="name">Name</Label>
 						<Input
 							id="name"
 							type="text"
@@ -112,7 +112,7 @@
 					</div>
 
 					<div class="flex flex-col gap-2">
-						<Label for="shortcode">Organisation Shortcode</Label>
+						<Label for="shortcode">Shortcode</Label>
 						<div class="relative flex items-center">
 							<Input
 								id="shortcode"
@@ -149,7 +149,7 @@
 					</div>
 
 					<div class="flex items-center justify-between">
-						<Label for="is_active" class="font-semibold">Organisation Status</Label>
+						<Label for="is_active">Status</Label>
 						<div class="flex items-center gap-2">
 							<span
 								class="text-sm {$formData.is_active
@@ -163,7 +163,7 @@
 					</div>
 
 					<div class="flex flex-col gap-2">
-						<Label>Organisation Logo</Label>
+						<Label>Logo</Label>
 						<label
 							for="logo-upload"
 							class="border-primary/40 hover:border-primary hover:bg-primary/5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 transition-colors"

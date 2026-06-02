@@ -96,11 +96,11 @@ describe('OrganisationFormPage', () => {
 	describe('Field labels', () => {
 		it('renders all field labels', () => {
 			render(OrganisationFormPage, { data: addModeData });
-			expect(screen.getByText('Organisation Name')).toBeInTheDocument();
-			expect(screen.getByText('Organisation Shortcode')).toBeInTheDocument();
+			expect(screen.getByText('Name')).toBeInTheDocument();
+			expect(screen.getByText('Shortcode')).toBeInTheDocument();
 			expect(screen.getByText('Description')).toBeInTheDocument();
-			expect(screen.getByText('Organisation Status')).toBeInTheDocument();
-			expect(screen.getByText('Organisation Logo')).toBeInTheDocument();
+			expect(screen.getByText('Status')).toBeInTheDocument();
+			expect(screen.getByText('Logo')).toBeInTheDocument();
 		});
 	});
 

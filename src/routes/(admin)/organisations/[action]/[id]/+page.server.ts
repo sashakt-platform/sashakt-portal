@@ -98,13 +98,21 @@ export const actions: Actions = {
 				body: formData
 			});
 		} else {
+			const editFormData = new FormData();
+			editFormData.append('name', form.data.name);
+			editFormData.append('shortcode', form.data.shortcode ?? '');
+			if (form.data.description) editFormData.append('description', form.data.description);
+			editFormData.append('is_active', String(form.data.is_active));
+			if (form.data.logo instanceof File && form.data.logo.size > 0) {
+				editFormData.append('logo', form.data.logo);
+			}
+
 			res = await fetch(`${BACKEND_URL}/organization/${params.id}`, {
 				method: 'PUT',
 				headers: {
-					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify(form.data)
+				body: editFormData
 			});
 		}
 

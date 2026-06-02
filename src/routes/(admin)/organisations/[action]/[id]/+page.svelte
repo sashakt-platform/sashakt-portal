@@ -28,6 +28,9 @@
 
 	const isEdit = $derived(data.action === 'edit');
 	const pageTitle = $derived(isEdit ? 'Edit Organisation' : 'Add Organisation');
+	const currentLogoUrl = $derived(
+		(data as { currentLogoUrl?: string | null }).currentLogoUrl ?? null
+	);
 	const portalUrl = $derived(`${page.url.origin}/${$formData.shortcode || 'shortcode'}`);
 
 	function copyPortalUrl() {
@@ -40,6 +43,9 @@
 	let fileInput: HTMLInputElement;
 
 	const selectedFileName = $derived($logoFile?.[0]?.name ?? null);
+	const logoDisplayName = $derived(
+		selectedFileName ?? (currentLogoUrl ? currentLogoUrl.split('/').pop() : null)
+	);
 	let previewUrl = $state<string | null>(null);
 
 	$effect(() => {
@@ -187,6 +193,12 @@
 									alt="Logo preview"
 									class="border-border bg-muted h-10 w-10 shrink-0 rounded-md border object-contain"
 								/>
+							{:else if currentLogoUrl}
+								<img
+									src={currentLogoUrl}
+									alt="Current logo"
+									class="border-border bg-muted h-10 w-10 shrink-0 rounded-md border object-contain"
+								/>
 							{:else}
 								<div
 									class="border-border bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-md border"
@@ -202,10 +214,10 @@
 									<span
 										class={[
 											'truncate text-sm',
-											selectedFileName ? 'text-foreground' : 'text-muted-foreground'
+											logoDisplayName ? 'text-foreground' : 'text-muted-foreground'
 										]}
 									>
-										{selectedFileName ?? 'No file selected'}
+										{logoDisplayName ?? 'No file selected'}
 									</span>
 								</div>
 								<button

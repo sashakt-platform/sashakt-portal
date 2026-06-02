@@ -13,9 +13,15 @@ vi.mock('$app/state', () => ({
 	}
 }));
 
+vi.mock('$app/environment', () => ({
+	browser: false
+}));
+
 vi.mock('svelte-sonner', () => ({
 	toast: { success: vi.fn(), error: vi.fn() }
 }));
+
+const emptyFileList = { subscribe: (fn: (v: FileList | null) => void) => { fn(null); return () => {}; }, set: () => {}, update: () => {} };
 
 vi.mock('sveltekit-superforms', () => ({
 	superForm: vi.fn((data) => {
@@ -23,12 +29,11 @@ vi.mock('sveltekit-superforms', () => ({
 			name: '',
 			shortcode: '',
 			description: '',
-			is_active: true,
-			logo: ''
+			is_active: true
 		};
 		return {
 			form: {
-				subscribe: (fn) => {
+				subscribe: (fn: (v: typeof formValues) => void) => {
 					fn(formValues);
 					return () => {};
 				},
@@ -36,7 +41,7 @@ vi.mock('sveltekit-superforms', () => ({
 				update: () => {}
 			},
 			errors: {
-				subscribe: (fn) => {
+				subscribe: (fn: (v: Record<string, unknown>) => void) => {
 					fn({});
 					return () => {};
 				},
@@ -45,13 +50,14 @@ vi.mock('sveltekit-superforms', () => ({
 			},
 			enhance: vi.fn(),
 			submitting: {
-				subscribe: (fn) => {
+				subscribe: (fn: (v: boolean) => void) => {
 					fn(false);
 					return () => {};
 				}
 			}
 		};
-	})
+	}),
+	fileProxy: vi.fn(() => emptyFileList)
 }));
 
 vi.mock('sveltekit-superforms/adapters', () => ({
@@ -60,7 +66,7 @@ vi.mock('sveltekit-superforms/adapters', () => ({
 
 const addModeData = {
 	form: {
-		data: { name: '', shortcode: '', description: '', is_active: true, logo: '' }
+		data: { name: '', shortcode: '', description: '', is_active: true }
 	},
 	action: 'add',
 	organisation: null
@@ -72,8 +78,7 @@ const editModeData = {
 			name: 'Acme Corp',
 			shortcode: 'acme',
 			description: 'A test organisation',
-			is_active: true,
-			logo: ''
+			is_active: true
 		}
 	},
 	action: 'edit',
@@ -139,7 +144,7 @@ describe('OrganisationFormPage', () => {
 			const { container } = render(OrganisationFormPage, { data: addModeData });
 			const fileInput = container.querySelector('input[type="file"]');
 			expect(fileInput).toBeInTheDocument();
-			expect(fileInput).toHaveAttribute('accept', 'image/*');
+			expect(fileInput).toHaveAttribute('accept', 'image/png,image/jpeg,image/webp');
 		});
 	});
 
@@ -177,9 +182,9 @@ describe('OrganisationFormPage', () => {
 			expect(screen.getByText('Active')).toBeInTheDocument();
 		});
 
-		it('shows "Browse files" when no logo is selected', () => {
+		it('shows "No file selected" when no logo is selected', () => {
 			render(OrganisationFormPage, { data: addModeData });
-			expect(screen.getByText('Browse files')).toBeInTheDocument();
+			expect(screen.getByText('No file selected')).toBeInTheDocument();
 		});
 	});
 });

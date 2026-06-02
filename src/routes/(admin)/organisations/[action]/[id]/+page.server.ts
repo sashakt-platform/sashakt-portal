@@ -37,8 +37,7 @@ export const load: PageServerLoad = async ({ params }) => {
 				name: organisation.name,
 				shortcode: organisation.shortcode,
 				description: organisation.description ?? '',
-				is_active: organisation.is_active,
-				logo: organisation.logo ?? ''
+				is_active: organisation.is_active
 			},
 			zod4(organisationSchema)
 		);
@@ -74,13 +73,21 @@ export const actions: Actions = {
 		let res: Response;
 
 		if (params.action === 'add') {
+			const formData = new FormData();
+			formData.append('name', form.data.name);
+			formData.append('shortcode', form.data.shortcode ?? '');
+			if (form.data.description) formData.append('description', form.data.description);
+			formData.append('is_active', String(form.data.is_active));
+			if (form.data.logo instanceof File && form.data.logo.size > 0) {
+				formData.append('logo', form.data.logo);
+			}
+
 			res = await fetch(`${BACKEND_URL}/organization/`, {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`
 				},
-				body: JSON.stringify(form.data)
+				body: formData
 			});
 		} else {
 			res = await fetch(`${BACKEND_URL}/organization/${params.id}`, {

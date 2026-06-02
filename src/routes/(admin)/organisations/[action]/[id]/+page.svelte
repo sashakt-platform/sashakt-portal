@@ -8,24 +8,23 @@
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { superForm } from 'sveltekit-superforms';
+	import { superForm, fileProxy } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { organisationSchema } from './schema.js';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
+	import { browser } from '$app/environment';
 	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
 
-	const {
-		form: formData,
-		enhance,
-		errors,
-		submitting
-	} = superForm(data.form, {
+	const form = superForm(data.form, {
 		validators: zod4Client(organisationSchema),
-		dataType: 'json'
+		dataType: 'form'
 	});
+
+	const { form: formData, enhance, errors, submitting } = form;
+	const logoFile = fileProxy(form, 'logo');
 
 	const isEdit = $derived(data.action === 'edit');
 	const pageTitle = $derived(isEdit ? 'Edit Organisation' : 'Add Organisation');
@@ -38,19 +37,28 @@
 		);
 	}
 
-	let logoFileName = $state('');
+	let fileInput: HTMLInputElement;
 
-	function handleLogoSelect(e: Event) {
-		const file = (e.currentTarget as HTMLInputElement).files?.[0];
-		if (file) logoFileName = file.name;
-	}
+	const selectedFileName = $derived($logoFile?.[0]?.name ?? null);
+	let previewUrl = $state<string | null>(null);
+
+	$effect(() => {
+		const file = $logoFile?.[0];
+		if (!browser || !file) {
+			previewUrl = null;
+			return;
+		}
+		const url = URL.createObjectURL(file);
+		previewUrl = url;
+		return () => URL.revokeObjectURL(url);
+	});
 
 	const canSave = $derived(
 		($formData.name?.trim() ?? '') !== '' && ($formData.shortcode?.trim() ?? '') !== ''
 	);
 </script>
 
-<form method="POST" action="?/save" use:enhance>
+<form method="POST" action="?/save" enctype="multipart/form-data" use:enhance>
 	<div class="bg-muted/40 min-h-screen">
 		<header
 			class="bg-background border-border sticky top-0 z-10 flex h-23 items-center justify-between gap-3.5 border-b p-8"
@@ -164,22 +172,55 @@
 
 					<div class="flex flex-col gap-2">
 						<Label>Logo</Label>
-						<label
-							for="logo-upload"
-							class="border-primary/40 hover:border-primary hover:bg-primary/5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 transition-colors"
-						>
-							<ImageIcon class="text-muted-foreground h-6 w-6" />
-							<span class="text-muted-foreground text-sm">
-								{logoFileName || 'Browse files'}
-							</span>
-							<input
-								id="logo-upload"
-								type="file"
-								accept="image/*"
-								class="hidden"
-								onchange={handleLogoSelect}
-							/>
-						</label>
+						<input
+							type="file"
+							name="logo"
+							accept="image/png,image/jpeg,image/webp"
+							bind:files={$logoFile}
+							bind:this={fileInput}
+							hidden
+						/>
+						<div class="flex items-center gap-3">
+							{#if previewUrl}
+								<img
+									src={previewUrl}
+									alt="Logo preview"
+									class="border-border bg-muted h-10 w-10 shrink-0 rounded-md border object-contain"
+								/>
+							{:else}
+								<div
+									class="border-border bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-md border"
+								>
+									<ImageIcon class="text-muted-foreground h-4 w-4" />
+								</div>
+							{/if}
+							<div
+								class="border-input bg-card flex h-9 flex-1 items-center rounded-md border shadow-xs"
+							>
+								<div class="flex min-w-0 flex-1 items-center gap-2 px-3">
+									<ImageIcon class="text-muted-foreground h-4 w-4 shrink-0" />
+									<span
+										class={[
+											'truncate text-sm',
+											selectedFileName ? 'text-foreground' : 'text-muted-foreground'
+										]}
+									>
+										{selectedFileName ?? 'No file selected'}
+									</span>
+								</div>
+								<button
+									type="button"
+									onclick={() => fileInput.click()}
+									class="text-primary hover:text-primary/80 px-3 text-sm font-medium"
+								>
+									Browse
+								</button>
+							</div>
+						</div>
+						{#if $errors.logo}
+							<span class="text-destructive text-sm">{$errors.logo}</span>
+						{/if}
+						<p class="text-muted-foreground text-xs">PNG, JPG, WebP, max 2MB</p>
 					</div>
 				</div>
 			</div>

@@ -330,6 +330,22 @@ describe('DataTable', () => {
 		});
 	});
 
+	describe('Responsive Layout', () => {
+		it('should have a horizontal scroll wrapper so the table scrolls on small screens', () => {
+			const { container } = render(DataTable, { props: defaultProps });
+
+			const scrollWrapper = container.querySelector('.overflow-x-auto');
+			expect(scrollWrapper).toBeInTheDocument();
+		});
+
+		it('should not clip table overflow at the table-container level', () => {
+			const { container } = render(DataTable, { props: defaultProps });
+
+			const tableContainer = container.querySelector('[data-slot="table-container"]');
+			expect(tableContainer).not.toHaveClass('overflow-hidden');
+		});
+	});
+
 	describe('Accessibility', () => {
 		it('should render table structure', () => {
 			const { container } = render(DataTable, { props: defaultProps });

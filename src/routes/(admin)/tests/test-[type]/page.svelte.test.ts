@@ -457,7 +457,7 @@ describe('Test Management Listing Page', () => {
 			render(TestListingPage, { data: withItems() });
 			expect(screen.getByRole('tab', { name: 'All' })).toBeInTheDocument();
 			expect(screen.getByRole('tab', { name: 'Mine' })).toBeInTheDocument();
-			expect(screen.getByRole('tab', { name: 'Shared' })).toBeInTheDocument();
+			expect(screen.getByRole('tab', { name: 'Others' })).toBeInTheDocument();
 		});
 
 		it('does not render the segmented control for template mode', () => {
@@ -502,10 +502,10 @@ describe('Test Management Listing Page', () => {
 			expect(screen.getByRole('tab', { name: 'Mine' })).toHaveAttribute('data-state', 'active');
 		});
 
-		it('"Shared" button is active when my_tests=false', () => {
+		it('"Others" button is active when my_tests=false', () => {
 			(page as any).url = new URL('http://localhost/tests/test-session?my_tests=false');
 			render(TestListingPage, { data: withItems() });
-			expect(screen.getByRole('tab', { name: 'Shared' })).toHaveAttribute('data-state', 'active');
+			expect(screen.getByRole('tab', { name: 'Others' })).toHaveAttribute('data-state', 'active');
 		});
 
 		it('"All" button is not active when my_tests=true', () => {
@@ -527,9 +527,9 @@ describe('Test Management Listing Page', () => {
 			expect(calledUrl.searchParams.get('my_tests')).toBe('true');
 		});
 
-		it('clicking "Shared" sets my_tests=false in the URL', async () => {
+		it('clicking "Others" sets my_tests=false in the URL', async () => {
 			render(TestListingPage, { data: withItems() });
-			await fireEvent.click(screen.getByRole('tab', { name: 'Shared' }));
+			await fireEvent.click(screen.getByRole('tab', { name: 'Others' }));
 			const [calledUrl] = vi.mocked(goto).mock.calls[0] as [URL, unknown];
 			expect(calledUrl.searchParams.get('my_tests')).toBe('false');
 		});

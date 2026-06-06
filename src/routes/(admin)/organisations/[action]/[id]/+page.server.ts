@@ -6,7 +6,7 @@ import { organisationSchema } from './schema.js';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const user = requireLogin();
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		});
 
 		if (!res.ok) {
-			throw fail(404, { message: 'Organisation not found' });
+			error(404, 'Organisation not found');
 		}
 
 		const organisation = await res.json();
@@ -57,7 +57,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		};
 	}
 
-	throw fail(400, { message: 'Invalid action' });
+	error(400, 'Invalid action');
 };
 
 export const actions: Actions = {
@@ -69,6 +69,8 @@ export const actions: Actions = {
 			requirePermission(user, PERMISSIONS.CREATE_ORGANIZATION);
 		} else if (params.action === 'edit') {
 			requirePermission(user, PERMISSIONS.UPDATE_ORGANIZATION);
+		} else {
+			error(400, 'Invalid action');
 		}
 
 		const form = await superValidate(request, zod4(organisationSchema));
@@ -125,7 +127,7 @@ export const actions: Actions = {
 				},
 				cookies
 			);
-			return fail(500, { form });
+			return fail(res.status, { form });
 		}
 
 		const message =

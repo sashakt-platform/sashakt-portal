@@ -138,7 +138,8 @@
 							<button
 								type="button"
 								onclick={copyPortalUrl}
-								class="text-primary absolute right-3 flex items-center gap-1 text-sm font-medium hover:underline"
+								disabled={!$formData.shortcode?.trim()}
+								class="text-primary absolute right-3 flex items-center gap-1 text-sm font-medium hover:underline disabled:opacity-50 disabled:hover:no-underline"
 							>
 								<Copy size={13} />
 								Copy Portal URL

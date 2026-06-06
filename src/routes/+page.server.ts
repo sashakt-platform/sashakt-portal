@@ -6,7 +6,7 @@ export function load() {
 	const user = requireLogin();
 
 	if (user) {
-		redirect(307, isSuperAdmin(user) ? '/organization' : '/tests/test-session');
+		redirect(307, isSuperAdmin(user) ? '/organisations' : '/tests/test-session');
 	} else {
 		redirect(307, '/login');
 	}

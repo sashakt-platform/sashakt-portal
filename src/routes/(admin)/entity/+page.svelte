@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { DataTable } from '$lib/components/data-table';
 	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
-	import { createColumns } from './columns';
+	import { createColumns, type EntityType } from './columns';
 	import { Button } from '$lib/components/ui/button';
 	import Plus from '@lucide/svelte/icons/plus';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
@@ -13,6 +13,9 @@
 	import SearchInput from '$lib/components/SearchInput.svelte';
 	import StatusFilter from '$lib/components/StatusFilter.svelte';
 	import { useTerms } from '$lib/nomenclature';
+	import BatchActionsToolbar from '$lib/components/data-table/BatchActionsToolbar.svelte';
+	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	import { enhance } from '$app/forms';
 
 	let { data } = $props();
 	const term = useTerms();
@@ -27,6 +30,16 @@
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 	const isActive = $derived(data?.params?.isActive || '');
 
+	// batch selection state
+	let deleteAction: string | null = $state(null);
+	let selectedEntities: EntityType[] = $state([]);
+	let selectedEntityIds: string[] = $state([]);
+	let batchDeleteMode = $state(false);
+	let clearTableSelection = $state(false);
+
+	const noEntitiesCreatedYet = $derived(totalItems === 0 && !search && isActive === '');
+	const enableSelection = $derived(!noEntitiesCreatedYet);
+
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
 		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
@@ -39,18 +52,80 @@
 	}
 
 	const columns = $derived(
-		createColumns(sortBy, sortOrder, handleSort, {
+		createColumns(sortBy, sortOrder, handleSort, enableSelection, {
 			canEdit: canUpdate(data.user, 'entity'),
 			canDelete: canDelete(data.user, 'entity')
 		})
 	);
 
-	const noEntitiesCreatedYet = $derived(totalItems === 0 && !search && isActive === '');
+	const handleSelectionChange = (selectedRows: EntityType[], selectedRowIds: string[]) => {
+		selectedEntities = selectedRows;
+		selectedEntityIds = selectedRowIds;
+	};
+
+	const handleBatchAction = (actionId: string) => {
+		if (actionId === 'delete') {
+			batchDeleteMode = true;
+		}
+	};
+
+	const handleBatchDeleteConfirm = () => {
+		const form = document.getElementById('batch-delete-form') as HTMLFormElement;
+		if (form) {
+			form.requestSubmit();
+		}
+	};
+
+	const handleBatchDeleteCancel = () => {
+		batchDeleteMode = false;
+	};
+
+	const handleClearSelection = () => {
+		selectedEntities = [];
+		selectedEntityIds = [];
+		batchDeleteMode = false;
+		clearTableSelection = true;
+
+		setTimeout(() => {
+			clearTableSelection = false;
+		}, 0);
+	};
 </script>
+
+<DeleteDialog
+	bind:action={deleteAction}
+	elementName="Entity"
+	batchMode={batchDeleteMode}
+	selectedCount={selectedEntityIds.length}
+	selectedItems={selectedEntities}
+	onBatchConfirm={handleBatchDeleteConfirm}
+	onBatchCancel={handleBatchDeleteCancel}
+/>
+
+<form
+	id="batch-delete-form"
+	method="POST"
+	action="?/batchDelete"
+	style="display: none;"
+	use:enhance={() => {
+		return async ({ result }) => {
+			batchDeleteMode = false;
+			handleClearSelection();
+			await invalidateAll();
+
+			if (result.type === 'failure') {
+				console.error('Batch delete failed');
+			}
+		};
+	}}
+>
+	<input type="hidden" name="entityIds" value={JSON.stringify(selectedEntityIds)} />
+</form>
 
 <ListingPageLayout
 	title={term('entities')}
 	subtitle=""
+	showFilters={selectedEntityIds.length === 0}
 	showEmptyState={noEntitiesCreatedYet}
 	tooltipKey="entity-management"
 >
@@ -60,6 +135,16 @@
 				><Button class="font-semibold"><Plus />Create {term('entity')}</Button></a
 			>
 		{/if}
+	{/snippet}
+
+	{#snippet toolbar()}
+		<BatchActionsToolbar
+			selectedCount={selectedEntityIds.length}
+			selectedRows={selectedEntities}
+			selectedRowIds={selectedEntityIds}
+			onAction={handleBatchAction}
+			onClearSelection={handleClearSelection}
+		/>
 	{/snippet}
 
 	{#snippet emptyState()}
@@ -102,6 +187,17 @@
 	{/snippet}
 
 	{#snippet content()}
-		<DataTable data={tableData} {columns} {totalItems} {totalPages} {currentPage} {pageSize} />
+		<DataTable
+			data={tableData}
+			{columns}
+			{totalItems}
+			{totalPages}
+			{currentPage}
+			{pageSize}
+			{enableSelection}
+			onSelectionChange={handleSelectionChange}
+			getRowId={(row) => String(row.id)}
+			clearSelection={clearTableSelection}
+		/>
 	{/snippet}
 </ListingPageLayout>

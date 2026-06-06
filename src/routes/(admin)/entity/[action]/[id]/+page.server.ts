@@ -213,6 +213,51 @@ export const actions: Actions = {
 		);
 	},
 
+	batchDeleteRecords: async ({ request, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_ENTITY);
+		const token = getSessionTokenCookie();
+		const formData = await request.formData();
+
+		try {
+			const response = await fetch(`${BACKEND_URL}/entity/`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: formData.get('entityRecordIds')
+			});
+
+			if (!response.ok) {
+				const errorMessage = await response.json();
+				setFlash(
+					{
+						type: 'error',
+						message: `Failed to delete records: ${errorMessage.detail || response.statusText}`
+					},
+					cookies
+				);
+				return fail(500);
+			}
+
+			const deleteResponse = await response.json();
+			setFlash(
+				{
+					type: deleteResponse.delete_failure_list?.length > 0 ? 'error' : 'success',
+					message: `Deletion complete: ${deleteResponse.delete_success_count} successful, ${deleteResponse.delete_failure_list?.length || 0} failed.`
+				},
+				cookies
+			);
+		} catch (error) {
+			console.error('Batch delete records error:', error);
+			setFlash({ type: 'error', message: 'Failed to delete records' }, cookies);
+			return fail(500);
+		}
+
+		return { success: true };
+	},
+
 	delete: async ({ params, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.DELETE_ENTITY);

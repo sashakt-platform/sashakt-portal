@@ -80,7 +80,7 @@ const sortRef = vi.hoisted(() => ({
 vi.mock('./columns.js', () => ({
 	createTestColumns: vi.fn((...args: any[]) => {
 		sortRef.handleSort = args[2];
-		sortRef.enableSelection = args[12]; // 13th arg (index 12)
+		sortRef.enableSelection = args[11]; // 12th arg (index 11)
 		return [];
 	})
 }));

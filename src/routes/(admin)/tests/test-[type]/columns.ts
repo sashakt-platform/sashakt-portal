@@ -1,6 +1,9 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { toast } from 'svelte-sonner';
-import { createSortableColumn, createSelectionColumn } from '$lib/components/data-table/column-helpers';
+import {
+	createSortableColumn,
+	createSelectionColumn
+} from '$lib/components/data-table/column-helpers';
 import { downloadQRCode } from '$lib/utils';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
@@ -8,14 +11,7 @@ import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import TestStatusBadge from '$lib/components/data-table/TestStatusBadge.svelte';
-import {
-	isStateAdmin,
-	hasAssignedDistricts,
-	getUserState,
-	getUserDistrict,
-	isOwnEntity,
-	type User
-} from '$lib/utils/permissions.js';
+import { getUserDistrict, isOwnEntity, type User } from '$lib/utils/permissions.js';
 import { resolve } from '$app/paths';
 import type { NomenclatureKey } from '$lib/nomenclature';
 import type { TestStatus } from '$lib/types/test.js';
@@ -33,42 +29,6 @@ export interface Test {
 	status: TestStatus;
 }
 
-/**
- * Check if a state admin can edit/delete this test
- * Test must be assigned ONLY to their state (not shared with other states)
- */
-function canStateAdminAccessTest(user: User | null, test: Test): boolean {
-	const userState = getUserState(user);
-	if (!userState) return false;
-
-	// Test must have exactly 1 state assigned, and it must be user's state
-	if (!test.states || test.states.length !== 1) return false;
-
-	return String(test.states[0].id) === String(userState.id);
-}
-
-/**
- * Check if a district admin can edit/delete this test
- * Test must be assigned ONLY to their state AND ONLY to their district(s)
- */
-function canDistrictAdminAccessTest(user: User | null, test: Test): boolean {
-	const userState = getUserState(user);
-	const userDistricts = getUserDistrict(user);
-
-	if (!userState || !userDistricts || userDistricts.length === 0) return false;
-
-	// Test must have exactly 1 state assigned, and it must be user's state
-	if (!test.states || test.states.length !== 1) return false;
-	if (String(test.states[0].id) !== String(userState.id)) return false;
-
-	// Test must have districts assigned
-	if (!test.districts || test.districts.length === 0) return false;
-
-	// All test districts must be within user's assigned districts
-	const userDistrictIds = userDistricts.map((d) => String(d.id));
-	return test.districts.every((district) => userDistrictIds.includes(String(district.id)));
-}
-
 export const createTestColumns = (
 	currentSortBy: string,
 	currentSortOrder: string,
@@ -79,10 +39,6 @@ export const createTestColumns = (
 	testTakerUrl: string,
 	onDelete: (testId: string) => void,
 	term: (key: NomenclatureKey) => string,
-	permissions?: {
-		canEdit?: boolean;
-		canDelete?: boolean;
-	},
 	user?: User | null,
 	onViewReport?: (testId: string) => void,
 	enableSelection: boolean = false
@@ -206,20 +162,7 @@ export const createTestColumns = (
 				});
 			}
 
-			// Restrict edit/delete for state/district admins to their jurisdiction
-			let isRestricted = false;
-
-			// Check district admin FIRST (has both state and districts)
-			// Then fall back to state admin (has state but no districts)
-			if (hasAssignedDistricts(user)) {
-				// District admin can only edit/delete tests assigned to their district
-				isRestricted = !canDistrictAdminAccessTest(user, test);
-			} else if (isStateAdmin(user)) {
-				// State admin can only edit/delete tests assigned to their state
-				isRestricted = !canStateAdminAccessTest(user, test);
-			}
-
-			const isNotOwner = !isOwnEntity(user ?? null, test.created_by_id);
+			const isOwner = isOwnEntity(user ?? null, test.created_by_id);
 
 			return renderComponent(DataTableActions, {
 				id: test.id,
@@ -228,8 +171,8 @@ export const createTestColumns = (
 				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,
 				onDelete: () => onDelete(test.id),
-				canEdit: (permissions?.canEdit ?? true) && !isRestricted && !isNotOwner,
-				canDelete: (permissions?.canDelete ?? true) && !isRestricted && !isNotOwner,
+				canEdit: isOwner,
+				canDelete: isOwner,
 				editInline: true
 			});
 		}

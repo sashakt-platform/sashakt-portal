@@ -19,7 +19,7 @@
 	import type { Filter } from '$lib/types/filters.js';
 	import TagTypeSelection from '$lib/components/TagTypeSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
-	import { canCreate, canRead, canUpdate, canDelete, hasLocation } from '$lib/utils/permissions.js';
+	import { canCreate, canRead, canDelete, hasLocation } from '$lib/utils/permissions.js';
 	import { useTerms } from '$lib/nomenclature';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import BatchActionsToolbar from '$lib/components/data-table/BatchActionsToolbar.svelte';
@@ -118,10 +118,6 @@
 			data?.test_taker_url,
 			handleDelete,
 			term,
-			{
-				canEdit: canUpdate(data.user, entityType),
-				canDelete: canDelete(data.user, entityType)
-			},
 			data.user,
 			handleViewReport,
 			enableSelection

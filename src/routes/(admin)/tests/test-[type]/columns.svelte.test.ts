@@ -38,7 +38,7 @@ const makeTest = (created_by_id: string | null): Test => ({
 	status: 'draft' as any
 });
 
-function getActionProps(user: User | null, test: Test, canEdit = true, canDelete = true) {
+function getActionProps(user: User | null, test: Test) {
 	const columns = createTestColumns(
 		'',
 		'asc',
@@ -49,7 +49,6 @@ function getActionProps(user: User | null, test: Test, canEdit = true, canDelete
 		'http://test-taker.example.com',
 		vi.fn(),
 		(key: any) => key,
-		{ canEdit, canDelete },
 		user
 	);
 	const actionsCol = columns.find((c: any) => c.id === 'actions') as any;
@@ -78,13 +77,13 @@ describe('createTestColumns — edit/delete visibility based on ownership', () =
 		expect(props.canDelete).toBe(false);
 	});
 
-	it('shows edit and delete for a super admin even on another user\'s test', () => {
+	it("shows edit and delete for a super admin even on another user's test", () => {
 		const props = getActionProps(superAdminUser, makeTest('1'));
 		expect(props.canEdit).toBe(true);
 		expect(props.canDelete).toBe(true);
 	});
 
-	it('shows edit and delete for a system admin even on another user\'s test', () => {
+	it("shows edit and delete for a system admin even on another user's test", () => {
 		const props = getActionProps(systemAdminUser, makeTest('1'));
 		expect(props.canEdit).toBe(true);
 		expect(props.canDelete).toBe(true);
@@ -94,15 +93,5 @@ describe('createTestColumns — edit/delete visibility based on ownership', () =
 		const props = getActionProps(currentUser, makeTest(null));
 		expect(props.canEdit).toBe(false);
 		expect(props.canDelete).toBe(false);
-	});
-
-	it('ownership overrides canEdit permission flag — owner can always edit', () => {
-		const props = getActionProps(currentUser, makeTest('1'), false, true);
-		expect(props.canEdit).toBe(true);
-	});
-
-	it('ownership overrides canDelete permission flag — owner can always delete', () => {
-		const props = getActionProps(currentUser, makeTest('1'), true, false);
-		expect(props.canDelete).toBe(true);
 	});
 });

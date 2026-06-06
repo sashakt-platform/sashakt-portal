@@ -39,10 +39,6 @@ export const createTestColumns = (
 	testTakerUrl: string,
 	onDelete: (testId: string) => void,
 	term: (key: NomenclatureKey) => string,
-	permissions?: {
-		canEdit?: boolean;
-		canDelete?: boolean;
-	},
 	user?: User | null,
 	onViewReport?: (testId: string) => void,
 	enableSelection: boolean = false

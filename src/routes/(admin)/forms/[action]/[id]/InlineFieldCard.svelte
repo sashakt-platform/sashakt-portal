@@ -146,8 +146,6 @@
 		return fieldData;
 	}
 
-	// Debounced save with abort support
-	let saveTimeout: ReturnType<typeof setTimeout>;
 	let saveController: AbortController | null = null;
 
 	async function saveField() {
@@ -177,15 +175,9 @@
 		}
 	}
 
-	function debouncedSave() {
-		clearTimeout(saveTimeout);
-		saveTimeout = setTimeout(saveField, 800);
-	}
-
 	// Cleanup on unmount
 	$effect(() => {
 		return () => {
-			clearTimeout(saveTimeout);
 			saveController?.abort();
 		};
 	});
@@ -198,7 +190,7 @@
 
 	function handleRequiredToggle(checked: boolean) {
 		isRequired = checked;
-		debouncedSave();
+		saveField();
 	}
 
 	// Options management
@@ -209,7 +201,7 @@
 
 	function removeOption(idx: number) {
 		options = options.filter((_, i) => i !== idx);
-		debouncedSave();
+		saveField();
 	}
 
 	function updateOptionLabel(idx: number, newLabel: string) {
@@ -226,7 +218,6 @@
 			}
 			return opt;
 		});
-		debouncedSave();
 	}
 </script>
 
@@ -302,7 +293,7 @@
 		<div class="grid grid-cols-2 gap-6">
 			<div class="flex flex-col gap-2">
 				<Label class="font-semibold">Field Label</Label>
-				<Input bind:value={label} placeholder="Enter a label" onblur={debouncedSave} />
+				<Input bind:value={label} placeholder="Enter a label" onblur={saveField} />
 			</div>
 			<div class="flex flex-col gap-2">
 				<Label class="font-semibold">
@@ -315,7 +306,7 @@
 					bind:value={name}
 					placeholder="Enter database label"
 					oninput={() => (nameManuallyEdited = true)}
-					onblur={debouncedSave}
+					onblur={saveField}
 				/>
 			</div>
 		</div>
@@ -326,7 +317,7 @@
 				<Input
 					bind:value={placeholder}
 					placeholder="Enter placeholder text for the input field"
-					onblur={debouncedSave}
+					onblur={saveField}
 				/>
 			</div>
 			<div class="flex flex-col gap-2">
@@ -334,7 +325,7 @@
 				<Input
 					bind:value={helpText}
 					placeholder="Enter placeholder text for the input field"
-					onblur={debouncedSave}
+					onblur={saveField}
 				/>
 			</div>
 		</div>
@@ -349,7 +340,7 @@
 						value={entityTypeId?.toString()}
 						onValueChange={(value) => {
 							entityTypeId = value ? parseInt(value) : null;
-							debouncedSave();
+							saveField();
 						}}
 					>
 						<Select.Trigger class="w-full">
@@ -388,6 +379,7 @@
 								<Input
 									value={option.label}
 									oninput={(e) => updateOptionLabel(idx, e.currentTarget.value)}
+									onblur={saveField}
 									placeholder="Option label"
 									class="flex-1"
 								/>
@@ -397,8 +389,8 @@
 										options = options.map((opt, i) =>
 											i === idx ? { ...opt, value: e.currentTarget.value } : opt
 										);
-										debouncedSave();
 									}}
+									onblur={saveField}
 									class="flex-1"
 									placeholder="Value"
 								/>
@@ -442,7 +434,7 @@
 										bind:value={minLength}
 										placeholder="Enter minimum length"
 										min="0"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 								<div class="flex flex-col gap-2">
@@ -452,7 +444,7 @@
 										bind:value={maxLength}
 										placeholder="Enter maximum length"
 										min="0"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 							</div>
@@ -466,7 +458,7 @@
 										type="number"
 										bind:value={minValue}
 										placeholder="Enter minimum value"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 								<div class="flex flex-col gap-2">
@@ -475,7 +467,7 @@
 										type="number"
 										bind:value={maxValue}
 										placeholder="Enter maximum value"
-										onblur={debouncedSave}
+										onblur={saveField}
 									/>
 								</div>
 							</div>
@@ -487,7 +479,7 @@
 								<Input
 									bind:value={customErrorMessage}
 									placeholder="Enter error message for the input field"
-									onblur={debouncedSave}
+									onblur={saveField}
 								/>
 							</div>
 							<div class="flex flex-col gap-2">
@@ -495,7 +487,7 @@
 									Pattern
 									<span class="text-muted-foreground font-normal">(Regex)</span>
 								</Label>
-								<Input bind:value={pattern} placeholder="e.g. ^[a-zA-Z]+$" onblur={debouncedSave} />
+								<Input bind:value={pattern} placeholder="e.g. ^[a-zA-Z]+$" onblur={saveField} />
 							</div>
 						</div>
 					</div>

@@ -21,7 +21,25 @@ vi.mock('svelte-sonner', () => ({
 	toast: { success: vi.fn(), error: vi.fn() }
 }));
 
-const emptyFileList = { subscribe: (fn: (v: FileList | null) => void) => { fn(null); return () => {}; }, set: () => {}, update: () => {} };
+const emptyFileList = {
+	subscribe: (fn: (v: FileList | null) => void) => {
+		fn(null);
+		return () => {};
+	},
+	set: () => {},
+	update: () => {}
+};
+
+function storeOf<T>(value: T) {
+	return {
+		subscribe: (fn: (v: T) => void) => {
+			fn(value);
+			return () => {};
+		},
+		set: () => {},
+		update: () => {}
+	};
+}
 
 vi.mock('sveltekit-superforms', () => ({
 	superForm: vi.fn((data) => {
@@ -32,29 +50,15 @@ vi.mock('sveltekit-superforms', () => ({
 			is_active: true
 		};
 		return {
-			form: {
-				subscribe: (fn: (v: typeof formValues) => void) => {
-					fn(formValues);
-					return () => {};
-				},
-				set: () => {},
-				update: () => {}
-			},
-			errors: {
-				subscribe: (fn: (v: Record<string, unknown>) => void) => {
-					fn({});
-					return () => {};
-				},
-				set: () => {},
-				update: () => {}
-			},
+			form: storeOf(formValues),
+			errors: storeOf({} as Record<string, unknown>),
+			constraints: storeOf({} as Record<string, unknown>),
+			tainted: storeOf(undefined as Record<string, unknown> | undefined),
+			allErrors: storeOf([] as unknown[]),
+			posted: storeOf(false),
+			message: storeOf(undefined),
 			enhance: vi.fn(),
-			submitting: {
-				subscribe: (fn: (v: boolean) => void) => {
-					fn(false);
-					return () => {};
-				}
-			}
+			submitting: storeOf(false)
 		};
 	}),
 	fileProxy: vi.fn(() => emptyFileList)
@@ -171,7 +175,9 @@ describe('OrganisationFormPage', () => {
 
 		it('pre-fills description textarea from organisation data', () => {
 			const { container } = render(OrganisationFormPage, { data: editModeData });
-			const textarea = container.querySelector('textarea[name="description"]') as HTMLTextAreaElement;
+			const textarea = container.querySelector(
+				'textarea[name="description"]'
+			) as HTMLTextAreaElement;
 			expect(textarea).toHaveValue('A test organisation');
 		});
 	});

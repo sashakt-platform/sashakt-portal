@@ -44,4 +44,3 @@ export const load = async ({ url }) => {
 		params: { page, size, search, sortBy, sortOrder, isActive }
 	};
 };
-

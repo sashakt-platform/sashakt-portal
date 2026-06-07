@@ -6,6 +6,7 @@
 
 	type Props = {
 		// `any` because callers use different schemas; formsnap validates internally.
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		form: any;
 	};
 

@@ -347,7 +347,7 @@
 					<TabsList class="h-auto p-0.5">
 						<TabsTrigger value="all" class="px-2 py-0.5 text-xs">All</TabsTrigger>
 						<TabsTrigger value="true" class="px-2 py-0.5 text-xs">Mine</TabsTrigger>
-						<TabsTrigger value="false" class="px-2 py-0.5 text-xs">Shared</TabsTrigger>
+						<TabsTrigger value="false" class="px-2 py-0.5 text-xs">Others</TabsTrigger>
 					</TabsList>
 				</Tabs>
 			</div>

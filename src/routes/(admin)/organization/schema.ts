@@ -1,6 +1,6 @@
 import { z } from 'zod';
+import { imageFileSchema } from '$lib/schemas/logo';
 
-const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 const PDF_MIME_TYPE = 'application/pdf';
 export const PLATFORM_GUIDE_MAX_BYTES = 10 * 1024 * 1024;
 
@@ -14,19 +14,7 @@ export const editOrganizationSchema = z.object({
 			message:
 				'Shortcode must contain only lowercase letters and numbers, with no spaces or special characters'
 		}),
-	logo: z
-		.union([
-			z
-				.instanceof(File, { message: 'Please upload a valid image file' })
-				.refine((file) => file.size === 0 || ALLOWED_IMAGE_TYPES.includes(file.type), {
-					message: 'File must be a PNG, JPG, or WebP image'
-				})
-				.refine((file) => file.size === 0 || file.size <= 2 * 1024 * 1024, {
-					message: 'Image must be less than 2MB'
-				}),
-			z.string()
-		])
-		.nullish(),
+	logo: imageFileSchema.nullish(),
 	platform_guide: z
 		.instanceof(File, { message: 'Please upload a valid PDF file' })
 		.refine((file) => file.size === 0 || file.type === PDF_MIME_TYPE, {

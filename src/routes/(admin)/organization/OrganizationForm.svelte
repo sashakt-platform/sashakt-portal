@@ -19,7 +19,11 @@
 	let { data }: { data: PageData } = $props();
 
 	let orgData: Partial<Infer<EditOrganizationSchema>> | null = data?.currentOrganization
-		? { ...data.currentOrganization, analytics_link: data.analyticsLinkUrl ?? '' }
+		? {
+				name: data.currentOrganization.name,
+				shortcode: data.currentOrganization.shortcode,
+				analytics_link: data.analyticsLinkUrl ?? ''
+			}
 		: null;
 	let currentLogoUrl = $state<string | null>(data?.currentOrganization?.logo || null);
 	let currentPlatformGuideUrl = $state<string | null>(data?.platformGuideUrl ?? null);

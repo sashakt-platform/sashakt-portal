@@ -146,8 +146,6 @@
 		return fieldData;
 	}
 
-	// Debounced save with abort support
-	let saveTimeout: ReturnType<typeof setTimeout>;
 	let saveController: AbortController | null = null;
 
 	async function saveField() {
@@ -177,15 +175,9 @@
 		}
 	}
 
-	function debouncedSave() {
-		clearTimeout(saveTimeout);
-		saveTimeout = setTimeout(saveField, 800);
-	}
-
 	// Cleanup on unmount
 	$effect(() => {
 		return () => {
-			clearTimeout(saveTimeout);
 			saveController?.abort();
 		};
 	});
@@ -198,7 +190,7 @@
 
 	function handleRequiredToggle(checked: boolean) {
 		isRequired = checked;
-		debouncedSave();
+		saveField();
 	}
 
 	// Options management
@@ -209,7 +201,7 @@
 
 	function removeOption(idx: number) {
 		options = options.filter((_, i) => i !== idx);
-		debouncedSave();
+		saveField();
 	}
 
 	function updateOptionLabel(idx: number, newLabel: string) {
@@ -226,7 +218,6 @@
 			}
 			return opt;
 		});
-		debouncedSave();
 	}
 </script>
 
@@ -349,7 +340,7 @@
 						value={entityTypeId?.toString()}
 						onValueChange={(value) => {
 							entityTypeId = value ? parseInt(value) : null;
-							debouncedSave();
+							saveField();
 						}}
 					>
 						<Select.Trigger class="w-full">
@@ -388,6 +379,7 @@
 								<Input
 									value={option.label}
 									oninput={(e) => updateOptionLabel(idx, e.currentTarget.value)}
+									onblur={saveField}
 									placeholder="Option label"
 									class="flex-1"
 								/>
@@ -397,8 +389,8 @@
 										options = options.map((opt, i) =>
 											i === idx ? { ...opt, value: e.currentTarget.value } : opt
 										);
-										debouncedSave();
 									}}
+									onblur={saveField}
 									class="flex-1"
 									placeholder="Value"
 								/>

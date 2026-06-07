@@ -10,6 +10,7 @@ export const editOrganizationSchema = z.object({
 	shortcode: z
 		.string()
 		.min(1, { message: 'Shortcode is required' })
+		.max(50, { message: 'Shortcode must be 50 characters or fewer' })
 		.regex(/^[a-z0-9]+$/, {
 			message:
 				'Shortcode must contain only lowercase letters and numbers, with no spaces or special characters'

@@ -42,18 +42,11 @@ export const load: PageServerLoad = async ({ params }) => {
 			zod4(organisationSchema)
 		);
 
-		const logoPath: string | null = organisation.logo ?? null;
-		const currentLogoUrl = logoPath
-			? logoPath.startsWith('http')
-				? logoPath
-				: `${new URL(BACKEND_URL).origin}${logoPath}`
-			: null;
-
 		return {
 			form,
 			action: params.action,
 			organisation,
-			currentLogoUrl
+			currentLogoUrl: organisation.logo ?? null
 		};
 	}
 

@@ -8,6 +8,20 @@ const minimalValid = {
 	certificate_id: null
 };
 
+describe('testSchema — shuffle and show_marks defaults', () => {
+	it('defaults shuffle to true when omitted', () => {
+		const result = testSchema.safeParse(minimalValid);
+		expect(result.success).toBe(true);
+		expect(result.data?.shuffle).toBe(true);
+	});
+
+	it('defaults show_marks to false when omitted', () => {
+		const result = testSchema.safeParse(minimalValid);
+		expect(result.success).toBe(true);
+		expect(result.data?.show_marks).toBe(false);
+	});
+});
+
 describe('testSchema — tag_type_ids', () => {
 	it('accepts a valid tag_type_ids array', () => {
 		const result = testSchema.safeParse({

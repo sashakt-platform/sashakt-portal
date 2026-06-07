@@ -82,7 +82,7 @@ export const testSchema = z.object({
 	start_instructions: z.string().nullable().optional(),
 	link: z.string().nullable().optional(),
 	no_of_attempts: z.number().default(1),
-	shuffle: z.boolean().default(false),
+	shuffle: z.boolean().default(true),
 	random_questions: z.boolean().default(false),
 	no_of_random_questions: z.number().nullable().optional(),
 	random_tag_count: z
@@ -103,7 +103,7 @@ export const testSchema = z.object({
 	question_sets: z.array(questionSetSchema).default([]),
 	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
-	show_marks: z.boolean().default(true),
+	show_marks: z.boolean().default(false),
 	show_result: z.boolean().default(true),
 	show_question_palette: z.boolean().default(true),
 	bookmark: z.boolean().default(false),

@@ -13,12 +13,14 @@
 		canUpdate,
 		hasAnyPermission,
 		hasPermission,
+		isSuperAdmin,
 		PERMISSIONS
 	} from '$lib/utils/permissions.js';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import Boxes from '@lucide/svelte/icons/boxes';
+	import Building2 from '@lucide/svelte/icons/building-2';
 	import BarChart3 from '@lucide/svelte/icons/bar-chart-3';
 	import Download from '@lucide/svelte/icons/download';
 	import LogOut from '@lucide/svelte/icons/log-out';
@@ -48,12 +50,15 @@
 		{ termKey: 'forms', url: '/forms', icon: FileText, entity: 'form' },
 		{ termKey: 'certificates', url: '/certificate', icon: ShieldCheck, entity: 'certificate' },
 		{ termKey: 'entities', url: '/entity', icon: Boxes, entity: 'entity' },
+		{ termKey: 'organisations', url: '/organisations', icon: Building2, entity: 'organization' },
 		{ termKey: 'users', url: '/users', icon: User, entity: 'user' }
 	];
 
 	let { data } = $props();
 	const sidebar = useSidebar();
 	const term = useTerms();
+
+	const superAdmin = $derived(isSuperAdmin(data.user));
 
 	const currentMenuUrl = $derived.by(() => {
 		const path = page.url.pathname;
@@ -130,12 +135,12 @@
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
 					{#each menu_items as item (item.url)}
-						{#if !item.entity || canCreate(data.user, item.entity) || canUpdate(data.user, item.entity)}
+						{#if (!item.entity || canCreate(data.user, item.entity) || canUpdate(data.user, item.entity)) && (!superAdmin || item.entity === 'user' || item.entity === 'organization')}
 							{@render sidebaritems(item)}
 						{/if}
 					{/each}
 
-					{#if myOrgChildren.length > 0}
+					{#if !superAdmin && myOrgChildren.length > 0}
 						<Collapsible.Root open={isMyOrgActive} class="group/collapsible">
 							<Sidebar.MenuItem class="m-1">
 								<Collapsible.Trigger>
@@ -171,7 +176,7 @@
 						</Collapsible.Root>
 					{/if}
 
-					{#if data.analyticsLinkUrl}
+					{#if !superAdmin && data.analyticsLinkUrl}
 						<Sidebar.MenuItem class="m-1">
 							<Sidebar.MenuButton onclick={() => handleMenuClick()}>
 								{#snippet child({ props })}
@@ -194,7 +199,7 @@
 	</Sidebar.Content>
 	<Sidebar.Footer>
 		<Sidebar.Menu>
-			{#if data.platformGuideUrl}
+			{#if !superAdmin && data.platformGuideUrl}
 				<Sidebar.MenuItem class="m-1">
 					<Sidebar.MenuButton onclick={() => handleMenuClick()}>
 						{#snippet child({ props })}

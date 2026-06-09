@@ -25,7 +25,7 @@ describe('GET /api/questions/bulk-template', () => {
 			headers: makeHeaders({ 'Content-Type': 'text/csv' })
 		});
 
-		await GET({} as any);
+		await GET();
 
 		expect(mockFetch).toHaveBeenCalledWith(
 			`${BACKEND_URL}/questions/bulk-upload/template`,

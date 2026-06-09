@@ -22,6 +22,46 @@ describe('testSchema — shuffle and show_marks defaults', () => {
 	});
 });
 
+describe('testSchema — form_id', () => {
+	it('coerces empty string to null (No Form selected)', () => {
+		const result = testSchema.safeParse({ ...minimalValid, form_id: '' });
+		expect(result.success).toBe(true);
+		expect(result.data?.form_id).toBeNull();
+	});
+
+	it('coerces numeric string to number when a form is selected', () => {
+		const result = testSchema.safeParse({ ...minimalValid, form_id: '42' });
+		expect(result.success).toBe(true);
+		expect(result.data?.form_id).toBe(42);
+	});
+
+	it('accepts null when no form is set', () => {
+		const result = testSchema.safeParse({ ...minimalValid, form_id: null });
+		expect(result.success).toBe(true);
+		expect(result.data?.form_id).toBeNull();
+	});
+});
+
+describe('testSchema — certificate_id', () => {
+	it('coerces empty string to null (No Certificate selected)', () => {
+		const result = testSchema.safeParse({ ...minimalValid, certificate_id: '' });
+		expect(result.success).toBe(true);
+		expect(result.data?.certificate_id).toBeNull();
+	});
+
+	it('coerces numeric string to number when a certificate is selected', () => {
+		const result = testSchema.safeParse({ ...minimalValid, certificate_id: '7' });
+		expect(result.success).toBe(true);
+		expect(result.data?.certificate_id).toBe(7);
+	});
+
+	it('accepts null when no certificate is set', () => {
+		const result = testSchema.safeParse({ ...minimalValid, certificate_id: null });
+		expect(result.success).toBe(true);
+		expect(result.data?.certificate_id).toBeNull();
+	});
+});
+
 describe('testSchema — tag_type_ids', () => {
 	it('accepts a valid tag_type_ids array', () => {
 		const result = testSchema.safeParse({

@@ -16,11 +16,11 @@
 >
 	<div class="flex flex-col gap-6">
 		<div class="flex items-center justify-between gap-4">
-			<span class="text-sm font-semibold text-gray-500">
+			<span class="text-sm font-semibold text-muted-foreground">
 				Maximum time limit for the {term('test', 'lower')}
 			</span>
 			<label
-				class="border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 w-[176px] items-center rounded-[10px] border bg-white px-4 shadow-xs focus-within:ring-[3px]"
+				class="border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 w-[176px] items-center rounded-[10px] border bg-card px-4 shadow-xs focus-within:ring-[3px]"
 			>
 				<input
 					type="number"
@@ -38,14 +38,14 @@
 		</div>
 
 		<div class="flex items-center justify-between gap-4">
-			<span class="text-sm font-semibold text-gray-500">
+			<span class="text-sm font-semibold text-muted-foreground">
 				Start time for the {term('test', 'lower')}
 			</span>
 			<TimePickerPill bind:value={settings.test_timings.value.start_time} />
 		</div>
 
 		<div class="flex items-center justify-between gap-4">
-			<span class="text-sm font-semibold text-gray-500">
+			<span class="text-sm font-semibold text-muted-foreground">
 				End time for the {term('test', 'lower')}
 			</span>
 			<TimePickerPill bind:value={settings.test_timings.value.end_time} />

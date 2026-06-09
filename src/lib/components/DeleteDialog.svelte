@@ -63,7 +63,7 @@
 							<p class="text-sm font-medium">Items to be deleted:</p>
 							<ul class="text-muted-foreground mt-1 list-inside list-disc text-sm">
 								{#each selectedItems.slice(0, 5) as item}
-									<li>{item.question_text || item.name || `Item ${item.id}`}</li>
+									<li>{item.question_text || item.full_name || item.name || `Item ${item.id}`}</li>
 								{/each}
 							</ul>
 						</div>

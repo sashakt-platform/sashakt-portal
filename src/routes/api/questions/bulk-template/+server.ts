@@ -21,13 +21,11 @@ export const GET: RequestHandler = async () => {
 		const contentDisposition = res.headers.get('Content-Disposition');
 
 		if (contentType) headers.set('Content-Type', contentType);
-		headers.set(
-			'Content-Disposition',
-			contentDisposition ?? 'attachment; filename="template.csv"'
-		);
+		headers.set('Content-Disposition', contentDisposition ?? 'attachment; filename="template.csv"');
 
 		return new Response(res.body, { headers });
 	} catch (_error) {
+		console.error('Failed to fetch template:', _error);
 		return new Response('Failed to fetch template', { status: 500 });
 	}
 };

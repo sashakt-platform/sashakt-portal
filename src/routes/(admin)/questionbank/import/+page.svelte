@@ -108,7 +108,7 @@
 					Use our template to ensure your data is formatted correctly for upload.
 				</p>
 			</div>
-			<a href="/api/questions/bulk-template" download="template.csv">
+			<a href={resolve('/api/questions/bulk-template')} download="template.csv">
 				<Button variant="outline" class="border-primary text-primary bg-card cursor-pointer">
 					<Download size={16} />
 					Download Template

@@ -44,7 +44,7 @@ describe('GET /api/questions/bulk-template', () => {
 			headers: makeHeaders({ 'Content-Type': 'text/csv' })
 		});
 
-		const response = await GET({} as any);
+		const response = await GET();
 
 		expect(response.headers.get('Content-Type')).toBe('text/csv');
 	});
@@ -56,7 +56,7 @@ describe('GET /api/questions/bulk-template', () => {
 			headers: makeHeaders({ 'Content-Type': 'text/csv' })
 		});
 
-		const response = await GET({} as any);
+		const response = await GET();
 
 		expect(response.headers.get('Content-Disposition')).toBe('attachment; filename="template.csv"');
 	});
@@ -71,7 +71,7 @@ describe('GET /api/questions/bulk-template', () => {
 			})
 		});
 
-		const response = await GET({} as any);
+		const response = await GET();
 
 		expect(response.headers.get('Content-Disposition')).toBe(
 			'attachment; filename="questions-template.csv"'
@@ -85,7 +85,7 @@ describe('GET /api/questions/bulk-template', () => {
 			headers: makeHeaders()
 		});
 
-		const response = await GET({} as any);
+		const response = await GET();
 
 		expect(response.status).toBe(500);
 		expect(await response.text()).toBe('Failed to fetch template');
@@ -94,7 +94,7 @@ describe('GET /api/questions/bulk-template', () => {
 	it('returns 500 when fetch throws a network error', async () => {
 		mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-		const response = await GET({} as any);
+		const response = await GET();
 
 		expect(response.status).toBe(500);
 		expect(await response.text()).toBe('Failed to fetch template');

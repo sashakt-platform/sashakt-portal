@@ -40,6 +40,12 @@ describe('testSchema — form_id', () => {
 		expect(result.success).toBe(true);
 		expect(result.data?.form_id).toBeNull();
 	});
+
+	it('coerces 0 to null', () => {
+		const result = testSchema.safeParse({ ...minimalValid, form_id: 0 });
+		expect(result.success).toBe(true);
+		expect(result.data?.form_id).toBeNull();
+	});
 });
 
 describe('testSchema — certificate_id', () => {
@@ -57,6 +63,12 @@ describe('testSchema — certificate_id', () => {
 
 	it('accepts null when no certificate is set', () => {
 		const result = testSchema.safeParse({ ...minimalValid, certificate_id: null });
+		expect(result.success).toBe(true);
+		expect(result.data?.certificate_id).toBeNull();
+	});
+
+	it('coerces 0 to null', () => {
+		const result = testSchema.safeParse({ ...minimalValid, certificate_id: 0 });
 		expect(result.success).toBe(true);
 		expect(result.data?.certificate_id).toBeNull();
 	});

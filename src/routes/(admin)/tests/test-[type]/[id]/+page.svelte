@@ -232,7 +232,7 @@
 
 <form method="POST" action="?/save" use:enhance class="pb-10">
 	<!-- Page Header -->
-	<div class="bg-gray-0 border-b px-6 py-4">
+	<div class="bg-card border-b px-6 py-4">
 		<div class="flex items-start justify-between">
 			<!-- Left: Back arrow, title, stepper -->
 			<div class="flex items-start gap-3">
@@ -302,7 +302,7 @@
 	<!-- Content -->
 	{#if currentScreen === typeOfScreen.primary || currentScreen === typeOfScreen.questions}
 		<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
-			<div class="bg-gray-0 overflow-hidden rounded-2xl border border-gray-300">
+			<div class="bg-card overflow-hidden rounded-2xl border border-border">
 				{#if currentScreen === typeOfScreen.primary}
 					<Primary
 						{formData}
@@ -325,7 +325,7 @@
 	{:else if currentScreen === typeOfScreen.configuration}
 		{#if questionSetMandatoryLimitError}
 			<div
-				class="mx-4 mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-8 md:mx-10"
+				class="mx-4 mt-4 rounded-lg border border-destructive/20 bg-error-subtle px-4 py-3 text-sm text-destructive sm:mx-8 md:mx-10"
 			>
 				{questionSetMandatoryLimitError}
 			</div>

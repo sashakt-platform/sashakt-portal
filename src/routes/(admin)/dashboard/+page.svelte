@@ -227,7 +227,7 @@
 			{@render dataBox(stat.title, '', stat.count, false, isLoadingStats)}
 		{/each}
 	</div>
-	<div class="flex flex-col rounded-xl bg-white p-4">
+	<div class="flex flex-col rounded-xl bg-card p-4">
 		<div class="mb-4">
 			<p class="font-semibold">Summary of {term('test')} Attempts</p>
 		</div>

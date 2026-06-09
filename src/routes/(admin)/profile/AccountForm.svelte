@@ -58,7 +58,7 @@
 					</label>
 					<Input
 						id="role-field"
-						class="disabled:bg-gray-50"
+						class="disabled:bg-background"
 						value={$formData.role_label ?? ''}
 						disabled
 					/>

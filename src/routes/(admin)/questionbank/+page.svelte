@@ -162,7 +162,7 @@
 		{#if canCreate(data.user, 'question')}
 			<a href={resolve('/questionbank/single-question/add/new')}
 				><Button
-					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
+					class="border-primary text-primary hover:bg-primary/5 bg-card font-semibold"
 					variant="outline"><Plus class="h-4 w-4" />Create Question</Button
 				></a
 			>

@@ -56,7 +56,7 @@
 			<button
 				type="button"
 				{...props}
-				class="border-input hover:bg-accent/30 flex h-9 w-[176px] items-center justify-between rounded-full border bg-white px-5 text-sm shadow-xs transition-colors"
+				class="border-input hover:bg-accent/30 flex h-9 w-[176px] items-center justify-between rounded-full border bg-card px-5 text-sm shadow-xs transition-colors"
 			>
 				<span class={value ? 'text-foreground' : 'text-muted-foreground'}>{display}</span>
 				{#if value}

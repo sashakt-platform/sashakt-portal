@@ -13,7 +13,7 @@
 		type="button"
 		class={[
 			'mt-2 flex w-full cursor-pointer flex-row items-center border px-3 py-4 shadow sm:px-4 sm:py-5',
-			visibility ? 'rounded-t-2xl' : 'rounded-2xl bg-white'
+			visibility ? 'rounded-t-2xl' : 'rounded-2xl bg-card'
 		]}
 		onclick={() => (visibility = !visibility)}
 	>
@@ -28,7 +28,7 @@
 	<div
 		class={[
 			!visibility && 'hidden',
-			'flex flex-col gap-4 rounded-b-2xl bg-white p-4 sm:gap-6 sm:p-6 md:p-8',
+			'flex flex-col gap-4 rounded-b-2xl bg-card p-4 sm:gap-6 sm:p-6 md:p-8',
 			'border border-t-0 shadow'
 		]}
 	>

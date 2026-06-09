@@ -51,7 +51,7 @@
 <div class="w-full overflow-auto rounded-lg border">
 	<!-- Table header -->
 	<div
-		class="grid grid-cols-[auto_1fr_80px_1fr_40px] items-center gap-2 bg-gray-50 px-4 py-4 text-sm font-semibold tracking-wide text-gray-500 uppercase"
+		class="grid grid-cols-[auto_1fr_80px_1fr_40px] items-center gap-2 bg-background px-4 py-4 text-sm font-semibold tracking-wide text-muted-foreground uppercase"
 	>
 		<div class="w-5"></div>
 		<div>Questions</div>
@@ -64,7 +64,7 @@
 	{#each displayQuestions as question (question.id)}
 		<div class="grid grid-cols-[auto_1fr_80px_1fr_40px] items-center gap-2 border-t px-4 py-4">
 			<!-- Drag handle -->
-			<div class="text-gray-300">
+			<div class="text-border">
 				<GripVertical class="h-4 w-4" />
 			</div>
 
@@ -95,7 +95,7 @@
 			<!-- Delete -->
 			<button
 				onclick={() => handleRemoveQuestion(question.id)}
-				class="cursor-pointer text-red-400 hover:text-red-600"
+				class="cursor-pointer text-destructive/70 hover:text-destructive"
 				type="button"
 				aria-label="Remove question"
 			>

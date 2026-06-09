@@ -43,7 +43,7 @@
 	</div>
 
 	{#each sortedQuestionSets as questionSet (questionSet.id ?? `${questionSet.display_order}-${questionSet.title}`)}
-		<div class="rounded-lg border bg-white p-4 shadow-sm">
+		<div class="rounded-lg border bg-card p-4 shadow-sm">
 			<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 				<div class="min-w-0">
 					<div class="flex flex-wrap items-center gap-2">
@@ -64,7 +64,7 @@
 				<div class="text-muted-foreground text-sm">
 					Attempt limit: {questionSet.max_questions_allowed_to_attempt}
 					{#if getMandatoryQuestionCount(questionSet) > questionSet.max_questions_allowed_to_attempt}
-						<p class="mt-1 text-xs text-red-600">
+						<p class="mt-1 text-xs text-destructive">
 							{getMandatoryQuestionCount(questionSet)} mandatory question(s) exceed this attempt limit.
 						</p>
 					{/if}

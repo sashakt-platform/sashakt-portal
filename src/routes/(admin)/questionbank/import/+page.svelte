@@ -98,7 +98,7 @@
 	</div>
 
 	<!-- Outer card container -->
-	<div class="border-border bg-gray-0 rounded-xl border p-4 sm:p-6">
+	<div class="border-border bg-card rounded-xl border p-4 sm:p-6">
 		<!-- Template download banner -->
 		<div
 			class="bg-accent mb-6 flex flex-col items-start gap-4 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between sm:p-6"
@@ -110,7 +110,7 @@
 				</p>
 			</div>
 			<a href={BulkTemplate} download="template.csv">
-				<Button variant="outline" class="border-primary text-primary bg-gray-0 cursor-pointer">
+				<Button variant="outline" class="border-primary text-primary bg-card cursor-pointer">
 					<Download size={16} />
 					Download Template
 				</Button>
@@ -129,7 +129,7 @@
 			/>
 
 			<div
-				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed bg-gray-50 p-6 text-center {dragging
+				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed bg-muted p-6 text-center {dragging
 					? 'border-primary bg-accent'
 					: 'border-border'}"
 				role="region"

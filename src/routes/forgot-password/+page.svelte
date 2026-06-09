@@ -37,7 +37,7 @@
 		<Card.Root class="w-full shadow-xl">
 			{#if !emailSent}
 				<Card.Header class="space-y-3 pb-6 text-center">
-					<Card.Title class="text-3xl font-bold text-gray-800">Forgot Password</Card.Title>
+					<Card.Title class="text-3xl font-bold text-foreground">Forgot Password</Card.Title>
 					<Card.Description>Please enter your registered email.</Card.Description>
 				</Card.Header>
 			{/if}
@@ -45,10 +45,10 @@
 				{#if emailSent}
 					<div class="space-y-4 text-center">
 						<div
-							class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100"
+							class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[--success-subtle]"
 						>
 							<svg
-								class="h-8 w-8 text-green-600"
+								class="h-8 w-8 text-[--success-bold]"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -62,7 +62,7 @@
 							</svg>
 						</div>
 						<div class="space-y-2">
-							<p class="pt-2 text-sm text-gray-600">Please check your email inbox.</p>
+							<p class="pt-2 text-sm text-muted-foreground">Please check your email inbox.</p>
 						</div>
 
 						<Button
@@ -101,7 +101,7 @@
 									? `/login?organization=${data.organizationData.shortcode}`
 									: '/login'
 							)}
-							class="hover:text-primary text-sm text-gray-500 hover:underline focus:outline-none"
+							class="hover:text-primary text-sm text-muted-foreground hover:underline focus:outline-none"
 						>
 							Back to Login
 						</a>

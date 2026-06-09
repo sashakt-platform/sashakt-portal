@@ -14,7 +14,7 @@
 
 		<Card.Root class="w-full shadow-xl">
 			<Card.Header class="space-y-3 pb-6 text-center">
-				<Card.Title class="text-3xl font-bold text-gray-800">Update Password</Card.Title>
+				<Card.Title class="text-3xl font-bold text-foreground">Update Password</Card.Title>
 				<Card.Description>Enter your new password below.</Card.Description>
 			</Card.Header>
 

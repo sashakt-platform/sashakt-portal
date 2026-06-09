@@ -52,7 +52,7 @@
 								? `/forgot-password?organization=${data.organizationData?.shortcode}`
 								: '/forgot-password'
 						)}
-						class="hover:text-primary text-sm text-gray-500 hover:underline focus:outline-none"
+						class="hover:text-primary text-sm text-muted-foreground hover:underline focus:outline-none"
 					>
 						Forgot your password?
 					</a>

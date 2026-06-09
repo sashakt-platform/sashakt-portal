@@ -240,16 +240,16 @@
 		{#if noTestCreatedYet}
 			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
 				<div
-					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card"
 				>
 					{#if data?.is_template}
 						<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 							<ClipboardList class="text-primary h-7 w-7" />
 						</div>
-						<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+						<h2 class="mt-5 text-xl font-bold text-foreground sm:text-2xl">
 							No {term('test_templates', 'lower')} yet
 						</h2>
-						<p class="mt-2 max-w-md text-center text-sm text-gray-400">
+						<p class="mt-2 max-w-md text-center text-sm text-subtle-foreground">
 							Create your first {term('test_template', 'lower')} to get started. {term(
 								'test_templates'
 							)} let you define question sets, scoring rules, and {term('test', 'lower')} configurations
@@ -263,39 +263,39 @@
 							</div>
 						{/if}
 					{:else}
-						<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">
+						<h2 class="text-xl font-bold text-foreground sm:text-2xl">
 							Create your first {term('test', 'lower')}
 						</h2>
-						<p class="mt-2 text-sm text-gray-400">Choose a method to get started</p>
+						<p class="mt-2 text-sm text-subtle-foreground">Choose a method to get started</p>
 
 						{#if canCreate(data.user, 'test')}
 							<div class="mt-8 flex flex-col gap-6 sm:flex-row">
 								<a
 									href={page.url.pathname + '/new'}
-									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
+									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-border px-8 py-10 transition-colors"
 								>
 									<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
 										<Upload class="text-primary h-6 w-6" />
 									</div>
-									<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
+									<h3 class="mt-5 text-center text-base font-semibold text-foreground">
 										Build from Scratch
 									</h3>
-									<p class="mt-1 text-center text-sm text-gray-400">
+									<p class="mt-1 text-center text-sm text-subtle-foreground">
 										Configure everything from scratch, details, questions and rules.
 									</p>
 								</a>
 
 								<a
 									href={resolve('/tests/test-template')}
-									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
+									class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-border px-8 py-10 transition-colors"
 								>
 									<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
 										<FileSpreadsheet class="text-primary h-6 w-6" />
 									</div>
-									<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
+									<h3 class="mt-5 text-center text-base font-semibold text-foreground">
 										Build from {term('test_template')}
 									</h3>
-									<p class="mt-1 text-center text-sm text-gray-400">
+									<p class="mt-1 text-center text-sm text-subtle-foreground">
 										Pick a pre-configured {term('test_template', 'lower')} and schedule a session.
 									</p>
 								</a>
@@ -328,7 +328,7 @@
 							filteration={true}
 						/>
 					</div>
-					<div class="mx-4 w-px self-stretch bg-gray-300"></div>
+					<div class="mx-4 w-px self-stretch bg-border"></div>
 				{/if}
 
 				<div>

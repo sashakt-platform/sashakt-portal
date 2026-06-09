@@ -155,7 +155,7 @@
 					<h2 class="mt-5 text-xl font-bold text-foreground sm:text-2xl">
 						No {term('tag_types', 'lower')} yet
 					</h2>
-					<p class="mt-2 max-w-sm text-center text-sm text-muted-foreground">
+					<p class="mt-2 max-w-sm text-center text-sm text-subtle-foreground">
 						Create your first {term('tag_type', 'lower')} to get started. {term('tag_types')} let you
 						categorize and filter questions.
 					</p>

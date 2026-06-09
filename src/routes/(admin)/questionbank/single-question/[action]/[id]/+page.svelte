@@ -850,7 +850,7 @@
 					<div class="p-6">
 						{#if $formData.question_type === QuestionTypeEnum.Subjective}
 							<div class="flex flex-col gap-2">
-								<div class="flex flex-col gap-2 rounded-lg border border-border bg-muted p-4">
+								<div class="flex flex-col gap-2 rounded-lg border border-border bg-background p-4">
 									<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
 										<Label for="subjective-limit" class="text-sm font-medium sm:w-48">
 											Maximum character limit

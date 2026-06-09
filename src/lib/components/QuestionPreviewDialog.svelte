@@ -228,7 +228,7 @@
 					class="bg-background border-border flex h-8 w-36.5 items-center justify-between gap-1.5 rounded-full border pr-3 pl-3.5 text-xs"
 				>
 					<span class="text-foreground">Marks:</span>
-					<span class="font-medium text-green-600">+{marking.correct}</span>
+					<span class="font-medium text-[--success-bold]">+{marking.correct}</span>
 
 					{#if marking.wrong !== 0}
 						<span class="text-destructive font-medium">-{Math.abs(marking.wrong)}</span>
@@ -246,7 +246,7 @@
 					>
 						<div class="flex items-center justify-between text-xs">
 							<span class="text-muted-foreground">Correct</span>
-							<span class="font-medium text-green-600">+{marking.correct}</span>
+							<span class="font-medium text-[--success-bold]">+{marking.correct}</span>
 						</div>
 						{#if marking.wrong !== 0}
 							<div class="mt-1 flex items-center justify-between text-xs">

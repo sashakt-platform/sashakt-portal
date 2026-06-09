@@ -115,7 +115,7 @@
 								<span class="text-xs">Field name: {field.name}</span>
 							</div>
 							{#if field.help_text}
-								<span class="text-xs text-gray-400">{field.help_text}</span>
+								<span class="text-xs text-subtle-foreground">{field.help_text}</span>
 							{/if}
 						</div>
 					</div>

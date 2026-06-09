@@ -186,7 +186,7 @@
 					<h2 class="mt-5 text-xl font-bold text-foreground sm:text-2xl">
 						No {term('forms', 'lower')} yet
 					</h2>
-					<p class="mt-2 max-w-sm text-center text-sm text-muted-foreground">
+					<p class="mt-2 max-w-sm text-center text-sm text-subtle-foreground">
 						Create your first {term('form', 'lower')} to get started. {term('forms')} let you create questions
 						that test takers must answer before starting the test.
 					</p>

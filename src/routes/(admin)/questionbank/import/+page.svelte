@@ -129,7 +129,7 @@
 			/>
 
 			<div
-				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed bg-muted p-6 text-center {dragging
+				class="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed bg-background p-6 text-center {dragging
 					? 'border-primary bg-accent'
 					: 'border-border'}"
 				role="region"

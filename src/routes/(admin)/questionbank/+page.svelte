@@ -189,7 +189,7 @@
 					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card"
 				>
 					<h2 class="text-xl font-bold text-foreground sm:text-2xl">Create your first question</h2>
-					<p class="mt-2 text-sm text-muted-foreground">Choose a method to get started</p>
+					<p class="mt-2 text-sm text-subtle-foreground">Choose a method to get started</p>
 
 					{#if canCreate(data.user, 'question')}
 						<div class="mt-8 flex flex-col gap-6 sm:flex-row">
@@ -203,7 +203,7 @@
 								<h3 class="mt-5 text-center text-base font-semibold text-foreground">
 									Create Question
 								</h3>
-								<p class="mt-1 text-center text-sm text-muted-foreground">Create questions from scratch.</p>
+								<p class="mt-1 text-center text-sm text-subtle-foreground">Create questions from scratch.</p>
 							</a>
 
 							<a
@@ -214,7 +214,7 @@
 									<FileSpreadsheet class="text-primary h-6 w-6" />
 								</div>
 								<h3 class="mt-5 text-center text-base font-semibold text-foreground">Bulk Upload</h3>
-								<p class="mt-1 text-center text-sm text-muted-foreground">
+								<p class="mt-1 text-center text-sm text-subtle-foreground">
 									Upload multiple questions at once.
 								</p>
 							</a>

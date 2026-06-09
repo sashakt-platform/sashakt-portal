@@ -93,7 +93,7 @@
 				filteration={true}
 			/>
 		</div>
-		<div class="mx-2 w-px self-stretch bg-gray-300"></div>
+		<div class="mx-2 w-px self-stretch bg-border"></div>
 		<div><TagTypeSelection bind:tagTypes={filteredTagTypes} filteration={true} /></div>
 		<div>
 			<TagsSelection bind:tags={filteredTags} filteration={true} tagTypes={filteredTagTypes} />
@@ -102,15 +102,15 @@
 </div>
 
 <!-- Table card -->
-<div class="mx-4 mb-4 overflow-hidden rounded-xl border border-gray-300 sm:mx-5">
+<div class="mx-4 mb-4 overflow-hidden rounded-xl border border-border sm:mx-5">
 	<!-- Header row -->
 	<div
-		class="grid grid-cols-[44px_1fr_280px_160px] bg-gray-200 px-4 py-6 text-xs font-semibold tracking-wide text-gray-500 uppercase"
+		class="grid grid-cols-[44px_1fr_280px_160px] bg-muted px-4 py-6 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
 	>
 		<div></div>
 		<button
 			type="button"
-			class="flex items-center gap-1 text-left hover:text-gray-700"
+			class="flex items-center gap-1 text-left hover:text-foreground"
 			onclick={() => handleSort('name')}
 		>
 			TEST TEMPLATES <ArrowUpDown class="h-3 w-3" />
@@ -118,7 +118,7 @@
 		<div>TAGS</div>
 		<button
 			type="button"
-			class="flex items-center gap-1 hover:text-gray-700"
+			class="flex items-center gap-1 hover:text-foreground"
 			onclick={() => handleSort('modified_date')}
 		>
 			UPDATED <ArrowUpDown class="h-3 w-3" />
@@ -126,7 +126,7 @@
 	</div>
 
 	{#if items.length === 0}
-		<div class="py-16 text-center text-sm text-gray-400">
+		<div class="py-16 text-center text-sm text-subtle-foreground">
 			No {term('test_templates', 'lower')} found.
 		</div>
 	{/if}
@@ -135,16 +135,16 @@
 		{@const isSelected = selectedTemplateId === String(template.id)}
 		<button
 			type="button"
-			class="grid w-full grid-cols-[44px_1fr_280px_160px] items-center border-t border-gray-100 px-4 py-4 text-left transition-colors {isSelected
+			class="grid w-full grid-cols-[44px_1fr_280px_160px] items-center border-t border-border px-4 py-4 text-left transition-colors {isSelected
 				? 'bg-primary/5'
-				: 'hover:bg-gray-50'}"
+				: 'hover:bg-background'}"
 			onclick={() => (selectedTemplateId = String(template.id))}
 		>
 			<!-- Checkbox -->
 			<div
 				class="flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 {isSelected
 					? 'border-primary bg-primary'
-					: 'border-gray-300'}"
+					: 'border-border'}"
 			>
 				{#if isSelected}
 					<svg class="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
@@ -160,7 +160,7 @@
 			</div>
 
 			<!-- Name -->
-			<p class="text-sm font-medium text-gray-800">{template.name}</p>
+			<p class="text-sm font-medium text-foreground">{template.name}</p>
 
 			<!-- Tags -->
 			<div class="flex flex-wrap gap-1">
@@ -173,16 +173,16 @@
 			</div>
 
 			<!-- Date -->
-			<div class="text-sm text-gray-500">
+			<div class="text-sm text-muted-foreground">
 				<p>{formatDate(template.modified_date)}</p>
-				<p class="text-xs text-gray-400">{formatTime(template.modified_date)}</p>
+				<p class="text-xs text-subtle-foreground">{formatTime(template.modified_date)}</p>
 			</div>
 		</button>
 	{/each}
 
 	<!-- Pagination -->
-	<div class="flex items-center justify-between border-t border-gray-100 px-4 py-3">
-		<p class="text-sm text-gray-500">
+	<div class="flex items-center justify-between border-t border-border px-4 py-3">
+		<p class="text-sm text-muted-foreground">
 			{#if totalItems > 0}
 				Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, totalItems)} of {totalItems}
 			{/if}

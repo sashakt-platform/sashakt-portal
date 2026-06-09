@@ -43,18 +43,18 @@
 					<img
 						src={media.image.url}
 						alt={media.image?.alt_text || 'Question image'}
-						class="h-auto w-full rounded-lg border border-gray-200 object-contain"
+						class="h-auto w-full rounded-lg border border-border object-contain"
 						loading="lazy"
 					/>
 				{:else}
-					<p class="text-xs text-gray-500">
+					<p class="text-xs text-muted-foreground">
 						{media.image?.content_type} &middot; {Math.round(
 							(media.image?.size_bytes || 0) / 1024
 						)}KB
 					</p>
 				{/if}
 				{#if media.image?.alt_text}
-					<p class="mt-1 text-xs text-gray-500">{media.image.alt_text}</p>
+					<p class="mt-1 text-xs text-muted-foreground">{media.image.alt_text}</p>
 				{/if}
 			</div>
 		{/if}

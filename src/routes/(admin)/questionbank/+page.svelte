@@ -162,7 +162,7 @@
 		{#if canCreate(data.user, 'question')}
 			<a href={resolve('/questionbank/single-question/add/new')}
 				><Button
-					class="border-primary text-primary hover:bg-primary/5 bg-white font-semibold"
+					class="border-primary text-primary hover:bg-primary/5 bg-card font-semibold"
 					variant="outline"><Plus class="h-4 w-4" />Create Question</Button
 				></a
 			>
@@ -186,35 +186,35 @@
 		{#if noQuestionCreatedYet}
 			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
 				<div
-					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card"
 				>
-					<h2 class="text-xl font-bold text-gray-800 sm:text-2xl">Create your first question</h2>
-					<p class="mt-2 text-sm text-gray-400">Choose a method to get started</p>
+					<h2 class="text-xl font-bold text-foreground sm:text-2xl">Create your first question</h2>
+					<p class="mt-2 text-sm text-subtle-foreground">Choose a method to get started</p>
 
 					{#if canCreate(data.user, 'question')}
 						<div class="mt-8 flex flex-col gap-6 sm:flex-row">
 							<a
 								href={resolve('/questionbank/single-question/add/new')}
-								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
+								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-border px-8 py-10 transition-colors"
 							>
 								<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
 									<Upload class="text-primary h-6 w-6" />
 								</div>
-								<h3 class="mt-5 text-center text-base font-semibold text-gray-800">
+								<h3 class="mt-5 text-center text-base font-semibold text-foreground">
 									Create Question
 								</h3>
-								<p class="mt-1 text-center text-sm text-gray-400">Create questions from scratch.</p>
+								<p class="mt-1 text-center text-sm text-subtle-foreground">Create questions from scratch.</p>
 							</a>
 
 							<a
 								href={resolve('/questionbank/import')}
-								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-gray-200 px-8 py-10 transition-colors"
+								class="hover:border-primary hover:bg-primary/5 flex w-64 flex-col items-center rounded-xl border-2 border-dashed border-border px-8 py-10 transition-colors"
 							>
 								<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
 									<FileSpreadsheet class="text-primary h-6 w-6" />
 								</div>
-								<h3 class="mt-5 text-center text-base font-semibold text-gray-800">Bulk Upload</h3>
-								<p class="mt-1 text-center text-sm text-gray-400">
+								<h3 class="mt-5 text-center text-base font-semibold text-foreground">Bulk Upload</h3>
+								<p class="mt-1 text-center text-sm text-subtle-foreground">
 									Upload multiple questions at once.
 								</p>
 							</a>

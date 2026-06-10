@@ -117,7 +117,7 @@
 			<Button
 				{...props}
 				variant="outline"
-				class="bg-gray-0 h-10 w-full justify-start rounded-full text-gray-500"
+				class="bg-card h-10 w-full justify-start rounded-full text-muted-foreground"
 				role="combobox"
 				aria-expanded={open}
 			>

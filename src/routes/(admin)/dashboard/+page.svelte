@@ -192,12 +192,12 @@
 	percent: boolean = false,
 	loading: boolean = false
 )}
-	<div class="w-full justify-items-center rounded-xl border border-gray-100 bg-white p-4">
+	<div class="w-full justify-items-center rounded-xl border border-border bg-card p-4">
 		<p class="font-semibold">{title}</p>
 		<p class="text-sm">{description}</p>
 		{#if loading}
 			<div class="p-12 text-5xl">
-				<div class="h-12 w-24 animate-pulse rounded bg-gray-200"></div>
+				<div class="h-12 w-24 animate-pulse rounded bg-muted"></div>
 			</div>
 		{:else}
 			<div class="p-12 text-5xl">{count}{percent ? '%' : ''}</div>
@@ -219,7 +219,7 @@
 		</div>
 	</div>
 </div>
-<hr class="border-gray-200" />
+<hr class="border-border" />
 
 <div class="mx-4 mt-4 flex flex-col gap-6 sm:mx-8">
 	<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -227,7 +227,7 @@
 			{@render dataBox(stat.title, '', stat.count, false, isLoadingStats)}
 		{/each}
 	</div>
-	<div class="flex flex-col rounded-xl bg-white p-4">
+	<div class="flex flex-col rounded-xl bg-card p-4">
 		<div class="mb-4">
 			<p class="font-semibold">Summary of {term('test')} Attempts</p>
 		</div>

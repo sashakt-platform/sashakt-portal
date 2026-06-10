@@ -15,10 +15,10 @@
 	} = $props();
 </script>
 
-<section class="border-border rounded-2xl border bg-white shadow-sm">
+<section class="border-border rounded-2xl border bg-card shadow-sm">
 	<header class="flex items-start justify-between gap-6 px-8 pt-7 pb-6">
 		<div class="max-w-xl min-w-0">
-			<h3 class="text-xl font-semibold text-gray-800">{title}</h3>
+			<h3 class="text-xl font-semibold text-foreground">{title}</h3>
 			<p class="text-muted-foreground mt-2 text-sm">{description}</p>
 		</div>
 		<div class="bg-muted flex h-[41px] w-[176px] shrink-0 items-center rounded-[10px] p-1">
@@ -28,7 +28,7 @@
 					'h-full flex-1 rounded-lg text-sm transition-colors',
 					mode === 'fixed'
 						? 'bg-background text-primary font-semibold shadow-sm'
-						: 'font-medium text-gray-500'
+						: 'font-medium text-muted-foreground'
 				]}
 				onclick={() => (mode = 'fixed')}
 			>
@@ -40,7 +40,7 @@
 					'h-full flex-1 rounded-lg text-sm transition-colors',
 					mode === 'flexible'
 						? 'bg-background text-primary font-semibold shadow-sm'
-						: 'font-medium text-gray-500'
+						: 'font-medium text-muted-foreground'
 				]}
 				onclick={() => (mode = 'flexible')}
 			>

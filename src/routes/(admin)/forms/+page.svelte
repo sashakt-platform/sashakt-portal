@@ -178,15 +178,15 @@
 		{#if noFormsCreatedYet}
 			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
 				<div
-					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white"
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card"
 				>
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<FileText class="text-primary h-7 w-7" />
 					</div>
-					<h2 class="mt-5 text-xl font-bold text-gray-800 sm:text-2xl">
+					<h2 class="mt-5 text-xl font-bold text-foreground sm:text-2xl">
 						No {term('forms', 'lower')} yet
 					</h2>
-					<p class="mt-2 max-w-sm text-center text-sm text-gray-400">
+					<p class="mt-2 max-w-sm text-center text-sm text-subtle-foreground">
 						Create your first {term('form', 'lower')} to get started. {term('forms')} let you create questions
 						that test takers must answer before starting the test.
 					</p>

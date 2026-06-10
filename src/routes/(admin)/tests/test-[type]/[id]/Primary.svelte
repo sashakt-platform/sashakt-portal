@@ -64,15 +64,15 @@
 </script>
 
 <!-- Section Header -->
-<div class="flex items-center gap-4 border-b border-gray-100 px-6 py-5 sm:px-8">
+<div class="flex items-center gap-4 border-b border-border px-6 py-5 sm:px-8">
 	<div class="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
 		<ClipboardList class="text-primary h-5 w-5" />
 	</div>
 	<div>
-		<h2 class="text-base font-semibold text-gray-900">
+		<h2 class="text-base font-semibold text-foreground">
 			{convertTemplate ? 'Select Template' : 'Primary Details'}
 		</h2>
-		<p class="text-sm text-gray-500">
+		<p class="text-sm text-muted-foreground">
 			{convertTemplate
 				? 'Choose template to include its questions'
 				: 'Basic information about the ' + ($formData.is_template ? 'test template' : 'test')}
@@ -87,7 +87,7 @@
 		<!-- Left Column: Name + Description -->
 		<div class="flex w-full flex-1 flex-col gap-6 lg:w-3/5 lg:pr-8">
 			<div>
-				<Label for="template-name" class="text-sm font-medium text-gray-800">
+				<Label for="template-name" class="text-sm font-medium text-foreground">
 					{$formData.is_template ? `${term('test_template')} Name` : `${term('test')} Name`}
 					<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
 				</Label>
@@ -102,7 +102,7 @@
 			</div>
 
 			<div>
-				<Label for="description" class="text-sm font-medium text-gray-800">
+				<Label for="description" class="text-sm font-medium text-foreground">
 					Description
 					<span class="text-muted-foreground font-normal">(Visible to the candidate)</span>
 				</Label>
@@ -119,19 +119,19 @@
 		</div>
 
 		<!-- Vertical Divider -->
-		<div class="hidden lg:block lg:w-px lg:self-stretch lg:bg-gray-200"></div>
+		<div class="hidden lg:block lg:w-px lg:self-stretch lg:bg-muted"></div>
 
 		<!-- Right Column: Tag Types, Tags, State, District, Status -->
 		<div class="flex w-full flex-col gap-5 lg:w-2/5 lg:pl-8">
 			<div>
-				<Label class="text-sm font-semibold text-gray-800">{term('tag_types')}</Label>
+				<Label class="text-sm font-semibold text-foreground">{term('tag_types')}</Label>
 				<div class="mt-2">
 					<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 				</div>
 			</div>
 
 			<div>
-				<Label class="text-sm font-semibold text-gray-800">{term('tags')}</Label>
+				<Label class="text-sm font-semibold text-foreground">{term('tags')}</Label>
 				<div class="mt-2">
 					<TagsSelection bind:tags={$formData.tag_ids} tagTypes={selectedTagTypes} />
 				</div>
@@ -139,13 +139,13 @@
 			{#if !hasLocation(user)}
 				<hr class="border-border my-4" />
 				<div>
-					<Label class="text-sm font-semibold text-gray-800">State</Label>
+					<Label class="text-sm font-semibold text-foreground">State</Label>
 					<div class="mt-2">
 						<StateSelection bind:states={$formData.state_ids} />
 					</div>
 				</div>
 				<div>
-					<Label class="text-sm font-semibold text-gray-800">District</Label>
+					<Label class="text-sm font-semibold text-foreground">District</Label>
 					<div class="mt-2">
 						<DistrictSelection bind:districts={$formData.district_ids} {selectedStates} />
 					</div>
@@ -154,7 +154,7 @@
 
 			<hr class="border-border my-4" />
 			<div class="flex items-center justify-between pt-2">
-				<Label class="text-sm font-semibold text-gray-800">
+				<Label class="text-sm font-semibold text-foreground">
 					{$formData.is_template ? `${term('test_template')} Status` : `${term('test')} Status`}
 				</Label>
 				<div class="flex items-center gap-2">

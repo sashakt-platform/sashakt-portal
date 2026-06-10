@@ -850,7 +850,7 @@
 					<div class="p-6">
 						{#if $formData.question_type === QuestionTypeEnum.Subjective}
 							<div class="flex flex-col gap-2">
-								<div class="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
+								<div class="flex flex-col gap-2 rounded-lg border border-border bg-background p-4">
 									<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
 										<Label for="subjective-limit" class="text-sm font-medium sm:w-48">
 											Maximum character limit
@@ -865,10 +865,10 @@
 												class="w-32"
 												bind:value={$formData.subjective_answer_limit}
 											/>
-											<span class="text-sm text-gray-500">characters</span>
+											<span class="text-sm text-muted-foreground">characters</span>
 										</div>
 									</div>
-									<p class="text-xs text-gray-500">
+									<p class="text-xs text-muted-foreground">
 										Leave empty for unlimited. Recommended: 200-1000 characters for short answers,
 										1000-5000 for essays.
 									</p>
@@ -1506,7 +1506,7 @@
 								<div class="flex gap-4">
 									<div class="flex flex-1 flex-col gap-2">
 										<Input bind:value={matrixRowLabel} class="font-semibold" />
-										<p class="text-xs font-medium text-gray-500">Questions</p>
+										<p class="text-xs font-medium text-muted-foreground">Questions</p>
 										<div class="flex flex-col gap-2">
 											{#each matrixLeftItems as item, index (item.id)}
 												<div class="group flex flex-row items-center gap-2">
@@ -1543,7 +1543,7 @@
 											class="font-semibold"
 											placeholder="Answer column label"
 										/>
-										<p class="text-xs font-medium text-gray-500">
+										<p class="text-xs font-medium text-muted-foreground">
 											Answer column ({$formData.question_type === QuestionTypeEnum.MatrixString
 												? 'text'
 												: 'number'} input)
@@ -1634,7 +1634,7 @@
 								name="marking_scheme.correct"
 								bind:value={$formData.marking_scheme.correct}
 								step="any"
-								class="w-full rounded-md border border-gray-300 p-2"
+								class="w-full rounded-md border border-border p-2"
 							/>
 						</div>
 						<div class="flex flex-1 flex-col gap-1">
@@ -1644,7 +1644,7 @@
 								name="marking_scheme.wrong"
 								bind:value={$formData.marking_scheme.wrong}
 								step="any"
-								class="w-full rounded-md border border-gray-300 p-2"
+								class="w-full rounded-md border border-border p-2"
 							/>
 						</div>
 						<div class="flex flex-1 flex-col gap-1">
@@ -1654,7 +1654,7 @@
 								name="marking_scheme.skipped"
 								bind:value={$formData.marking_scheme.skipped}
 								step="any"
-								class="w-full rounded-md border border-gray-300 p-2"
+								class="w-full rounded-md border border-border p-2"
 							/>
 						</div>
 					</div>

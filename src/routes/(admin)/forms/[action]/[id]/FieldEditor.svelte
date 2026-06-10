@@ -234,7 +234,7 @@
 				<div class="space-y-2">
 					<Label>Field Name *</Label>
 					<Input bind:value={name} placeholder="field_name" disabled={isEditing} />
-					<p class="text-xs text-gray-500">
+					<p class="text-xs text-muted-foreground">
 						Used as token in certificate and key in form response.
 					</p>
 				</div>
@@ -267,7 +267,7 @@
 					</div>
 
 					{#if options.length === 0}
-						<p class="text-sm text-gray-500">Add at least one option for this field type.</p>
+						<p class="text-sm text-muted-foreground">Add at least one option for this field type.</p>
 					{:else}
 						<div class="space-y-2">
 							{#each options as option, index}

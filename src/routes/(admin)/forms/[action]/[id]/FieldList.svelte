@@ -75,7 +75,7 @@
 
 <div class="space-y-3">
 	{#each fields as field, index (field.id)}
-		<Card.Root class="border border-gray-200">
+		<Card.Root class="border border-border">
 			<Card.Content class="p-4">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-4">
@@ -107,7 +107,7 @@
 									<Badge variant="destructive" class="text-xs">Required</Badge>
 								{/if}
 							</div>
-							<div class="flex items-center gap-2 text-sm text-gray-500">
+							<div class="flex items-center gap-2 text-sm text-muted-foreground">
 								<Badge variant="outline"
 									>{fieldTypeLabels[field.field_type as keyof typeof fieldTypeLabels] ||
 										field.field_type}</Badge
@@ -115,7 +115,7 @@
 								<span class="text-xs">Field name: {field.name}</span>
 							</div>
 							{#if field.help_text}
-								<span class="text-xs text-gray-400">{field.help_text}</span>
+								<span class="text-xs text-subtle-foreground">{field.help_text}</span>
 							{/if}
 						</div>
 					</div>

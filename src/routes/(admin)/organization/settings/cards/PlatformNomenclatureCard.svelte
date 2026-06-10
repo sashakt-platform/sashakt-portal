@@ -30,10 +30,10 @@
 	let isCustom = $derived(settings.platform_nomenclature.mode === 'custom');
 </script>
 
-<section class="border-border rounded-2xl border bg-white shadow-sm">
+<section class="border-border rounded-2xl border bg-card shadow-sm">
 	<header class="flex items-start justify-between gap-6 px-8 pt-7 pb-6">
 		<div class="max-w-xl min-w-0">
-			<h3 class="text-xl font-semibold text-gray-800">Platform Nomenclature</h3>
+			<h3 class="text-xl font-semibold text-foreground">Platform Nomenclature</h3>
 			<p class="text-muted-foreground mt-2 text-sm">
 				Rename sections across the platform to match your organisation's terminology
 			</p>
@@ -45,7 +45,7 @@
 					'h-full flex-1 rounded-lg text-sm transition-colors',
 					!isCustom
 						? 'bg-background text-primary font-semibold shadow-sm'
-						: 'font-medium text-gray-500'
+						: 'font-medium text-muted-foreground'
 				]}
 				onclick={() => (settings.platform_nomenclature.mode = 'default')}
 			>
@@ -57,7 +57,7 @@
 					'h-full flex-1 rounded-lg text-sm transition-colors',
 					isCustom
 						? 'bg-background text-primary font-semibold shadow-sm'
-						: 'font-medium text-gray-500'
+						: 'font-medium text-muted-foreground'
 				]}
 				onclick={() => (settings.platform_nomenclature.mode = 'custom')}
 			>
@@ -101,7 +101,7 @@
 						<div class="flex flex-col gap-2">
 							<label
 								class={[
-									'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-[10px] border bg-white px-4 shadow-xs focus-within:ring-[3px]',
+									'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-[10px] border bg-card px-4 shadow-xs focus-within:ring-[3px]',
 									!isCustom && 'opacity-60'
 								]}
 							>
@@ -117,7 +117,7 @@
 							{#if row.singular}
 								<label
 									class={[
-										'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-[10px] border bg-white px-4 shadow-xs focus-within:ring-[3px]',
+										'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-9 items-center rounded-[10px] border bg-card px-4 shadow-xs focus-within:ring-[3px]',
 										!isCustom && 'opacity-60'
 									]}
 								>

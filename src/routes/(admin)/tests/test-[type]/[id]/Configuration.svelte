@@ -148,13 +148,13 @@
 </script>
 
 {#snippet label(label: string)}
-	<Label class="mb-2 block text-sm font-semibold text-gray-800">{label}</Label>
+	<Label class="mb-2 block text-sm font-semibold text-foreground">{label}</Label>
 {/snippet}
 
 {#snippet selectTrigger(text: string, isSelected: boolean)}
-	<Select.Trigger class="w-full rounded-full border-gray-300">
+	<Select.Trigger class="w-full rounded-full border-border">
 		<span
-			class={['truncate', isSelected ? 'font-normal text-gray-800' : 'font-light text-gray-500']}
+			class={['truncate', isSelected ? 'font-normal text-foreground' : 'font-light text-muted-foreground']}
 		>
 			{text}
 		</span>
@@ -312,7 +312,7 @@
 	</ConfigureBox>
 
 	{#snippet labelTestRules(label: string)}
-		<Label class="text-sm font-medium text-gray-700">{label}</Label>
+		<Label class="text-sm font-medium text-foreground">{label}</Label>
 	{/snippet}
 	{#snippet yesNo(value: boolean, onYes: () => void, onNo: () => void)}
 		<div class="bg-muted flex rounded-xl p-1">
@@ -320,7 +320,7 @@
 				type="button"
 				class={[
 					'rounded-xl px-4 py-1.5 text-sm transition-colors',
-					value ? 'bg-background text-primary font-semibold shadow' : 'text-gray-500'
+					value ? 'bg-background text-primary font-semibold shadow' : 'text-muted-foreground'
 				]}
 				onclick={onYes}>Yes</button
 			>
@@ -328,7 +328,7 @@
 				type="button"
 				class={[
 					'rounded-xl px-4 py-1.5 text-sm transition-colors',
-					!value ? 'bg-background text-primary font-semibold shadow' : 'text-gray-500'
+					!value ? 'bg-background text-primary font-semibold shadow' : 'text-muted-foreground'
 				]}
 				onclick={onNo}>No</button
 			>

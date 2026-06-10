@@ -48,10 +48,10 @@
 
 <div class={cn('relative shrink-0 lg:w-80', className)}>
 	<SearchIcon
-		class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+		class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-subtle-foreground"
 	/>
 	<Input
-		class="rounded-full border border-gray-300 pl-9 placeholder:text-gray-400"
+		class="rounded-full border border-border pl-9 placeholder:text-subtle-foreground"
 		{placeholder}
 		{value}
 		oninput={handleInput}

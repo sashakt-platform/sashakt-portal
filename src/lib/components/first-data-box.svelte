@@ -45,8 +45,8 @@
 		</g>
 	</svg>
 
-	<h1 class="mt-4 text-2xl font-bold text-gray-800 sm:text-3xl">{title}</h1>
-	<p class="mt-4 px-4 text-gray-400 sm:px-0">
+	<h1 class="mt-4 text-2xl font-bold text-foreground sm:text-3xl">{title}</h1>
+	<p class="mt-4 px-4 text-subtle-foreground sm:px-0">
 		{subtitle}
 	</p>
 	<div class="mt-4 flex flex-col gap-3 sm:flex-row sm:gap-4">

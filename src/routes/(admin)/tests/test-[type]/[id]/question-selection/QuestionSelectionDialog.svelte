@@ -142,7 +142,7 @@
 		<div class="flex h-full flex-col">
 			<!-- Header -->
 			<Dialog.Header class="border-b px-6 py-5">
-				<Dialog.Title class="text-xl font-bold text-gray-900">
+				<Dialog.Title class="text-xl font-bold text-foreground">
 					Select Questions from the {term('question_bank')}
 				</Dialog.Title>
 				<p class="text-primary text-sm font-medium">
@@ -171,7 +171,7 @@
 							</div>
 						{/if}
 						<!-- Vertical Divider -->
-						<div class="hidden h-8 w-px bg-gray-200 sm:block"></div>
+						<div class="hidden h-8 w-px bg-muted sm:block"></div>
 						<div class="flex-1">
 							<TagTypeSelection bind:tagTypes={selectedTagTypes} />
 						</div>
@@ -201,7 +201,7 @@
 					</div>
 
 					<!-- Fixed bottom bar -->
-					<div class="absolute right-0 bottom-0 left-0 border-t bg-white p-3 sm:p-4">
+					<div class="absolute right-0 bottom-0 left-0 border-t bg-card p-3 sm:p-4">
 						<div class="flex justify-center">
 							<Button
 								class="bg-primary hover:bg-primary/90 w-full sm:w-auto"

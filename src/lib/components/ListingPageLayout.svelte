@@ -39,7 +39,7 @@
 
 <div>
 	<!-- Page Header -->
-	<div class="bg-gray-0">
+	<div class="bg-card">
 		<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
 			<div class="my-auto flex flex-col">
 				<div class="flex w-full items-center align-middle">
@@ -74,14 +74,14 @@
 			{/if}
 		</div>
 	</div>
-	<hr class="border-gray-200" />
+	<hr class="border-border" />
 
 	<!-- Empty State -->
 	{#if showEmptyState && emptyState}
 		{@render emptyState()}
 	{:else}
 		<!-- Content Section -->
-		<div class="bg-gray-50">
+		<div class="bg-background">
 			<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
 				<!-- Toolbar (always shown if present, e.g., batch actions) -->
 				{#if toolbar}

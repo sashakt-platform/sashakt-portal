@@ -15,7 +15,7 @@
 </script>
 
 {#if $message}
-	<div class="mb-4 text-green-600">{$message}</div>
+	<div class="mb-4 text-success">{$message}</div>
 {/if}
 <form method="POST" action="?/update" use:enhance>
 	<input type="hidden" name="token" value={$formData.token} />

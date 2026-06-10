@@ -45,10 +45,10 @@
 				{#if emailSent}
 					<div class="space-y-4 text-center">
 						<div
-							class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[--success-subtle]"
+							class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success-subtle"
 						>
 							<svg
-								class="h-8 w-8 text-[--success-bold]"
+								class="h-8 w-8 text-success"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"

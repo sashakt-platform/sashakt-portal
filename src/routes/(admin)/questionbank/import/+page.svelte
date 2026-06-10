@@ -11,7 +11,6 @@
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { schema } from './schema.js';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import BulkTemplate from '$lib/components/Bulk-Upload-Question-Template.csv?url';
 	import { resolve } from '$app/paths';
 	import { useTerms } from '$lib/nomenclature';
 
@@ -109,7 +108,7 @@
 					Use our template to ensure your data is formatted correctly for upload.
 				</p>
 			</div>
-			<a href={BulkTemplate} download="template.csv">
+			<a href={resolve('/api/questions/bulk-template')} download="template.csv">
 				<Button variant="outline" class="border-primary text-primary bg-card cursor-pointer">
 					<Download size={16} />
 					Download Template

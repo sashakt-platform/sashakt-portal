@@ -5,6 +5,7 @@ import { schema } from './schema.js';
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async () => {
 	const user = requireLogin();
@@ -19,7 +20,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions = {
-	default: async ({ request }) => {
+	default: async ({ request, cookies }) => {
 		const user = requireLogin();
 		requirePermission(user, PERMISSIONS.CREATE_QUESTION);
 		const token = getSessionTokenCookie();
@@ -48,7 +49,16 @@ export const actions = {
 		});
 
 		if (!response.ok) {
-			return fail(500, { form });
+			const errorMessage = await response.json();
+			setFlash(
+				{
+					type: 'error',
+					message:
+						errorMessage.detail || `Unable to process file. Kindly check the format and try again.`
+				},
+				cookies
+			);
+			return fail(400, { form });
 		}
 
 		const data = await response.json();

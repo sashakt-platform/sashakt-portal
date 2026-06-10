@@ -177,6 +177,7 @@
 			selectedCount={selectedQuestionIds.length}
 			selectedRows={selectedQuestions}
 			selectedRowIds={selectedQuestionIds}
+			entityLabel="question"
 			onAction={handleBatchAction}
 			onClearSelection={handleClearSelection}
 		/>
@@ -234,6 +235,7 @@
 					<div>
 						<StateSelection bind:states={filteredStates} filteration={true} />
 					</div>
+					<div class="mx-4 w-px self-stretch bg-gray-300"></div>
 				{/if}
 
 				<div>

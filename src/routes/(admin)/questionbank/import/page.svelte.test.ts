@@ -167,7 +167,7 @@ describe('Import Questions Page', () => {
 			});
 			capturedOnUpdated?.();
 			await tick();
-			expect(screen.getByText('Bulk upload successful')).toBeInTheDocument();
+			expect(screen.getByText('File upload successful')).toBeInTheDocument();
 			expect(screen.queryByText('Processing your file...')).not.toBeInTheDocument();
 		});
 
@@ -181,7 +181,7 @@ describe('Import Questions Page', () => {
 			});
 			capturedOnUpdated?.();
 			await tick();
-			expect(screen.getByText('Bulk upload error')).toBeInTheDocument();
+			expect(screen.getByText('File upload error')).toBeInTheDocument();
 			expect(screen.queryByText('Processing your file...')).not.toBeInTheDocument();
 		});
 

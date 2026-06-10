@@ -37,7 +37,7 @@
 	}: ListingPageLayoutProps = $props();
 </script>
 
-<div>
+<div class="flex min-h-full flex-col">
 	<!-- Page Header -->
 	<div class="bg-card">
 		<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">

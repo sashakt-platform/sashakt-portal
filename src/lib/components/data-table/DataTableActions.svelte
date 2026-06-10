@@ -90,7 +90,8 @@
 					<Button
 						variant="secondary"
 						size="sm"
-						class="text-primary bg-brand-light rounded-lg font-semibold">Edit</Button
+						class="text-primary bg-brand-light rounded-lg font-semibold"
+						><Pencil class="h-2 w-2" />Edit</Button
 					>
 				</a>
 			{/if}

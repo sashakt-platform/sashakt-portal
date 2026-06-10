@@ -179,9 +179,9 @@
 				</div>
 			{:else}
 				<div class="mb-4 flex items-center justify-between">
-					<p class="text-primary text-sm font-semibold">
-						✓ {totalSelectedCount}
-						{totalSelectedCount === 1 ? 'question' : 'questions'} added
+					<p class="text-muted-foreground flex items-center gap-2 text-sm font-semibold">
+						<span>✓</span>
+						<span>{totalSelectedCount} {totalSelectedCount === 1 ? 'question' : 'questions'} added</span>
 					</p>
 					<button
 						type="button"
@@ -209,9 +209,9 @@
 			</div>
 
 			{#if $formData.random_tag_count.length > 0}
-				<p class="text-primary mb-4 text-center text-sm font-semibold">
-					{totalSelectedCount}
-					{totalSelectedCount === 1 ? 'question' : 'questions'}
+				<p class="text-muted-foreground mb-4 flex items-center justify-center gap-2 text-sm font-semibold">
+					<span>✓</span>
+					<span>{totalSelectedCount} {totalSelectedCount === 1 ? 'question' : 'questions'} added</span>
 				</p>
 
 				<div class="bg-background mx-auto w-full max-w-2xl overflow-hidden rounded-xl border">

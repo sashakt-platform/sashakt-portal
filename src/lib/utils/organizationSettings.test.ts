@@ -171,6 +171,46 @@ describe('applyOrgSettingsToNewTestForm', () => {
 		expect(formData.omr).toBe('OPTIONAL');
 	});
 
+	it('copies pre_test_instructions text to start_instructions', () => {
+		const formData: any = {};
+		const s = settings({ pre_test_instructions: { value: { text: '<p>Read carefully</p>' } } });
+		applyOrgSettingsToNewTestForm(formData, s);
+		expect(formData.start_instructions).toBe('<p>Read carefully</p>');
+	});
+
+	it('copies completion_message text to completion_message', () => {
+		const formData: any = {};
+		const s = settings({ completion_message: { value: { text: '<p>Thank you!</p>' } } });
+		applyOrgSettingsToNewTestForm(formData, s);
+		expect(formData.completion_message).toBe('<p>Thank you!</p>');
+	});
+
+	it('sets start_instructions to null when pre_test_instructions text is null', () => {
+		const formData: any = {};
+		const s = settings({ pre_test_instructions: { value: { text: null } } });
+		applyOrgSettingsToNewTestForm(formData, s);
+		expect(formData.start_instructions).toBeNull();
+	});
+
+	it('sets completion_message to null when completion_message text is null', () => {
+		const formData: any = {};
+		const s = settings({ completion_message: { value: { text: null } } });
+		applyOrgSettingsToNewTestForm(formData, s);
+		expect(formData.completion_message).toBeNull();
+	});
+
+	it('sets start_instructions to null when pre_test_instructions is absent', () => {
+		const formData: any = {};
+		applyOrgSettingsToNewTestForm(formData, settings());
+		expect(formData.start_instructions).toBeNull();
+	});
+
+	it('sets completion_message to null when completion_message is absent', () => {
+		const formData: any = {};
+		applyOrgSettingsToNewTestForm(formData, settings());
+		expect(formData.completion_message).toBeNull();
+	});
+
 	it('no-op when settings is null', () => {
 		const formData: any = { time_limit: 999 };
 		applyOrgSettingsToNewTestForm(formData, null);

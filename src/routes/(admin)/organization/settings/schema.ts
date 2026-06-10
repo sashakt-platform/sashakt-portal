@@ -124,8 +124,20 @@ const analyticsLinkSchema = z.object({
 	})
 });
 
+const preTestInstructionsSchema = z.object({
+	value: z.object({
+		text: z.string().nullable().default(null)
+	})
+});
+
+const completionMessageSchema = z.object({
+	value: z.object({
+		text: z.string().nullable().default(null)
+	})
+});
+
 export const organizationSettingsSchema = z.object({
-	version: z.literal(4).default(4),
+	version: z.literal(5).default(5),
 	test_timings: testTimingsSchema,
 	questions_per_page: questionsPerPageSchema,
 	marking_scheme: markingSchemeSchema,
@@ -134,6 +146,8 @@ export const organizationSettingsSchema = z.object({
 	mark_for_review: markForReviewSchema,
 	omr_mode: omrModeSchema,
 	pause_test: pauseTestSchema,
+	pre_test_instructions: preTestInstructionsSchema,
+	completion_message: completionMessageSchema,
 	platform_nomenclature: platformNomenclatureSchema,
 	platform_guide: platformGuideSchema,
 	analytics_link: analyticsLinkSchema

@@ -50,9 +50,18 @@ export type OrgSettingsPayload = {
 		mode: OrgSettingMode;
 		value: { default: boolean };
 	};
+	pre_test_instructions?: {
+		value: { text: string | null };
+	};
+	completion_message?: {
+		value: { text: string | null };
+	};
 };
 
-type Feature = keyof Omit<OrgSettingsPayload, 'version'>;
+type Feature = keyof Omit<
+	OrgSettingsPayload,
+	'version' | 'pre_test_instructions' | 'completion_message'
+>;
 
 export function isFixed(settings: OrgSettingsPayload | null, feature: Feature): boolean {
 	if (!settings) return false;
@@ -136,4 +145,7 @@ export function applyOrgSettingsToNewTestForm(
 	} else {
 		formData.omr = 'OPTIONAL';
 	}
+
+	formData.start_instructions = settings.pre_test_instructions?.value?.text ?? null;
+	formData.completion_message = settings.completion_message?.value?.text ?? null;
 }

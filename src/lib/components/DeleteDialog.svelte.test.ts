@@ -40,7 +40,7 @@ describe('DeleteDialog', () => {
 			});
 
 			expect(
-				screen.getByText('This action cannot be undone. This will permanently delete your User')
+				screen.getByText('Are you sure you want to delete the User? This action cannot be undone.')
 			).toBeInTheDocument();
 		});
 

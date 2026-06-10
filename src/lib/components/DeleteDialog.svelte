@@ -1,6 +1,8 @@
 <script lang="ts">
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
+	import X from '@lucide/svelte/icons/x';
 
 	let {
 		action = $bindable(),
@@ -20,38 +22,48 @@
 		onBatchCancel?: () => void;
 	}>();
 
-	let open = $derived.by(() => (action ? true : false) || (batchMode && selectedCount > 0));
+	let open = $state(false);
+
+	$effect(() => {
+		open = (action ? true : false) || (batchMode && selectedCount > 0);
+	});
+
+	function handleClose() {
+		if (batchMode) {
+			onBatchCancel?.();
+		} else {
+			action = null;
+		}
+	}
 
 	const handleBatchConfirm = () => {
 		onBatchConfirm?.();
-	};
-
-	const handleBatchCancel = () => {
-		onBatchCancel?.();
 	};
 </script>
 
 <AlertDialog.Root
 	bind:open
 	onOpenChange={(value) => {
-		if (!value) {
-			if (batchMode) {
-				handleBatchCancel();
-			} else {
-				action = null; // Reset action when dialog is closed
-			}
-		}
+		if (!value) handleClose();
 	}}
 >
-	<AlertDialog.Content>
-		<AlertDialog.Header>
-			<AlertDialog.Title>
+	<AlertDialog.Content class="gap-0 p-0">
+		<div class="flex items-start justify-between p-6 pb-6">
+			<AlertDialog.Title class="text-xl font-bold">
 				{#if batchMode}
 					Delete {selectedCount} {elementName}?
 				{:else}
 					Delete {elementName}?
 				{/if}
 			</AlertDialog.Title>
+			<Button variant="ghost" size="icon" class="h-6 w-6 shrink-0" onclick={handleClose}>
+				<X class="h-4 w-4" />
+			</Button>
+		</div>
+
+		<Separator />
+
+		<div class="p-6 pt-4">
 			<AlertDialog.Description>
 				{#if batchMode}
 					This action cannot be undone. This will permanently delete the selected {elementName}{selectedCount >
@@ -69,20 +81,20 @@
 						</div>
 					{/if}
 				{:else}
-					This action cannot be undone. This will permanently delete your {elementName}
+					Are you sure you want to delete the {elementName}? This action cannot be undone.
 				{/if}
 			</AlertDialog.Description>
-		</AlertDialog.Header>
-		<AlertDialog.Footer>
+		</div>
+
+		<AlertDialog.Footer class="p-6 pt-0">
 			{#if batchMode}
-				<AlertDialog.Cancel type="button" onclick={handleBatchCancel}>Cancel</AlertDialog.Cancel>
+				<AlertDialog.Cancel type="button" onclick={handleClose}>Cancel</AlertDialog.Cancel>
 				<Button variant="destructive" onclick={handleBatchConfirm}>
 					Delete {selectedCount}
 					{elementName}
 				</Button>
 			{:else}
-				<AlertDialog.Cancel type="button" onclick={() => (action = null)}>Cancel</AlertDialog.Cancel
-				>
+				<AlertDialog.Cancel type="button" onclick={handleClose}>Cancel</AlertDialog.Cancel>
 				<form {action} method="POST">
 					<Button variant="destructive" type="submit">Delete</Button>
 				</form>

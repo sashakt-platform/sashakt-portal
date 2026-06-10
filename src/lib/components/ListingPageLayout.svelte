@@ -81,8 +81,8 @@
 		{@render emptyState()}
 	{:else}
 		<!-- Content Section -->
-		<div class="bg-background">
-			<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
+		<div class="flex flex-1 flex-col bg-background">
+			<div class="mx-4 mt-6 flex flex-1 flex-col gap-8 pb-6 sm:mx-8 sm:mt-10">
 				<!-- Toolbar (always shown if present, e.g., batch actions) -->
 				{#if toolbar}
 					{@render toolbar()}

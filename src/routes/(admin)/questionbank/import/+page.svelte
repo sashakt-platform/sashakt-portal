@@ -141,8 +141,9 @@
 			>
 				{#if $message}
 					<!-- Result state (inline) -->
+					{@const hasErrors = Number($message.failed_questions) > 0}
 					<div class="flex w-full max-w-lg flex-col items-center gap-4">
-						{#if $message.failed_questions}
+						{#if hasErrors}
 							<div class="bg-destructive flex h-10 w-10 items-center justify-center rounded-full">
 								<X class="text-destructive-foreground" size={24} />
 							</div>
@@ -157,7 +158,7 @@
 							<h3 class="text-xl font-bold">File upload successful</h3>
 						{/if}
 						<p class="text-muted-foreground text-sm">
-							{#if $message.failed_questions}
+							{#if hasErrors}
 								{$message.message}
 							{:else}
 								You can view and edit the uploaded questions in the Question Bank.
@@ -182,7 +183,7 @@
 							</div>
 							<div class="mx-4 border-b"></div>
 							<div
-								class="flex justify-between bg-card px-4 py-3 font-medium {$message.failed_questions
+								class="flex justify-between bg-card px-4 py-3 font-medium {hasErrors
 									? 'text-destructive'
 									: ''}"
 							>
@@ -191,7 +192,7 @@
 							</div>
 						</div>
 
-						{#if $message.failed_questions}
+						{#if hasErrors}
 							<div class="mt-2 flex gap-3">
 								{#if $message.error_log?.startsWith('data:text/csv;base64')}
 									<a href={$message.error_log} download="error_report.csv">

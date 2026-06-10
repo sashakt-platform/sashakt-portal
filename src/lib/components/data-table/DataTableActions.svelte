@@ -88,7 +88,7 @@
 			{#if canEdit && editInline}
 				<a href={editUrl}>
 					<Button variant="outline" size="sm" class="border-secondary text-primary  font-semibold">
-						<Pencil class="h-2 w-2" />
+						<Pencil class="h-4 w-4" />
 						Edit
 					</Button>
 				</a>

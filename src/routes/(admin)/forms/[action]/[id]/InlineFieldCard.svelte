@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { deserialize } from '$app/forms';
-	import { dragHandle } from 'svelte-dnd-action';
+	import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
 	import { Input } from '$lib/components/ui/input';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
@@ -281,7 +281,7 @@
 			<div class="bg-border mx-2 h-6 w-px"></div>
 
 			<div class="flex items-center gap-2">
-				<span class="text-muted-foreground text-sm">Required</span>
+				<span class="text-sm {isRequired ? 'text-primary font-medium' : 'text-muted-foreground'}">Required</span>
 				<Switch checked={isRequired} onCheckedChange={handleRequiredToggle} />
 			</div>
 		</div>
@@ -362,52 +362,53 @@
 		<!-- Options for select/radio/multi_select -->
 		{#if needsOptions}
 			<div class="border-border flex flex-col gap-3 border-t pt-4">
-				<div class="flex items-center justify-between">
-					<Label class="font-semibold">Options</Label>
-					<Button type="button" variant="outline" size="sm" onclick={addOption}>
-						<Plus class="mr-1 h-4 w-4" />
-						Add Option
-					</Button>
-				</div>
+				<Label class="font-semibold">Options</Label>
 
-				{#if options.length === 0}
-					<p class="text-muted-foreground text-sm">Add at least one option for this field type.</p>
-				{:else}
-					<div class="flex flex-col gap-2">
+				{#if options.length > 0}
+					<div
+						class="flex flex-col gap-2"
+						use:dragHandleZone={{ items: options, flipDurationMs: 150 }}
+						onconsider={(e) => (options = e.detail.items)}
+						onfinalize={(e) => {
+							options = e.detail.items;
+							saveField();
+						}}
+					>
 						{#each options as option, idx (option.id ?? idx)}
 							<div class="flex items-center gap-2">
+								<span class="text-muted-foreground w-5 shrink-0 text-center text-sm font-medium">
+									{String.fromCharCode(65 + idx)}
+								</span>
+								<span use:dragHandle aria-label="drag to reorder option" class="cursor-grab">
+									<GripVertical class="text-muted-foreground h-4 w-4" />
+								</span>
 								<Input
 									value={option.label}
 									oninput={(e) => updateOptionLabel(idx, e.currentTarget.value)}
 									onblur={saveField}
-									placeholder="Option label"
+									placeholder={`Option ${String.fromCharCode(65 + idx)}`}
 									class="flex-1"
 								/>
-								<Input
-									value={option.value}
-									oninput={(e) => {
-										options = options.map((opt, i) =>
-											i === idx ? { ...opt, value: e.currentTarget.value } : opt
-										);
-									}}
-									onblur={saveField}
-									class="flex-1"
-									placeholder="Value"
-								/>
-								<Button
+								<button
 									type="button"
-									variant="ghost"
-									size="sm"
-									class="text-destructive"
+									class="text-muted-foreground hover:text-destructive shrink-0 rounded p-1 transition-colors"
 									aria-label="Remove option"
 									onclick={() => removeOption(idx)}
 								>
 									<Trash2 class="h-4 w-4" />
-								</Button>
+								</button>
 							</div>
 						{/each}
 					</div>
 				{/if}
+
+				<button
+					type="button"
+					class="border-border text-muted-foreground hover:border-primary hover:text-primary flex w-full items-center justify-center rounded-lg border-2 border-dashed py-3 text-sm font-medium transition-colors"
+					onclick={addOption}
+				>
+					Add Row
+				</button>
 			</div>
 		{/if}
 

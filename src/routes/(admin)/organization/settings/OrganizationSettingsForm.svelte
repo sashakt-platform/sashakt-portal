@@ -14,6 +14,7 @@
 	import OmrModeCard from './cards/OmrModeCard.svelte';
 	import PauseTestCard from './cards/PauseTestCard.svelte';
 	import PlatformNomenclatureCard from './cards/PlatformNomenclatureCard.svelte';
+	import TestInstructionsCard from './cards/TestInstructionsCard.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -60,6 +61,7 @@
 			<MarkForReviewCard bind:settings={$formData} />
 			<OmrModeCard bind:settings={$formData} />
 			<PauseTestCard bind:settings={$formData} />
+			<TestInstructionsCard bind:settings={$formData} />
 			<PlatformNomenclatureCard bind:settings={$formData} />
 		</div>
 	</div>

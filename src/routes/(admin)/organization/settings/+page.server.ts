@@ -25,6 +25,12 @@ function normalizeSettingsFromBackend(raw: OrganizationSettings): OrganizationSe
 				end_time: trimSeconds(raw.test_timings.value.end_time)
 			}
 		},
+		pre_test_instructions: {
+			value: { text: raw.pre_test_instructions?.value?.text ?? null }
+		},
+		completion_message: {
+			value: { text: raw.completion_message?.value?.text ?? null }
+		},
 		platform_nomenclature: {
 			mode: raw.platform_nomenclature?.mode ?? 'default',
 			value: fillMissingNomenclatureKeys(raw.platform_nomenclature?.value)

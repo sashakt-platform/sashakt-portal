@@ -282,7 +282,7 @@
 <form method="POST" action="?/save" use:enhance class="flex min-h-screen flex-col">
 	<div class="flex-1 overflow-auto">
 		<!-- Header -->
-		<div class="bg-gray-0 flex items-center justify-between px-12 py-8 md:px-10">
+		<div class="bg-card flex items-center justify-between px-12 py-8 md:px-10">
 			<div class="flex items-center gap-3">
 				<a
 					href={resolve('/forms/')}

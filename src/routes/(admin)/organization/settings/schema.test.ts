@@ -9,7 +9,7 @@ import { MAX_NOMENCLATURE_LABEL_LEN, NOMENCLATURE_DEFAULTS } from '$lib/nomencla
 
 function validBaseSettings() {
 	return {
-		version: 4,
+		version: 5,
 		test_timings: {
 			mode: 'fixed',
 			value: { time_limit: 60, start_time: '09:00:00', end_time: '17:00:00' }
@@ -21,6 +21,8 @@ function validBaseSettings() {
 		mark_for_review: { mode: 'fixed', value: { default: true } },
 		omr_mode: { mode: 'fixed', value: { default: false } },
 		pause_test: { mode: 'fixed', value: { default: false } },
+		pre_test_instructions: { value: { text: null } },
+		completion_message: { value: { text: null } },
 		platform_nomenclature: {
 			mode: 'default',
 			value: fillMissingNomenclatureKeys({})
@@ -83,8 +85,7 @@ describe('organizationSettingsSchema — platform_nomenclature', () => {
 
 	it('rejects mode values other than "default" / "custom"', () => {
 		const settings = validBaseSettings();
-		// @ts-expect-error - intentionally invalid
-		settings.platform_nomenclature = {
+		(settings as Record<string, unknown>).platform_nomenclature = {
 			mode: 'flexible',
 			value: fillMissingNomenclatureKeys({})
 		};
@@ -99,9 +100,9 @@ describe('organizationSettingsSchema — platform_nomenclature', () => {
 		expect(result.success).toBe(false);
 	});
 
-	it('pins version to literal 4', () => {
+	it('pins version to literal 5', () => {
 		const settings = validBaseSettings();
-		settings.version = 2 as 4; // wrong version
+		settings.version = 2 as 5; // wrong version
 		const result = organizationSettingsSchema.safeParse(settings);
 		expect(result.success).toBe(false);
 	});
@@ -114,7 +115,7 @@ describe('organizationSettingsSchema — platform_guide & analytics_link', () =>
 	});
 
 	it('accepts a resolved file_path URL and analytics URL', () => {
-		const settings = validBaseSettings();
+		const settings = validBaseSettings() as Record<string, unknown>;
 		settings.platform_guide = { value: { file_path: 'https://cdn.example.com/guide.pdf' } };
 		settings.analytics_link = { value: { url: 'https://lookerstudio.google.com/abc' } };
 		const result = organizationSettingsSchema.safeParse(settings);
@@ -129,6 +130,61 @@ describe('organizationSettingsSchema — platform_guide & analytics_link', () =>
 		const s2 = validBaseSettings() as Record<string, unknown>;
 		delete s2.analytics_link;
 		expect(organizationSettingsSchema.safeParse(s2).success).toBe(false);
+	});
+});
+
+describe('organizationSettingsSchema — pre_test_instructions & completion_message', () => {
+	it('accepts null text for both fields', () => {
+		const result = organizationSettingsSchema.safeParse(validBaseSettings());
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.pre_test_instructions.value.text).toBeNull();
+			expect(result.data.completion_message.value.text).toBeNull();
+		}
+	});
+
+	it('accepts an HTML string for pre_test_instructions', () => {
+		const settings = validBaseSettings() as Record<string, unknown>;
+		settings.pre_test_instructions = { value: { text: '<p>Read carefully</p>' } };
+		const result = organizationSettingsSchema.safeParse(settings);
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.pre_test_instructions.value.text).toBe('<p>Read carefully</p>');
+		}
+	});
+
+	it('accepts an HTML string for completion_message', () => {
+		const settings = validBaseSettings() as Record<string, unknown>;
+		settings.completion_message = { value: { text: '<p>Thank you!</p>' } };
+		const result = organizationSettingsSchema.safeParse(settings);
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.completion_message.value.text).toBe('<p>Thank you!</p>');
+		}
+	});
+
+	it('defaults text to null when value.text is omitted', () => {
+		const settings = validBaseSettings() as Record<string, unknown>;
+		settings.pre_test_instructions = { value: {} };
+		settings.completion_message = { value: {} };
+		const result = organizationSettingsSchema.safeParse(settings);
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.pre_test_instructions.value.text).toBeNull();
+			expect(result.data.completion_message.value.text).toBeNull();
+		}
+	});
+
+	it('rejects payload missing pre_test_instructions', () => {
+		const settings = validBaseSettings() as Record<string, unknown>;
+		delete settings.pre_test_instructions;
+		expect(organizationSettingsSchema.safeParse(settings).success).toBe(false);
+	});
+
+	it('rejects payload missing completion_message', () => {
+		const settings = validBaseSettings() as Record<string, unknown>;
+		delete settings.completion_message;
+		expect(organizationSettingsSchema.safeParse(settings).success).toBe(false);
 	});
 });
 

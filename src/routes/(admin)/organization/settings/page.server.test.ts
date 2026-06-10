@@ -56,6 +56,8 @@ function defaultSettings() {
 		question_palette: { mode: 'fixed', value: { default: true } },
 		mark_for_review: { mode: 'fixed', value: { default: true } },
 		omr_mode: { mode: 'fixed', value: { default: false } },
+		pre_test_instructions: { value: { text: null } },
+		completion_message: { value: { text: null } },
 		platform_guide: { value: { file_path: null } },
 		analytics_link: { value: { url: null } }
 	};
@@ -150,6 +152,53 @@ describe('Organization Settings - load()', () => {
 		});
 
 		await expect(load(mockEvent({ fetch: fetchMock }))).rejects.toMatchObject({ status: 500 });
+	});
+});
+
+describe('Organization Settings - load() normalization of pre_test_instructions & completion_message', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('passes through non-null text values unchanged', async () => {
+		const settings = defaultSettings() as Record<string, unknown>;
+		settings.pre_test_instructions = { value: { text: '<p>Read carefully</p>' } };
+		settings.completion_message = { value: { text: '<p>Thank you!</p>' } };
+
+		const fetchMock = vi.fn().mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ settings })
+		});
+
+		const result = (await load(mockEvent({ fetch: fetchMock }))) as any;
+		expect(result.form.data.pre_test_instructions.value.text).toBe('<p>Read carefully</p>');
+		expect(result.form.data.completion_message.value.text).toBe('<p>Thank you!</p>');
+	});
+
+	it('falls back to null for missing pre_test_instructions from old backend', async () => {
+		const settings = defaultSettings() as Record<string, unknown>;
+		delete settings.pre_test_instructions;
+
+		const fetchMock = vi.fn().mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ settings })
+		});
+
+		const result = (await load(mockEvent({ fetch: fetchMock }))) as any;
+		expect(result.form.data.pre_test_instructions.value.text).toBeNull();
+	});
+
+	it('falls back to null for missing completion_message from old backend', async () => {
+		const settings = defaultSettings() as Record<string, unknown>;
+		delete settings.completion_message;
+
+		const fetchMock = vi.fn().mockResolvedValueOnce({
+			ok: true,
+			json: async () => ({ settings })
+		});
+
+		const result = (await load(mockEvent({ fetch: fetchMock }))) as any;
+		expect(result.form.data.completion_message.value.text).toBeNull();
 	});
 });
 
@@ -252,5 +301,30 @@ describe('Organization Settings - actions.save', () => {
 		expect(sentBody.settings.platform_nomenclature.mode).toBe('custom');
 		expect(sentBody.settings.platform_nomenclature.value.tests).toBe('Exams');
 		expect(sentBody.settings.platform_nomenclature.value.user).toBe('Member');
+	});
+
+	it('PUTs pre_test_instructions and completion_message in payload', async () => {
+		const body = defaultSettings() as Record<string, any>;
+		body.test_timings.value.start_time = '09:00';
+		body.test_timings.value.end_time = '17:00';
+		body.pre_test_instructions = { value: { text: '<p>Read carefully</p>' } };
+		body.completion_message = { value: { text: '<p>Thank you!</p>' } };
+
+		const request = new Request('http://localhost', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ ...body, __superform_id: 'x' })
+		});
+		const fetchMock = vi.fn().mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+		try {
+			await actions.save!(mockEvent({ fetch: fetchMock, request }));
+		} catch {
+			/* expected redirect */
+		}
+
+		const sentBody = JSON.parse(fetchMock.mock.calls[0][1].body);
+		expect(sentBody.settings.pre_test_instructions.value.text).toBe('<p>Read carefully</p>');
+		expect(sentBody.settings.completion_message.value.text).toBe('<p>Thank you!</p>');
 	});
 });

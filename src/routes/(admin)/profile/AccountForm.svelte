@@ -5,7 +5,10 @@
 	import type { ProfileSchema } from './schema';
 	import Settings from '@lucide/svelte/icons/settings';
 
-	let { form }: { form: SuperForm<Infer<ProfileSchema>> } = $props();
+	let {
+		form,
+		organizationName = null
+	}: { form: SuperForm<Infer<ProfileSchema>>; organizationName?: string | null } = $props();
 
 	const { form: formData } = form;
 </script>
@@ -63,6 +66,21 @@
 						disabled
 					/>
 				</div>
+
+				{#if organizationName}
+					<div class="flex flex-col gap-1.5">
+						<label for="organisation-field" class="text-sm font-medium">
+							Organisation
+							<span class="text-muted-foreground font-normal">(Managed by your organisation admin)</span>
+						</label>
+						<Input
+							id="organisation-field"
+							class="disabled:bg-background"
+							value={organizationName}
+							disabled
+						/>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

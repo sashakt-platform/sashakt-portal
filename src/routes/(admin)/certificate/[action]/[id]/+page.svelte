@@ -59,7 +59,7 @@
 				<div class="flex items-center gap-3 m-4">
 					<a
 						href={resolve('/certificate')}
-						class="hover:bg-muted rounded-lg border p-2"
+						class="hover:bg-muted rounded-lg border border-border p-2"
 						aria-label={`Back to ${term('certificates', 'lower')}`}
 					>
 						<ArrowLeft size={20} />
@@ -75,7 +75,7 @@
 
 		<div class="bg-background">
 			<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
-				<div class="bg-card rounded-2xl border">
+				<div class="bg-card rounded-2xl border border-border">
 					<div class="border-border flex items-center gap-5 rounded-t-2xl border-b p-8">
 						<span class="bg-brand-subtle shrink-0 rounded-lg p-2">
 							<Settings class="text-primary h-4 w-4 sm:h-5 sm:w-5" />

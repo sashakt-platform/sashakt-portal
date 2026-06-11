@@ -214,6 +214,7 @@
 			selectedRowIds={selectedTestIds}
 			onAction={handleBatchAction}
 			onClearSelection={handleClearSelection}
+			entityLabel={data?.is_template ? term('test_template') : term('test')}
 		/>
 	{/snippet}
 

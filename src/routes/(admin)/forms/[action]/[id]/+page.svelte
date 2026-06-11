@@ -281,34 +281,35 @@
 
 <form method="POST" action="?/save" use:enhance class="flex min-h-screen flex-col">
 	<div class="flex-1 overflow-auto">
-		<div class="mx-auto flex flex-col gap-6 px-6 py-8 md:px-10">
-			<!-- Header -->
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-3">
-					<a
-						href={resolve('/forms/')}
-						aria-label={`Back to ${term('forms', 'lower')}`}
-						class="text-foreground hover:bg-accent rounded-md p-1.5 transition-colors"
-					>
-						<ArrowLeft class="h-5 w-5" />
-					</a>
-					<h1 class="text-2xl font-bold">
-						{isEditMode ? `Edit ${term('form')}` : `Create ${term('form')}`}
-					</h1>
-				</div>
-
-				<div class="flex items-center gap-3">
-					<Button
-						type="button"
-						class="bg-primary"
-						disabled={!$formData.name?.trim()}
-						onclick={submit}
-					>
-						Save
-					</Button>
-				</div>
+		<!-- Header -->
+		<div class="bg-card flex items-center justify-between px-12 py-8 md:px-10">
+			<div class="flex items-center gap-3">
+				<a
+					href={resolve('/forms/')}
+					aria-label={`Back to ${term('forms', 'lower')}`}
+					class="hover:bg-muted rounded-lg border p-2"
+				>
+					<ArrowLeft class="h-5 w-5" />
+				</a>
+				<h1 class="text-2xl font-bold">
+					{isEditMode ? `Edit ${term('form')}` : `Create ${term('form')}`}
+				</h1>
 			</div>
 
+			<div class="flex items-center gap-3">
+				<Button
+					type="button"
+					class="bg-primary"
+					disabled={!$formData.name?.trim()}
+					onclick={submit}
+				>
+					Save
+				</Button>
+			</div>
+		</div>
+		<hr class="border-border" />
+
+		<div class="mx-auto flex flex-col gap-6 bg-background px-6 py-8 md:px-10">
 			<!-- Primary Details Card -->
 			<div class="border-border bg-card rounded-lg border">
 				<div class="border-border flex items-center gap-3 border-b px-6 py-4">
@@ -346,16 +347,20 @@
 						</div>
 					</div>
 
-					<div class="flex items-center gap-3">
-						<Label class="font-semibold">{term('form')} Status</Label>
-						<span
-							class="text-sm {$formData.is_active
-								? 'text-primary font-medium'
-								: 'text-muted-foreground'}"
-						>
-							{$formData.is_active ? 'Active' : 'Inactive'}
-						</span>
-						<Switch id="is_active" name="is_active" bind:checked={$formData.is_active} />
+					<div class="grid grid-cols-2 gap-6">
+						<div class="flex items-center justify-between">
+							<Label class="flex-none font-semibold">{term('form')} Status</Label>
+							<div class="flex items-center gap-3">
+								<span
+									class="text-sm {$formData.is_active
+										? 'text-primary font-medium'
+										: 'text-muted-foreground'}"
+								>
+									{$formData.is_active ? 'Active' : 'Inactive'}
+								</span>
+								<Switch id="is_active" name="is_active" bind:checked={$formData.is_active} />
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

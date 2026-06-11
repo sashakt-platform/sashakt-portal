@@ -281,7 +281,7 @@
 			<div class="bg-border mx-2 h-6 w-px"></div>
 
 			<div class="flex items-center gap-2">
-				<span class="text-muted-foreground text-sm">Required</span>
+				<span class="text-sm {isRequired ? 'text-primary font-medium' : 'text-muted-foreground'}">Required</span>
 				<Switch checked={isRequired} onCheckedChange={handleRequiredToggle} />
 			</div>
 		</div>
@@ -362,13 +362,7 @@
 		<!-- Options for select/radio/multi_select -->
 		{#if needsOptions}
 			<div class="border-border flex flex-col gap-3 border-t pt-4">
-				<div class="flex items-center justify-between">
-					<Label class="font-semibold">Options</Label>
-					<Button type="button" variant="outline" size="sm" onclick={addOption}>
-						<Plus class="mr-1 h-4 w-4" />
-						Add Option
-					</Button>
-				</div>
+				<Label class="font-semibold">Options</Label>
 
 				{#if options.length === 0}
 					<p class="text-muted-foreground text-sm">Add at least one option for this field type.</p>
@@ -408,6 +402,14 @@
 						{/each}
 					</div>
 				{/if}
+
+				<button
+					type="button"
+					class="border-border text-muted-foreground hover:border-primary hover:text-primary flex w-full items-center justify-center rounded-lg border-2 border-dashed py-3 text-sm font-medium transition-colors"
+					onclick={addOption}
+				>
+					Add Row
+				</button>
 			</div>
 		{/if}
 

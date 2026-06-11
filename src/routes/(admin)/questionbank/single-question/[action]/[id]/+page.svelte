@@ -238,14 +238,21 @@
 	}
 
 	if (questionData?.tags?.length) {
-		$formData.tag_ids = questionData.tags.map((tag) => {
-			const tagName = tag.name;
-			const tagTypeName = tag.tag_type?.name;
-			return {
-				id: String((tag as { id: string | number }).id),
-				name: tagTypeName ? `${tagName} (${tagTypeName})` : tagName
-			};
+		$formData.tag_ids = questionData.tags.map((tag) => ({
+			id: String((tag as { id: string | number }).id),
+			name: tag.name
+		}));
+
+		const tagTypeMap = new Map<string, { id: string; name: string }>();
+		(questionData.tags as any[]).forEach((tag: any) => {
+			if (tag?.tag_type?.id) {
+				tagTypeMap.set(String(tag.tag_type.id), {
+					id: String(tag.tag_type.id),
+					name: tag.tag_type.name
+				});
+			}
 		});
+		$formData.tag_type_ids = Array.from(tagTypeMap.values());
 	}
 
 	if (questionData && !questionData.marking_scheme) {
@@ -325,7 +332,11 @@
 			: {}
 	);
 
-	let selectedTagTypes = $state<{ id: string; name: string }[]>([]);
+	let selectedTagTypes = $state<{ id: string; name: string }[]>($formData.tag_type_ids || []);
+
+	$effect(() => {
+		$formData.tag_type_ids = selectedTagTypes;
+	});
 	let openQuestionTypeDialog = $state(!questionData);
 	let showUnsavedDialog = $state(false);
 

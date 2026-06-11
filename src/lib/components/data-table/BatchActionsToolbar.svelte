@@ -7,6 +7,7 @@
 		selectedCount: number;
 		selectedRows: T[];
 		selectedRowIds: string[];
+		entityLabel?: string;
 		actions?: Array<{
 			id: string;
 			label: string;
@@ -22,6 +23,7 @@
 		selectedCount,
 		selectedRows,
 		selectedRowIds,
+		entityLabel = 'item',
 		actions = [
 			{
 				id: 'delete',
@@ -48,7 +50,7 @@
 		<div class="flex items-center gap-1">
 			<span class="text-primary text-sm font-medium">
 				{selectedCount}
-				{selectedCount !== 1 ? 'items' : 'item'} selected
+				{selectedCount !== 1 ? `${entityLabel}s` : entityLabel} selected
 			</span>
 			<span class="text-muted-foreground mx-1">|</span>
 			<div class="flex items-center gap-2">

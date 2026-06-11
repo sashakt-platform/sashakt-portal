@@ -37,7 +37,7 @@
 	}: ListingPageLayoutProps = $props();
 </script>
 
-<div>
+<div class="flex min-h-full flex-col">
 	<!-- Page Header -->
 	<div class="bg-card">
 		<div class="mx-4 flex flex-col gap-4 py-4 sm:mx-10 sm:flex-row sm:gap-0">
@@ -81,8 +81,8 @@
 		{@render emptyState()}
 	{:else}
 		<!-- Content Section -->
-		<div class="bg-background">
-			<div class="mx-4 mt-6 flex flex-col gap-8 sm:mx-8 sm:mt-10">
+		<div class="flex flex-1 flex-col bg-background">
+			<div class="mx-4 mt-6 flex flex-1 flex-col gap-8 pb-6 sm:mx-8 sm:mt-10">
 				<!-- Toolbar (always shown if present, e.g., batch actions) -->
 				{#if toolbar}
 					{@render toolbar()}

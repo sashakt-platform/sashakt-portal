@@ -1,8 +1,7 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import CircleCheck from '@lucide/svelte/icons/circle-check';
+	import Check from '@lucide/svelte/icons/check';
 	import Download from '@lucide/svelte/icons/download';
-	import CircleX from '@lucide/svelte/icons/circle-x';
 	import Upload from '@lucide/svelte/icons/upload';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -90,8 +89,8 @@
 <div class="mx-4 sm:mx-6 md:mx-10">
 	<!-- Header -->
 	<div class="mt-6 mb-6 flex items-center gap-3 sm:mt-10">
-		<a href={resolve('/questionbank')} class="text-foreground hover:text-foreground/80">
-			<ArrowLeft size={24} />
+		<a href={resolve('/questionbank')} class="hover:bg-muted rounded-lg border p-2">
+			<ArrowLeft size={20} />
 		</a>
 		<h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Bulk Upload Questions</h2>
 	</div>
@@ -142,25 +141,29 @@
 			>
 				{#if $message}
 					<!-- Result state (inline) -->
+					{@const hasErrors = Number($message.failed_questions) > 0}
 					<div class="flex w-full max-w-lg flex-col items-center gap-4">
-						{#if $message.failed_questions}
-							<div
-								class="flex h-14 w-14 items-center justify-center rounded-full"
-								style="background-color: hsl(var(--error-subtle));"
-							>
-								<CircleX class="text-destructive" size={28} />
+						{#if hasErrors}
+							<div class="bg-destructive flex h-10 w-10 items-center justify-center rounded-full">
+								<X class="text-destructive-foreground" size={24} />
 							</div>
-							<h3 class="text-xl font-bold">Bulk upload error</h3>
+							<h3 class="text-xl font-bold">File upload error</h3>
 						{:else}
 							<div
-								class="flex h-14 w-14 items-center justify-center rounded-full"
-								style="background-color: hsl(var(--success-subtle));"
+								class="flex h-12 w-12 items-center justify-center rounded-full"
+								style="background-color: hsl(var(--success-bold));"
 							>
-								<CircleCheck style="color: hsl(var(--success-bold));" size={28} />
+								<Check class="text-primary-foreground" size={24} />
 							</div>
-							<h3 class="text-xl font-bold">Bulk upload successful</h3>
+							<h3 class="text-xl font-bold">File upload successful</h3>
 						{/if}
-						<p class="text-muted-foreground text-sm">{$message.message}</p>
+						<p class="text-muted-foreground text-sm">
+							{#if hasErrors}
+								{$message.message}
+							{:else}
+								You can view and edit the uploaded questions in the Question Bank.
+							{/if}
+						</p>
 
 						<!-- Upload Summary -->
 						<div class="w-full max-w-sm overflow-hidden rounded-2xl border text-left text-sm">
@@ -169,18 +172,18 @@
 							>
 								Upload Summary
 							</div>
-							<div class="flex justify-between px-4 py-3 font-medium">
+							<div class="flex justify-between bg-card px-4 py-3 font-medium">
 								<span>Total rows</span>
 								<span>{$message.uploaded_questions}</span>
 							</div>
 							<div class="mx-4 border-b"></div>
-							<div class="flex justify-between px-4 py-3 font-medium">
-								<span>Validated rows</span>
+							<div class="flex justify-between bg-card px-4 py-3 font-medium">
+								<span>Valid rows</span>
 								<span>{$message.success_questions}</span>
 							</div>
 							<div class="mx-4 border-b"></div>
 							<div
-								class="flex justify-between px-4 py-3 font-medium {$message.failed_questions
+								class="flex justify-between bg-card px-4 py-3 font-medium {hasErrors
 									? 'text-destructive'
 									: ''}"
 							>
@@ -189,7 +192,7 @@
 							</div>
 						</div>
 
-						{#if $message.failed_questions}
+						{#if hasErrors}
 							<div class="mt-2 flex gap-3">
 								{#if $message.error_log?.startsWith('data:text/csv;base64')}
 									<a href={$message.error_log} download="error_report.csv">
@@ -199,7 +202,6 @@
 									</a>
 								{/if}
 								<Button
-									variant="destructive"
 									onclick={() => {
 										$message = undefined;
 										clearFile();

@@ -315,7 +315,7 @@
 	<div class="relative flex justify-end">
 		<button
 			type="button"
-			class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm transition-colors"
+			class="text-primary hover:text-primary/80 inline-flex items-center gap-1 text-sm transition-colors"
 			onclick={() => (showDropdown = !showDropdown)}
 		>
 			<Paperclip size={14} />

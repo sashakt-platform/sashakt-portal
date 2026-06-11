@@ -26,10 +26,8 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { resolve } from '$app/paths';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { useTerms, type NomenclatureKey } from '$lib/nomenclature';
-	import LogoutDialog from '$lib/components/LogoutDialog.svelte';
 
 	type MenuItem = {
 		termKey: NomenclatureKey;
@@ -90,21 +88,10 @@
 		)
 	);
 
-	let showLogoutDialog = $state(false);
-
 	function handleMenuClick() {
 		if (sidebar.isMobile) {
 			sidebar.setOpenMobile(false);
 		}
-	}
-
-	function handleLogoutClick() {
-		showLogoutDialog = true;
-	}
-
-	function confirmLogout() {
-		showLogoutDialog = false;
-		goto(resolve('/logout'), { invalidateAll: true });
 	}
 </script>
 
@@ -240,15 +227,22 @@
 			</Sidebar.MenuItem>
 			<Sidebar.MenuItem class="m-1">
 				<Sidebar.MenuButton
-					onclick={handleLogoutClick}
+					onclick={() => handleMenuClick()}
 					class="text-destructive hover:bg-destructive/10 hover:text-destructive"
 				>
-					<LogOut />
-					<span>Logout</span>
+					{#snippet child({ props })}
+						<a
+							href={resolve('/logout')}
+							data-sveltekit-preload-data="off"
+							data-sveltekit-preload-code="off"
+							{...props}
+						>
+							<LogOut />
+							<span>Logout</span>
+						</a>
+					{/snippet}
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Footer>
 </Sidebar.Root>
-
-<LogoutDialog bind:open={showLogoutDialog} onConfirm={confirmLogout} />

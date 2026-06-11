@@ -26,8 +26,10 @@
 	import LogOut from '@lucide/svelte/icons/log-out';
 	import ChevronsLeft from '@lucide/svelte/icons/chevrons-left';
 	import { resolve } from '$app/paths';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { useTerms, type NomenclatureKey } from '$lib/nomenclature';
+	import LogoutDialog from '$lib/components/LogoutDialog.svelte';
 
 	type MenuItem = {
 		termKey: NomenclatureKey;
@@ -88,10 +90,21 @@
 		)
 	);
 
+	let showLogoutDialog = $state(false);
+
 	function handleMenuClick() {
 		if (sidebar.isMobile) {
 			sidebar.setOpenMobile(false);
 		}
+	}
+
+	function handleLogoutClick() {
+		showLogoutDialog = true;
+	}
+
+	function confirmLogout() {
+		showLogoutDialog = false;
+		goto(resolve('/logout'), { invalidateAll: true });
 	}
 </script>
 
@@ -213,7 +226,10 @@
 				<Sidebar.Separator class="my-2" />
 			{/if}
 			<Sidebar.MenuItem class="m-1">
-				<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+				<Sidebar.MenuButton
+					isActive={page.url.pathname === resolve('/profile')}
+					onclick={() => handleMenuClick()}
+				>
 					{#snippet child({ props })}
 						<a href={resolve('/profile')} {...props}>
 							<User />
@@ -224,22 +240,15 @@
 			</Sidebar.MenuItem>
 			<Sidebar.MenuItem class="m-1">
 				<Sidebar.MenuButton
-					onclick={() => handleMenuClick()}
+					onclick={handleLogoutClick}
 					class="text-destructive hover:bg-destructive/10 hover:text-destructive"
 				>
-					{#snippet child({ props })}
-						<a
-							href={resolve('/logout')}
-							data-sveltekit-preload-data="off"
-							data-sveltekit-preload-code="off"
-							{...props}
-						>
-							<LogOut />
-							<span>Logout</span>
-						</a>
-					{/snippet}
+					<LogOut />
+					<span>Logout</span>
 				</Sidebar.MenuButton>
 			</Sidebar.MenuItem>
 		</Sidebar.Menu>
 	</Sidebar.Footer>
 </Sidebar.Root>
+
+<LogoutDialog bind:open={showLogoutDialog} onConfirm={confirmLogout} />

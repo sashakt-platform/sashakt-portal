@@ -226,7 +226,9 @@
 			<a href={page.url.pathname + '/new'}>
 				<Button
 					variant="outline"
-					class="border-primary text-primary bg-card font-semibold"
+					class="{canReadTestTemplate
+						? `border-primary text-primary bg-card font-semibold`
+						: `border-primary text-primary-foreground bg-primary font-semibold`}}"
 				>
 					<Plus />{canReadTestTemplate ? 'Create Manually' : `Create New ${term('test')}`}
 				</Button>

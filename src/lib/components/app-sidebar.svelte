@@ -213,7 +213,10 @@
 				<Sidebar.Separator class="my-2" />
 			{/if}
 			<Sidebar.MenuItem class="m-1">
-				<Sidebar.MenuButton onclick={() => handleMenuClick()}>
+				<Sidebar.MenuButton
+					isActive={page.url.pathname === resolve('/profile')}
+					onclick={() => handleMenuClick()}
+				>
 					{#snippet child({ props })}
 						<a href={resolve('/profile')} {...props}>
 							<User />

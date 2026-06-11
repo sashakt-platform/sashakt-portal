@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { deserialize } from '$app/forms';
-	import { dragHandle, dragHandleZone } from 'svelte-dnd-action';
+	import { dragHandle } from 'svelte-dnd-action';
 	import { Input } from '$lib/components/ui/input';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import Label from '$lib/components/ui/label/label.svelte';
@@ -364,39 +364,40 @@
 			<div class="border-border flex flex-col gap-3 border-t pt-4">
 				<Label class="font-semibold">Options</Label>
 
-				{#if options.length > 0}
-					<div
-						class="flex flex-col gap-2"
-						use:dragHandleZone={{ items: options, flipDurationMs: 150 }}
-						onconsider={(e) => (options = e.detail.items)}
-						onfinalize={(e) => {
-							options = e.detail.items;
-							saveField();
-						}}
-					>
+				{#if options.length === 0}
+					<p class="text-muted-foreground text-sm">Add at least one option for this field type.</p>
+				{:else}
+					<div class="flex flex-col gap-2">
 						{#each options as option, idx (option.id ?? idx)}
 							<div class="flex items-center gap-2">
-								<span class="text-muted-foreground w-5 shrink-0 text-center text-sm font-medium">
-									{String.fromCharCode(65 + idx)}
-								</span>
-								<span use:dragHandle aria-label="drag to reorder option" class="cursor-grab">
-									<GripVertical class="text-muted-foreground h-4 w-4" />
-								</span>
 								<Input
 									value={option.label}
 									oninput={(e) => updateOptionLabel(idx, e.currentTarget.value)}
 									onblur={saveField}
-									placeholder={`Option ${String.fromCharCode(65 + idx)}`}
+									placeholder="Option label"
 									class="flex-1"
 								/>
-								<button
+								<Input
+									value={option.value}
+									oninput={(e) => {
+										options = options.map((opt, i) =>
+											i === idx ? { ...opt, value: e.currentTarget.value } : opt
+										);
+									}}
+									onblur={saveField}
+									class="flex-1"
+									placeholder="Value"
+								/>
+								<Button
 									type="button"
-									class="text-muted-foreground hover:text-destructive shrink-0 rounded p-1 transition-colors"
+									variant="ghost"
+									size="sm"
+									class="text-destructive"
 									aria-label="Remove option"
 									onclick={() => removeOption(idx)}
 								>
 									<Trash2 class="h-4 w-4" />
-								</button>
+								</Button>
 							</div>
 						{/each}
 					</div>

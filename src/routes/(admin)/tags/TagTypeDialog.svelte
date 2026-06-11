@@ -39,7 +39,7 @@
 	const title = $derived(
 		mode === 'create' ? `Create ${term('tag_type')}` : `Edit ${term('tag_type')}`
 	);
-	const buttonText = $derived(mode === 'create' ? 'Save' : 'Save changes');
+	const buttonText = $derived(mode === 'create' ? `Create ${term('tag_type')}` : 'Save changes');
 	const action = $derived(mode === 'create' ? '?/createTagType' : '?/updateTagType');
 </script>
 
@@ -48,6 +48,7 @@
 		<Dialog.Header>
 			<Dialog.Title>{title}</Dialog.Title>
 		</Dialog.Header>
+		<hr class="-mx-6 border-border" />
 		<form
 			method="POST"
 			{action}
@@ -63,21 +64,28 @@
 			{#if mode === 'edit' && tagType}
 				<input type="hidden" name="id" value={tagType.id} />
 			{/if}
-			<div class="flex flex-col gap-4">
-				<div class="flex flex-col gap-2">
-					<Label for="tag-type-name">Name</Label>
-					<Input id="tag-type-name" name="name" bind:value={name} required />
+			<div class="flex flex-col gap-5 pt-2 pb-2">
+				<div class="flex flex-col gap-3">
+					<Label for="tag-type-name">{term('tag_type')} name</Label>
+					<Input
+						id="tag-type-name"
+						name="name"
+						bind:value={name}
+						placeholder="E.g., Difficulty Level"
+						required
+					/>
 				</div>
-				<div class="flex flex-col gap-2">
-					<Label for="tag-type-description">Description</Label>
+				<div class="flex flex-col gap-3">
+					<Label for="tag-type-description">{term('tag_type')} description</Label>
 					<Textarea
 						id="tag-type-description"
 						name="description"
 						bind:value={description}
+						placeholder="Optional — helps others understand what this tag type is for"
 						rows={3}
 					/>
 				</div>
-				<Button type="submit" class="w-full" disabled={!name.trim() || submitting}>
+				<Button type="submit" class="mt-4 w-full" disabled={!name.trim() || submitting}>
 					{buttonText}
 				</Button>
 			</div>

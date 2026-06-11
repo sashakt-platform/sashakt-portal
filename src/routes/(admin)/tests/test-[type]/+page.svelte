@@ -214,6 +214,7 @@
 			selectedRowIds={selectedTestIds}
 			onAction={handleBatchAction}
 			onClearSelection={handleClearSelection}
+			entityLabel={data?.is_template ? term('test_template') : term('test')}
 		/>
 	{/snippet}
 
@@ -224,7 +225,12 @@
 			>
 		{:else if !data?.is_template && canCreate(data.user, 'test')}
 			<a href={page.url.pathname + '/new'}>
-				<Button class="font-semibold">
+				<Button
+					variant="outline"
+					class="{canReadTestTemplate
+						? `border-primary text-primary bg-card font-semibold`
+						: `border-primary text-primary-foreground bg-primary font-semibold`}}"
+				>
 					<Plus />{canReadTestTemplate ? 'Create Manually' : `Create New ${term('test')}`}
 				</Button>
 			</a>

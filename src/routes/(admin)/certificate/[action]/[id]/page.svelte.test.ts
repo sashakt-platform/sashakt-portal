@@ -2,6 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import CertificateFormPage from './+page.svelte';
+import { superForm } from 'sveltekit-superforms';
+import { zod4Client } from 'sveltekit-superforms/adapters';
+import { createCertificateSchema, editCertificateSchema } from './schema.js';
 
 vi.mock('sveltekit-superforms', () => ({
 	superForm: vi.fn((data) => ({
@@ -22,13 +25,36 @@ vi.mock('sveltekit-superforms', () => ({
 			},
 			set: () => {},
 			update: () => {}
-		}
+		},
+		enhance: () => ({})
 	}))
 }));
 
 vi.mock('sveltekit-superforms/adapters', () => ({
 	zod4Client: vi.fn()
 }));
+
+vi.mock('./schema.js', () => ({
+	createCertificateSchema: 'createSchema',
+	editCertificateSchema: 'editSchema',
+	certificateSchema: 'createSchema'
+}));
+
+function makeFormStore(values: Record<string, unknown>, errors: Record<string, string> = {}) {
+	vi.mocked(superForm).mockImplementationOnce(() => ({
+		form: {
+			subscribe: (fn: (v: unknown) => void) => { fn(values); return () => {}; },
+			set: () => {},
+			update: () => {}
+		},
+		errors: {
+			subscribe: (fn: (v: unknown) => void) => { fn(errors); return () => {}; },
+			set: () => {},
+			update: () => {}
+		},
+		enhance: () => ({})
+	}));
+}
 
 const addModeData = {
 	form: { valid: false, data: { name: '', description: '', url: '', is_active: true } },
@@ -98,5 +124,92 @@ describe('CertificateFormPage', () => {
 		expect(nameInput).toHaveValue('Test');
 		expect(urlInput).toBeInTheDocument();
 		expect(urlInput).toHaveValue('https://example.com');
+	});
+
+	it('disables Save when name is empty but URL is present', () => {
+		makeFormStore({ name: '', url: 'https://example.com', description: '', is_active: true });
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+	});
+
+	it('disables Save when URL is empty but name is present', () => {
+		makeFormStore({ name: 'My Cert', url: '', description: '', is_active: true });
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+	});
+
+	it('disables Save when name is whitespace only', () => {
+		makeFormStore({ name: '   ', url: 'https://example.com', description: '', is_active: true });
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByRole('button', { name: /save/i })).toBeDisabled();
+	});
+
+	// --- is_active status text ---
+
+	it('shows "Active" status text when is_active is true', () => {
+		makeFormStore({ name: 'Cert', url: 'https://x.com', description: '', is_active: true });
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByText('Active')).toBeInTheDocument();
+	});
+
+	it('shows "Inactive" status text when is_active is false', () => {
+		makeFormStore({ name: 'Cert', url: 'https://x.com', description: '', is_active: false });
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByText('Inactive')).toBeInTheDocument();
+	});
+
+	// --- validation error messages ---
+
+	it('shows name error message when errors.name is set', () => {
+		makeFormStore(
+			{ name: '', url: '', description: '', is_active: true },
+			{ name: 'Certificate name is required' }
+		);
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByText('Certificate name is required')).toBeInTheDocument();
+	});
+
+	it('shows URL error message when errors.url is set', () => {
+		makeFormStore(
+			{ name: 'Cert', url: 'not-a-url', description: '', is_active: true },
+			{ url: 'Please enter a valid URL' }
+		);
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByText('Please enter a valid URL')).toBeInTheDocument();
+	});
+
+	// --- section heading & description field ---
+
+	it('renders "Certificate Details" section heading', () => {
+		render(CertificateFormPage, { data: addModeData });
+		expect(screen.getByText('Certificate Details')).toBeInTheDocument();
+	});
+
+	it('renders description textarea', () => {
+		const { container } = render(CertificateFormPage, { data: addModeData });
+		expect(container.querySelector('textarea[name="description"]')).toBeInTheDocument();
+	});
+
+	it('pre-populates description textarea in edit mode', () => {
+		const dataWithDesc = {
+			...editModeData,
+			certificate: { name: 'Test', description: 'Some desc', url: 'https://example.com', is_active: true }
+		};
+		makeFormStore({ name: 'Test', description: 'Some desc', url: 'https://example.com', is_active: true });
+		const { container } = render(CertificateFormPage, { data: dataWithDesc });
+		const textarea = container.querySelector('textarea[name="description"]') as HTMLTextAreaElement;
+		expect(textarea).toHaveValue('Some desc');
+	});
+
+	// --- correct validator selected ---
+
+	it('passes createCertificateSchema to zod4Client in add mode', () => {
+		render(CertificateFormPage, { data: addModeData });
+		expect(vi.mocked(zod4Client)).toHaveBeenCalledWith(createCertificateSchema);
+	});
+
+	it('passes editCertificateSchema to zod4Client in edit mode', () => {
+		render(CertificateFormPage, { data: editModeData });
+		expect(vi.mocked(zod4Client)).toHaveBeenCalledWith(editCertificateSchema);
 	});
 });

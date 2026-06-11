@@ -45,6 +45,7 @@ export const questionSchema = z.object({
 	district_ids: z.array(z.string()).default([]),
 	block_ids: z.array(z.string()).default([]),
 	tag_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	tag_type_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	is_active: z.boolean().default(true)
 });
 

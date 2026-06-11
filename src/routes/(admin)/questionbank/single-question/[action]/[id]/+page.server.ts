@@ -121,11 +121,13 @@ export const actions: Actions = {
 			});
 		}
 
-		const transformedFormData = {
+		const transformedFormData: Record<string, any> = {
 			...form.data,
 			state_ids: form.data.state_ids.map((s) => s.id),
 			tag_ids: form.data.tag_ids.map((t) => t.id)
 		};
+		// tag_type_ids is UI-only state for filtering the tag picker; never sent to the backend.
+		delete transformedFormData.tag_type_ids;
 
 		if (params.id === 'new') {
 			const response = await fetch(`${BACKEND_URL}/questions/`, {

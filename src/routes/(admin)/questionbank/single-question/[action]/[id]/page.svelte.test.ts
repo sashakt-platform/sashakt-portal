@@ -2967,3 +2967,75 @@ describe('Single Question Page - Matrix Number Question Type', () => {
 		});
 	});
 });
+
+describe('Single Question Page - tag_type pre-population on edit', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('shows the tag type badge when editing a question whose tag belongs to a tag_type', () => {
+		const questionData = {
+			question_text: 'What is gravity?',
+			question_type: QuestionTypeEnum.SingleChoice,
+			options: [
+				{ id: 1, key: 'A', value: 'A force' },
+				{ id: 2, key: 'B', value: 'An energy' }
+			],
+			correct_answer: [1],
+			is_mandatory: false,
+			is_active: true,
+			tags: [{ id: 5, name: 'Physics', tag_type: { id: '10', name: 'Subject' } }]
+		};
+		render(SingleQuestionPage, { data: { ...baseData, questionData } as any });
+		expect(screen.getByText('Subject')).toBeInTheDocument();
+	});
+
+	it('shows multiple tag type badges when tags belong to different tag_types', () => {
+		const questionData = {
+			question_text: 'What is gravity?',
+			question_type: QuestionTypeEnum.SingleChoice,
+			options: [],
+			correct_answer: [],
+			is_mandatory: false,
+			is_active: true,
+			tags: [
+				{ id: 5, name: 'Physics', tag_type: { id: '10', name: 'Subject' } },
+				{ id: 6, name: 'Science', tag_type: { id: '20', name: 'Domain' } }
+			]
+		};
+		render(SingleQuestionPage, { data: { ...baseData, questionData } as any });
+		expect(screen.getByText('Subject')).toBeInTheDocument();
+		expect(screen.getByText('Domain')).toBeInTheDocument();
+	});
+
+	it('deduplicates the tag type badge when multiple tags share the same tag_type', () => {
+		const questionData = {
+			question_text: 'What is gravity?',
+			question_type: QuestionTypeEnum.SingleChoice,
+			options: [],
+			correct_answer: [],
+			is_mandatory: false,
+			is_active: true,
+			tags: [
+				{ id: 5, name: 'Physics', tag_type: { id: '10', name: 'Subject' } },
+				{ id: 6, name: 'Chemistry', tag_type: { id: '10', name: 'Subject' } }
+			]
+		};
+		render(SingleQuestionPage, { data: { ...baseData, questionData } as any });
+		expect(screen.getAllByText('Subject')).toHaveLength(1);
+	});
+
+	it('shows no tag type badge when tag has no tag_type', () => {
+		const questionData = {
+			question_text: 'What is gravity?',
+			question_type: QuestionTypeEnum.SingleChoice,
+			options: [],
+			correct_answer: [],
+			is_mandatory: false,
+			is_active: true,
+			tags: [{ id: 5, name: 'Physics' }]
+		};
+		render(SingleQuestionPage, { data: { ...baseData, questionData } as any });
+		expect(screen.queryByText('Subject')).not.toBeInTheDocument();
+	});
+});

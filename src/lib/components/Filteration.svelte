@@ -154,7 +154,7 @@
 			</Button>
 		{/snippet}
 	</Popover.Trigger>
-	<Popover.Content class="w-fit p-0 ">
+	<Popover.Content class="w-(--radix-popover-trigger-width) min-w-50 max-w-100 p-0">
 		<Command.Root>
 			<Command.Input
 				placeholder={'Search ' + pluralLabel + '...'}
@@ -192,11 +192,12 @@
 					>
 						<CheckIcon
 							class={cn(
+								'shrink-0',
 								!(items ?? []).some((s: Filter) => String(s.id) === String(item.id)) &&
 									'text-transparent'
 							)}
 						/>
-						{item.name}
+						<span class="min-w-0 truncate" title={item.name}>{item.name}</span>
 					</Command.Item>
 				{/each}
 			</Command.List>

@@ -37,16 +37,12 @@ function makeForm(data: { name: string; description?: string }) {
 
 const createData = {
 	action: 'add' as const,
-	form: makeForm({ name: '', description: '' }),
-	entityType: null,
-	currentUser: { id: 1 }
+	form: makeForm({ name: '', description: '' })
 };
 
 const editData = {
 	action: 'edit' as const,
-	form: makeForm({ name: 'CLF', description: 'Community Level Federation' }),
-	entityType: { name: 'CLF', description: 'Community Level Federation' },
-	currentUser: { id: 1 }
+	form: makeForm({ name: 'CLF', description: 'Community Level Federation' })
 };
 
 describe('EntityForm', () => {

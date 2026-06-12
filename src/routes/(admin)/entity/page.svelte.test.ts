@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen,  } from '@testing-library/svelte';
+import { render, screen, within } from '@testing-library/svelte';
 import EntityListingPage from './+page.svelte';
 import { canCreate, } from '$lib/utils/permissions.js';
 
@@ -85,7 +85,7 @@ const sampleItems = [
 
 describe('Entity Listing Page', () => {
 	beforeEach(() => {
-		vi.clearAllMocks();
+		vi.resetAllMocks();
 		(page as any).url = new URL('http://localhost/entity');
 	});
 
@@ -112,7 +112,8 @@ describe('Entity Listing Page', () => {
 		it('shows "Create Entity" button inside empty state when user has create permission', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
 			render(EntityListingPage, { data: makeData([]) } as any);
-			expect(screen.getAllByRole('link', { name: /create entity/i }).length).toBeGreaterThan(0);
+			const emptyStateRegion = screen.getByText('No entities yet').closest('div') as HTMLElement;
+			expect(within(emptyStateRegion).getByRole('link', { name: /create entity/i })).toBeInTheDocument();
 		});
 
 		it('does not show create button inside empty state when user lacks create permission', () => {

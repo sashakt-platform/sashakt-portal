@@ -57,6 +57,6 @@
 </div>
 
 <form id="profile-form" method="POST" action="?/save" use:enhance>
-	<AccountForm {form} organizationName={data.organizationName} />
+	<AccountForm {form} />
 	<ChangePassword {form} />
 </form>

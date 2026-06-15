@@ -7,10 +7,9 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { profileSchema } from './schema.js';
 
-export const load: PageServerLoad = async ({ fetch, locals }) => {
+export const load: PageServerLoad = async ({ fetch }) => {
 	const token = getSessionTokenCookie();
 	let userData = null;
-	let organizationName: string | null = null;
 
 	// get current user data
 	try {
@@ -33,29 +32,9 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 		userData = null;
 	}
 
-	if (locals.user?.organization_id) {
-		try {
-			const orgResponse = await fetch(`${BACKEND_URL}/organization/${locals.user.organization_id}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`
-				}
-			});
-
-			if (orgResponse.ok) {
-				const orgData = await orgResponse.json();
-				organizationName = orgData.name ?? null;
-			}
-		} catch {
-			
-		}
-	}
-
 	return {
 		form: await superValidate(zod4(profileSchema)),
-		currentUser: userData,
-		organizationName
+		currentUser: userData
 	};
 };
 

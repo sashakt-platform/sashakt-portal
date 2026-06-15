@@ -255,7 +255,7 @@
 						<h2 class="mt-5 text-xl font-bold text-foreground sm:text-2xl">
 							No {term('test_templates', 'lower')} yet
 						</h2>
-						<p class="mt-2 max-w-md text-center text-sm text-subtle-foreground">
+						<p class="mt-2 max-w-md text-center text-sm text-muted-foreground">
 							Create your first {term('test_template', 'lower')} to get started. {term(
 								'test_templates'
 							)} let you define question sets, scoring rules, and {term('test', 'lower')} configurations

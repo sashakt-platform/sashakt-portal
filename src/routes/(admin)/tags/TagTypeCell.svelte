@@ -12,7 +12,12 @@
 		onEdit,
 		onDelete
 	}: {
-		tagType: { id: number | string; name: string; description?: string };
+		tagType: {
+			id: number | string;
+			name: string;
+			description?: string;
+			tags?: { id: number | string; name: string }[];
+		};
 		canEdit?: boolean;
 		canDelete?: boolean;
 		onEdit?: (tagType: { id: number | string; name: string; description?: string }) => void;
@@ -22,7 +27,14 @@
 
 <div class="group flex items-start justify-between">
 	<div>
-		<div class="font-semibold">{tagType.name}</div>
+		<div class="font-semibold">
+			{tagType.name}
+			{#if tagType.tags !== undefined}
+				<span class="ml-1 text-muted-foreground font-normal">
+					({tagType.tags.length})
+				</span>
+			{/if}
+		</div>
 		{#if tagType.description}
 			<div class="text-muted-foreground text-sm">{tagType.description}</div>
 		{/if}

@@ -39,7 +39,7 @@
 	const title = $derived(
 		mode === 'create' ? `Create ${term('tag_type')}` : `Edit ${term('tag_type')}`
 	);
-	const buttonText = $derived(mode === 'create' ? `Create ${term('tag_type')}` : 'Save changes');
+	const buttonText = $derived(mode === 'create' ? 'Save' : 'Save changes');
 	const action = $derived(mode === 'create' ? '?/createTagType' : '?/updateTagType');
 </script>
 
@@ -66,7 +66,7 @@
 			{/if}
 			<div class="flex flex-col gap-5 pt-2 pb-2">
 				<div class="flex flex-col gap-3">
-					<Label for="tag-type-name">{term('tag_type')} name</Label>
+					<Label for="tag-type-name">Name</Label>
 					<Input
 						id="tag-type-name"
 						name="name"
@@ -76,7 +76,7 @@
 					/>
 				</div>
 				<div class="flex flex-col gap-3">
-					<Label for="tag-type-description">{term('tag_type')} description</Label>
+					<Label for="tag-type-description">Description</Label>
 					<Textarea
 						id="tag-type-description"
 						name="description"

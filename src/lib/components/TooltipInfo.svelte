@@ -25,7 +25,7 @@
 	<Popover.Trigger
 		aria-label={label}
 		aria-describedby={tooltipId}
-		class="focus-visible:ring-primary text-muted-foreground hover:text-foreground mt-3 inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded focus-visible:ring-2 focus-visible:outline-none"
+		class="focus-visible:ring-primary text-muted-foreground hover:text-foreground inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded focus-visible:ring-2 focus-visible:outline-none"
 	>
 		<Info class="h-8 w-8" />
 	</Popover.Trigger>

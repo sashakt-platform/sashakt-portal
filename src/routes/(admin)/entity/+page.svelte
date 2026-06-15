@@ -151,7 +151,7 @@
 		{#if noEntitiesCreatedYet}
 			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
 				<div
-					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card"
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border border-border bg-card"
 				>
 					<div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-xl">
 						<Boxes class="text-primary h-7 w-7" />

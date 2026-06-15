@@ -187,7 +187,7 @@
 		{#if noQuestionCreatedYet}
 			<div class="mx-4 mt-4 sm:mx-8 md:mx-10">
 				<div
-					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card"
+					class="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center rounded-2xl border border-border bg-card"
 				>
 					<h2 class="text-xl font-bold text-foreground sm:text-2xl">Create your first question</h2>
 					<p class="mt-2 text-sm text-subtle-foreground">Choose a method to get started</p>
@@ -204,7 +204,9 @@
 								<h3 class="mt-5 text-center text-base font-semibold text-foreground">
 									Create Question
 								</h3>
-								<p class="mt-1 text-center text-sm text-subtle-foreground">Create questions from scratch.</p>
+								<p class="mt-1 text-center text-sm text-subtle-foreground">
+									Create questions from scratch.
+								</p>
 							</a>
 
 							<a
@@ -214,7 +216,9 @@
 								<div class="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-xl">
 									<FileSpreadsheet class="text-primary h-6 w-6" />
 								</div>
-								<h3 class="mt-5 text-center text-base font-semibold text-foreground">Bulk Upload</h3>
+								<h3 class="mt-5 text-center text-base font-semibold text-foreground">
+									Bulk Upload
+								</h3>
 								<p class="mt-1 text-center text-sm text-subtle-foreground">
 									Upload multiple questions at once.
 								</p>

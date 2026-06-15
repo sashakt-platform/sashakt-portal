@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { actions } from './+page.server';
+import { load, actions } from './+page.server';
+import { superValidate } from 'sveltekit-superforms';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { setFlash } from 'sveltekit-flash-message/server';
+import { fail } from '@sveltejs/kit';
 
 // Mock environment variables
 vi.mock('$env/static/private', () => ({
@@ -62,6 +66,55 @@ vi.mock('@sveltejs/kit', () => ({
 		throw err;
 	})
 }));
+
+vi.mock('sveltekit-superforms/adapters', () => ({
+	zod4: vi.fn(() => ({}))
+}));
+
+describe('load — permission checks based on params.action', () => {
+	const mockFetch = vi.fn();
+
+	beforeEach(() => {
+		global.fetch = mockFetch;
+		mockFetch.mockResolvedValue({
+			ok: true,
+			json: async () => ({ items: [] })
+		});
+		vi.clearAllMocks();
+	});
+
+	it('calls requirePermission with CREATE_FORM when action is "add"', async () => {
+		await load({ params: { action: 'add', id: 'new' } } as any);
+
+		const { requirePermission, PERMISSIONS } = await import('$lib/utils/permissions.js');
+		expect(requirePermission).toHaveBeenCalledWith(expect.anything(), PERMISSIONS.CREATE_FORM);
+	});
+
+	it('calls requirePermission with UPDATE_FORM when action is "edit"', async () => {
+		mockFetch
+			.mockResolvedValueOnce({ ok: true, json: async () => ({ items: [] }) })
+			.mockResolvedValueOnce({ ok: true, json: async () => ({ id: '42', name: 'My Form' }) });
+
+		await load({ params: { action: 'edit', id: '42' } } as any);
+
+		const { requirePermission, PERMISSIONS } = await import('$lib/utils/permissions.js');
+		expect(requirePermission).toHaveBeenCalledWith(expect.anything(), PERMISSIONS.UPDATE_FORM);
+	});
+
+	it('calls requirePermission with DELETE_FORM when action is "delete"', async () => {
+		await load({ params: { action: 'delete', id: '42' } } as any);
+
+		const { requirePermission, PERMISSIONS } = await import('$lib/utils/permissions.js');
+		expect(requirePermission).toHaveBeenCalledWith(expect.anything(), PERMISSIONS.DELETE_FORM);
+	});
+
+	it('does not call requirePermission for an unknown action', async () => {
+		await load({ params: { action: 'view', id: '42' } } as any);
+
+		const { requirePermission } = await import('$lib/utils/permissions.js');
+		expect(requirePermission).not.toHaveBeenCalled();
+	});
+});
 
 describe('actions.addField — fixed token names', () => {
 	const mockFetch = vi.fn();
@@ -227,5 +280,173 @@ describe('actions.addField — fixed token names', () => {
 		} as any);
 
 		expect(result).toEqual({ success: true, id: 99 });
+	});
+});
+
+describe('actions.save', () => {
+	const mockFetch = vi.fn();
+
+	const mockRequest = () =>
+		new Request('http://localhost', { method: 'POST', body: new FormData() });
+
+	beforeEach(() => {
+		global.fetch = mockFetch;
+		mockFetch.mockClear();
+		vi.clearAllMocks();
+	});
+
+	// ── Permissions ───────────────────────────────────────────────────────────
+	describe('permissions', () => {
+		it('calls requirePermission with UPDATE_FORM when action is "edit"', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+			try {
+				await actions.save({
+					request: mockRequest(),
+					params: { action: 'edit', id: '42' },
+					cookies: {} as any
+				} as any);
+			} catch {}
+
+			expect(requirePermission).toHaveBeenCalledWith(
+				expect.objectContaining({ id: 1 }),
+				PERMISSIONS.UPDATE_FORM
+			);
+		});
+
+		it('calls requirePermission with CREATE_FORM when action is "add"', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ id: 99 }) });
+
+			try {
+				await actions.save({
+					request: mockRequest(),
+					params: { action: 'add', id: 'new' },
+					cookies: {} as any
+				} as any);
+			} catch {}
+
+			expect(requirePermission).toHaveBeenCalledWith(
+				expect.objectContaining({ id: 1 }),
+				PERMISSIONS.CREATE_FORM
+			);
+		});
+	});
+
+	// ── Invalid form ──────────────────────────────────────────────────────────
+	describe('invalid form', () => {
+		it('returns fail(400) and sets error flash when form is invalid', async () => {
+			vi.mocked(superValidate).mockResolvedValueOnce({ valid: false, data: {} } as any);
+
+			await actions.save({
+				request: mockRequest(),
+				params: { action: 'add', id: 'new' },
+				cookies: {} as any
+			} as any);
+
+			expect(fail).toHaveBeenCalledWith(400, expect.objectContaining({ form: expect.anything() }));
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'error' }),
+				expect.anything()
+			);
+		});
+	});
+
+	// ── Create new form (id = "new") ──────────────────────────────────────────
+	describe('create new form (id = "new")', () => {
+		it('POSTs to /form/ and redirects to edit page when backend succeeds', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ id: 55 }) });
+
+			try {
+				await actions.save({
+					request: mockRequest(),
+					params: { action: 'add', id: 'new' },
+					cookies: {} as any
+				} as any);
+				expect.fail('Should have redirected');
+			} catch (error: any) {
+				expect(error.location).toBe('/forms/edit/55');
+			}
+
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://localhost:8000/form/',
+				expect.objectContaining({ method: 'POST' })
+			);
+		});
+
+		it('returns fail(500) and sets error flash when POST fails', async () => {
+			mockFetch.mockResolvedValueOnce({
+				ok: false,
+				json: async () => ({ detail: 'Server error' })
+			});
+
+			await actions.save({
+				request: mockRequest(),
+				params: { action: 'add', id: 'new' },
+				cookies: {} as any
+			} as any);
+
+			expect(fail).toHaveBeenCalledWith(500, expect.objectContaining({ form: expect.anything() }));
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'error', message: 'Server error' }),
+				expect.anything()
+			);
+		});
+
+		it('sets organization_id from user onto form.data before sending to backend', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ id: 77 }) });
+
+			try {
+				await actions.save({
+					request: mockRequest(),
+					params: { action: 'add', id: 'new' },
+					cookies: {} as any
+				} as any);
+			} catch {}
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body.organization_id).toBe('org-123');
+		});
+	});
+
+	// ── Update existing form (id != "new") ────────────────────────────────────
+	describe('update existing form (id != "new")', () => {
+		it('PUTs to /form/:id and redirects to /forms when backend succeeds', async () => {
+			mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+			try {
+				await actions.save({
+					request: mockRequest(),
+					params: { action: 'edit', id: '42' },
+					cookies: {} as any
+				} as any);
+				expect.fail('Should have redirected');
+			} catch (error: any) {
+				expect(error.location).toBe('/forms');
+			}
+
+			expect(mockFetch).toHaveBeenCalledWith(
+				'http://localhost:8000/form/42',
+				expect.objectContaining({ method: 'PUT' })
+			);
+		});
+
+		it('returns fail(500) and sets error flash when PUT fails', async () => {
+			mockFetch.mockResolvedValueOnce({
+				ok: false,
+				json: async () => ({ detail: 'Update failed' })
+			});
+
+			await actions.save({
+				request: mockRequest(),
+				params: { action: 'edit', id: '42' },
+				cookies: {} as any
+			} as any);
+
+			expect(fail).toHaveBeenCalledWith(500, expect.objectContaining({ form: expect.anything() }));
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({ type: 'error', message: 'Update failed' }),
+				expect.anything()
+			);
+		});
 	});
 });

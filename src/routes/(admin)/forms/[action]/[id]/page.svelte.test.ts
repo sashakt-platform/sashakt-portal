@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
+import { toast } from 'svelte-sonner';
 import Page from './+page.svelte';
 
 vi.mock('$app/paths', () => ({
@@ -102,7 +103,6 @@ describe('Edit/Create Form Page component', () => {
 		const addFieldButton = screen.getByRole('button', { name: /Add Field/i });
 		await fireEvent.click(addFieldButton);
 
-		const { toast } = await import('svelte-sonner');
 		expect(toast.error).toHaveBeenCalledWith('Please enter a form name first');
 		expect(mockSubmit).not.toHaveBeenCalled();
 	});
@@ -192,7 +192,6 @@ describe('Edit/Create Form Page component', () => {
 		const shortTextButton = screen.getByRole('button', { name: 'Short Text' });
 		await fireEvent.click(shortTextButton);
 
-		const { toast } = await import('svelte-sonner');
 		await waitFor(() => {
 			expect(toast.error).toHaveBeenCalledWith('Failed to add field');
 		});
@@ -267,7 +266,6 @@ describe('Edit/Create Form Page component', () => {
 		expect(parsedField.label).toBe('Field 50 (Copy)');
 		expect(parsedField.name).toBe('field_50_copy');
 
-		const { toast } = await import('svelte-sonner');
 		await waitFor(() => {
 			expect(toast.success).toHaveBeenCalledWith('Field duplicated');
 			expect(screen.getByDisplayValue('Field 50 (Copy)')).toBeInTheDocument();
@@ -326,7 +324,6 @@ describe('Edit/Create Form Page component', () => {
 		const parsedField = JSON.parse(body.get('field') as string);
 		expect(parsedField.field_type).toBe('number');
 
-		const { toast } = await import('svelte-sonner');
 		await waitFor(() => {
 			expect(toast.success).toHaveBeenCalledWith('Field type changed');
 		});

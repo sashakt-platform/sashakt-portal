@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import FieldList from './FieldList.svelte';
@@ -59,12 +59,17 @@ describe('FieldList Component', () => {
 	let onEdit: any;
 	let onDelete: any;
 	let onReorder: any;
+	const originalFetch = global.fetch;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
 		onEdit = vi.fn();
 		onDelete = vi.fn();
 		onReorder = vi.fn();
+	});
+
+	afterEach(() => {
+		global.fetch = originalFetch;
 	});
 
 	it('renders fields and details correctly', () => {

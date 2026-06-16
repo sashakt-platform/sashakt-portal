@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as server from './+page.server';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
+import { zod4 } from 'sveltekit-superforms/adapters';
 import { createCertificateSchema, editCertificateSchema } from './schema.js';
 
 vi.mock('$lib/server/auth.js', () => ({
@@ -38,7 +39,9 @@ vi.mock('$lib/server/nomenclature', () => ({
 
 vi.mock('sveltekit-flash-message/server', () => ({
 	setFlash: vi.fn(),
-	redirect: vi.fn()
+	redirect: vi.fn(() => {
+		throw new Error('redirect');
+	})
 }));
 
 const mockCookies = {
@@ -70,8 +73,6 @@ describe('page.server load function', () => {
 		});
 
 		it('uses createCertificateSchema for add action', async () => {
-			const zod4 = (await import('sveltekit-superforms/adapters')).zod4;
-
 			await server.load({ params: { action: 'add', id: 'new' } } as any);
 
 			expect(zod4).toHaveBeenCalledWith(createCertificateSchema);
@@ -104,7 +105,6 @@ describe('page.server load function', () => {
 
 		it('uses editCertificateSchema for edit action', async () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
-			const zod4 = (await import('sveltekit-superforms/adapters')).zod4;
 
 			await server.load({ params: { action: 'edit', id: '1' } } as any);
 
@@ -360,6 +360,7 @@ describe('page.server delete action', () => {
 			{ type: 'error', message: 'Certificate not found' },
 			mockCookies
 		);
+		expect(redirect).toHaveBeenCalledTimes(1);
 	});
 
 	it('redirects with statusText fallback when delete fails without detail', async () => {
@@ -383,5 +384,6 @@ describe('page.server delete action', () => {
 			{ type: 'error', message: 'Internal Server Error' },
 			mockCookies
 		);
+		expect(redirect).toHaveBeenCalledTimes(1);
 	});
 });

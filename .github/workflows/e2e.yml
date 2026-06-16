@@ -37,9 +37,11 @@ jobs:
         working-directory: core
         run: |
           cp .env.example .env
-          docker compose build backend db
+          docker compose build backend
+          # db must come up first — `prestart` polls for the DB but doesn't
+          # declare it as a dependency, so `up --wait backend` alone hangs.
+          docker compose up -d --wait db
           docker compose up -d --wait backend
-          # Confirm health endpoint responds before continuing
           curl --retry 10 --retry-delay 3 --retry-all-errors \
             --fail http://localhost:8000/api/v1/utils/health-check
 

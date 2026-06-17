@@ -429,7 +429,7 @@ describe('Single Question Route', () => {
 			);
 		});
 
-		it('uses statusText in error flash when POST failure has no detail', async () => {
+		it('falls back to default message in error flash when POST failure has no detail', async () => {
 			mockFetch.mockResolvedValue({
 				ok: false,
 				status: 500,
@@ -463,13 +463,13 @@ describe('Single Question Route', () => {
 				.mockResolvedValueOnce({ ok: true, json: async () => ({}) })
 				.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-			try {
-				await actions.save({
+			await expect(
+				actions.save({
 					request: new Request('http://localhost', { method: 'POST' }),
 					params: { action: 'edit', id: '10' },
 					cookies: mockCookies
-				} as any);
-			} catch {}
+				} as any)
+			).rejects.toThrow('Redirect');
 
 			expect(requirePermission).toHaveBeenCalledWith(
 				expect.objectContaining({ id: 1 }),

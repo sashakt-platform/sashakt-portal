@@ -6,7 +6,7 @@ import type { TMedia } from '$lib/types/media';
 
 const toastErrorMock = vi.fn();
 vi.mock('svelte-sonner', () => ({
-	toast: { error: (...args: any[]) => toastErrorMock(...args) }
+	toast: { error: (...args: unknown[]) => toastErrorMock(...args) }
 }));
 
 function makeImageMedia(url = 'https://example.com/img.png'): TMedia {

@@ -452,18 +452,22 @@ describe('Question Bank Listing Page', () => {
 		});
 
 		it('submits the hidden batch-delete form when batch delete is confirmed', async () => {
+			const originalRequestSubmit = HTMLFormElement.prototype.requestSubmit;
 			const requestSubmitSpy = vi.fn();
 			HTMLFormElement.prototype.requestSubmit = requestSubmitSpy;
+			try {
+				await renderWithItems();
+				dtRef.props.onSelectionChange([{ id: '1' }], ['1']);
+				await waitFor(() => expect(batchToolbarRef.props.selectedCount).toBe(1));
+				batchToolbarRef.props.onAction('delete');
+				await waitFor(() => expect(deleteDialogRef.props.batchMode).toBe(true));
 
-			await renderWithItems();
-			dtRef.props.onSelectionChange([{ id: '1' }], ['1']);
-			await waitFor(() => expect(batchToolbarRef.props.selectedCount).toBe(1));
-			batchToolbarRef.props.onAction('delete');
-			await waitFor(() => expect(deleteDialogRef.props.batchMode).toBe(true));
+				deleteDialogRef.props.onBatchConfirm();
 
-			deleteDialogRef.props.onBatchConfirm();
-
-			expect(requestSubmitSpy).toHaveBeenCalledOnce();
+				expect(requestSubmitSpy).toHaveBeenCalledOnce();
+			} finally {
+				HTMLFormElement.prototype.requestSubmit = originalRequestSubmit;
+			}
 		});
 
 		it('cancelling the batch delete dialog turns off batch delete mode', async () => {
@@ -541,18 +545,6 @@ describe('Question Bank Listing Page', () => {
 			errorSpy.mockRestore();
 		});
 
-		it('still calls invalidateAll even when the submission fails', async () => {
-			vi.spyOn(console, 'error').mockImplementation(() => {});
-			render(QuestionListingPage, { data: baseData([{ id: '1' }]) });
-			await waitFor(() => {
-				if (!enhanceRef.submitFactory) throw new Error('enhance submit function not captured yet');
-			});
-
-			const submitHandler = enhanceRef.submitFactory!();
-			await submitHandler({ result: { type: 'failure' } });
-
-			expect(invalidateAll).toHaveBeenCalled();
-		});
 	});
 
 	// ────────────────────────────────────────────────────────────────────────

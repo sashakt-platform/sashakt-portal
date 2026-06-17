@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen, fireEvent } from '@testing-library/svelte';
+import { render, screen } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import ProfilePage from './+page.svelte';
 
@@ -99,9 +99,7 @@ describe('Profile Page', () => {
 		it('should display user full_name when currentUser is present', () => {
 			render(ProfilePage, { data: userProfileData });
 
-			expect(
-				screen.getByRole('heading', { name: 'Jane Smith' })
-			).toBeInTheDocument();
+			expect(screen.getByRole('heading', { name: 'Jane Smith' })).toBeInTheDocument();
 		});
 
 		it('should display "My Profile" when currentUser is null', () => {

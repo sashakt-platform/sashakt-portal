@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Cookies } from '@sveltejs/kit';
 import { load, actions } from './+page.server';
+import { superValidate } from 'sveltekit-superforms';
+import { redirect } from 'sveltekit-flash-message/server';
 
 function makeCookies(overrides: Partial<Cookies> = {}): Cookies {
 	return {
@@ -200,7 +202,6 @@ describe('Profile Page Server', () => {
 		});
 
 		it('should return fail(400) when form validation fails', async () => {
-			const { superValidate } = await import('sveltekit-superforms');
 			vi.mocked(superValidate).mockResolvedValueOnce({
 				valid: false,
 				data: {},
@@ -335,8 +336,6 @@ describe('Profile Page Server', () => {
 		});
 
 		it('should redirect to /profile with success message on success', async () => {
-			const { redirect } = await import('sveltekit-flash-message/server');
-
 			const request = makeRequest({
 				full_name: 'Jane',
 				email: 'jane@example.com',

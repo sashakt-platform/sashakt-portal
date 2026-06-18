@@ -5,6 +5,8 @@ import {
 	setRefreshTokenCookie,
 	validateSessionToken
 } from '$lib/server/auth.js';
+import type { Redirect } from '@sveltejs/kit';
+import type { PageServerLoadEvent, RequestEvent } from './$types';
 
 vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
@@ -30,11 +32,28 @@ const mockCookies = {
 	serialize: vi.fn()
 };
 
-const makeLoginRequest = (username: string, password: string) =>
-	new Request('http://localhost', {
-		method: 'POST',
-		body: new URLSearchParams({ username, password })
-	});
+const makeLoadEvent = (overrides: Partial<PageServerLoadEvent> = {}): PageServerLoadEvent =>
+	({
+		url: new URL('http://localhost/login'),
+		fetch: vi.fn(),
+		cookies: mockCookies,
+		locals: { organization: null },
+		...overrides
+	}) as unknown as PageServerLoadEvent;
+
+const makeActionEvent = (
+	username: string,
+	password: string,
+	overrides: Partial<RequestEvent> = {}
+): RequestEvent =>
+	({
+		request: new Request('http://localhost', {
+			method: 'POST',
+			body: new URLSearchParams({ username, password })
+		}),
+		cookies: mockCookies,
+		...overrides
+	}) as unknown as RequestEvent;
 
 describe('Login Route', () => {
 	const mockFetch = vi.fn();
@@ -47,35 +66,20 @@ describe('Login Route', () => {
 
 	describe('load()', () => {
 		it('should return loginForm property', async () => {
-			const result = await load({
-				url: new URL('http://localhost/login'),
-				fetch: mockFetch,
-				cookies: mockCookies,
-				locals: { organization: null }
-			} as any);
+			const result = await load(makeLoadEvent({ fetch: mockFetch }));
 
 			expect(result).toHaveProperty('loginForm');
 			expect(result.loginForm).toBeDefined();
 		});
 
 		it('should return organizationData property', async () => {
-			const result = await load({
-				url: new URL('http://localhost/login'),
-				fetch: mockFetch,
-				cookies: mockCookies,
-				locals: { organization: null }
-			} as any);
+			const result = await load(makeLoadEvent({ fetch: mockFetch }));
 
 			expect(result).toHaveProperty('organizationData');
 		});
 
 		it('should initialize form with empty username and password', async () => {
-			const result = await load({
-				url: new URL('http://localhost/login'),
-				fetch: mockFetch,
-				cookies: mockCookies,
-				locals: { organization: null }
-			} as any);
+			const result = await load(makeLoadEvent({ fetch: mockFetch }));
 
 			expect(result.loginForm.data).toEqual({
 				username: '',
@@ -84,12 +88,7 @@ describe('Login Route', () => {
 		});
 
 		it('should return valid supervalidated form object', async () => {
-			const result = await load({
-				url: new URL('http://localhost/login'),
-				fetch: mockFetch,
-				cookies: mockCookies,
-				locals: { organization: null }
-			} as any);
+			const result = await load(makeLoadEvent({ fetch: mockFetch }));
 
 			expect(result.loginForm).toHaveProperty('valid');
 			expect(result.loginForm).toHaveProperty('errors');
@@ -104,12 +103,12 @@ describe('Login Route', () => {
 				json: async () => ({ logo: 'x', name: 'Acme', shortcode: 'acme' })
 			});
 
-			const result = await load({
-				url: new URL('http://localhost/login?organization=acme'),
-				fetch: orgFetch,
-				cookies: mockCookies,
-				locals: { organization: null }
-			} as any);
+			const result = await load(
+				makeLoadEvent({
+					url: new URL('http://localhost/login?organization=acme'),
+					fetch: orgFetch
+				})
+			);
 
 			expect(orgFetch).toHaveBeenCalledWith('http://localhost:8000/organization/public/acme');
 			expect(result.organizationData).toEqual({ logo: 'x', name: 'Acme', shortcode: 'acme' });
@@ -118,23 +117,18 @@ describe('Login Route', () => {
 		it('returns null organizationData when backend returns error', async () => {
 			const orgFetch = vi.fn().mockResolvedValue({ ok: false });
 
-			const result = await load({
-				url: new URL('http://localhost/login?organization=unknown'),
-				fetch: orgFetch,
-				cookies: mockCookies,
-				locals: { organization: null }
-			} as any);
+			const result = await load(
+				makeLoadEvent({
+					url: new URL('http://localhost/login?organization=unknown'),
+					fetch: orgFetch
+				})
+			);
 
 			expect(result.organizationData).toBeNull();
 		});
 
 		it('returns null organizationData when no organization param', async () => {
-			const result = await load({
-				url: new URL('http://localhost/login'),
-				fetch: mockFetch,
-				cookies: mockCookies,
-				locals: { organization: null }
-			} as any);
+			const result = await load(makeLoadEvent({ fetch: mockFetch }));
 
 			expect(result.organizationData).toBeNull();
 		});
@@ -143,12 +137,13 @@ describe('Login Route', () => {
 			const orgData = { logo: 'logo.png', name: 'Acme', shortcode: 'acme' };
 			const orgFetch = vi.fn();
 
-			const result = await load({
-				url: new URL('http://localhost/login?organization=acme'),
-				fetch: orgFetch,
-				cookies: mockCookies,
-				locals: { organization: orgData }
-			} as any);
+			const result = await load(
+				makeLoadEvent({
+					url: new URL('http://localhost/login?organization=acme'),
+					fetch: orgFetch,
+					locals: { organization: orgData } as App.Locals
+				})
+			);
 
 			expect(result.organizationData).toEqual(orgData);
 			expect(orgFetch).not.toHaveBeenCalled();
@@ -157,50 +152,35 @@ describe('Login Route', () => {
 
 	describe('actions.login — form validation', () => {
 		it('should fail with 400 when email is invalid', async () => {
-			const result = await actions.login({
-				request: makeLoginRequest('invalid-email', 'password123'),
-				cookies: mockCookies
-			} as any);
+			const result = await actions.login(makeActionEvent('invalid-email', 'password123'));
 
 			expect(result.status).toBe(400);
 			expect(result.data.form.valid).toBe(false);
 		});
 
 		it('should fail with 400 when email is empty', async () => {
-			const result = await actions.login({
-				request: makeLoginRequest('', 'password123'),
-				cookies: mockCookies
-			} as any);
+			const result = await actions.login(makeActionEvent('', 'password123'));
 
 			expect(result.status).toBe(400);
 			expect(result.data.form.valid).toBe(false);
 		});
 
 		it('should fail with 400 when password is empty', async () => {
-			const result = await actions.login({
-				request: makeLoginRequest('test@example.com', ''),
-				cookies: mockCookies
-			} as any);
+			const result = await actions.login(makeActionEvent('test@example.com', ''));
 
 			expect(result.status).toBe(400);
 			expect(result.data.form.valid).toBe(false);
 		});
 
 		it('should fail with 400 when password is too short', async () => {
-			const result = await actions.login({
-				request: makeLoginRequest('test@example.com', 'short'),
-				cookies: mockCookies
-			} as any);
+			const result = await actions.login(makeActionEvent('test@example.com', 'short'));
 
 			expect(result.status).toBe(400);
 			expect(result.data.form.valid).toBe(false);
 		});
 
 		it('should have validation errors when both fields are invalid', async () => {
-			const result = await actions.login({
-				request: makeLoginRequest('not-an-email', 'abc'),
-				cookies: mockCookies
-			} as any);
+			const result = await actions.login(makeActionEvent('not-an-email', 'abc'));
 
 			expect(result.status).toBe(400);
 			expect(result.data.form.valid).toBe(false);
@@ -222,10 +202,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 			} catch {
 				// Expected redirect
 			}
@@ -252,10 +229,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 			} catch {
 				// Expected redirect
 			}
@@ -274,10 +248,7 @@ describe('Login Route', () => {
 				json: async () => ({ detail: 'Invalid credentials' })
 			});
 
-			const result = await actions.login({
-				request: makeLoginRequest('test@example.com', 'wrongpassword'),
-				cookies: mockCookies
-			} as any);
+			const result = await actions.login(makeActionEvent('test@example.com', 'wrongpassword'));
 
 			expect(result.status).toBe(401);
 			expect(result.data.form.errors.username).toEqual(['Invalid credentials']);
@@ -290,10 +261,7 @@ describe('Login Route', () => {
 				json: async () => ({ detail: 'Account locked' })
 			});
 
-			const result = await actions.login({
-				request: makeLoginRequest('test@example.com', 'password123'),
-				cookies: mockCookies
-			} as any);
+			const result = await actions.login(makeActionEvent('test@example.com', 'password123'));
 
 			expect(result.data.form.errors.username).toEqual(['Account locked']);
 		});
@@ -313,10 +281,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 			} catch {
 				// Expected redirect
 			}
@@ -342,10 +307,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 			} catch {
 				// Expected redirect
 			}
@@ -367,10 +329,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 			} catch {
 				// Expected redirect
 			}
@@ -395,10 +354,7 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 			} catch {
 				// Expected redirect
 			}
@@ -426,14 +382,12 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 				expect.fail('Should have thrown a redirect');
-			} catch (error: any) {
-				expect(error.status).toBe(303);
-				expect(error.location).toBe('/tests/test-session');
+			} catch (error) {
+				const redirect = error as Redirect;
+				expect(redirect.status).toBe(303);
+				expect(redirect.location).toBe('/tests/test-session');
 			}
 		});
 
@@ -452,14 +406,12 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('admin@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('admin@example.com', 'password123'));
 				expect.fail('Should have thrown a redirect');
-			} catch (error: any) {
-				expect(error.status).toBe(303);
-				expect(error.location).toBe('/organisations');
+			} catch (error) {
+				const redirect = error as Redirect;
+				expect(redirect.status).toBe(303);
+				expect(redirect.location).toBe('/organisations');
 			}
 		});
 
@@ -476,13 +428,11 @@ describe('Login Route', () => {
 			});
 
 			try {
-				await actions.login({
-					request: makeLoginRequest('test@example.com', 'password123'),
-					cookies: mockCookies
-				} as any);
+				await actions.login(makeActionEvent('test@example.com', 'password123'));
 				expect.fail('Should have thrown a redirect');
-			} catch (error: any) {
-				expect(error.status).toBe(303);
+			} catch (error) {
+				const redirect = error as Redirect;
+				expect(redirect.status).toBe(303);
 			}
 		});
 	});

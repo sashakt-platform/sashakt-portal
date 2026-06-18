@@ -1,13 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { load, actions } from './+page.server';
-import { setSessionTokenCookie, setRefreshTokenCookie } from '$lib/server/auth.js';
+import {
+	setSessionTokenCookie,
+	setRefreshTokenCookie,
+	validateSessionToken
+} from '$lib/server/auth.js';
 
-// Mock environment variables
 vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
 }));
 
-// Mock auth functions — use importActual so resolveOrganization runs for real
 vi.mock('$lib/server/auth.js', async () => {
 	const actual = await vi.importActual('$lib/server/auth.js');
 	return {
@@ -15,9 +17,24 @@ vi.mock('$lib/server/auth.js', async () => {
 		setSessionTokenCookie: vi.fn(),
 		setRefreshTokenCookie: vi.fn(),
 		setOrganizationCookie: vi.fn(),
-		deleteOrganizationCookie: vi.fn()
+		deleteOrganizationCookie: vi.fn(),
+		validateSessionToken: vi.fn()
 	};
 });
+
+const mockCookies = {
+	set: vi.fn(),
+	get: vi.fn(),
+	delete: vi.fn(),
+	getAll: vi.fn(),
+	serialize: vi.fn()
+};
+
+const makeLoginRequest = (username: string, password: string) =>
+	new Request('http://localhost', {
+		method: 'POST',
+		body: new URLSearchParams({ username, password })
+	});
 
 describe('Login Route', () => {
 	const mockFetch = vi.fn();
@@ -29,11 +46,11 @@ describe('Login Route', () => {
 	});
 
 	describe('load()', () => {
-		it('should return supervalidate form', async () => {
+		it('should return loginForm property', async () => {
 			const result = await load({
 				url: new URL('http://localhost/login'),
 				fetch: mockFetch,
-				cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+				cookies: mockCookies,
 				locals: { organization: null }
 			} as any);
 
@@ -41,11 +58,22 @@ describe('Login Route', () => {
 			expect(result.loginForm).toBeDefined();
 		});
 
-		it('should initialize form with empty values', async () => {
+		it('should return organizationData property', async () => {
 			const result = await load({
 				url: new URL('http://localhost/login'),
 				fetch: mockFetch,
-				cookies: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any);
+
+			expect(result).toHaveProperty('organizationData');
+		});
+
+		it('should initialize form with empty username and password', async () => {
+			const result = await load({
+				url: new URL('http://localhost/login'),
+				fetch: mockFetch,
+				cookies: mockCookies,
 				locals: { organization: null }
 			} as any);
 
@@ -54,28 +82,83 @@ describe('Login Route', () => {
 				password: ''
 			});
 		});
+
+		it('should return valid supervalidated form object', async () => {
+			const result = await load({
+				url: new URL('http://localhost/login'),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any);
+
+			expect(result.loginForm).toHaveProperty('valid');
+			expect(result.loginForm).toHaveProperty('errors');
+			expect(result.loginForm).toHaveProperty('data');
+		});
 	});
 
-	describe('actions.login', () => {
-		it('should fail with 400 when form validation fails', async () => {
-			const mockRequest = new Request('http://localhost', {
-				method: 'POST',
-				body: new URLSearchParams({
-					username: 'invalid-email',
-					password: 'short'
-				})
+	describe('load() with organization param', () => {
+		it('fetches org public data when organization param is provided', async () => {
+			const orgFetch = vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ logo: 'x', name: 'Acme', shortcode: 'acme' })
 			});
 
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
+			const result = await load({
+				url: new URL('http://localhost/login?organization=acme'),
+				fetch: orgFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any);
 
+			expect(orgFetch).toHaveBeenCalledWith('http://localhost:8000/organization/public/acme');
+			expect(result.organizationData).toEqual({ logo: 'x', name: 'Acme', shortcode: 'acme' });
+		});
+
+		it('returns null organizationData when backend returns error', async () => {
+			const orgFetch = vi.fn().mockResolvedValue({ ok: false });
+
+			const result = await load({
+				url: new URL('http://localhost/login?organization=unknown'),
+				fetch: orgFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any);
+
+			expect(result.organizationData).toBeNull();
+		});
+
+		it('returns null organizationData when no organization param', async () => {
+			const result = await load({
+				url: new URL('http://localhost/login'),
+				fetch: mockFetch,
+				cookies: mockCookies,
+				locals: { organization: null }
+			} as any);
+
+			expect(result.organizationData).toBeNull();
+		});
+
+		it('uses cached organization from locals when shortcode matches', async () => {
+			const orgData = { logo: 'logo.png', name: 'Acme', shortcode: 'acme' };
+			const orgFetch = vi.fn();
+
+			const result = await load({
+				url: new URL('http://localhost/login?organization=acme'),
+				fetch: orgFetch,
+				cookies: mockCookies,
+				locals: { organization: orgData }
+			} as any);
+
+			expect(result.organizationData).toEqual(orgData);
+			expect(orgFetch).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('actions.login — form validation', () => {
+		it('should fail with 400 when email is invalid', async () => {
 			const result = await actions.login({
-				request: mockRequest,
+				request: makeLoginRequest('invalid-email', 'password123'),
 				cookies: mockCookies
 			} as any);
 
@@ -83,105 +166,51 @@ describe('Login Route', () => {
 			expect(result.data.form.valid).toBe(false);
 		});
 
-		it('should successfully login with valid credentials', async () => {
-			const mockRequest = new Request('http://localhost', {
-				method: 'POST',
-				body: new URLSearchParams({
-					username: 'test@example.com',
-					password: 'password123'
-				})
-			});
-
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
-
-			// Mock successful backend response
-			mockFetch.mockResolvedValue({
-				ok: true,
-				json: async () => ({
-					access_token: 'mock-access-token',
-					refresh_token: 'mock-refresh-token',
-					expires_in: 3600
-				})
-			});
-
-			try {
-				await actions.login({
-					request: mockRequest,
-					cookies: mockCookies
-				} as any);
-				expect.fail('Should have thrown a redirect');
-			} catch (error: any) {
-				// Should redirect to tests
-				expect(error.status).toBe(303);
-				expect(error.location).toBe('/tests/test-session');
-			}
-
-			// Should set cookies
-			expect(setSessionTokenCookie).toHaveBeenCalledWith(
-				mockCookies,
-				'mock-access-token',
-				expect.any(Date)
-			);
-			expect(setRefreshTokenCookie).toHaveBeenCalledWith(mockCookies, 'mock-refresh-token');
-		});
-
-		it('should fail with 401 when backend returns error', async () => {
-			const mockRequest = new Request('http://localhost', {
-				method: 'POST',
-				body: new URLSearchParams({
-					username: 'test@example.com',
-					password: 'wrongpassword'
-				})
-			});
-
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
-
-			// Mock failed backend response
-			mockFetch.mockResolvedValue({
-				ok: false,
-				status: 401,
-				json: async () => ({
-					detail: 'Invalid credentials'
-				})
-			});
-
+		it('should fail with 400 when email is empty', async () => {
 			const result = await actions.login({
-				request: mockRequest,
+				request: makeLoginRequest('', 'password123'),
 				cookies: mockCookies
 			} as any);
 
-			expect(result.status).toBe(401);
-			expect(result.data.form.errors.username).toEqual(['Invalid credentials']);
+			expect(result.status).toBe(400);
+			expect(result.data.form.valid).toBe(false);
 		});
 
-		it('should call backend with correct credentials', async () => {
-			const mockRequest = new Request('http://localhost', {
-				method: 'POST',
-				body: new URLSearchParams({
-					username: 'test@example.com',
-					password: 'password123'
-				})
-			});
+		it('should fail with 400 when password is empty', async () => {
+			const result = await actions.login({
+				request: makeLoginRequest('test@example.com', ''),
+				cookies: mockCookies
+			} as any);
 
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
+			expect(result.status).toBe(400);
+			expect(result.data.form.valid).toBe(false);
+		});
+
+		it('should fail with 400 when password is too short', async () => {
+			const result = await actions.login({
+				request: makeLoginRequest('test@example.com', 'short'),
+				cookies: mockCookies
+			} as any);
+
+			expect(result.status).toBe(400);
+			expect(result.data.form.valid).toBe(false);
+		});
+
+		it('should have validation errors when both fields are invalid', async () => {
+			const result = await actions.login({
+				request: makeLoginRequest('not-an-email', 'abc'),
+				cookies: mockCookies
+			} as any);
+
+			expect(result.status).toBe(400);
+			expect(result.data.form.valid).toBe(false);
+			expect(result.data.form.errors).toBeDefined();
+		});
+	});
+
+	describe('actions.login — backend call', () => {
+		it('should call backend with correct URL and method', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({ user: { permissions: [] } });
 
 			mockFetch.mockResolvedValue({
 				ok: true,
@@ -194,10 +223,10 @@ describe('Login Route', () => {
 
 			try {
 				await actions.login({
-					request: mockRequest,
+					request: makeLoginRequest('test@example.com', 'password123'),
 					cookies: mockCookies
 				} as any);
-			} catch (error) {
+			} catch {
 				// Expected redirect
 			}
 
@@ -205,92 +234,256 @@ describe('Login Route', () => {
 				'http://localhost:8000/login/access-token/',
 				expect.objectContaining({
 					method: 'POST',
-					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-					body: expect.any(URLSearchParams)
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 				})
 			);
-
-			const callBody = mockFetch.mock.calls[0][1].body as URLSearchParams;
-			expect(callBody.get('username')).toBe('test@example.com');
-			expect(callBody.get('password')).toBe('password123');
 		});
 
-		it('should use default expiry when expires_in is not provided', async () => {
-			const mockRequest = new Request('http://localhost', {
-				method: 'POST',
-				body: new URLSearchParams({
-					username: 'test@example.com',
-					password: 'password123'
-				})
-			});
-
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
+		it('should send credentials as URL-encoded form data', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({ user: { permissions: [] } });
 
 			mockFetch.mockResolvedValue({
 				ok: true,
 				json: async () => ({
-					access_token: 'mock-access-token',
-					refresh_token: 'mock-refresh-token'
-					// No expires_in
+					access_token: 'token',
+					refresh_token: 'refresh',
+					expires_in: 3600
 				})
 			});
 
 			try {
 				await actions.login({
-					request: mockRequest,
+					request: makeLoginRequest('test@example.com', 'password123'),
 					cookies: mockCookies
 				} as any);
-			} catch (error) {
+			} catch {
 				// Expected redirect
 			}
 
-			// Should set cookie with default 24-hour expiry
-			expect(setSessionTokenCookie).toHaveBeenCalled();
+			const callBody = mockFetch.mock.calls[0][1].body as URLSearchParams;
+			expect(callBody.get('username')).toBe('test@example.com');
+			expect(callBody.get('password')).toBe('password123');
 		});
 	});
-});
 
-describe('login load() with organization param', () => {
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
+	describe('actions.login — backend error', () => {
+		it('should fail with 401 when backend returns invalid credentials', async () => {
+			mockFetch.mockResolvedValue({
+				ok: false,
+				status: 401,
+				json: async () => ({ detail: 'Invalid credentials' })
+			});
 
-	it('fetches org public data and returns organizationData (200)', async () => {
-		const mockFetch = vi.fn().mockResolvedValue({
-			ok: true,
-			json: async () => ({ logo: 'x', name: 'Acme', shortcode: 'acme' })
+			const result = await actions.login({
+				request: makeLoginRequest('test@example.com', 'wrongpassword'),
+				cookies: mockCookies
+			} as any);
+
+			expect(result.status).toBe(401);
+			expect(result.data.form.errors.username).toEqual(['Invalid credentials']);
 		});
 
-		const cookies = { get: vi.fn(), set: vi.fn(), delete: vi.fn() };
+		it('should pass backend error detail to form errors', async () => {
+			mockFetch.mockResolvedValue({
+				ok: false,
+				status: 401,
+				json: async () => ({ detail: 'Account locked' })
+			});
 
-		const result = await load({
-			url: new URL('http://localhost/login?organization=acme'),
-			fetch: mockFetch,
-			cookies,
-			locals: { organization: null }
-		} as any);
+			const result = await actions.login({
+				request: makeLoginRequest('test@example.com', 'password123'),
+				cookies: mockCookies
+			} as any);
 
-		expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/organization/public/acme');
-		expect(result.organizationData).toEqual({ logo: 'x', name: 'Acme', shortcode: 'acme' });
+			expect(result.data.form.errors.username).toEqual(['Account locked']);
+		});
 	});
 
-	it('when backend is not ok, returns null organizationData', async () => {
-		const mockFetch = vi.fn().mockResolvedValue({ ok: false });
-		const cookies = { get: vi.fn(), set: vi.fn(), delete: vi.fn() };
+	describe('actions.login — successful login', () => {
+		it('should set session and refresh token cookies', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({ user: { permissions: [] } });
 
-		const result = await load({
-			url: new URL('http://localhost/login?organization=unknown'),
-			fetch: mockFetch,
-			cookies,
-			locals: { organization: null }
-		} as any);
+			mockFetch.mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					access_token: 'mock-access-token',
+					refresh_token: 'mock-refresh-token',
+					expires_in: 3600
+				})
+			});
 
-		expect(result.organizationData).toBeNull();
+			try {
+				await actions.login({
+					request: makeLoginRequest('test@example.com', 'password123'),
+					cookies: mockCookies
+				} as any);
+			} catch {
+				// Expected redirect
+			}
+
+			expect(setSessionTokenCookie).toHaveBeenCalledWith(
+				mockCookies,
+				'mock-access-token',
+				expect.any(Date)
+			);
+			expect(setRefreshTokenCookie).toHaveBeenCalledWith(mockCookies, 'mock-refresh-token');
+		});
+
+		it('should call validateSessionToken with the access token', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({ user: { permissions: [] } });
+
+			mockFetch.mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					access_token: 'my-token-123',
+					refresh_token: 'refresh-456',
+					expires_in: 3600
+				})
+			});
+
+			try {
+				await actions.login({
+					request: makeLoginRequest('test@example.com', 'password123'),
+					cookies: mockCookies
+				} as any);
+			} catch {
+				// Expected redirect
+			}
+
+			expect(validateSessionToken).toHaveBeenCalledWith('my-token-123');
+		});
+
+		it('should use backend expires_in for cookie expiry', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({ user: { permissions: [] } });
+
+			const beforeTime = Date.now();
+			mockFetch.mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					access_token: 'token',
+					refresh_token: 'refresh',
+					expires_in: 7200
+				})
+			});
+
+			try {
+				await actions.login({
+					request: makeLoginRequest('test@example.com', 'password123'),
+					cookies: mockCookies
+				} as any);
+			} catch {
+				// Expected redirect
+			}
+
+			const expiryDate = vi.mocked(setSessionTokenCookie).mock.calls[0][2] as Date;
+			const expectedMin = beforeTime + 7200 * 1000;
+			const expectedMax = expectedMin + 1000;
+			expect(expiryDate.getTime()).toBeGreaterThanOrEqual(expectedMin);
+			expect(expiryDate.getTime()).toBeLessThanOrEqual(expectedMax);
+		});
+
+		it('should use default 24-hour expiry when expires_in is not provided', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({ user: { permissions: [] } });
+
+			const beforeTime = Date.now();
+			mockFetch.mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					access_token: 'token',
+					refresh_token: 'refresh'
+				})
+			});
+
+			try {
+				await actions.login({
+					request: makeLoginRequest('test@example.com', 'password123'),
+					cookies: mockCookies
+				} as any);
+			} catch {
+				// Expected redirect
+			}
+
+			const expiryDate = vi.mocked(setSessionTokenCookie).mock.calls[0][2] as Date;
+			const expected24h = beforeTime + 60 * 60 * 24 * 1000;
+			expect(expiryDate.getTime()).toBeGreaterThanOrEqual(expected24h);
+			expect(expiryDate.getTime()).toBeLessThanOrEqual(expected24h + 1000);
+		});
+	});
+
+	describe('actions.login — redirect', () => {
+		it('should redirect non-super-admin to /tests/test-session', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({
+				user: { permissions: ['read_test'] }
+			});
+
+			mockFetch.mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					access_token: 'token',
+					refresh_token: 'refresh',
+					expires_in: 3600
+				})
+			});
+
+			try {
+				await actions.login({
+					request: makeLoginRequest('test@example.com', 'password123'),
+					cookies: mockCookies
+				} as any);
+				expect.fail('Should have thrown a redirect');
+			} catch (error: any) {
+				expect(error.status).toBe(303);
+				expect(error.location).toBe('/tests/test-session');
+			}
+		});
+
+		it('should redirect super admin to /organisations', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({
+				user: { permissions: ['create_organization'] }
+			});
+
+			mockFetch.mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					access_token: 'token',
+					refresh_token: 'refresh',
+					expires_in: 3600
+				})
+			});
+
+			try {
+				await actions.login({
+					request: makeLoginRequest('admin@example.com', 'password123'),
+					cookies: mockCookies
+				} as any);
+				expect.fail('Should have thrown a redirect');
+			} catch (error: any) {
+				expect(error.status).toBe(303);
+				expect(error.location).toBe('/organisations');
+			}
+		});
+
+		it('should throw redirect with status 303', async () => {
+			vi.mocked(validateSessionToken).mockResolvedValue({ user: { permissions: [] } });
+
+			mockFetch.mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					access_token: 'token',
+					refresh_token: 'refresh',
+					expires_in: 3600
+				})
+			});
+
+			try {
+				await actions.login({
+					request: makeLoginRequest('test@example.com', 'password123'),
+					cookies: mockCookies
+				} as any);
+				expect.fail('Should have thrown a redirect');
+			} catch (error: any) {
+				expect(error.status).toBe(303);
+			}
+		});
 	});
 });

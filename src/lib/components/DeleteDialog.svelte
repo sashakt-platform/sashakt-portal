@@ -86,11 +86,12 @@
 			</AlertDialog.Description>
 		</div>
 
-		<AlertDialog.Footer class="flex-row justify-end gap-2 p-6 pt-0">
+		<AlertDialog.Footer class="flex-row gap-2 p-6 pt-0">
 			{#if batchMode}
 				<AlertDialog.Cancel
 					type="button"
 					onclick={handleClose}
+					class="flex-1 sm:flex-none"
 				>
 					Cancel
 				</AlertDialog.Cancel>
@@ -98,6 +99,7 @@
 				<Button
 					variant="destructive"
 					onclick={handleBatchConfirm}
+					class="flex-1 sm:flex-none"
 				>
 					Delete {selectedCount} {elementName}
 				</Button>
@@ -105,14 +107,20 @@
 				<AlertDialog.Cancel
 					type="button"
 					onclick={handleClose}
+					class="flex-1 sm:flex-none"
 				>
 					Cancel
 				</AlertDialog.Cancel>
 
-				<form {action} method="POST">
+				<form
+					{action}
+					method="POST"
+					class="flex-1 sm:flex-none"
+				>
 					<Button
 						variant="destructive"
 						type="submit"
+						class="w-full"
 					>
 						Delete
 					</Button>

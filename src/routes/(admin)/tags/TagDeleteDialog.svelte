@@ -45,11 +45,19 @@
 			<AlertDialog.Description>{description}</AlertDialog.Description>
 		</div>
 
-		<AlertDialog.Footer class="flex-row justify-end gap-2 p-6 pt-0">
-			<AlertDialog.Cancel type="button" onclick={() => (open = false)}>Cancel</AlertDialog.Cancel>
+		<AlertDialog.Footer class="flex-row gap-2 p-6 pt-0">
+			<AlertDialog.Cancel
+				type="button"
+				onclick={() => (open = false)}
+				class="flex-1 sm:flex-none"
+			>
+				Cancel
+			</AlertDialog.Cancel>
+
 			<form
 				method="POST"
 				{action}
+				class="flex-1 sm:flex-none"
 				use:enhance={() => {
 					return async ({ update }) => {
 						open = false;
@@ -58,7 +66,14 @@
 				}}
 			>
 				<input type="hidden" name="id" value={elementId} />
-				<Button variant="destructive" type="submit">Delete</Button>
+
+				<Button
+					variant="destructive"
+					type="submit"
+					class="w-full"
+				>
+					Delete
+				</Button>
 			</form>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>

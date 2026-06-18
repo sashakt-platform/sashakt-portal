@@ -86,17 +86,36 @@
 			</AlertDialog.Description>
 		</div>
 
-		<AlertDialog.Footer class="p-6 pt-0">
+		<AlertDialog.Footer class="flex-row justify-end gap-2 p-6 pt-0">
 			{#if batchMode}
-				<AlertDialog.Cancel type="button" onclick={handleClose}>Cancel</AlertDialog.Cancel>
-				<Button variant="destructive" onclick={handleBatchConfirm}>
-					Delete {selectedCount}
-					{elementName}
+				<AlertDialog.Cancel
+					type="button"
+					onclick={handleClose}
+				>
+					Cancel
+				</AlertDialog.Cancel>
+
+				<Button
+					variant="destructive"
+					onclick={handleBatchConfirm}
+				>
+					Delete {selectedCount} {elementName}
 				</Button>
 			{:else}
-				<AlertDialog.Cancel type="button" onclick={handleClose}>Cancel</AlertDialog.Cancel>
+				<AlertDialog.Cancel
+					type="button"
+					onclick={handleClose}
+				>
+					Cancel
+				</AlertDialog.Cancel>
+
 				<form {action} method="POST">
-					<Button variant="destructive" type="submit">Delete</Button>
+					<Button
+						variant="destructive"
+						type="submit"
+					>
+						Delete
+					</Button>
 				</form>
 			{/if}
 		</AlertDialog.Footer>

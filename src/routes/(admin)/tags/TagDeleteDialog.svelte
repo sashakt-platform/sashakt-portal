@@ -45,7 +45,7 @@
 			<AlertDialog.Description>{description}</AlertDialog.Description>
 		</div>
 
-		<AlertDialog.Footer class="p-6 pt-0">
+		<AlertDialog.Footer class="flex-row justify-end gap-2 p-6 pt-0">
 			<AlertDialog.Cancel type="button" onclick={() => (open = false)}>Cancel</AlertDialog.Cancel>
 			<form
 				method="POST"

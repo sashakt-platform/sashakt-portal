@@ -29,3 +29,6 @@ coverage/
 
 # AI related plans
 plans/
+
+# Playwright test artifacts
+playwright-report/

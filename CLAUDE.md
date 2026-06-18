@@ -25,9 +25,8 @@ Sashakt Portal is a SvelteKit (Svelte 5) admin frontend for the Sashakt platform
 - `pnpm check` — Run svelte-check for type errors
 - `pnpm lint` — Run prettier + eslint checks
 - `pnpm format` — Auto-format code with prettier
-- `pnpm test:unit` — Run unit tests in watch mode (vitest)
-- `pnpm test:unit -- --run` — Run unit tests once (no watch)
-- `pnpm test:unit -- --run src/path/to/file.test.ts` — Run a single test file
+- `pnpm test:unit` — Run unit tests (vitest; stays in watch mode in interactive terminals, exits in CI)
+- `pnpm test:unit -- src/path/to/file.test.ts` — Run a single test file
 - `pnpm test:e2e` — Run Playwright e2e tests
 - `pnpm test` — Run all tests (unit + e2e)
 

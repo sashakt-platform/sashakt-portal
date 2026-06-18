@@ -86,7 +86,6 @@ describe('load — permission checks based on params.action', () => {
 	it('calls requirePermission with CREATE_FORM when action is "add"', async () => {
 		await load({ params: { action: 'add', id: 'new' } } as any);
 
-		const { requirePermission, PERMISSIONS } = await import('$lib/utils/permissions.js');
 		expect(requirePermission).toHaveBeenCalledWith(expect.anything(), PERMISSIONS.CREATE_FORM);
 	});
 
@@ -97,21 +96,18 @@ describe('load — permission checks based on params.action', () => {
 
 		await load({ params: { action: 'edit', id: '42' } } as any);
 
-		const { requirePermission, PERMISSIONS } = await import('$lib/utils/permissions.js');
 		expect(requirePermission).toHaveBeenCalledWith(expect.anything(), PERMISSIONS.UPDATE_FORM);
 	});
 
 	it('calls requirePermission with DELETE_FORM when action is "delete"', async () => {
 		await load({ params: { action: 'delete', id: '42' } } as any);
 
-		const { requirePermission, PERMISSIONS } = await import('$lib/utils/permissions.js');
 		expect(requirePermission).toHaveBeenCalledWith(expect.anything(), PERMISSIONS.DELETE_FORM);
 	});
 
 	it('does not call requirePermission for an unknown action', async () => {
 		await load({ params: { action: 'view', id: '42' } } as any);
 
-		const { requirePermission } = await import('$lib/utils/permissions.js');
 		expect(requirePermission).not.toHaveBeenCalled();
 	});
 });
@@ -163,7 +159,6 @@ describe('actions.addField — fixed token names', () => {
 			})
 		);
 
-		const { fail } = await import('@sveltejs/kit');
 		expect(fail).toHaveBeenCalledWith(500, {});
 	});
 
@@ -191,7 +186,6 @@ describe('actions.addField — fixed token names', () => {
 			})
 		);
 
-		const { fail } = await import('@sveltejs/kit');
 		expect(fail).toHaveBeenCalledWith(500, {});
 	});
 
@@ -212,7 +206,6 @@ describe('actions.addField — fixed token names', () => {
 			cookies: {} as any
 		} as any);
 
-		const { setFlash } = await import('sveltekit-flash-message/server');
 		expect(setFlash).toHaveBeenCalledWith(
 			expect.objectContaining({ type: 'error', message: backendErrorMsg }),
 			expect.anything()
@@ -255,10 +248,7 @@ describe('actions.addField — fixed token names', () => {
 			cookies: {} as any
 		} as any);
 
-		const { fail } = await import('@sveltejs/kit');
 		expect(fail).toHaveBeenCalledWith(500, {});
-
-		const { setFlash } = await import('sveltekit-flash-message/server');
 		expect(setFlash).toHaveBeenCalledWith(
 			expect.objectContaining({ type: 'error', message: backendErrorMsg }),
 			expect.anything()

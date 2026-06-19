@@ -9,6 +9,14 @@ vi.mock('$env/static/private', () => ({
 describe('Reset Password Route', () => {
 	const mockFetch = vi.fn();
 
+	const mockCookies = {
+		set: vi.fn(),
+		get: vi.fn(),
+		delete: vi.fn(),
+		getAll: vi.fn(),
+		serialize: vi.fn()
+	};
+
 	beforeEach(() => {
 		global.fetch = mockFetch;
 		mockFetch.mockClear();
@@ -54,14 +62,6 @@ describe('Reset Password Route', () => {
 				})
 			});
 
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
-
 			const result = await actions.update({
 				request: mockRequest,
 				cookies: mockCookies
@@ -80,14 +80,6 @@ describe('Reset Password Route', () => {
 					token: 'valid-token'
 				})
 			});
-
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
 
 			const result = await actions.update({
 				request: mockRequest,
@@ -109,14 +101,6 @@ describe('Reset Password Route', () => {
 				})
 			});
 
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
-
 			const result = await actions.update({
 				request: mockRequest,
 				cookies: mockCookies
@@ -135,14 +119,6 @@ describe('Reset Password Route', () => {
 					token: 'valid-token'
 				})
 			});
-
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
 
 			mockFetch.mockResolvedValue({
 				ok: true,
@@ -172,14 +148,6 @@ describe('Reset Password Route', () => {
 					token: 'my-reset-token'
 				})
 			});
-
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
 
 			mockFetch.mockResolvedValue({
 				ok: true,
@@ -218,14 +186,6 @@ describe('Reset Password Route', () => {
 				})
 			});
 
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
-
 			mockFetch.mockResolvedValue({
 				ok: false,
 				status: 400,
@@ -252,14 +212,6 @@ describe('Reset Password Route', () => {
 					token: 'some-token'
 				})
 			});
-
-			const mockCookies = {
-				set: vi.fn(),
-				get: vi.fn(),
-				delete: vi.fn(),
-				getAll: vi.fn(),
-				serialize: vi.fn()
-			};
 
 			mockFetch.mockResolvedValue({
 				ok: false,

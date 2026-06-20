@@ -17,12 +17,12 @@
 <span
 	data-slot="tag-chip"
 	class={cn(
-		'bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-full border border-transparent px-3 py-1 text-xs font-normal transition-colors',
+		'bg-muted text-muted-foreground inline-flex max-w-full items-center gap-1 rounded-full border border-transparent px-3 py-1 text-xs font-normal transition-colors',
 		className
 	)}
 	{...restProps}
 >
-	<span class="truncate">{name}</span>
+	<span class="whitespace-normal break-all">{name}</span>
 	{#if children}
 		{@render children()}
 	{/if}

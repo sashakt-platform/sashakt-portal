@@ -6,45 +6,26 @@ import FormPreviewDialog from './FormPreviewDialog.svelte';
 import type { FormField } from './schema.js';
 
 // Mock child components that fetch data
-vi.mock('$lib/components/StateSelection.svelte', () => ({
-	default: function MockStateSelection(options: any) {
-		const el = document.createElement('div');
-		el.setAttribute('data-testid', 'state-selection');
-		el.textContent = 'State Selection';
-		options?.target?.appendChild(el);
-		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
-	}
-}));
+const {
+	mockStateSelection,
+	mockDistrictSelection,
+	mockBlockSelection,
+	mockEntitySelection
+} = vi.hoisted(() => {
+	const makeMock = () =>
+		vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }));
+	return {
+		mockStateSelection: makeMock(),
+		mockDistrictSelection: makeMock(),
+		mockBlockSelection: makeMock(),
+		mockEntitySelection: makeMock()
+	};
+});
 
-vi.mock('$lib/components/DistrictSelection.svelte', () => ({
-	default: function MockDistrictSelection(options: any) {
-		const el = document.createElement('div');
-		el.setAttribute('data-testid', 'district-selection');
-		el.textContent = 'District Selection';
-		options?.target?.appendChild(el);
-		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
-	}
-}));
-
-vi.mock('$lib/components/BlockSelection.svelte', () => ({
-	default: function MockBlockSelection(options: any) {
-		const el = document.createElement('div');
-		el.setAttribute('data-testid', 'block-selection');
-		el.textContent = 'Block Selection';
-		options?.target?.appendChild(el);
-		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
-	}
-}));
-
-vi.mock('$lib/components/EntitySelection.svelte', () => ({
-	default: function MockEntitySelection(options: any) {
-		const el = document.createElement('div');
-		el.setAttribute('data-testid', 'entity-selection');
-		el.textContent = 'Entity Selection';
-		options?.target?.appendChild(el);
-		return { $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() };
-	}
-}));
+vi.mock('$lib/components/StateSelection.svelte', () => ({ default: mockStateSelection }));
+vi.mock('$lib/components/DistrictSelection.svelte', () => ({ default: mockDistrictSelection }));
+vi.mock('$lib/components/BlockSelection.svelte', () => ({ default: mockBlockSelection }));
+vi.mock('$lib/components/EntitySelection.svelte', () => ({ default: mockEntitySelection }));
 
 function makeField(overrides: Partial<FormField> & { id: number; field_type: string; label: string; name: string }): FormField {
 	return {
@@ -447,58 +428,84 @@ describe('FormPreviewDialog', () => {
 	});
 
 	describe('Location Fields', () => {
-		it('should render label for STATE field type', () => {
+		it('should render StateSelection for STATE field type', () => {
 			const fields = [
 				makeField({ id: 1, field_type: 'state', label: 'State', name: 'state' })
 			];
 
-			const { container } = render(FormPreviewDialog, {
+			render(FormPreviewDialog, {
 				props: { open: true, formName: 'Form', fields }
 			});
 
 			expect(screen.getByText('State')).toBeInTheDocument();
-			expect(container).toBeInTheDocument();
+			expect(mockStateSelection).toHaveBeenCalled();
 		});
 
-		it('should render label for DISTRICT field type', () => {
+		it('should render DistrictSelection for DISTRICT field type', () => {
 			const fields = [
 				makeField({ id: 1, field_type: 'district', label: 'District', name: 'district' })
 			];
 
-			const { container } = render(FormPreviewDialog, {
+			render(FormPreviewDialog, {
 				props: { open: true, formName: 'Form', fields }
 			});
 
 			expect(screen.getByText('District')).toBeInTheDocument();
-			expect(container).toBeInTheDocument();
+			expect(mockDistrictSelection).toHaveBeenCalled();
 		});
 
-		it('should render label for BLOCK field type', () => {
+		it('should render BlockSelection for BLOCK field type', () => {
 			const fields = [
 				makeField({ id: 1, field_type: 'block', label: 'Block', name: 'block' })
 			];
 
-			const { container } = render(FormPreviewDialog, {
+			render(FormPreviewDialog, {
 				props: { open: true, formName: 'Form', fields }
 			});
 
 			expect(screen.getByText('Block')).toBeInTheDocument();
-			expect(container).toBeInTheDocument();
+			expect(mockBlockSelection).toHaveBeenCalled();
+		});
+
+		it('should not render location components for non-location fields', () => {
+			const fields = [
+				makeField({ id: 1, field_type: 'text', label: 'Name', name: 'name' })
+			];
+
+			render(FormPreviewDialog, {
+				props: { open: true, formName: 'Form', fields }
+			});
+
+			expect(mockStateSelection).not.toHaveBeenCalled();
+			expect(mockDistrictSelection).not.toHaveBeenCalled();
+			expect(mockBlockSelection).not.toHaveBeenCalled();
 		});
 	});
 
 	describe('Entity Field', () => {
-		it('should render label for ENTITY field type', () => {
+		it('should render EntitySelection for ENTITY field type', () => {
 			const fields = [
 				makeField({ id: 1, field_type: 'entity', label: 'School', name: 'school', entity_type_id: 3 })
 			];
 
-			const { container } = render(FormPreviewDialog, {
+			render(FormPreviewDialog, {
 				props: { open: true, formName: 'Form', fields }
 			});
 
 			expect(screen.getByText('School')).toBeInTheDocument();
-			expect(container).toBeInTheDocument();
+			expect(mockEntitySelection).toHaveBeenCalled();
+		});
+
+		it('should not render EntitySelection for non-entity fields', () => {
+			const fields = [
+				makeField({ id: 1, field_type: 'text', label: 'Name', name: 'name' })
+			];
+
+			render(FormPreviewDialog, {
+				props: { open: true, formName: 'Form', fields }
+			});
+
+			expect(mockEntitySelection).not.toHaveBeenCalled();
 		});
 	});
 

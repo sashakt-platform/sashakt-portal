@@ -32,6 +32,8 @@
 					id: String(item.id),
 					name: item.name
 				}));
+			} else {
+				entityList = [];
 			}
 		} catch (error) {
 			console.error('Failed to fetch entities:', error);

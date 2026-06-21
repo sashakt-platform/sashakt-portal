@@ -30,9 +30,11 @@
 		onDelete: (fieldId: number) => void;
 		onDuplicate: (field: FormField) => void;
 		onFieldTypeChange: (field: FormField, newType: FormFieldTypeValue) => void;
+		onFieldUpdate?: (field: FormField) => void;
 	}
 
-	let { field, index, entityTypes, onDelete, onDuplicate, onFieldTypeChange }: Props = $props();
+	let { field, index, entityTypes, onDelete, onDuplicate, onFieldTypeChange, onFieldUpdate }: Props =
+		$props();
 
 	// Local editable state — seeded from prop, synced via $effect on prop changes
 	let fieldType = $state(field.field_type);
@@ -151,11 +153,14 @@
 	async function saveField() {
 		if (!field.id || !isValid) return;
 
+		const fieldData = buildFieldData();
+		onFieldUpdate?.(fieldData);
+
 		saveController?.abort();
 		saveController = new AbortController();
 
 		const formData = new FormData();
-		formData.set('field', JSON.stringify(buildFieldData()));
+		formData.set('field', JSON.stringify(fieldData));
 		formData.set('fieldId', String(field.id));
 
 		try {

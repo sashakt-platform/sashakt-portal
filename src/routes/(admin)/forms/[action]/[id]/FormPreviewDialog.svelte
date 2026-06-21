@@ -9,6 +9,7 @@
 	import StateSelection from '$lib/components/StateSelection.svelte';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
 	import BlockSelection from '$lib/components/BlockSelection.svelte';
+	import EntitySelection from '$lib/components/EntitySelection.svelte';
 	import type { FormField } from './schema.js';
 	import { FormFieldType } from './schema.js';
 
@@ -28,12 +29,16 @@
 	let selectedStates = $state<{ id: string; name: string }[]>([]);
 	let selectedDistricts = $state<{ id: string; name: string }[]>([]);
 	let selectedBlocks = $state<{ id: string; name: string }[]>([]);
+	let selectedEntities = $state<{ id: string; name: string }[]>([]);
+	let selectValues = $state<Record<string, string>>({});
 
 	$effect(() => {
 		if (open) {
 			selectedStates = [];
 			selectedDistricts = [];
 			selectedBlocks = [];
+			selectedEntities = [];
+			selectValues = {};
 		}
 	});
 </script>
@@ -57,11 +62,19 @@
 				class="min-h-20 text-sm"
 			/>
 		{:else if field.field_type === FormFieldType.SELECT}
-			<Select.Root type="single">
+			<Select.Root
+				type="single"
+				value={selectValues[field.name]}
+				onValueChange={(v) => {
+					if (v) selectValues[field.name] = v;
+				}}
+			>
 				<Select.Trigger class="h-10 w-full rounded-full px-4 text-sm">
-					<span class="text-muted-foreground"
-						>{field.placeholder ?? `Select ${field.label.toLowerCase()}...`}</span
-					>
+					{#if selectValues[field.name]}
+						<span>{(field.options ?? []).find((o) => o.value === selectValues[field.name])?.label ?? selectValues[field.name]}</span>
+					{:else}
+						<span class="text-muted-foreground">{field.placeholder ?? `Select ${field.label.toLowerCase()}...`}</span>
+					{/if}
 				</Select.Trigger>
 				<Select.Content>
 					{#each field.options ?? [] as opt, idx (idx)}
@@ -130,19 +143,15 @@
 		{:else if field.field_type === FormFieldType.STATE}
 			<StateSelection bind:states={selectedStates} multiple={false} />
 		{:else if field.field_type === FormFieldType.DISTRICT}
-			<DistrictSelection
-				bind:districts={selectedDistricts}
-				{selectedStates}
-				multiple={false}
-			/>
+			<DistrictSelection bind:districts={selectedDistricts} {selectedStates} multiple={false} />
 		{:else if field.field_type === FormFieldType.BLOCK}
 			<BlockSelection bind:blocks={selectedBlocks} {selectedDistricts} multiple={false} />
 		{:else if field.field_type === FormFieldType.ENTITY}
-			<Select.Root type="single">
-				<Select.Trigger class="h-10 w-full rounded-full px-4 text-sm">
-					<span class="text-muted-foreground">Select {field.label.toLowerCase()}...</span>
-				</Select.Trigger>
-			</Select.Root>
+			<EntitySelection
+				bind:entities={selectedEntities}
+				entityTypeId={field.entity_type_id ?? null}
+				multiple={false}
+			/>
 		{:else}
 			<Input
 				type="text"

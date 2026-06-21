@@ -37,6 +37,30 @@ vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
 	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
 }));
 
+const mockTermMap: Record<string, string> = {};
+
+vi.mock('$lib/nomenclature', () => ({
+	useTerms: () => (key: string, casing?: string) => {
+		const label = mockTermMap[key] ?? {
+			tests: 'Tests', test: 'Test', test_templates: 'Test Templates',
+			test_template: 'Test Template', tags: 'Tags', tag: 'Tag',
+			tag_types: 'Tag Types', tag_type: 'Tag Type'
+		}[key] ?? key;
+		if (casing === 'lower') return label.toLowerCase();
+		if (casing === 'upper') return label.toUpperCase();
+		return label;
+	}
+}));
+
+function setCustomNomenclature(overrides: Record<string, string>) {
+	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
+	Object.assign(mockTermMap, overrides);
+}
+
+function resetNomenclature() {
+	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
+}
+
 vi.mock('$lib/components/data-table/index.js', () => ({
 	// The DataTable mock must read `columns` from its props so Svelte 5 evaluates
 	// the lazy $derived(columns) — which is the only trigger for createTestColumns.
@@ -590,6 +614,70 @@ describe('Test Management Listing Page', () => {
 		it('passes enableSelection=true when user can delete test templates and templates exist', async () => {
 			await renderAndCapture(true, true);
 			expect(sortRef.enableSelection).toBe(true);
+		});
+	});
+
+	// ────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		afterEach(() => {
+			resetNomenclature();
+		});
+
+		it('renders custom title for session mode when nomenclature overrides tests', () => {
+			setCustomNomenclature({ tests: 'Assessments', test: 'Assessment' });
+			render(TestListingPage, { data: baseData(false) });
+			expect(screen.getByText('Assessments')).toBeInTheDocument();
+			expect(screen.queryByText('Tests')).not.toBeInTheDocument();
+		});
+
+		it('renders custom title for template mode when nomenclature overrides test_templates', () => {
+			setCustomNomenclature({ test_templates: 'Exam Blueprints', test_template: 'Exam Blueprint' });
+			render(TestListingPage, { data: baseData(true) });
+			expect(screen.getByText('Exam Blueprints')).toBeInTheDocument();
+			expect(screen.queryByText('Test Templates')).not.toBeInTheDocument();
+		});
+
+		it('renders custom search placeholder for session mode', () => {
+			setCustomNomenclature({ tests: 'Assessments' });
+			const items = [{ id: '1', name: 'Test A' }];
+			render(TestListingPage, { data: baseData(false, items) });
+			expect(screen.getByPlaceholderText('Search assessments...')).toBeInTheDocument();
+		});
+
+		it('renders custom search placeholder for template mode', () => {
+			setCustomNomenclature({ test_templates: 'Exam Blueprints' });
+			const items = [{ id: '1', name: 'Template A' }];
+			render(TestListingPage, { data: baseData(true, items) });
+			expect(screen.getByPlaceholderText('Search exam blueprints...')).toBeInTheDocument();
+		});
+
+		it('renders custom empty state text for template mode', () => {
+			setCustomNomenclature({ test_templates: 'Exam Blueprints', test_template: 'Exam Blueprint' });
+			render(TestListingPage, { data: baseData(true, []) });
+			expect(screen.getByText('No exam blueprints yet')).toBeInTheDocument();
+		});
+
+		it('renders custom empty state text for session mode', () => {
+			setCustomNomenclature({ test: 'Assessment' });
+			render(TestListingPage, { data: baseData(false, []) });
+			expect(screen.getByText('Create your first assessment')).toBeInTheDocument();
+		});
+
+		it('renders custom create button text for templates', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			setCustomNomenclature({ test_template: 'Exam Blueprint' });
+			const items = [{ id: '1', name: 'Template A' }];
+			render(TestListingPage, { data: baseData(true, items) });
+			expect(screen.getByText('Create Exam Blueprint')).toBeInTheDocument();
+		});
+
+		it('renders custom "Create New" text when user cannot read test templates', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			vi.mocked(canRead).mockReturnValue(false);
+			setCustomNomenclature({ test: 'Assessment' });
+			const items = [{ id: '1', name: 'Session A' }];
+			render(TestListingPage, { data: baseData(false, items) });
+			expect(screen.getByText('Create New Assessment')).toBeInTheDocument();
 		});
 	});
 });

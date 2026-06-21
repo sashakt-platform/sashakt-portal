@@ -27,6 +27,7 @@ export const load: PageServerLoad = async ({ fetch }) => {
 		}
 
 		userData = await userResponse.json();
+		userData.state_name = userData.states?.[0]?.name ?? '';
 	} catch (error) {
 		console.error('Error fetching user data:', error);
 		userData = null;

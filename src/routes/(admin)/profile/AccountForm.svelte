@@ -63,6 +63,17 @@
 						disabled
 					/>
 				</div>
+				<div class="flex flex-col gap-1.5">
+					<label for="state-field" class="text-sm font-medium">
+						State
+					</label>
+					<Input
+						id="state-field"
+						class="disabled:bg-background"
+						value={$formData.state_name ?? ''}
+						disabled
+					/>
+				</div>
 			</div>
 		</div>
 	</div>

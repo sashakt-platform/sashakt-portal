@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { load } from './+layout.server';
 import { loadOrganizationLayoutSettings } from '$lib/server/organization-layout-settings';
+import { getRequestEvent } from '$app/server';
 
 vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://localhost:8000'
@@ -18,8 +19,6 @@ vi.mock('$app/server', () => ({
 vi.mock('$lib/server/organization-layout-settings', () => ({
 	loadOrganizationLayoutSettings: vi.fn()
 }));
-
-const { getRequestEvent } = await import('$app/server');
 
 describe('Admin Layout Server - load()', () => {
 	const mockFetch = vi.fn();
@@ -81,7 +80,11 @@ describe('Admin Layout Server - load()', () => {
 
 	it('should pass user and organization from locals to the result', async () => {
 		const mockUser = { organization_id: 10, permissions: ['read_test'] };
-		const mockOrganization = { name: 'Acme', shortcode: 'acme', logo: 'https://example.com/logo.png' };
+		const mockOrganization = {
+			name: 'Acme',
+			shortcode: 'acme',
+			logo: 'https://example.com/logo.png'
+		};
 
 		vi.mocked(getRequestEvent).mockReturnValue({
 			locals: {

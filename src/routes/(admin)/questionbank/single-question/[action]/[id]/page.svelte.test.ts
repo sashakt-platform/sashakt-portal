@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent, within } from '@testing-library/svelte';
 import SingleQuestionPage from './+page.svelte';
 import { QuestionTypeEnum } from '$lib/types/question';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('sveltekit-superforms/adapters', () => ({
 	zod4Client: vi.fn((schema: unknown) => schema)
@@ -25,6 +26,11 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	getUserState: vi.fn(() => null),
 	hasLocation: vi.fn(() => false)
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 const baseForm = {
 	question_text: '',
@@ -3037,5 +3043,38 @@ describe('Single Question Page - tag_type pre-population on edit', () => {
 		};
 		render(SingleQuestionPage, { data: { ...baseData, questionData } as any });
 		expect(screen.queryByText('Subject')).not.toBeInTheDocument();
+	});
+});
+
+describe('Single Question Page - Custom nomenclature labels', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		resetNomenclature();
+	});
+
+	it('renders custom tag_types label when nomenclature is overridden', () => {
+		setCustomNomenclature({ tag_types: 'Categories' });
+		render(SingleQuestionPage, { data: baseData as any });
+		expect(screen.getByText('Categories')).toBeInTheDocument();
+		expect(screen.queryByText('Tag Types')).not.toBeInTheDocument();
+	});
+
+	it('renders custom tags label when nomenclature is overridden', () => {
+		setCustomNomenclature({ tags: 'Labels' });
+		render(SingleQuestionPage, { data: baseData as any });
+		expect(screen.getByText('Labels')).toBeInTheDocument();
+	});
+
+	it('applies multiple custom nomenclature overrides simultaneously', () => {
+		setCustomNomenclature({ tag_types: 'Categories', tags: 'Labels' });
+		render(SingleQuestionPage, { data: baseData as any });
+		expect(screen.getByText('Categories')).toBeInTheDocument();
+		expect(screen.getByText('Labels')).toBeInTheDocument();
+	});
+
+	it('falls back to defaults when no custom nomenclature is set', () => {
+		render(SingleQuestionPage, { data: baseData as any });
+		expect(screen.getByText('Tag Types')).toBeInTheDocument();
+		expect(screen.getByText('Tags')).toBeInTheDocument();
 	});
 });

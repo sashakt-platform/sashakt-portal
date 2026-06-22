@@ -2,37 +2,12 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import Dashboard from './+page.svelte';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
-const mockTermMap: Record<string, string> = {};
-
-vi.mock('$lib/nomenclature', () => ({
-	useTerms: () => (key: string, casing?: string) => {
-		const label =
-			mockTermMap[key] ??
-			{
-				dashboard: 'Dashboard',
-				tests: 'Tests',
-				test: 'Test',
-				users: 'Users',
-				user: 'User',
-				question_bank: 'Question Bank',
-				test_templates: 'Test Templates'
-			}[key] ??
-			key;
-		if (casing === 'lower') return label.toLowerCase();
-		if (casing === 'upper') return label.toUpperCase();
-		return label;
-	}
-}));
-
-function setCustomNomenclature(overrides: Record<string, string>) {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-	Object.assign(mockTermMap, overrides);
-}
-
-function resetNomenclature() {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-}
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 describe('Dashboard.svelte', () => {
 	afterEach(() => {

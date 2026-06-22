@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { writable } from 'svelte/store';
 import ImportQuestions from './+page.svelte';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 type MessageData = Record<string, unknown> | undefined;
 
@@ -12,6 +13,11 @@ let capturedOnUpdated: (() => void) | undefined;
 let formMessageStore = writable<MessageData>(undefined);
 
 const mockSubmit = vi.fn(() => capturedOnSubmit?.());
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 vi.mock('sveltekit-superforms', () => ({
 	fileProxy: () => ({
@@ -198,6 +204,39 @@ describe('Import Questions Page', () => {
 			expect(screen.getByText('10')).toBeInTheDocument();
 			expect(screen.getByText('8')).toBeInTheDocument();
 			expect(screen.getByText('2')).toBeInTheDocument();
+		});
+	});
+
+	// ────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		beforeEach(() => {
+			resetNomenclature();
+		});
+
+		async function uploadAndComplete() {
+			render(ImportQuestions, { data: dataWithFile });
+			await fireEvent.click(screen.getByRole('button', { name: /import/i }));
+			await tick();
+			formMessageStore.set({
+				message: 'Done.',
+				uploaded_questions: 10,
+				success_questions: 10,
+				failed_questions: 0
+			});
+			capturedOnUpdated?.();
+			await tick();
+		}
+
+		it('renders custom "Go to" button label when question_bank is overridden', async () => {
+			setCustomNomenclature({ question_bank: 'Knowledge Base' });
+			await uploadAndComplete();
+			expect(screen.getByText('Go to Knowledge Base')).toBeInTheDocument();
+			expect(screen.queryByText('Go to Question Bank')).not.toBeInTheDocument();
+		});
+
+		it('renders default "Go to Question Bank" when no custom nomenclature is set', async () => {
+			await uploadAndComplete();
+			expect(screen.getByText('Go to Question Bank')).toBeInTheDocument();
 		});
 	});
 });

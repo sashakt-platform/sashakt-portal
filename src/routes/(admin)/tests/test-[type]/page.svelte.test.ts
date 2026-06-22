@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/svelte';
 import TestListingPage from './+page.svelte';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/state', () => ({
 	page: {
@@ -37,29 +38,10 @@ vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
 	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
 }));
 
-const mockTermMap: Record<string, string> = {};
-
-vi.mock('$lib/nomenclature', () => ({
-	useTerms: () => (key: string, casing?: string) => {
-		const label = mockTermMap[key] ?? {
-			tests: 'Tests', test: 'Test', test_templates: 'Test Templates',
-			test_template: 'Test Template', tags: 'Tags', tag: 'Tag',
-			tag_types: 'Tag Types', tag_type: 'Tag Type'
-		}[key] ?? key;
-		if (casing === 'lower') return label.toLowerCase();
-		if (casing === 'upper') return label.toUpperCase();
-		return label;
-	}
-}));
-
-function setCustomNomenclature(overrides: Record<string, string>) {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-	Object.assign(mockTermMap, overrides);
-}
-
-function resetNomenclature() {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-}
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 vi.mock('$lib/components/data-table/index.js', () => ({
 	// The DataTable mock must read `columns` from its props so Svelte 5 evaluates

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, within } from '@testing-library/svelte';
 import QuestionListingPage from './+page.svelte';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/state', () => ({
 	page: {
@@ -31,6 +32,11 @@ vi.mock('$app/forms', () => ({
 vi.mock('$lib/constants', () => ({
 	DEFAULT_PAGE_SIZE: 25
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 vi.mock('$lib/utils/permissions.js', () => ({
 	canCreate: vi.fn(() => false),
@@ -133,6 +139,7 @@ describe('Question Bank Listing Page', () => {
 		batchToolbarRef.props = null;
 		deleteDialogRef.props = null;
 		enhanceRef.submitFactory = null;
+		resetNomenclature();
 	});
 
 	// ────────────────────────────────────────────────────────────────────────
@@ -622,6 +629,21 @@ describe('Question Bank Listing Page', () => {
 		it('renders the TagsSelection filter', () => {
 			render(QuestionListingPage, { data: baseData([{ id: '1' }]) });
 			expect(mockTagsSelection).toHaveBeenCalled();
+		});
+	});
+
+	// ────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		it('renders custom page title when question_bank is overridden', () => {
+			setCustomNomenclature({ question_bank: 'Knowledge Base' });
+			render(QuestionListingPage, { data: baseData([{ id: '1' }]) });
+			expect(screen.getByText('Knowledge Base')).toBeInTheDocument();
+			expect(screen.queryByText('Question Bank')).not.toBeInTheDocument();
+		});
+
+		it('falls back to default "Question Bank" when no custom nomenclature is set', () => {
+			render(QuestionListingPage, { data: baseData([{ id: '1' }]) });
+			expect(screen.getByText('Question Bank')).toBeInTheDocument();
 		});
 	});
 });

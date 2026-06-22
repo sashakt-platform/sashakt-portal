@@ -5,6 +5,7 @@ import EntityListingPage from './+page.svelte';
 import { canCreate, } from '$lib/utils/permissions.js';
 
 import { page } from '$app/state';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/state', () => ({
 	page: {
@@ -34,6 +35,11 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	canUpdate: vi.fn(() => false),
 	canDelete: vi.fn(() => false)
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
 	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
@@ -87,6 +93,7 @@ describe('Entity Listing Page', () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
 		(page as any).url = new URL('http://localhost/entity');
+		resetNomenclature();
 	});
 
 	
@@ -196,6 +203,47 @@ describe('Entity Listing Page', () => {
 		});
 	});
 
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		it('renders custom page title when entities is overridden', () => {
+			setCustomNomenclature({ entities: 'Groups' });
+			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			expect(screen.getByText('Groups')).toBeInTheDocument();
+			expect(screen.queryByText('Entities')).not.toBeInTheDocument();
+		});
 
-	
+		it('renders custom create button label when entity is overridden', () => {
+			setCustomNomenclature({ entity: 'Group' });
+			vi.mocked(canCreate).mockReturnValue(true);
+			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			expect(screen.getByRole('link', { name: /create group/i })).toBeInTheDocument();
+		});
+
+		it('renders custom empty state text when entities/entity are overridden', () => {
+			setCustomNomenclature({ entities: 'Groups', entity: 'Group' });
+			render(EntityListingPage, { data: makeData([]) } as any);
+			expect(screen.getByText('No groups yet')).toBeInTheDocument();
+			expect(screen.getByText(/Create your first group/i)).toBeInTheDocument();
+		});
+
+		it('renders custom search placeholder when entities is overridden', () => {
+			setCustomNomenclature({ entities: 'Groups' });
+			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			expect(screen.getByPlaceholderText('Search groups...')).toBeInTheDocument();
+		});
+
+		it('applies multiple custom nomenclature overrides simultaneously', () => {
+			setCustomNomenclature({ entities: 'Clusters', entity: 'Cluster' });
+			vi.mocked(canCreate).mockReturnValue(true);
+			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			expect(screen.getByText('Clusters')).toBeInTheDocument();
+			expect(screen.getByRole('link', { name: /create cluster/i })).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Search clusters...')).toBeInTheDocument();
+		});
+
+		it('falls back to defaults when no custom nomenclature is set', () => {
+			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			expect(screen.getByText('Entities')).toBeInTheDocument();
+		});
+	});
 });

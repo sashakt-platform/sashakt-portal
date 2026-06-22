@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import { tick } from 'svelte';
 import { writable } from 'svelte/store';
 import EntityForm from './EntityForm.svelte';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/paths', () => ({
 	resolve: vi.fn((path: string) => path)
@@ -12,6 +13,11 @@ vi.mock('$app/paths', () => ({
 vi.mock('sveltekit-superforms/adapters', () => ({
 	zod4Client: vi.fn((schema) => schema)
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 const superFormRef = vi.hoisted(() => ({
 	errors: null as ReturnType<typeof writable> | null
@@ -239,6 +245,58 @@ describe('EntityForm', () => {
 			await tick();
 
 			expect(screen.queryByText('Entity name is required')).not.toBeInTheDocument();
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		afterEach(() => {
+			resetNomenclature();
+		});
+
+		it('renders custom heading in add mode when entity is overridden', () => {
+			setCustomNomenclature({ entity: 'Group' });
+			render(EntityForm, { data: createData } as any);
+			expect(screen.getByText('Create Group')).toBeInTheDocument();
+			expect(screen.queryByText('Create Entity')).not.toBeInTheDocument();
+		});
+
+		it('renders custom heading in edit mode when entity is overridden', () => {
+			setCustomNomenclature({ entity: 'Group' });
+			render(EntityForm, { data: editData } as any);
+			expect(screen.getByText('Edit Group')).toBeInTheDocument();
+		});
+
+		it('renders custom back link label when entities is overridden', () => {
+			setCustomNomenclature({ entities: 'Groups' });
+			render(EntityForm, { data: createData } as any);
+			expect(screen.getByRole('link', { name: /back to groups/i })).toBeInTheDocument();
+		});
+
+		it('renders custom name label when entity is overridden', () => {
+			setCustomNomenclature({ entity: 'Group' });
+			render(EntityForm, { data: createData } as any);
+			expect(screen.getByText('Group Name')).toBeInTheDocument();
+			expect(screen.queryByText('Entity Name')).not.toBeInTheDocument();
+		});
+
+		it('renders custom save button label when entity is overridden', () => {
+			setCustomNomenclature({ entity: 'Group' });
+			render(EntityForm, { data: createData } as any);
+			expect(screen.getByRole('button', { name: /save group/i })).toBeInTheDocument();
+		});
+
+		it('renders custom placeholder when entity is overridden', () => {
+			setCustomNomenclature({ entity: 'Group' });
+			render(EntityForm, { data: createData } as any);
+			expect(screen.getByPlaceholderText('Name of this group...')).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Brief description of this group...')).toBeInTheDocument();
+		});
+
+		it('falls back to defaults when no custom nomenclature is set', () => {
+			render(EntityForm, { data: createData } as any);
+			expect(screen.getByText('Create Entity')).toBeInTheDocument();
+			expect(screen.getByText('Entity Name')).toBeInTheDocument();
 		});
 	});
 });

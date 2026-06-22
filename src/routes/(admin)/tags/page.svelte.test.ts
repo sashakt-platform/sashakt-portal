@@ -4,29 +4,12 @@ import TagManagementPage from './+page.svelte';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
-const mockTermMap: Record<string, string> = {};
-
-vi.mock('$lib/nomenclature', () => ({
-	useTerms: () => (key: string, casing?: string) => {
-		const label = mockTermMap[key] ?? {
-			tag_management: 'Tag Management', tags: 'Tags', tag: 'Tag',
-			tag_types: 'Tag Types', tag_type: 'Tag Type'
-		}[key] ?? key;
-		if (casing === 'lower') return label.toLowerCase();
-		if (casing === 'upper') return label.toUpperCase();
-		return label;
-	}
-}));
-
-function setCustomNomenclature(overrides: Record<string, string>) {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-	Object.assign(mockTermMap, overrides);
-}
-
-function resetNomenclature() {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-}
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 const mockData = {
 	user: { id: 1, organization_id: 10, permissions: ['create_tag', 'update_tag', 'delete_tag'] },

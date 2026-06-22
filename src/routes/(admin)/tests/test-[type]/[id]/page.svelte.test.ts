@@ -4,6 +4,7 @@ import { render, screen, fireEvent } from '@testing-library/svelte';
 import { get, writable } from 'svelte/store';
 import TestCreatePage from './+page.svelte';
 import { superForm } from 'sveltekit-superforms';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 // ── Module mocks ─────────────────────────────────────────────────────────────
 
@@ -40,6 +41,11 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	getUserState: vi.fn(() => null),
 	getUserDistrict: vi.fn(() => null)
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -131,6 +137,7 @@ describe('Test Create/Update Page', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		setupSuperFormMock();
+		resetNomenclature();
 	});
 
 	// ── Step header ───────────────────────────────────────────────────────────
@@ -698,6 +705,65 @@ describe('Test Create/Update Page', () => {
 
 			// Still intact after returning to step 1
 			expect(get(formStore).tag_type_ids).toEqual([{ id: '10', name: 'Subject' }]);
+		});
+	});
+
+	// ── Custom nomenclature labels ───────────────────────────────────────────
+
+	describe('Custom nomenclature labels', () => {
+		it('renders custom heading for session mode when test is overridden', () => {
+			setCustomNomenclature({ test: 'Exam' });
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData() });
+			expect(screen.getByText('Create Exam')).toBeInTheDocument();
+			expect(screen.queryByText('Create Test')).not.toBeInTheDocument();
+		});
+
+		it('renders custom heading for template mode when test_template is overridden', () => {
+			setCustomNomenclature({ test_template: 'Exam Blueprint' });
+			setupSuperFormMock({ is_template: true });
+			render(TestCreatePage, { data: baseData({ convertTemplate: false }) });
+			expect(screen.getByText('Create Exam Blueprint')).toBeInTheDocument();
+		});
+
+		it('renders custom step label for test configuration when test is overridden', () => {
+			setCustomNomenclature({ test: 'Assessment' });
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData() });
+			expect(screen.getByText('Assessment Configuration')).toBeInTheDocument();
+			expect(screen.queryByText('Test Configuration')).not.toBeInTheDocument();
+		});
+
+		it('renders custom edit heading when test is overridden and testData is present', () => {
+			setCustomNomenclature({ test: 'Quiz' });
+			setupSuperFormMock();
+			const testData = {
+				id: '42',
+				name: 'Existing',
+				description: '',
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [],
+				random_tag_counts: []
+			};
+			render(TestCreatePage, { data: baseData({ testData }) });
+			expect(screen.getByText('Edit Quiz')).toBeInTheDocument();
+		});
+
+		it('renders custom select template step label when test_template is overridden', () => {
+			setCustomNomenclature({ test_template: 'Exam Blueprint' });
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData({ convertTemplate: true }) });
+			expect(screen.getByText('Select Exam Blueprint')).toBeInTheDocument();
+		});
+
+		it('falls back to defaults when no custom nomenclature is set', () => {
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData() });
+			expect(screen.getByText('Create Test')).toBeInTheDocument();
+			expect(screen.getByText('Test Configuration')).toBeInTheDocument();
 		});
 	});
 });

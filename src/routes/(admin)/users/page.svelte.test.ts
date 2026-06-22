@@ -5,6 +5,7 @@ import UsersListingPage from './+page.svelte';
 import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/navigation', () => ({
 	goto: vi.fn(),
@@ -35,25 +36,10 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	canDelete: vi.fn(() => false)
 }));
 
-const mockTermMap: Record<string, string> = {};
-
-vi.mock('$lib/nomenclature', () => ({
-	useTerms: () => (key: string, casing?: string) => {
-		const label = mockTermMap[key] ?? { users: 'Users', user: 'User' }[key] ?? key;
-		if (casing === 'lower') return label.toLowerCase();
-		if (casing === 'upper') return label.toUpperCase();
-		return label;
-	}
-}));
-
-function setCustomNomenclature(overrides: Record<string, string>) {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-	Object.assign(mockTermMap, overrides);
-}
-
-function resetNomenclature() {
-	Object.keys(mockTermMap).forEach((k) => delete mockTermMap[k]);
-}
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
 	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))

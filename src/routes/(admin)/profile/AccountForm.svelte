@@ -4,15 +4,19 @@
 	import type { SuperForm, Infer } from 'sveltekit-superforms';
 	import type { ProfileSchema } from './schema';
 	import Settings from '@lucide/svelte/icons/settings';
-	import { isStateAdmin, hasAssignedDistricts } from '$lib/utils/permissions';
+	import { isStateAdmin, hasAssignedDistricts, getUserState, getUserDistrict } from '$lib/utils/permissions';
+	import type { User } from '$lib/utils/permissions';
 
 	let {
 		form,
 		currentUser
 	}: {
 		form: SuperForm<Infer<ProfileSchema>>;
-		currentUser: any;
+		currentUser: User | null;
 	} = $props();
+
+	const userState = getUserState(currentUser);
+	const userDistricts = getUserDistrict(currentUser);
 
 	const { form: formData } = form;
 </script>
@@ -70,7 +74,7 @@
 						disabled
 					/>
 				</div>
-				{#if isStateAdmin(currentUser) || hasAssignedDistricts(currentUser)}
+				{#if currentUser && isStateAdmin(currentUser)}
 					<div class="flex flex-col gap-1.5">
 						<label for="state-field" class="text-sm font-medium">
 							State
@@ -78,12 +82,12 @@
 						<Input
 							id="state-field"
 							class="disabled:bg-background"
-							value={currentUser.states?.[0]?.name ?? ''}
+							value={userState?.name ?? ''}
 							disabled
 						/>
 					</div>
 				{/if}
-				{#if hasAssignedDistricts(currentUser)}
+				{#if currentUser && hasAssignedDistricts(currentUser)}
 					<div class="flex flex-col gap-1.5">
 						<label for="district-field" class="text-sm font-medium">
 							District
@@ -91,7 +95,7 @@
 						<Input
 							id="district-field"
 							class="disabled:bg-background"
-							value={currentUser.districts?.[0]?.name ?? ''}
+							value={userDistricts?.map((district) => district.name).join(', ') ?? ''}
 							disabled
 						/>
 					</div>

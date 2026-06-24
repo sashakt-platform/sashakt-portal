@@ -10,7 +10,6 @@ export const profileSchema = z
 			.optional()
 			.refine((val) => !val || PHONE_REGEX.test(val), { error: PHONE_ERROR }),
 		role_label: z.string().optional(),
-		state_name: z.string().optional(),
 		current_password: z.string().optional(),
 		new_password: z.string().optional(),
 		confirm_password: z.string().optional()

@@ -1,20 +1,16 @@
 import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
+import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
+import type { CandidateStatus } from '$lib/types/test.js';
+
 export interface CandidateResponse {
 	candidate_uuid: string;
-	status: string;
+	status: CandidateStatus;
 	obtained_marks: number | null;
 	start_time: string | null;
 	end_time: string | null;
 	time_taken_seconds: number | null;
-}
-
-function formatStatus(status: string): string {
-	return status
-		.split('_')
-		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-		.join(' ');
 }
 
 export const createResponseColumns = (): ColumnDef<CandidateResponse>[] => [
@@ -26,8 +22,9 @@ export const createResponseColumns = (): ColumnDef<CandidateResponse>[] => [
 	{
 		accessorKey: 'status',
 		header: 'Status',
-		cell: ({ row }) => formatStatus(row.original.status),
-		size: 130
+		cell: ({ row }) =>
+			renderComponent(CandidateStatusBadge, { status: row.original.status }),
+		size: 150
 	},
 	{
 		accessorKey: 'obtained_marks',

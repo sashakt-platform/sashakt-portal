@@ -166,6 +166,11 @@
 			clearTableSelection = false;
 		}, 0);
 	};
+
+	$effect(() => {
+		const testType = data?.is_template;
+		handleClearSelection();
+	});
 </script>
 
 <DeleteDialog

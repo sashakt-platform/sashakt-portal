@@ -168,7 +168,7 @@
 	};
 
 	$effect(() => {
-		const testType = data?.is_template;
+		data?.is_template;
 		handleClearSelection();
 	});
 </script>

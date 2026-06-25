@@ -2,7 +2,6 @@
 	import { cn } from '$lib/utils';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 
 	let {
 		name,
@@ -18,12 +17,12 @@
 <span
 	data-slot="tag-chip"
 	class={cn(
-		'bg-muted text-muted-foreground inline-flex max-w-45 items-center gap-1 rounded-full border border-transparent px-3 py-1 text-xs font-normal transition-colors',
+		'bg-muted text-muted-foreground group inline-flex items-center gap-1 rounded-full border border-transparent px-3 py-1 text-xs font-normal transition-colors',
 		className
 	)}
 	{...restProps}
 >
-	<TruncatedTextCell value={name} />
+	{name}
 	{#if children}
 		{@render children()}
 	{/if}

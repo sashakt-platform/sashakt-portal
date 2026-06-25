@@ -26,7 +26,7 @@
 		onCancelEdit?: () => void;
 	} = $props();
 
-	let hovered = $state(false);
+
 </script>
 
 {#if isEditing}
@@ -73,24 +73,20 @@
 {:else}
 	<!-- Default state: tag chip with hover edit/delete icons -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<TagChip
-		name={tag.name}
-		onmouseenter={() => (hovered = true)}
-		onmouseleave={() => (hovered = false)}
-	>
-		{#if hovered && canEdit}
+	<TagChip name={tag.name}>
+		{#if canEdit}
 			<button
 				type="button"
-				class="text-muted-foreground hover:text-foreground"
+				class="invisible text-muted-foreground group-hover:visible hover:text-foreground"
 				onclick={() => onEdit?.(tag.id, tag.name)}
 			>
 				<Pencil class="h-3 w-3" />
 			</button>
 		{/if}
-		{#if hovered && canDelete}
+		{#if canDelete}
 			<button
 				type="button"
-				class="text-muted-foreground hover:text-destructive"
+				class="invisible text-muted-foreground group-hover:visible hover:text-destructive"
 				onclick={() => onDelete?.(tag.id, tag.name)}
 			>
 				<Trash2 class="h-3 w-3" />

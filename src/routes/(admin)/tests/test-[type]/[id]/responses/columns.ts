@@ -2,18 +2,34 @@ import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
+import { DataTableActions } from '$lib/components/data-table/index.js';
 import type { CandidateStatus } from '$lib/types/test.js';
 
+export interface CandidateResult {
+	correct_answer: number;
+	incorrect_answer: number;
+	mandatory_not_attempted: number;
+	optional_not_attempted: number;
+	total_questions: number;
+	marks_obtained: number | null;
+	marks_maximum: number | null;
+	certificate_download_url: string | null;
+}
+
 export interface CandidateResponse {
+	candidate_id: number;
 	candidate_uuid: string;
 	status: CandidateStatus;
-	obtained_marks: number | null;
 	start_time: string | null;
 	end_time: string | null;
 	time_taken_seconds: number | null;
+	result: CandidateResult | null;
 }
 
-export const createResponseColumns = (): ColumnDef<CandidateResponse>[] => [
+export const createResponseColumns = (
+	onDelete?: (candidateId: number) => void,
+	canDelete = true
+): ColumnDef<CandidateResponse>[] => [
 	{
 		accessorKey: 'candidate_uuid',
 		header: 'Candidate',
@@ -22,15 +38,19 @@ export const createResponseColumns = (): ColumnDef<CandidateResponse>[] => [
 	{
 		accessorKey: 'status',
 		header: 'Status',
-		cell: ({ row }) =>
-			renderComponent(CandidateStatusBadge, { status: row.original.status }),
+		cell: ({ row }) => renderComponent(CandidateStatusBadge, { status: row.original.status }),
 		size: 150
 	},
 	{
-		accessorKey: 'obtained_marks',
+		id: 'marks',
 		header: 'Marks',
-		cell: ({ row }) => row.original.obtained_marks ?? '—',
-		size: 100
+		cell: ({ row }) => {
+			const result = row.original.result;
+			if (!result || result.marks_obtained == null) return '—';
+			if (result.marks_maximum == null) return `${result.marks_obtained}`;
+			return `${result.marks_obtained} / ${result.marks_maximum}`;
+		},
+		size: 130
 	},
 	{
 		accessorKey: 'start_time',
@@ -55,5 +75,26 @@ export const createResponseColumns = (): ColumnDef<CandidateResponse>[] => [
 			return `${mins}m ${secs}s`;
 		},
 		size: 120
-	}
+	},
+	...(canDelete
+		? [
+				{
+					id: 'actions',
+					enableSorting: false,
+					enableHiding: false,
+					size: 60,
+					cell: ({ row }: { row: { original: CandidateResponse } }) => {
+						return renderComponent(DataTableActions, {
+							entityName: 'Candidate',
+							editUrl: '',
+							deleteUrl: '',
+							canEdit: false,
+							canDelete: true,
+							deleteInline: true,
+							onDelete: () => onDelete?.(row.original.candidate_id)
+						});
+					}
+				} satisfies ColumnDef<CandidateResponse>
+			]
+		: [])
 ];

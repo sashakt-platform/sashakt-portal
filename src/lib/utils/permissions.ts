@@ -152,6 +152,9 @@ export const PERMISSIONS = {
 	DELETE_TEST_TEMPLATE: 'delete_test_template',
 	READ_TEST_TEMPLATE: 'read_test_template',
 
+	// Candidate permissions
+	DELETE_CANDIDATE: 'delete_candidate',
+
 	// Form permissions
 	CREATE_FORM: 'create_form',
 	UPDATE_FORM: 'update_form',
@@ -269,6 +272,12 @@ export const ENTITY_PERMISSIONS = {
 		read: PERMISSIONS.READ_FORM,
 		update: PERMISSIONS.UPDATE_FORM,
 		delete: PERMISSIONS.DELETE_FORM
+	},
+	candidate: {
+		create: PERMISSIONS.DELETE_CANDIDATE,
+		read: PERMISSIONS.DELETE_CANDIDATE,
+		update: PERMISSIONS.DELETE_CANDIDATE,
+		delete: PERMISSIONS.DELETE_CANDIDATE
 	}
 } as const;
 

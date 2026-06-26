@@ -1,28 +1,28 @@
 <script lang="ts">
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import CirclePlay from '@lucide/svelte/icons/circle-play';
-	type CandidateStatus = 'submitted' | 'in_progress';
+	type CandidateStatus = 'submitted' | 'not_submitted';
 
 	const { status }: { status: CandidateStatus } = $props();
 
 	const styles: Record<CandidateStatus, string> = {
 		submitted: 'bg-success-subtle text-success',
-		in_progress: 'bg-warning-subtle text-warning'
+		not_submitted: 'bg-warning-subtle text-warning'
 	};
 
 	const icons: Record<CandidateStatus, typeof CircleCheck> = {
 		submitted: CircleCheck,
-		in_progress: CirclePlay
+		not_submitted: CirclePlay
 	};
 
 	const iconStyles: Record<CandidateStatus, string> = {
 		submitted: 'fill-success text-success-subtle',
-		in_progress: 'font-extrabold text-warning'
+		not_submitted: 'font-extrabold text-warning'
 	};
 
 	const labels: Record<CandidateStatus, string> = {
 		submitted: 'Submitted',
-		in_progress: 'In Progress'
+		not_submitted: 'Not Submitted'
 	};
 
 	const style = $derived(status ? (styles[status] ?? 'bg-muted text-muted-foreground') : '');

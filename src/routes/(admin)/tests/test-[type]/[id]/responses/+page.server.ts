@@ -4,30 +4,41 @@ import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { fail } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
+import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
 	const user = requireLogin();
 	requirePermission(user, PERMISSIONS.READ_TEST);
 
 	const token = getSessionTokenCookie();
+
+	const page = Number(url.searchParams.get('page')) || 1;
+	const size = Number(url.searchParams.get('size')) || DEFAULT_PAGE_SIZE;
+
+	const queryParams = new URLSearchParams({
+		page: page.toString(),
+		size: size.toString()
+	});
 
 	const [testRes, reportRes] = await Promise.all([
 		fetch(`${BACKEND_URL}/test/${params.id}`, {
 			method: 'GET',
 			headers: { Authorization: `Bearer ${token}` }
 		}),
-		fetch(`${BACKEND_URL}/test/${params.id}/candidate-report`, {
+		fetch(`${BACKEND_URL}/test/${params.id}/candidate-report?${queryParams}`, {
 			method: 'GET',
 			headers: { Authorization: `Bearer ${token}` }
 		})
 	]);
 
 	const test = testRes.ok ? await testRes.json() : null;
-	const responses = reportRes.ok ? await reportRes.json() : [];
+	const responses = reportRes.ok ? await reportRes.json() : { items: [], total: 0, pages: 0 };
 	return {
 		testId: params.id,
 		testName: test?.name || 'Test',
-		responses
+		responses,
+		totalPages: responses.pages || 0,
+		params: { page, size }
 	};
 };
 

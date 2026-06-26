@@ -3,8 +3,8 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
-import type { CandidateStatus } from '$lib/types/test.js';
 
+type CandidateStatus = 'submitted' | 'not_submitted';
 export interface CandidateResult {
 	correct_answer: number;
 	incorrect_answer: number;

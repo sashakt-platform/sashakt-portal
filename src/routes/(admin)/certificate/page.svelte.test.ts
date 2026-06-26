@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { fireEvent, render, screen } from '@testing-library/svelte';
 import CertificatePage from './+page.svelte';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 const baseData = {
 	certificates: {
@@ -31,6 +32,11 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	canUpdate: vi.fn(),
 	canDelete: vi.fn()
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 describe('CertificatePage', () => {
 	it('renders certificate management page', () => {
@@ -152,5 +158,59 @@ describe('CertificatePage – bulk delete feature', () => {
 			'#batch-delete-form input[name="certificateIds"]'
 		) as HTMLInputElement;
 		expect(input.value).toBe('[]');
+	});
+});
+
+describe('CertificatePage – Custom nomenclature labels', () => {
+	afterEach(() => {
+		resetNomenclature();
+	});
+
+	it('renders custom page heading when certificates is overridden', () => {
+		setCustomNomenclature({ certificates: 'Awards' });
+		render(CertificatePage, { data: baseData });
+		expect(screen.getByRole('heading', { name: /Awards/i })).toBeInTheDocument();
+		expect(screen.queryByRole('heading', { name: /Certificates/i })).not.toBeInTheDocument();
+	});
+
+	it('renders custom create button label when certificate is overridden', async () => {
+		setCustomNomenclature({ certificate: 'Award' });
+		const permissions = await import('$lib/utils/permissions.js');
+		vi.mocked(permissions.canCreate).mockReturnValue(true);
+		render(CertificatePage, { data: baseData });
+		expect(screen.getByText(/Create Award/i)).toBeInTheDocument();
+	});
+
+	it('renders custom empty state text when certificates/certificate are overridden', () => {
+		setCustomNomenclature({ certificates: 'Awards', certificate: 'Award' });
+		render(CertificatePage, {
+			data: {
+				...baseData,
+				certificates: { items: [], total: 0, pages: 0 }
+			}
+		});
+		expect(screen.getByText(/No awards yet/i)).toBeInTheDocument();
+	});
+
+	it('renders custom search placeholder when certificates is overridden', () => {
+		setCustomNomenclature({ certificates: 'Awards' });
+		render(CertificatePage, { data: baseData });
+		expect(screen.getByPlaceholderText('Search awards...')).toBeInTheDocument();
+	});
+
+	it('renders custom test label in empty state description', () => {
+		setCustomNomenclature({ certificates: 'Awards', certificate: 'Award', test: 'Exam' });
+		render(CertificatePage, {
+			data: {
+				...baseData,
+				certificates: { items: [], total: 0, pages: 0 }
+			}
+		});
+		expect(screen.getByText(/complete a exam/i)).toBeInTheDocument();
+	});
+
+	it('falls back to defaults when no custom nomenclature is set', () => {
+		render(CertificatePage, { data: baseData });
+		expect(screen.getByRole('heading', { name: /Certificates/i })).toBeInTheDocument();
 	});
 });

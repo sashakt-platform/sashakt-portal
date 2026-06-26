@@ -1,10 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import UsersListingPage from './+page.svelte';
 import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/navigation', () => ({
 	goto: vi.fn(),
@@ -35,9 +36,10 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	canDelete: vi.fn(() => false)
 }));
 
-vi.mock('$lib/nomenclature', () => ({
-	useTerms: () => (key: string) => key
-}));
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
 	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
@@ -95,9 +97,9 @@ describe('Users Listing Page', () => {
 
 	// ─────────────────────────────────────────────────────────────────────────
 	describe('Page title', () => {
-		it('renders "users" as the page title', () => {
+		it('renders "Users" as the page title', () => {
 			render(UsersListingPage, { data: makeData() } as any);
-			expect(screen.getByText('users')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 	});
 
@@ -225,7 +227,7 @@ describe('Users Listing Page', () => {
 	describe('Empty state', () => {
 		it('renders without error when users list is empty', () => {
 			render(UsersListingPage, { data: makeData([]) } as any);
-			expect(screen.getByText('users')).toBeInTheDocument();
+			expect(screen.getByText('Users')).toBeInTheDocument();
 		});
 
 		it('does not show user data when items list is empty', () => {
@@ -281,6 +283,42 @@ describe('Users Listing Page', () => {
 			vi.mocked(canDelete).mockReturnValue(true);
 			render(UsersListingPage, { data: makeData() } as any);
 			expect(canDelete).toHaveBeenCalledWith(expect.anything(), 'user');
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		afterEach(() => {
+			resetNomenclature();
+		});
+
+		it('renders custom page title when nomenclature overrides users', () => {
+			setCustomNomenclature({ users: 'Members', user: 'Member' });
+			render(UsersListingPage, { data: makeData() } as any);
+			expect(screen.getByText('Members')).toBeInTheDocument();
+			expect(screen.queryByText('Users')).not.toBeInTheDocument();
+		});
+
+		it('renders custom create button label', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			setCustomNomenclature({ user: 'Participant' });
+			render(UsersListingPage, { data: makeData() } as any);
+			expect(screen.getByRole('link', { name: /create participant/i })).toBeInTheDocument();
+		});
+
+		it('renders custom search placeholder', () => {
+			setCustomNomenclature({ users: 'Learners' });
+			render(UsersListingPage, { data: makeData() } as any);
+			expect(screen.getByPlaceholderText('Search learners...')).toBeInTheDocument();
+		});
+
+		it('applies multiple custom nomenclature overrides together', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			setCustomNomenclature({ users: 'Participants', user: 'Participant' });
+			render(UsersListingPage, { data: makeData() } as any);
+			expect(screen.getByText('Participants')).toBeInTheDocument();
+			expect(screen.getByRole('link', { name: /create participant/i })).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Search participants...')).toBeInTheDocument();
 		});
 	});
 });

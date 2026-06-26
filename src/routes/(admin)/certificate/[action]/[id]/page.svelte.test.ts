@@ -1,10 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import CertificateFormPage from './+page.svelte';
 import { superForm } from 'sveltekit-superforms';
 import { zod4Client } from 'sveltekit-superforms/adapters';
 import { createCertificateSchema, editCertificateSchema } from './schema.js';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('sveltekit-superforms', () => ({
 	superForm: vi.fn((data) => ({
@@ -39,6 +40,11 @@ vi.mock('./schema.js', () => ({
 	editCertificateSchema: 'editSchema',
 	certificateSchema: 'createSchema'
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 function makeFormStore(values: Record<string, unknown>, errors: Record<string, string> = {}) {
 	vi.mocked(superForm).mockImplementationOnce(() => ({
@@ -211,5 +217,53 @@ describe('CertificateFormPage', () => {
 	it('passes editCertificateSchema to zod4Client in edit mode', () => {
 		render(CertificateFormPage, { data: editModeData });
 		expect(vi.mocked(zod4Client)).toHaveBeenCalledWith(editCertificateSchema);
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		afterEach(() => {
+			resetNomenclature();
+		});
+
+		it('renders custom heading in add mode when certificate is overridden', () => {
+			setCustomNomenclature({ certificate: 'Award' });
+			render(CertificateFormPage, { data: addModeData });
+			expect(screen.getByRole('heading', { name: /create award/i })).toBeInTheDocument();
+			expect(screen.queryByRole('heading', { name: /create certificate/i })).not.toBeInTheDocument();
+		});
+
+		it('renders custom heading in edit mode when certificate is overridden', () => {
+			setCustomNomenclature({ certificate: 'Award' });
+			render(CertificateFormPage, { data: editModeData });
+			expect(screen.getByRole('heading', { name: /edit award/i })).toBeInTheDocument();
+		});
+
+		it('renders custom field labels when certificate is overridden', () => {
+			setCustomNomenclature({ certificate: 'Award' });
+			render(CertificateFormPage, { data: addModeData });
+			expect(screen.getByText('Award Name')).toBeInTheDocument();
+			expect(screen.getByText('Award URL')).toBeInTheDocument();
+			expect(screen.getByText('Award Status')).toBeInTheDocument();
+		});
+
+		it('renders custom section heading when certificate is overridden', () => {
+			setCustomNomenclature({ certificate: 'Award' });
+			render(CertificateFormPage, { data: addModeData });
+			expect(screen.getByText('Award Details')).toBeInTheDocument();
+			expect(screen.queryByText('Certificate Details')).not.toBeInTheDocument();
+		});
+
+		it('renders custom back link label when certificates is overridden', () => {
+			setCustomNomenclature({ certificates: 'Awards' });
+			const { container } = render(CertificateFormPage, { data: addModeData });
+			const backLink = container.querySelector('a[aria-label="Back to awards"]');
+			expect(backLink).toBeInTheDocument();
+		});
+
+		it('falls back to defaults when no custom nomenclature is set', () => {
+			render(CertificateFormPage, { data: addModeData });
+			expect(screen.getByRole('heading', { name: /create certificate/i })).toBeInTheDocument();
+			expect(screen.getByText('Certificate Details')).toBeInTheDocument();
+		});
 	});
 });

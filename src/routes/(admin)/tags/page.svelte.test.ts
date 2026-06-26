@@ -1,9 +1,15 @@
 import { render, fireEvent, screen } from '@testing-library/svelte';
 import '@testing-library/jest-dom/vitest';
 import TagManagementPage from './+page.svelte';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 const mockData = {
 	user: { id: 1, organization_id: 10, permissions: ['create_tag', 'update_tag', 'delete_tag'] },
@@ -217,6 +223,60 @@ describe('TagManagementPage', () => {
 			render(TagManagementPage, { data: mockData });
 			const nextButton = screen.getByText('Next');
 			expect(nextButton).toBeDisabled();
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		afterEach(() => {
+			resetNomenclature();
+		});
+
+		it('renders custom page title when nomenclature overrides tag_management', () => {
+			setCustomNomenclature({ tag_management: 'Category Hub' });
+			render(TagManagementPage, { data: mockData });
+			expect(screen.getByRole('heading', { name: 'Category Hub' })).toBeInTheDocument();
+		});
+
+		it('renders custom create button label when tag_type is overridden', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			setCustomNomenclature({ tag_type: 'Topic' });
+			render(TagManagementPage, { data: mockData });
+			expect(screen.getByText(/Create Topic/)).toBeInTheDocument();
+		});
+
+		it('renders custom search placeholder with overridden labels', () => {
+			setCustomNomenclature({ tag_types: 'Topics', tags: 'Labels' });
+			render(TagManagementPage, { data: mockData });
+			expect(screen.getByPlaceholderText('Search topics or labels...')).toBeInTheDocument();
+		});
+
+		it('renders custom empty state text when tag_types is overridden', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			setCustomNomenclature({ tag_types: 'Topics', tag_type: 'Topic' });
+			render(TagManagementPage, { data: emptyMockData });
+			expect(screen.getByText('No topics yet')).toBeInTheDocument();
+		});
+
+		it('renders custom column header when tag_types is overridden', () => {
+			setCustomNomenclature({ tag_types: 'Categories' });
+			render(TagManagementPage, { data: mockData });
+			const sortButton = screen.getByText('Categories').closest('button');
+			expect(sortButton).toBeTruthy();
+		});
+
+		it('applies multiple custom nomenclature overrides together', () => {
+			vi.mocked(canCreate).mockReturnValue(true);
+			setCustomNomenclature({
+				tag_management: 'Label Centre',
+				tag_type: 'Category',
+				tag_types: 'Categories',
+				tags: 'Labels'
+			});
+			render(TagManagementPage, { data: mockData });
+			expect(screen.getByRole('heading', { name: 'Label Centre' })).toBeInTheDocument();
+			expect(screen.getByText(/Create Category/)).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Search categories or labels...')).toBeInTheDocument();
 		});
 	});
 });

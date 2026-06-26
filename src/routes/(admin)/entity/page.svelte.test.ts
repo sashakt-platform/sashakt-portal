@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, within } from '@testing-library/svelte';
+import type { ComponentProps } from 'svelte';
 import EntityListingPage from './+page.svelte';
 import { canCreate, } from '$lib/utils/permissions.js';
 
 import { page } from '$app/state';
+import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/state', () => ({
 	page: {
@@ -34,6 +36,11 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	canUpdate: vi.fn(() => false),
 	canDelete: vi.fn(() => false)
 }));
+
+vi.mock('$lib/nomenclature', async () => {
+	const { createNomenclatureMock } = await import('$lib/test-utils/nomenclature-mock');
+	return createNomenclatureMock();
+});
 
 vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
 	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
@@ -83,16 +90,21 @@ const sampleItems = [
 	{ id: 2, name: 'SHG', description: 'Self Help Group', modified_date: '2026-06-02', total_records: 3 }
 ];
 
+function renderEntityListingPage(data: ReturnType<typeof makeData>) {
+	return render(EntityListingPage, { data } as ComponentProps<typeof EntityListingPage>);
+}
+
 describe('Entity Listing Page', () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
 		(page as any).url = new URL('http://localhost/entity');
+		resetNomenclature();
 	});
 
 	
 	describe('Page title', () => {
 		it('renders "Entities" as the page title', () => {
-			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			renderEntityListingPage(makeData(sampleItems));
 			expect(screen.getByText('Entities')).toBeInTheDocument();
 		});
 	});
@@ -100,40 +112,40 @@ describe('Entity Listing Page', () => {
 
 	describe('Empty state', () => {
 		it('shows empty state heading when no items, no search, and no status filter', () => {
-			render(EntityListingPage, { data: makeData([]) } as any);
+			renderEntityListingPage(makeData([]));
 			expect(screen.getByText('No entities yet')).toBeInTheDocument();
 		});
 
 		it('shows descriptive text in the empty state', () => {
-			render(EntityListingPage, { data: makeData([]) } as any);
+			renderEntityListingPage(makeData([]));
 			expect(screen.getByText(/Create your first entity/i)).toBeInTheDocument();
 		});
 
 		it('shows "Create Entity" button inside empty state when user has create permission', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
-			render(EntityListingPage, { data: makeData([]) } as any);
+			renderEntityListingPage(makeData([]));
 			const emptyStateRegion = screen.getByText('No entities yet').closest('div') as HTMLElement;
 			expect(within(emptyStateRegion).getByRole('link', { name: /create entity/i })).toBeInTheDocument();
 		});
 
 		it('does not show create button inside empty state when user lacks create permission', () => {
 			vi.mocked(canCreate).mockReturnValue(false);
-			render(EntityListingPage, { data: makeData([]) } as any);
+			renderEntityListingPage(makeData([]));
 			expect(screen.queryByRole('link', { name: /create entity/i })).not.toBeInTheDocument();
 		});
 
 		it('does not show empty state when items exist', () => {
-			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			renderEntityListingPage(makeData(sampleItems));
 			expect(screen.queryByText('No entities yet')).not.toBeInTheDocument();
 		});
 
 		it('does not show empty state when search is set even with 0 results', () => {
-			render(EntityListingPage, { data: makeData([], { search: 'xyz' }) } as any);
+			renderEntityListingPage(makeData([], { search: 'xyz' }));
 			expect(screen.queryByText('No entities yet')).not.toBeInTheDocument();
 		});
 
 		it('does not show empty state when isActive filter is set even with 0 results', () => {
-			render(EntityListingPage, { data: makeData([], { isActive: 'true' }) } as any);
+			renderEntityListingPage(makeData([], { isActive: 'true' }));
 			expect(screen.queryByText('No entities yet')).not.toBeInTheDocument();
 		});
 	});
@@ -142,19 +154,19 @@ describe('Entity Listing Page', () => {
 	describe('Create button (header)', () => {
 		it('shows "Create Entity" header button when user has permission and items exist', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
-			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			renderEntityListingPage(makeData(sampleItems));
 			expect(screen.getByRole('link', { name: /create entity/i })).toBeInTheDocument();
 		});
 
 		it('does not show "Create Entity" header button when user lacks permission', () => {
 			vi.mocked(canCreate).mockReturnValue(false);
-			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			renderEntityListingPage(makeData(sampleItems));
 			expect(screen.queryByRole('link', { name: /create entity/i })).not.toBeInTheDocument();
 		});
 
 		it('create button links to /entity/add/new', () => {
 			vi.mocked(canCreate).mockReturnValue(true);
-			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			renderEntityListingPage(makeData(sampleItems));
 			const link = screen.getByRole('link', { name: /create entity/i });
 			expect(link).toHaveAttribute('href', '/entity/add/new');
 		});
@@ -163,17 +175,17 @@ describe('Entity Listing Page', () => {
 	// ─────────────────────────────────────────────────────────────────────────
 	describe('Search input', () => {
 		it('renders search input with placeholder "Search entities..."', () => {
-			render(EntityListingPage, { data: makeData(sampleItems) } as any);
+			renderEntityListingPage(makeData(sampleItems));
 			expect(screen.getByPlaceholderText('Search entities...')).toBeInTheDocument();
 		});
 
 		it('reflects the current search value from params', () => {
-			render(EntityListingPage, { data: makeData(sampleItems, { search: 'CLF' }) } as any);
+			renderEntityListingPage(makeData(sampleItems, { search: 'CLF' }));
 			expect(screen.getByPlaceholderText('Search entities...')).toHaveValue('CLF');
 		});
 
 		it('shows empty value when search param is empty', () => {
-			render(EntityListingPage, { data: makeData(sampleItems, { search: '' }) } as any);
+			renderEntityListingPage(makeData(sampleItems, { search: '' }));
 			expect(screen.getByPlaceholderText('Search entities...')).toHaveValue('');
 		});
 	});
@@ -181,21 +193,62 @@ describe('Entity Listing Page', () => {
 	// ─────────────────────────────────────────────────────────────────────────
 	describe('Status filter', () => {
 		it('renders a "Status" button when no filter is active', () => {
-			render(EntityListingPage, { data: makeData(sampleItems, { isActive: '' }) } as any);
+			renderEntityListingPage(makeData(sampleItems, { isActive: '' }));
 			expect(screen.getByRole('button', { name: /status/i })).toBeInTheDocument();
 		});
 
 		it('renders "Active" label when isActive is "true"', () => {
-			render(EntityListingPage, { data: makeData(sampleItems, { isActive: 'true' }) } as any);
+			renderEntityListingPage(makeData(sampleItems, { isActive: 'true' }));
 			expect(screen.getByRole('button', { name: /active/i })).toBeInTheDocument();
 		});
 
 		it('renders "Inactive" label when isActive is "false"', () => {
-			render(EntityListingPage, { data: makeData(sampleItems, { isActive: 'false' }) } as any);
+			renderEntityListingPage(makeData(sampleItems, { isActive: 'false' }));
 			expect(screen.getByRole('button', { name: /inactive/i })).toBeInTheDocument();
 		});
 	});
 
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Custom nomenclature labels', () => {
+		it('renders custom page title when entities is overridden', () => {
+			setCustomNomenclature({ entities: 'Groups' });
+			renderEntityListingPage(makeData(sampleItems));
+			expect(screen.getByText('Groups')).toBeInTheDocument();
+			expect(screen.queryByText('Entities')).not.toBeInTheDocument();
+		});
 
-	
+		it('renders custom create button label when entity is overridden', () => {
+			setCustomNomenclature({ entity: 'Group' });
+			vi.mocked(canCreate).mockReturnValue(true);
+			renderEntityListingPage(makeData(sampleItems));
+			expect(screen.getByRole('link', { name: /create group/i })).toBeInTheDocument();
+		});
+
+		it('renders custom empty state text when entities/entity are overridden', () => {
+			setCustomNomenclature({ entities: 'Groups', entity: 'Group' });
+			renderEntityListingPage(makeData([]));
+			expect(screen.getByText('No groups yet')).toBeInTheDocument();
+			expect(screen.getByText(/Create your first group/i)).toBeInTheDocument();
+		});
+
+		it('renders custom search placeholder when entities is overridden', () => {
+			setCustomNomenclature({ entities: 'Groups' });
+			renderEntityListingPage(makeData(sampleItems));
+			expect(screen.getByPlaceholderText('Search groups...')).toBeInTheDocument();
+		});
+
+		it('applies multiple custom nomenclature overrides simultaneously', () => {
+			setCustomNomenclature({ entities: 'Clusters', entity: 'Cluster' });
+			vi.mocked(canCreate).mockReturnValue(true);
+			renderEntityListingPage(makeData(sampleItems));
+			expect(screen.getByText('Clusters')).toBeInTheDocument();
+			expect(screen.getByRole('link', { name: /create cluster/i })).toBeInTheDocument();
+			expect(screen.getByPlaceholderText('Search clusters...')).toBeInTheDocument();
+		});
+
+		it('falls back to defaults when no custom nomenclature is set', () => {
+			renderEntityListingPage(makeData(sampleItems));
+			expect(screen.getByText('Entities')).toBeInTheDocument();
+		});
+	});
 });

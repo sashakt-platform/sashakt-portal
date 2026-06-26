@@ -75,39 +75,9 @@
 					/>
 				</div>
 				{#if userState}
-					<!-- Use grid layout only when both state and district exist -->
-					{#if userDistricts}
-						<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-							<div class="flex flex-col gap-1.5">
-								<label for="state-field" class="text-sm font-medium">
-									State
-								</label>
-								<Input
-									id="state-field"
-									class="disabled:bg-background"
-									value={userState.name}
-									disabled
-								/>
-							</div>
-							
-							<div class="flex flex-col gap-1.5">
-								<label for="district-field" class="text-sm font-medium">
-									District
-								</label>
-								<Input
-									id="district-field"
-									class="disabled:bg-background"
-									value={userDistricts.map((district) => district.name).join(', ')}
-									disabled
-								/>
-							</div>
-						</div>
-					{:else}
-						<!-- State only: full width, no grid -->
+					<div class={userDistricts ? 'grid grid-cols-1 gap-4 md:grid-cols-2' : ''}>
 						<div class="flex flex-col gap-1.5">
-							<label for="state-field" class="text-sm font-medium">
-								State
-							</label>
+							<label for="state-field" class="text-sm font-medium">State</label>
 							<Input
 								id="state-field"
 								class="disabled:bg-background"
@@ -115,7 +85,19 @@
 								disabled
 							/>
 						</div>
-					{/if}
+
+						{#if userDistricts}
+							<div class="flex flex-col gap-1.5">
+								<label for="district-field" class="text-sm font-medium">District</label>
+								<Input
+									id="district-field"
+									class="disabled:bg-background"
+									value={userDistricts.map((d) => d.name).join(', ')}
+									disabled
+								/>
+							</div>
+						{/if}
+					</div>
 				{/if}
 
 			</div>

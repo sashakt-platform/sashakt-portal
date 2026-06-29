@@ -82,7 +82,8 @@ describe('TagChip', () => {
 				await fireEvent.mouseEnter(chip);
 				expect(screen.getAllByRole('button')).toHaveLength(2);
 				await fireEvent.mouseLeave(chip);
-				expect(screen.queryByRole('button')).not.toBeInTheDocument();
+				// buttons remain in DOM (CSS group-hover controls visibility, not JS mount/unmount)
+				screen.getAllByRole('button').forEach((b) => expect(b).toHaveClass('invisible'));
 			});
 
 			it('does not show edit button on hover when canEdit is false', async () => {

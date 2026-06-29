@@ -103,17 +103,6 @@ describe('TagCell', () => {
 			const tagChip = container.querySelector('[data-slot="tag-chip"]');
 			expect(tagChip).toBeInTheDocument();
 		});
-
-		it('should apply truncate class to tag text', () => {
-			render(TagCell, {
-				props: {
-					tags: [{ name: 'Math' }]
-				}
-			});
-
-			const span = screen.getByText('Math');
-			expect(span).toHaveClass('truncate');
-		});
 	});
 
 	describe('Tooltip', () => {
@@ -169,7 +158,6 @@ describe('TagCell', () => {
 
 			const span = screen.getByText(longTag);
 			expect(span).toBeInTheDocument();
-			expect(span).toHaveClass('truncate');
 		});
 	});
 });

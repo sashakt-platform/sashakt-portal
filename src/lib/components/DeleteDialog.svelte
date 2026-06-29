@@ -75,7 +75,13 @@
 							<p class="text-sm font-medium">Items to be deleted:</p>
 							<ul class="text-muted-foreground mt-1 list-inside list-disc text-sm">
 								{#each selectedItems.slice(0, 5) as item}
-									<li>{item.question_text || item.full_name || item.name || `Item ${item.id}`}</li>
+									<li>
+										{item.question_text ||
+											item.full_name ||
+											item.name ||
+											item.candidate_uuid ||
+											`Item ${item.id}`}
+									</li>
 								{/each}
 							</ul>
 						</div>
@@ -88,42 +94,21 @@
 
 		<AlertDialog.Footer class="flex-row gap-2 p-6 pt-0">
 			{#if batchMode}
-				<AlertDialog.Cancel
-					type="button"
-					onclick={handleClose}
-					class="flex-1 sm:flex-none"
-				>
+				<AlertDialog.Cancel type="button" onclick={handleClose} class="flex-1 sm:flex-none">
 					Cancel
 				</AlertDialog.Cancel>
 
-				<Button
-					variant="destructive"
-					onclick={handleBatchConfirm}
-					class="flex-1 sm:flex-none"
-				>
-					Delete {selectedCount} {elementName}
+				<Button variant="destructive" onclick={handleBatchConfirm} class="flex-1 sm:flex-none">
+					Delete {selectedCount}
+					{elementName}
 				</Button>
 			{:else}
-				<AlertDialog.Cancel
-					type="button"
-					onclick={handleClose}
-					class="flex-1 sm:flex-none"
-				>
+				<AlertDialog.Cancel type="button" onclick={handleClose} class="flex-1 sm:flex-none">
 					Cancel
 				</AlertDialog.Cancel>
 
-				<form
-					{action}
-					method="POST"
-					class="flex-1 sm:flex-none"
-				>
-					<Button
-						variant="destructive"
-						type="submit"
-						class="w-full"
-					>
-						Delete
-					</Button>
+				<form {action} method="POST" class="flex-1 sm:flex-none">
+					<Button variant="destructive" type="submit" class="w-full">Delete</Button>
 				</form>
 			{/if}
 		</AlertDialog.Footer>

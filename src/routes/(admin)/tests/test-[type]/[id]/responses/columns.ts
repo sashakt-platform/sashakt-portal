@@ -3,6 +3,7 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
+import { createSelectionColumn } from '$lib/components/data-table/column-helpers';
 
 type CandidateStatus = 'submitted' | 'not_submitted';
 export interface CandidateResult {
@@ -28,8 +29,10 @@ export interface CandidateResponse {
 
 export const createResponseColumns = (
 	onDelete?: (candidateId: number) => void,
-	canDelete = true
+	canDelete = true,
+	enableSelection = false
 ): ColumnDef<CandidateResponse>[] => [
+	...(enableSelection ? [createSelectionColumn<CandidateResponse>()] : []),
 	{
 		accessorKey: 'candidate_uuid',
 		header: 'Candidate',

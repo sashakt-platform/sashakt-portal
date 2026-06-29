@@ -75,5 +75,50 @@ export const actions: Actions = {
 		}
 
 		throw redirect(303, url.pathname, { type: 'success', message: 'Candidate deleted successfully.' }, cookies);
+	},
+
+	batchDeleteCandidates: async ({ request, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_CANDIDATE);
+		const token = getSessionTokenCookie();
+		const formData = await request.formData();
+
+		try {
+			const response = await fetch(`${BACKEND_URL}/candidate/`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				},
+				body: formData.get('candidateIds')
+			});
+
+			if (!response.ok) {
+				const errorMessage = await response.json();
+				setFlash(
+					{
+						type: 'error',
+						message: `Failed to delete candidates: ${errorMessage.detail || response.statusText}`
+					},
+					cookies
+				);
+				return fail(response.status);
+			}
+
+			const deleteResponse = await response.json();
+			setFlash(
+				{
+					type: deleteResponse.delete_failure_list ? 'error' : 'success',
+					message: `Deletion complete: ${deleteResponse.delete_success_count} successful, ${deleteResponse.delete_failure_list?.length || 0} failed.`
+				},
+				cookies
+			);
+		} catch (error) {
+			console.error('Batch delete error:', error);
+			setFlash({ type: 'error', message: 'Failed to delete candidates.' }, cookies);
+			return fail(500);
+		}
+
+		return { success: true };
 	}
 };

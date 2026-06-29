@@ -148,6 +148,63 @@ describe('Login Route', () => {
 			expect(result.organizationData).toEqual(orgData);
 			expect(orgFetch).not.toHaveBeenCalled();
 		});
+
+		it('returns both shortcode and logo when org is fully configured', async () => {
+			const orgFetch = vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({
+					name: 'XYZ Org',
+					logo: 'https://cdn.example.com/xyz-logo.png',
+					shortcode: 'xyz'
+				})
+			});
+
+			const result = await load(
+				makeLoadEvent({
+					url: new URL('http://localhost/login?organization=xyz'),
+					fetch: orgFetch
+				})
+			);
+
+			expect(result.organizationData).toMatchObject({
+				shortcode: 'xyz',
+				logo: 'https://cdn.example.com/xyz-logo.png',
+				name: 'XYZ Org'
+			});
+		});
+
+		it('fetches from public endpoint using the shortcode from the URL param', async () => {
+			const orgFetch = vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ name: 'XYZ Org', logo: 'logo.png', shortcode: 'xyz' })
+			});
+
+			await load(
+				makeLoadEvent({
+					url: new URL('http://localhost/login?organization=xyz'),
+					fetch: orgFetch
+				})
+			);
+
+			expect(orgFetch).toHaveBeenCalledWith('http://localhost:8000/organization/public/xyz');
+		});
+
+		it('returns null logo in organizationData when org has shortcode but no logo', async () => {
+			const orgFetch = vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ name: 'XYZ Org', logo: null, shortcode: 'xyz' })
+			});
+
+			const result = await load(
+				makeLoadEvent({
+					url: new URL('http://localhost/login?organization=xyz'),
+					fetch: orgFetch
+				})
+			);
+
+			expect(result.organizationData?.shortcode).toBe('xyz');
+			expect(result.organizationData?.logo).toBeFalsy();
+		});
 	});
 
 	describe('actions.login — form validation', () => {

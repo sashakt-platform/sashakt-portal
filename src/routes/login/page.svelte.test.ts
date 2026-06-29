@@ -113,6 +113,39 @@ describe('Login Page', () => {
 			});
 			expect(screen.getByAltText('Tech4Dev')).toBeInTheDocument();
 		});
+
+		it('should show logo when organization has both shortcode and logo configured', () => {
+			render(LoginPage, {
+				data: createPageData({
+					name: 'XYZ Org',
+					logo: 'https://cdn.example.com/xyz-logo.png',
+					shortcode: 'xyz'
+				})
+			});
+			const img = screen.getByRole('img');
+			expect(img).toBeInTheDocument();
+			expect(img).toHaveAttribute('src', 'https://cdn.example.com/xyz-logo.png');
+			expect(img).toHaveAttribute('alt', 'XYZ Org');
+		});
+
+		it('should not show SASHAKT heading when org has shortcode and logo configured', () => {
+			render(LoginPage, {
+				data: createPageData({
+					name: 'XYZ Org',
+					logo: 'https://cdn.example.com/xyz-logo.png',
+					shortcode: 'xyz'
+				})
+			});
+			expect(screen.queryByText('SASHAKT')).not.toBeInTheDocument();
+		});
+
+		it('should fall back to SASHAKT when org has shortcode but no logo', () => {
+			render(LoginPage, {
+				data: createPageData({ name: 'XYZ Org', logo: '', shortcode: 'xyz' })
+			});
+			expect(screen.getByText('SASHAKT')).toBeInTheDocument();
+			expect(screen.queryByRole('img')).not.toBeInTheDocument();
+		});
 	});
 
 	describe('Forgot Password Link', () => {

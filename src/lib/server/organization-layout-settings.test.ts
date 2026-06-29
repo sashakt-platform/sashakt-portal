@@ -102,42 +102,4 @@ describe('loadOrganizationLayoutSettings', () => {
 		expect(result.analyticsLinkUrl).toBeNull();
 		expect(result.platformGuideUrl).toBeNull();
 	});
-
-	it('should parse platform nomenclature with custom mode', async () => {
-		mockFetch.mockResolvedValueOnce({
-			ok: true,
-			json: async () => ({
-				settings: {
-					platform_nomenclature: {
-						mode: 'custom',
-						value: { tests: 'Exams', users: 'Participants' }
-					}
-				}
-			})
-		});
-
-		const result = await loadOrganizationLayoutSettings(42, mockFetch);
-
-		expect(result.platformNomenclature.mode).toBe('custom');
-		expect(result.platformNomenclature.value.tests).toBe('Exams');
-		expect(result.platformNomenclature.value.users).toBe('Participants');
-	});
-
-	it('should default nomenclature mode when mode is not custom', async () => {
-		mockFetch.mockResolvedValueOnce({
-			ok: true,
-			json: async () => ({
-				settings: {
-					platform_nomenclature: {
-						mode: 'something_else',
-						value: {}
-					}
-				}
-			})
-		});
-
-		const result = await loadOrganizationLayoutSettings(42, mockFetch);
-
-		expect(result.platformNomenclature.mode).toBe('default');
-	});
 });

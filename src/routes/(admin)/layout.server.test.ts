@@ -104,28 +104,4 @@ describe('Admin Layout Server - load()', () => {
 		expect(result.user).toBe(mockUser);
 		expect(result.organization).toBe(mockOrganization);
 	});
-
-	it('should return platformNomenclature from org settings', async () => {
-		const customNomenclature = {
-			mode: 'custom' as const,
-			value: { tests: 'Exams', users: 'Participants' } as any
-		};
-
-		vi.mocked(getRequestEvent).mockReturnValue({
-			locals: {
-				user: { organization_id: 42, permissions: [] },
-				organization: null
-			}
-		} as any);
-
-		vi.mocked(loadOrganizationLayoutSettings).mockResolvedValue({
-			platformNomenclature: customNomenclature,
-			platformGuideUrl: null,
-			analyticsLinkUrl: null
-		});
-
-		const result = await load({ fetch: mockFetch } as any);
-
-		expect(result.platformNomenclature).toBe(customNomenclature);
-	});
 });

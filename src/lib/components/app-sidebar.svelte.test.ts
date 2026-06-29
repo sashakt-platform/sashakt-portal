@@ -93,6 +93,55 @@ describe('AppSidebar - Organization Branding', () => {
 		expect(screen.queryByText('Sashakt')).not.toBeInTheDocument();
 		expect(screen.queryByText('Acme Corp')).not.toBeInTheDocument();
 	});
+
+	it('should show org logo in sidebar after login when org has shortcode and logo configured', () => {
+		render(AppSidebar, {
+			data: {
+				...baseData,
+				organization: {
+					name: 'XYZ Org',
+					logo: 'https://cdn.example.com/xyz-logo.png',
+					shortcode: 'xyz'
+				}
+			}
+		});
+
+		const img = screen.getByRole('img');
+		expect(img).toBeInTheDocument();
+		expect(img).toHaveAttribute('src', 'https://cdn.example.com/xyz-logo.png');
+		expect(img).toHaveAttribute('alt', 'XYZ Org');
+	});
+
+	it('should not show "Sashakt" in sidebar after login when org has shortcode and logo configured', () => {
+		render(AppSidebar, {
+			data: {
+				...baseData,
+				organization: {
+					name: 'XYZ Org',
+					logo: 'https://cdn.example.com/xyz-logo.png',
+					shortcode: 'xyz'
+				}
+			}
+		});
+
+		expect(screen.queryByText('Sashakt')).not.toBeInTheDocument();
+	});
+
+	it('should show "Sashakt" in sidebar after login when org has shortcode but no logo configured', () => {
+		render(AppSidebar, {
+			data: {
+				...baseData,
+				organization: {
+					name: 'XYZ Org',
+					logo: '',
+					shortcode: 'xyz'
+				}
+			}
+		});
+
+		expect(screen.getByText('Sashakt')).toBeInTheDocument();
+		expect(screen.queryByRole('img')).not.toBeInTheDocument();
+	});
 });
 
 describe('AppSidebar - Custom nomenclature labels', () => {

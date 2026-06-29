@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import AccountForm from './AccountForm.svelte';
+import type { User } from '$lib/utils/permissions';
 
 function makeStore(initial: unknown) {
 	let value = initial;
@@ -216,6 +217,177 @@ describe('AccountForm', () => {
 
 			const header = container.querySelector('.border-b');
 			expect(header).toBeInTheDocument();
+		});
+	});
+
+	describe('State and District Display', () => {
+		const baseUser: User = {
+			id: '1',
+			full_name: 'Test User',
+			email: 'test@example.com',
+			role_id: 1,
+			organization_id: 1,
+			is_active: true,
+			created_date: '2024-01-01T00:00:00Z',
+			modified_date: '2024-01-01T00:00:00Z',
+			is_deleted: false,
+			states: [],
+			districts: [],
+			permissions: []
+		};
+
+		it('should not render State or District fields when currentUser is null', () => {
+			const form = createMockForm();
+			render(AccountForm, { props: { form, currentUser: null } as any });
+
+			expect(document.getElementById('state-field')).not.toBeInTheDocument();
+			expect(document.getElementById('district-field')).not.toBeInTheDocument();
+		});
+
+		it('should not render State or District fields when user has no states assigned', () => {
+			const form = createMockForm();
+			const currentUser: User = { ...baseUser, states: [], districts: [] };
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			expect(document.getElementById('state-field')).not.toBeInTheDocument();
+			expect(document.getElementById('district-field')).not.toBeInTheDocument();
+		});
+
+		it('should render State field with the correct name when user has a state assigned', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: []
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			const stateInput = document.getElementById('state-field') as HTMLInputElement;
+			expect(stateInput).toBeInTheDocument();
+			expect(stateInput).toHaveValue('Maharashtra');
+		});
+
+		it('should render State field as disabled (read-only)', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: []
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			const stateInput = document.getElementById('state-field') as HTMLInputElement;
+			expect(stateInput).toBeDisabled();
+		});
+
+		it('should not render District field when user has a state but no districts', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: []
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			expect(document.getElementById('district-field')).not.toBeInTheDocument();
+		});
+
+		it('should not apply two-column grid when user has state but no districts', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: []
+			};
+			const { container } = render(AccountForm, { props: { form, currentUser } as any });
+
+			const grid = container.querySelector('.grid.grid-cols-1.gap-4.md\\:grid-cols-2');
+			expect(grid).not.toBeInTheDocument();
+		});
+
+		it('should render both State and District fields when user has state and districts', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: [
+					{ id: 10, name: 'Pune' },
+					{ id: 11, name: 'Nashik' }
+				]
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			expect(document.getElementById('state-field')).toBeInTheDocument();
+			expect(document.getElementById('district-field')).toBeInTheDocument();
+		});
+
+		it('should display multiple districts as a comma-separated string', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: [
+					{ id: 10, name: 'Pune' },
+					{ id: 11, name: 'Nashik' },
+					{ id: 12, name: 'Nagpur' }
+				]
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			const districtInput = document.getElementById('district-field') as HTMLInputElement;
+			expect(districtInput).toHaveValue('Pune, Nashik, Nagpur');
+		});
+
+		it('should display a single district without a trailing comma', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: [{ id: 10, name: 'Pune' }]
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			const districtInput = document.getElementById('district-field') as HTMLInputElement;
+			expect(districtInput).toHaveValue('Pune');
+		});
+
+		it('should render District field as disabled (read-only)', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: [{ id: 10, name: 'Pune' }]
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			const districtInput = document.getElementById('district-field') as HTMLInputElement;
+			expect(districtInput).toBeDisabled();
+		});
+
+		it('should apply two-column grid layout when both state and districts are present', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: [{ id: 10, name: 'Pune' }]
+			};
+			const { container } = render(AccountForm, { props: { form, currentUser } as any });
+
+			const grid = container.querySelector('.grid.grid-cols-1.gap-4.md\\:grid-cols-2');
+			expect(grid).toBeInTheDocument();
+		});
+
+		it('should render State label and District label when both are present', () => {
+			const form = createMockForm();
+			const currentUser: User = {
+				...baseUser,
+				states: [{ id: 1, name: 'Maharashtra' }],
+				districts: [{ id: 10, name: 'Pune' }]
+			};
+			render(AccountForm, { props: { form, currentUser } as any });
+
+			expect(screen.getByText('State')).toBeInTheDocument();
+			expect(screen.getByText('District')).toBeInTheDocument();
 		});
 	});
 });

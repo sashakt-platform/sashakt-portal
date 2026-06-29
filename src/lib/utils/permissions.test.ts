@@ -14,6 +14,7 @@ import {
 	isSystemAdmin,
 	isOwnEntity,
 	getUserState,
+	getUserDistrict,
 	hasLocation,
 	PERMISSIONS,
 	type User
@@ -363,6 +364,77 @@ describe('permissions', () => {
 		});
 	});
 
+	describe('getUserDistrict()', () => {
+		const userWithDistricts = {
+			id: 20,
+			username: 'districtuser',
+			email: 'district@example.com',
+			permissions: [],
+			states: [{ id: 1, name: 'Maharashtra' }],
+			districts: [
+				{ id: 10, name: 'Pune' },
+				{ id: 11, name: 'Nashik' }
+			]
+		} as unknown as User;
+
+		const userWithOneDistrict = {
+			id: 21,
+			username: 'onedistrict',
+			email: 'onedistrict@example.com',
+			permissions: [],
+			states: [{ id: 1, name: 'Maharashtra' }],
+			districts: [{ id: 10, name: 'Pune' }]
+		} as unknown as User;
+
+		const userWithEmptyDistricts = {
+			id: 22,
+			username: 'emptydistricts',
+			email: 'emptydistricts@example.com',
+			permissions: [],
+			states: [{ id: 1, name: 'Maharashtra' }],
+			districts: []
+		} as unknown as User;
+
+		it('should return all districts when user has multiple districts assigned', () => {
+			const districts = getUserDistrict(userWithDistricts);
+			expect(districts).toEqual([
+				{ id: 10, name: 'Pune' },
+				{ id: 11, name: 'Nashik' }
+			]);
+		});
+
+		it('should return array with one district when user has a single district', () => {
+			const districts = getUserDistrict(userWithOneDistrict);
+			expect(districts).toEqual([{ id: 10, name: 'Pune' }]);
+		});
+
+		it('should return null when user has an empty districts array', () => {
+			expect(getUserDistrict(userWithEmptyDistricts)).toBeNull();
+		});
+
+		it('should return null when user is null', () => {
+			expect(getUserDistrict(null)).toBeNull();
+		});
+
+		it('should return null when user.districts is undefined', () => {
+			const userWithoutDistricts = { ...mockUser, districts: undefined } as unknown as User;
+			expect(getUserDistrict(userWithoutDistricts)).toBeNull();
+		});
+
+		it('should preserve the original order of districts returned from API', () => {
+			const userWithOrderedDistricts = {
+				...mockUser,
+				districts: [
+					{ id: 3, name: 'Nagpur' },
+					{ id: 1, name: 'Pune' },
+					{ id: 2, name: 'Nashik' }
+				]
+			} as unknown as User;
+			const districts = getUserDistrict(userWithOrderedDistricts);
+			expect(districts?.map((d) => d.name)).toEqual(['Nagpur', 'Pune', 'Nashik']);
+		});
+	});
+
 	describe('hasLocation()', () => {
 		const userWithState: User = {
 			id: 10,
@@ -432,7 +504,11 @@ describe('permissions', () => {
 		});
 
 		it('should return false when states and districts are undefined', () => {
-			const userWithoutLocationFields = { ...mockUser, states: undefined, districts: undefined } as User;
+			const userWithoutLocationFields = {
+				...mockUser,
+				states: undefined,
+				districts: undefined
+			} as User;
 			expect(hasLocation(userWithoutLocationFields)).toBe(false);
 		});
 	});

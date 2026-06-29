@@ -4,7 +4,7 @@
 	import type { SuperForm, Infer } from 'sveltekit-superforms';
 	import type { ProfileSchema } from './schema';
 	import Settings from '@lucide/svelte/icons/settings';
-	import { isStateAdmin, hasAssignedDistricts, getUserState, getUserDistrict } from '$lib/utils/permissions';
+	import { getUserState, getUserDistrict } from '$lib/utils/permissions';
 	import type { User } from '$lib/utils/permissions';
 
 	let {
@@ -99,7 +99,6 @@
 						{/if}
 					</div>
 				{/if}
-
 			</div>
 		</div>
 	</div>

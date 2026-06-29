@@ -3,7 +3,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { fail } from '@sveltejs/kit';
-import { setFlash } from 'sveltekit-flash-message/server';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 export const load: PageServerLoad = async ({ params, url }) => {
@@ -74,6 +74,6 @@ export const actions: Actions = {
 			return fail(response.status);
 		}
 
-		setFlash({ type: 'success', message: 'Candidate deleted successfully.' }, cookies);
+		throw redirect(303, url.pathname, { type: 'success', message: 'Candidate deleted successfully.' }, cookies);
 	}
 };

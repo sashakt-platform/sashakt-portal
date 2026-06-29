@@ -3,7 +3,7 @@
 	import { DataTable } from '$lib/components/data-table/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { createResponseColumns } from './columns.js';
-	import { canDelete } from '$lib/utils/permissions.js';
+	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 
 	let { data } = $props();
@@ -14,7 +14,7 @@
 	const currentPage = $derived(data?.params?.page || 1);
 	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
 
-	const userCanDelete = $derived(canDelete(data.user, 'candidate'));
+	const userCanDelete = $derived(hasPermission(data.user, PERMISSIONS.DELETE_CANDIDATE));
 
 	let deleteAction: string | null = $state(null);
 

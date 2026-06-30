@@ -46,13 +46,6 @@
 	let selectedTemplateId = $state<string | null>(null);
 	let currentScreen: number = $state(typeOfScreen.primary);
 
-	let cachedTemplates = $state(data.templates);
-	let cachedTemplateParams = $state(data.templateParams);
-	$effect(() => {
-		cachedTemplates = data.templates;
-		cachedTemplateParams = data.templateParams;
-	});
-
 	$effect(() => {
 		if (data.convertTemplate && data.testData) {
 			currentScreen = typeOfScreen.questions;
@@ -245,7 +238,11 @@
 			label: convertTemplate ? `Select ${term('test_template')}` : 'Primary Details',
 			mode: typeOfScreen.primary
 		},
-		{ number: 2, label: convertTemplate ? 'Review Questions' : 'Select Questions', mode: typeOfScreen.questions },
+		{
+			number: 2,
+			label: convertTemplate ? 'Review Questions' : 'Select Questions',
+			mode: typeOfScreen.questions
+		},
 		{ number: 3, label: `${term('test')} Configuration`, mode: typeOfScreen.configuration }
 	]);
 </script>
@@ -328,8 +325,8 @@
 						{formData}
 						user={data.user}
 						{convertTemplate}
-						templates={cachedTemplates}
-						templateParams={cachedTemplateParams}
+						templates={data.templates}
+						templateParams={data.templateParams}
 						bind:selectedTemplateId
 					/>
 				{:else if currentScreen === typeOfScreen.questions}

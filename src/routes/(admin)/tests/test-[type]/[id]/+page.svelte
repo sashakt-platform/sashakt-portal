@@ -11,6 +11,7 @@
 	import { getQuestionSetMandatoryLimitError, testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import {
 		applyOrgSettingsToNewTestForm,
 		type OrgSettingsPayload
@@ -45,9 +46,26 @@
 	let selectedTemplateId = $state<string | null>(null);
 	let currentScreen: number = $state(typeOfScreen.primary);
 
+	let cachedTemplates = $state(data.templates);
+	let cachedTemplateParams = $state(data.templateParams);
+	$effect(() => {
+		if (data.templates.items.length > 0) {
+			cachedTemplates = data.templates;
+			cachedTemplateParams = data.templateParams;
+		}
+	});
+
 	$effect(() => {
 		if (data.convertTemplate && data.testData) {
 			currentScreen = typeOfScreen.questions;
+		}
+	});
+
+	$effect(() => {
+		if (convertTemplate && currentScreen === typeOfScreen.primary) {
+			if (page.url.searchParams.has('template_id')) {
+				goto('?', { invalidateAll: true, noScroll: true, keepFocus: true });
+			}
 		}
 	});
 
@@ -308,8 +326,8 @@
 						{formData}
 						user={data.user}
 						{convertTemplate}
-						templates={data.templates}
-						templateParams={data.templateParams}
+						templates={cachedTemplates}
+						templateParams={cachedTemplateParams}
 						bind:selectedTemplateId
 					/>
 				{:else if currentScreen === typeOfScreen.questions}

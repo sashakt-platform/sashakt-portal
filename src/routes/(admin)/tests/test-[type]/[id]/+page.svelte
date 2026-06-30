@@ -49,10 +49,8 @@
 	let cachedTemplates = $state(data.templates);
 	let cachedTemplateParams = $state(data.templateParams);
 	$effect(() => {
-		if (data.templates.items.length > 0) {
-			cachedTemplates = data.templates;
-			cachedTemplateParams = data.templateParams;
-		}
+		cachedTemplates = data.templates;
+		cachedTemplateParams = data.templateParams;
 	});
 
 	$effect(() => {
@@ -64,7 +62,9 @@
 	$effect(() => {
 		if (convertTemplate && currentScreen === typeOfScreen.primary) {
 			if (page.url.searchParams.has('template_id')) {
-				goto('?', { invalidateAll: true, noScroll: true, keepFocus: true });
+				const url = new URL(page.url);
+				url.searchParams.delete('template_id');
+				goto(url, { invalidateAll: true, noScroll: true, keepFocus: true });
 			}
 		}
 	});
@@ -227,7 +227,9 @@
 
 	function handleNext() {
 		if (currentScreen === typeOfScreen.primary && convertTemplate) {
-			goto(`?template_id=${selectedTemplateId}`, { invalidateAll: true });
+			const url = new URL(page.url);
+			url.searchParams.set('template_id', selectedTemplateId!);
+			goto(url, { invalidateAll: true });
 			return;
 		}
 		if (currentScreen === typeOfScreen.configuration) {
@@ -243,7 +245,7 @@
 			label: convertTemplate ? `Select ${term('test_template')}` : 'Primary Details',
 			mode: typeOfScreen.primary
 		},
-		{ number: 2, label: 'Select Questions', mode: typeOfScreen.questions },
+		{ number: 2, label: convertTemplate ? 'Review Questions' : 'Select Questions', mode: typeOfScreen.questions },
 		{ number: 3, label: `${term('test')} Configuration`, mode: typeOfScreen.configuration }
 	]);
 </script>
@@ -336,6 +338,7 @@
 						questions={data.questions}
 						questionParams={data.questionParams}
 						user={data.user}
+						{convertTemplate}
 					/>
 				{/if}
 			</div>

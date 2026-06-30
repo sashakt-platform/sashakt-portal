@@ -7,6 +7,7 @@
 	import SearchInput from '$lib/components/SearchInput.svelte';
 	import ArrowUpDown from '@lucide/svelte/icons/arrow-up-down';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group/index.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { useTerms } from '$lib/nomenclature';
@@ -131,54 +132,40 @@
 		</div>
 	{/if}
 
-	{#each items as template (template.id)}
-		{@const isSelected = selectedTemplateId === String(template.id)}
-		<button
-			type="button"
-			class="grid w-full grid-cols-[44px_1fr_280px_160px] items-center border-t border-border px-4 py-4 text-left transition-colors {isSelected
-				? 'bg-primary/5'
-				: 'hover:bg-background'}"
-			onclick={() => (selectedTemplateId = String(template.id))}
-		>
-			<!-- Checkbox -->
-			<div
-				class="flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 {isSelected
-					? 'border-primary bg-primary'
-					: 'border-border'}"
+	<RadioGroup bind:value={selectedTemplateId} class="gap-0">
+		{#each items as template (template.id)}
+			{@const isSelected = selectedTemplateId === String(template.id)}
+			<button
+				type="button"
+				class="grid w-full grid-cols-[44px_1fr_280px_160px] items-center border-t border-border px-4 py-4 text-left transition-colors {isSelected
+					? 'bg-primary/5'
+					: 'hover:bg-background'}"
+				onclick={() => (selectedTemplateId = String(template.id))}
 			>
-				{#if isSelected}
-					<svg class="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
-						<path
-							d="M2 6l3 3 5-5"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						/>
-					</svg>
-				{/if}
-			</div>
+				<!-- Radio Button -->
+				<RadioGroupItem value={String(template.id)} />
 
-			<!-- Name -->
-			<p class="text-sm font-medium text-foreground">{template.name}</p>
+				<!-- Name -->
+				<p class="text-sm font-medium text-foreground">{template.name}</p>
 
-			<!-- Tags -->
-			<div class="flex flex-wrap gap-1">
-				{#each (template.tags ?? []).slice(0, 2) as tag}
-					<TagChip name={tag.name} class="max-w-36" />
-				{/each}
-				{#if (template.tags ?? []).length > 2}
-					<TagChip name="+{(template.tags ?? []).length - 2}" />
-				{/if}
-			</div>
+				<!-- Tags -->
+				<div class="flex flex-wrap gap-1">
+					{#each (template.tags ?? []).slice(0, 2) as tag}
+						<TagChip name={tag.name} class="max-w-36" />
+					{/each}
+					{#if (template.tags ?? []).length > 2}
+						<TagChip name="+{(template.tags ?? []).length - 2}" />
+					{/if}
+				</div>
 
-			<!-- Date -->
-			<div class="text-sm text-muted-foreground">
-				<p>{formatDate(template.modified_date)}</p>
-				<p class="text-xs text-subtle-foreground">{formatTime(template.modified_date)}</p>
-			</div>
-		</button>
-	{/each}
+				<!-- Date -->
+				<div class="text-sm text-muted-foreground">
+					<p>{formatDate(template.modified_date)}</p>
+					<p class="text-xs text-subtle-foreground">{formatTime(template.modified_date)}</p>
+				</div>
+			</button>
+		{/each}
+	</RadioGroup>
 
 	<!-- Pagination -->
 	<div class="flex items-center justify-between border-t border-border px-4 py-3">

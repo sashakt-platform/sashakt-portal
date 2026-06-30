@@ -57,6 +57,9 @@
 </div>
 
 <form id="profile-form" method="POST" action="?/save" use:enhance>
-	<AccountForm {form} />
+	<AccountForm
+		form={form}
+		currentUser={data.currentUser}
+	/>
 	<ChangePassword {form} />
 </form>

@@ -4,8 +4,19 @@
 	import type { SuperForm, Infer } from 'sveltekit-superforms';
 	import type { ProfileSchema } from './schema';
 	import Settings from '@lucide/svelte/icons/settings';
+	import { getUserState, getUserDistrict } from '$lib/utils/permissions';
+	import type { User } from '$lib/utils/permissions';
 
-	let { form }: { form: SuperForm<Infer<ProfileSchema>> } = $props();
+	let {
+		form,
+		currentUser
+	}: {
+		form: SuperForm<Infer<ProfileSchema>>;
+		currentUser: User | null;
+	} = $props();
+
+	const userState = getUserState(currentUser);
+	const userDistricts = getUserDistrict(currentUser);
 
 	const { form: formData } = form;
 </script>
@@ -63,6 +74,31 @@
 						disabled
 					/>
 				</div>
+				{#if userState}
+					<div class={userDistricts ? 'grid grid-cols-1 gap-4 md:grid-cols-2' : ''}>
+						<div class="flex flex-col gap-1.5">
+							<label for="state-field" class="text-sm font-medium">State</label>
+							<Input
+								id="state-field"
+								class="disabled:bg-background"
+								value={userState.name}
+								disabled
+							/>
+						</div>
+
+						{#if userDistricts}
+							<div class="flex flex-col gap-1.5">
+								<label for="district-field" class="text-sm font-medium">District</label>
+								<Input
+									id="district-field"
+									class="disabled:bg-background"
+									value={userDistricts.map((d) => d.name).join(', ')}
+									disabled
+								/>
+							</div>
+						{/if}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

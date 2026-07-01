@@ -11,6 +11,7 @@
 	import { getQuestionSetMandatoryLimitError, testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import {
 		applyOrgSettingsToNewTestForm,
 		type OrgSettingsPayload
@@ -48,6 +49,16 @@
 	$effect(() => {
 		if (data.convertTemplate && data.testData) {
 			currentScreen = typeOfScreen.questions;
+		}
+	});
+
+	$effect(() => {
+		if (convertTemplate && currentScreen === typeOfScreen.primary) {
+			if (page.url.searchParams.has('template_id')) {
+				const url = new URL(page.url);
+				url.searchParams.delete('template_id');
+				goto(url, { invalidateAll: true, noScroll: true, keepFocus: true });
+			}
 		}
 	});
 
@@ -209,7 +220,9 @@
 
 	function handleNext() {
 		if (currentScreen === typeOfScreen.primary && convertTemplate) {
-			goto(`?template_id=${selectedTemplateId}`, { invalidateAll: true });
+			const url = new URL(page.url);
+			url.searchParams.set('template_id', selectedTemplateId!);
+			goto(url, { invalidateAll: true });
 			return;
 		}
 		if (currentScreen === typeOfScreen.configuration) {
@@ -225,7 +238,11 @@
 			label: convertTemplate ? `Select ${term('test_template')}` : 'Primary Details',
 			mode: typeOfScreen.primary
 		},
-		{ number: 2, label: 'Select Questions', mode: typeOfScreen.questions },
+		{
+			number: 2,
+			label: convertTemplate ? 'Review Questions' : 'Select Questions',
+			mode: typeOfScreen.questions
+		},
 		{ number: 3, label: `${term('test')} Configuration`, mode: typeOfScreen.configuration }
 	]);
 </script>
@@ -318,6 +335,7 @@
 						questions={data.questions}
 						questionParams={data.questionParams}
 						user={data.user}
+						{convertTemplate}
 					/>
 				{/if}
 			</div>

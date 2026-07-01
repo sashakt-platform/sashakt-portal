@@ -5,7 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import Plus from '@lucide/svelte/icons/plus';
 	import { resolve } from '$app/paths';
-	import { canCreate } from '$lib/utils/permissions.js';
+	import { canCreate, canDelete } from '$lib/utils/permissions.js';
 
 	let { data } = $props();
 
@@ -15,7 +15,7 @@
 	const currentPage = 1;
 	const pageSize = $derived(Math.max(tableData.length, 1));
 
-	const columns = $derived(createColumns());
+	const columns = $derived(createColumns({ canDelete: canDelete(data.user, 'provider') }));
 </script>
 
 <ListingPageLayout title="Integrations" subtitle="" showInfoIcon={false}>

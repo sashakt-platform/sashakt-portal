@@ -75,5 +75,37 @@ export const actions: Actions = {
 			{ type: 'success', message: 'Provider added successfully' },
 			cookies
 		);
+	},
+
+	delete: async ({ params, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_PROVIDER);
+		const token = getSessionTokenCookie();
+
+		const res = await fetch(
+			`${BACKEND_URL}/providers/organizations/${user.organization_id}/providers/${params.id}`,
+			{
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`
+				}
+			}
+		);
+
+		if (!res.ok) {
+			const errorMessage = await res.json();
+			redirect(
+				'/organization/integrations',
+				{ type: 'error', message: errorMessage.detail || 'Failed to delete provider' },
+				cookies
+			);
+		}
+
+		redirect(
+			'/organization/integrations',
+			{ type: 'success', message: 'Provider deleted successfully' },
+			cookies
+		);
 	}
 };

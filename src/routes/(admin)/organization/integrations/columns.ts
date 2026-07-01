@@ -1,9 +1,11 @@
 import { z } from 'zod';
 import type { ColumnDef } from '@tanstack/table-core';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
+import { DataTableActions } from '$lib/components/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import ActiveStatusBadge from '$lib/components/data-table/ActiveStatusBadge.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
+import { resolve } from '$app/paths';
 
 export const providerSchema = z.object({
 	provider_type: z.string(),
@@ -28,7 +30,9 @@ export const organizationProviderSchema = z.object({
 
 export type OrganizationProvider = z.infer<typeof organizationProviderSchema>;
 
-export const createColumns = (): ColumnDef<OrganizationProvider>[] => [
+export const createColumns = (permissions?: {
+	canDelete?: boolean;
+}): ColumnDef<OrganizationProvider>[] => [
 	{
 		accessorKey: 'provider.name',
 		header: 'NAME',
@@ -71,5 +75,21 @@ export const createColumns = (): ColumnDef<OrganizationProvider>[] => [
 				? renderComponent(DateCell, { value: row.original.last_sync_timestamp })
 				: 'Never',
 		size: 160
+	},
+	{
+		id: 'actions',
+		enableSorting: false,
+		enableHiding: false,
+		size: 60,
+		cell: ({ row }) =>
+			renderComponent(DataTableActions, {
+				id: row.original.provider_id,
+				entityName: 'Provider',
+				editUrl: '',
+				deleteUrl: resolve(`/organization/integrations/delete/${row.original.provider_id}?/delete`),
+				canEdit: false,
+				canDelete: permissions?.canDelete ?? true,
+				deleteInline: true
+			})
 	}
 ];

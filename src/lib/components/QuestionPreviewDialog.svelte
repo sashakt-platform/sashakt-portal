@@ -1,20 +1,16 @@
 <script lang="ts">
-	import type { Component } from 'svelte';
-	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as RadioGroup from '$lib/components/ui/radio-group/index.js';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import MediaDisplay from '$lib/components/MediaDisplay.svelte';
+	import PreviewDialog from '$lib/components/PreviewDialog.svelte';
 	import type { TMedia } from '$lib/types/media';
 	import { QuestionTypeEnum } from '$lib/types/question';
 	import RichText from '$lib/components/RichText.svelte';
 	import Flag from '@lucide/svelte/icons/flag';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import Monitor from '@lucide/svelte/icons/monitor';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
-	import X from '@lucide/svelte/icons/x';
 
 	export type MatrixItem = { id: number; key: string; value: string };
 
@@ -116,73 +112,14 @@
 	{/if}
 {/snippet}
 
-{#snippet viewModeButton(
-	mode: 'mobile' | 'desktop',
-	Icon: Component<{ size?: number }>,
-	label: string
-)}
-	<button
-		type="button"
-		onclick={() => (viewMode = mode)}
-		class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors {viewMode ===
-		mode
-			? 'bg-background text-primary font-medium shadow-sm'
-			: 'text-muted-foreground hover:text-foreground'}"
-	>
-		<Icon size={14} />
-		{label}
-	</button>
-{/snippet}
-
-<Dialog.Root
-	bind:open
-	onOpenChange={(isOpen) => {
-		if (!isOpen) resetSelections();
-	}}
->
-	<Dialog.Overlay class="fixed bg-black/30 backdrop-blur-sm" />
-	<Dialog.Content
-		showCloseButton={false}
-		class="flex flex-col gap-0 overflow-hidden rounded-xl p-0"
-		style="width: 1200px; max-width: 95vw; height: 700px; max-height: 90vh;"
-	>
-		<Dialog.Header class="flex flex-row items-center justify-between space-y-0 border-b px-8 py-4">
-			<Dialog.Title class="text-base font-semibold">Question Preview</Dialog.Title>
-
-			<div class="flex items-center gap-3">
-				<div class="bg-muted flex items-center rounded-lg border p-1">
-					{@render viewModeButton('mobile', Smartphone, 'Mobile')}
-					{@render viewModeButton('desktop', Monitor, 'Desktop')}
-				</div>
-
-				<Dialog.Close
-					aria-label="Close"
-					class="text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center rounded-md p-2 transition-colors"
-				>
-					<X size={22} />
-				</Dialog.Close>
-			</div>
-		</Dialog.Header>
-
-		<div class="bg-muted/30 flex flex-1 items-start justify-center overflow-y-auto p-10">
-			{#if viewMode === 'mobile'}
-				<div
-					class="border-foreground/80 bg-background relative mx-auto w-100 rounded-2xl border-[3px]"
-					style="min-height: 553px;"
-				>
-					<div class="overflow-y-auto px-4" style="max-height: 553px;">
-						{@render questionCard()}
-						{@render reviewButton('mobile')}
-					</div>
-				</div>
-			{:else}
-				<div class="border-foreground/80 bg-background w-full overflow-hidden rounded-2xl border-2">
-					{@render questionCard()}
-				</div>
-			{/if}
-		</div>
-	</Dialog.Content>
-</Dialog.Root>
+<PreviewDialog bind:open bind:viewMode title="Question Preview" onClose={resetSelections}>
+	<div class={viewMode === 'mobile' ? 'px-4' : ''}>
+		{@render questionCard()}
+		{#if viewMode === 'mobile'}
+			{@render reviewButton('mobile')}
+		{/if}
+	</div>
+</PreviewDialog>
 
 {#snippet matrixColumnCard(
 	label: string,

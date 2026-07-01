@@ -13,6 +13,7 @@
 	import { dragHandleZone } from 'svelte-dnd-action';
 	import InlineFieldCard from './InlineFieldCard.svelte';
 	import ChooseFieldTypeDialog from './ChooseFieldTypeDialog.svelte';
+	import FormPreview from './FormPreview.svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Plus from '@lucide/svelte/icons/plus';
@@ -152,6 +153,10 @@
 
 	function handleFieldDeleted(fieldId: number) {
 		fields = fields.filter((f) => f.id !== fieldId);
+	}
+
+	function handleFieldUpdated(updatedField: FormField) {
+		fields = fields.map((f) => (f.id === updatedField.id ? updatedField : f));
 	}
 
 	function handleDndConsider(e: CustomEvent<{ items: FormField[] }>) {
@@ -297,6 +302,11 @@
 			</div>
 
 			<div class="flex items-center gap-3">
+				<FormPreview
+					formName={$formData.name ?? ''}
+					formDescription={$formData.description}
+					{fields}
+				/>
 				<Button
 					type="button"
 					class="bg-primary"
@@ -381,6 +391,7 @@
 							onDelete={handleFieldDeleted}
 							onDuplicate={handleDuplicateField}
 							onFieldTypeChange={handleFieldTypeChange}
+							onFieldUpdate={handleFieldUpdated}
 						/>
 					{/each}
 				</div>

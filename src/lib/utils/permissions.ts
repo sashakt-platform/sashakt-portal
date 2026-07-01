@@ -157,7 +157,13 @@ export const PERMISSIONS = {
 	UPDATE_FORM: 'update_form',
 	DELETE_FORM: 'delete_form',
 	READ_FORM: 'read_form',
-	READ_FORM_RESPONSE: 'read_form_response'
+	READ_FORM_RESPONSE: 'read_form_response',
+
+	// Provider permissions
+	CREATE_PROVIDER: 'create_provider',
+	UPDATE_PROVIDER: 'update_provider',
+	DELETE_PROVIDER: 'delete_provider',
+	READ_PROVIDER: 'read_provider'
 } as const;
 
 /**

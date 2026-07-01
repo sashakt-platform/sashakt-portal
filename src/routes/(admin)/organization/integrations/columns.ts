@@ -6,42 +6,54 @@ import ActiveStatusBadge from '$lib/components/data-table/ActiveStatusBadge.svel
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 
 export const providerSchema = z.object({
-	id: z.number(),
+	provider_type: z.string(),
 	name: z.string(),
 	description: z.string().optional().nullable(),
-	provider_type: z.string(),
 	is_active: z.boolean(),
+	id: z.number(),
 	created_date: z.string(),
 	modified_date: z.string()
 });
 
-export type Provider = z.infer<typeof providerSchema>;
+export const organizationProviderSchema = z.object({
+	id: z.number(),
+	organization_id: z.number(),
+	provider_id: z.number(),
+	is_enabled: z.boolean(),
+	last_sync_timestamp: z.string().nullable(),
+	created_date: z.string(),
+	modified_date: z.string(),
+	provider: providerSchema
+});
 
-export const createColumns = (): ColumnDef<Provider>[] => [
+export type OrganizationProvider = z.infer<typeof organizationProviderSchema>;
+
+export const createColumns = (): ColumnDef<OrganizationProvider>[] => [
 	{
-		accessorKey: 'name',
+		accessorKey: 'provider.name',
 		header: 'NAME',
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.name }),
+		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.provider.name }),
 		meta: { grow: true }
 	},
 	{
-		accessorKey: 'provider_type',
+		accessorKey: 'provider.provider_type',
 		header: 'Type',
-		cell: ({ row }) => renderComponent(TruncatedTextCell, { value: row.original.provider_type }),
+		cell: ({ row }) =>
+			renderComponent(TruncatedTextCell, { value: row.original.provider.provider_type }),
 		size: 160
 	},
 	{
-		accessorKey: 'description',
+		accessorKey: 'provider.description',
 		header: 'Description',
 		cell: ({ row }) =>
-			renderComponent(TruncatedTextCell, { value: row.original.description ?? '' }),
+			renderComponent(TruncatedTextCell, { value: row.original.provider.description ?? '' }),
 		size: 220,
 		meta: { cellClassName: 'max-w-[220px] overflow-hidden' }
 	},
 	{
-		accessorKey: 'is_active',
+		accessorKey: 'is_enabled',
 		header: 'Status',
-		cell: ({ row }) => renderComponent(ActiveStatusBadge, { active: row.original.is_active }),
+		cell: ({ row }) => renderComponent(ActiveStatusBadge, { active: row.original.is_enabled }),
 		size: 130,
 		meta: { align: 'center' }
 	},
@@ -49,6 +61,15 @@ export const createColumns = (): ColumnDef<Provider>[] => [
 		accessorKey: 'modified_date',
 		header: 'Updated',
 		cell: ({ row }) => renderComponent(DateCell, { value: row.original.modified_date }),
+		size: 160
+	},
+	{
+		accessorKey: 'last_sync_timestamp',
+		header: 'Last Synced',
+		cell: ({ row }) =>
+			row.original.last_sync_timestamp
+				? renderComponent(DateCell, { value: row.original.last_sync_timestamp })
+				: 'Never',
 		size: 160
 	}
 ];

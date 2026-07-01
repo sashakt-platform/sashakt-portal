@@ -143,6 +143,13 @@ describe('Candidate Responses page (UI)', () => {
 			).toBeGreaterThan(0);
 		});
 
+		it('shows a dash (not "Invalid Date") for start/end time when the candidate has not submitted', () => {
+			render(ResponsesPage, { data: makeData([notSubmittedCandidate]) } as any);
+			expect(screen.queryByText(/Invalid Date/)).not.toBeInTheDocument();
+			const row = screen.getByText('candidate-bbb').closest('tr') as HTMLElement;
+			expect(within(row).getAllByText('—').length).toBeGreaterThan(0);
+		});
+
 		it('shows "Xm Ys" time taken for a submitted candidate', () => {
 			render(ResponsesPage, { data: makeData() } as any);
 			expect(screen.getByText('1m 30s')).toBeInTheDocument();

@@ -1,22 +1,16 @@
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
-import { DEFAULT_PAGE_SIZE } from '$lib/constants';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ cookies, url }) => {
-	requireLogin();
+export const load: PageServerLoad = async ({ cookies }) => {
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.READ_PROVIDER);
 	const token = getSessionTokenCookie();
+	const orgId = user.organization_id;
 
-	const page = Number(url.searchParams.get('page')) || 1;
-	const size = Number(url.searchParams.get('size')) || DEFAULT_PAGE_SIZE;
-
-	const providersQueryParams = new URLSearchParams({
-		page: page.toString(),
-		size: size.toString()
-	});
-
-	const res = await fetch(`${BACKEND_URL}/providers/?${providersQueryParams}`, {
+	const res = await fetch(`${BACKEND_URL}/providers/organizations/${orgId}/providers`, {
 		method: 'GET',
 		headers: { Authorization: `Bearer ${token}` }
 	});
@@ -32,18 +26,12 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 			cookies
 		);
 
-		return {
-			providers: { items: [], total: 0, pages: 0 },
-			totalPages: 0,
-			params: { page, size }
-		};
+		return { providers: [] };
 	}
 
 	const providers = await res.json();
 
-	return {
-		providers,
-		totalPages: providers.pages || 0,
-		params: { page, size }
-	};
+
+
+	return { providers };
 };

@@ -160,6 +160,12 @@ export const createTestColumns = (
 					action: () => onViewReport?.(test.id),
 					icon: 'chart-column-decreasing'
 				});
+
+				customActions.push({
+					label: 'View Responses',
+					href: resolve(`${baseUrl}/${test.id}/responses`),
+					icon: 'eye'
+				});
 			}
 
 			const isOwner = isOwnEntity(user ?? null, test.created_by_id);

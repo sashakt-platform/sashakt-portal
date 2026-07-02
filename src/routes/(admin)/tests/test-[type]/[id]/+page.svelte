@@ -52,16 +52,6 @@
 		}
 	});
 
-	$effect(() => {
-		if (convertTemplate && currentScreen === typeOfScreen.primary) {
-			if (page.url.searchParams.has('template_id')) {
-				const url = new URL(page.url);
-				url.searchParams.delete('template_id');
-				goto(url, { invalidateAll: true, noScroll: true, keepFocus: true });
-			}
-		}
-	});
-
 	const {
 		form: formData,
 		enhance,
@@ -173,6 +163,34 @@
 					question_revisions: questionSet.question_revisions || []
 				})
 			) || [];
+
+		// Configuration-tab fields: also inherit these from the template.
+		const configFields = [
+			'time_limit',
+			'pause_timer_when_inactive',
+			'shuffle',
+			'random_questions',
+			'no_of_random_questions',
+			'question_pagination',
+			'marks_level',
+			'marking_scheme',
+			'show_result',
+			'show_question_palette',
+			'bookmark',
+			'show_feedback_on_completion',
+			'show_feedback_immediately',
+			'locale',
+			'omr',
+			'form_id',
+			'certificate_id',
+			'start_instructions',
+			'completion_message',
+			'no_of_attempts',
+			'link'
+		] as const;
+		for (const field of configFields) {
+			if ((td as any)[field] !== undefined) ($formData as any)[field] = (td as any)[field];
+		}
 	}
 
 	populateFormFromTestData(testData);
@@ -212,9 +230,18 @@
 			(currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
 	);
 
+	function goToStep(step: number) {
+		currentScreen = step;
+		if (step === typeOfScreen.primary && page.url.searchParams.has('template_id')) {
+			const url = new URL(page.url);
+			url.searchParams.delete('template_id');
+			goto(url, { invalidateAll: true, noScroll: true, keepFocus: true });
+		}
+	}
+
 	function handlePrevious() {
 		if (currentScreen > typeOfScreen.primary) {
-			currentScreen--;
+			goToStep(currentScreen - 1);
 		}
 	}
 
@@ -272,7 +299,7 @@
 									? 'cursor-pointer'
 									: ''}"
 								onclick={() => {
-									if (isCompleted) currentScreen = step.mode;
+									if (isCompleted) goToStep(step.mode);
 								}}
 								disabled={!isCompleted && !isActive}
 							>

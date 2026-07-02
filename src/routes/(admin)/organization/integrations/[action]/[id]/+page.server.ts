@@ -4,7 +4,7 @@ import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { addProviderSchema } from './schema.js';
 import type { PageServerLoad, Actions } from './$types';
 
@@ -18,7 +18,12 @@ export const load: PageServerLoad = async ({ params }) => {
 		headers: { Authorization: `Bearer ${token}` }
 	});
 
-	const providers = res.ok ? (await res.json()).items : [];
+	if (!res.ok) {
+		const errorMessage = await res.json();
+		error(res.status, errorMessage.detail || 'Failed to load providers');
+	}
+
+	const providers = (await res.json()).items;
 
 	return {
 		form: await superValidate(zod4(addProviderSchema)),

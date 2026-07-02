@@ -18,6 +18,7 @@ vi.mock('$app/state', () => ({
 
 vi.mock('$lib/utils/permissions.js', () => ({
 	canCreate: vi.fn(),
+	canUpdate: vi.fn(),
 	canDelete: vi.fn()
 }));
 
@@ -73,6 +74,7 @@ describe('Integrations Page (+page.svelte)', () => {
 		vi.clearAllMocks();
 		const permissions = await import('$lib/utils/permissions.js');
 		vi.mocked(permissions.canCreate).mockReturnValue(false);
+		vi.mocked(permissions.canUpdate).mockReturnValue(false);
 		vi.mocked(permissions.canDelete).mockReturnValue(false);
 	});
 
@@ -138,6 +140,16 @@ describe('Integrations Page (+page.svelte)', () => {
 		it('renders without crashing when the providers list is empty', () => {
 			render(IntegrationsPage, { data: makeData({ providers: [] }) } as never);
 			expect(screen.getByText(/no results/i)).toBeInTheDocument();
+		});
+	});
+
+	describe('Column permissions', () => {
+		it('passes canEdit=true to columns when the user has update permission', async () => {
+			const permissions = await import('$lib/utils/permissions.js');
+			vi.mocked(permissions.canUpdate).mockReturnValue(true);
+
+			render(IntegrationsPage, { data: makeData() } as never);
+			expect(permissions.canUpdate).toHaveBeenCalledWith(expect.anything(), 'provider');
 		});
 	});
 

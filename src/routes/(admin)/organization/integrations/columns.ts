@@ -31,6 +31,7 @@ export const organizationProviderSchema = z.object({
 export type OrganizationProvider = z.infer<typeof organizationProviderSchema>;
 
 export const createColumns = (permissions?: {
+	canEdit?: boolean;
 	canDelete?: boolean;
 }): ColumnDef<OrganizationProvider>[] => [
 	{
@@ -85,10 +86,11 @@ export const createColumns = (permissions?: {
 			renderComponent(DataTableActions, {
 				id: row.original.provider_id,
 				entityName: 'Provider',
-				editUrl: '',
+				editUrl: resolve(`/organization/integrations/edit/${row.original.provider_id}`),
 				deleteUrl: resolve(`/organization/integrations/delete/${row.original.provider_id}?/delete`),
-				canEdit: false,
+				canEdit: permissions?.canEdit ?? true,
 				canDelete: permissions?.canDelete ?? true,
+				editInline: true,
 				deleteInline: true
 			})
 	}

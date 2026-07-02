@@ -32,17 +32,19 @@ function storeOf<T>(initial: T) {
 }
 
 vi.mock('sveltekit-superforms', () => ({
-	superForm: vi.fn((formInput: { data?: Record<string, unknown>; errors?: Record<string, unknown> }) => ({
-		form: storeOf(formInput?.data ?? { provider_id: 0, config_json: '', is_enabled: true }),
-		errors: storeOf(formInput?.errors ?? {}),
-		constraints: storeOf({}),
-		tainted: storeOf(undefined),
-		allErrors: storeOf([]),
-		posted: storeOf(false),
-		message: storeOf(undefined),
-		submitting: storeOf(false),
-		enhance: vi.fn()
-	}))
+	superForm: vi.fn(
+		(formInput: { data?: Record<string, unknown>; errors?: Record<string, unknown> }) => ({
+			form: storeOf(formInput?.data ?? { provider_id: 0, config_json: '', is_enabled: true }),
+			errors: storeOf(formInput?.errors ?? {}),
+			constraints: storeOf({}),
+			tainted: storeOf(undefined),
+			allErrors: storeOf([]),
+			posted: storeOf(false),
+			message: storeOf(undefined),
+			submitting: storeOf(false),
+			enhance: vi.fn()
+		})
+	)
 }));
 
 const mockProviders = [
@@ -150,27 +152,27 @@ describe('Add Provider Page (+page.svelte)', () => {
 	});
 
 	describe('Status toggle', () => {
-		it('shows "Enabled" and a checked switch when is_enabled is true', () => {
+		it('shows "Active" and a checked switch when is_enabled is true', () => {
 			render(AddProviderPage, { data: makeData() } as never);
-			expect(screen.getByText('Enabled')).toBeInTheDocument();
+			expect(screen.getByText('Active')).toBeInTheDocument();
 			expect(screen.getByRole('switch')).toHaveAttribute('data-state', 'checked');
 		});
 
-		it('shows "Disabled" and an unchecked switch when is_enabled is false', () => {
+		it('shows "Inactive" and an unchecked switch when is_enabled is false', () => {
 			render(AddProviderPage, {
 				data: makeData({
 					form: { data: { provider_id: 0, config_json: '', is_enabled: false }, errors: {} }
 				})
 			} as never);
-			expect(screen.getByText('Disabled')).toBeInTheDocument();
+			expect(screen.getByText('Inactive')).toBeInTheDocument();
 			expect(screen.getByRole('switch')).toHaveAttribute('data-state', 'unchecked');
 		});
 
-		it('toggling the switch flips the label from Enabled to Disabled', async () => {
+		it('toggling the switch flips the label from Active to Inactive', async () => {
 			render(AddProviderPage, { data: makeData() } as never);
-			expect(screen.getByText('Enabled')).toBeInTheDocument();
+			expect(screen.getByText('Active')).toBeInTheDocument();
 			await fireEvent.click(screen.getByRole('switch'));
-			expect(screen.getByText('Disabled')).toBeInTheDocument();
+			expect(screen.getByText('Inactive')).toBeInTheDocument();
 		});
 	});
 
@@ -224,5 +226,43 @@ describe('Add Provider Page (+page.svelte)', () => {
 			} as never);
 			expect(screen.getByText('Config must be valid JSON')).toBeInTheDocument();
 		});
+	});
+});
+
+function makeEditData(overrides: Record<string, unknown> = {}) {
+	return {
+		form: {
+			data: { provider_id: 2, config_json: '', is_enabled: true },
+			errors: {}
+		},
+		action: 'edit',
+		providers: mockProviders,
+		...overrides
+	};
+}
+
+describe('Edit Provider Page (+page.svelte)', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('renders the "Edit Provider" heading', () => {
+		render(AddProviderPage, { data: makeEditData() } as never);
+		expect(screen.getByRole('heading', { name: /edit provider/i })).toBeInTheDocument();
+	});
+
+	it('shows the matching provider name pre-selected in the (still editable) dropdown', () => {
+		const { container } = render(AddProviderPage, { data: makeEditData() } as never);
+		expect(container.querySelector('[aria-haspopup="listbox"]')).toHaveTextContent('Twilio');
+	});
+
+	it('shows the "leave blank to keep existing configuration" hint', () => {
+		render(AddProviderPage, { data: makeEditData() } as never);
+		expect(screen.getByText(/leave blank to keep the existing configuration/i)).toBeInTheDocument();
+	});
+
+	it('enables Save since the provider is already locked in', () => {
+		render(AddProviderPage, { data: makeEditData() } as never);
+		expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 	});
 });

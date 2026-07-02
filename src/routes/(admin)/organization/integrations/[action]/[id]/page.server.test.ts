@@ -18,6 +18,7 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	requirePermission: vi.fn(),
 	PERMISSIONS: {
 		CREATE_PROVIDER: 'CREATE_PROVIDER',
+		UPDATE_PROVIDER: 'UPDATE_PROVIDER',
 		DELETE_PROVIDER: 'DELETE_PROVIDER'
 	}
 }));
@@ -121,6 +122,98 @@ describe('page.server load function', () => {
 			server.load({ params: { action: 'add', id: 'new' } } as any)
 		).rejects.toMatchObject({ status: 500, body: { message: 'Failed to load providers' } });
 	});
+
+	describe('edit action', () => {
+		const mockOrgProviders = [
+			{ provider_id: 1, is_enabled: true, provider: { name: 'Google Sheets' } },
+			{ provider_id: 2, is_enabled: false, provider: { name: 'Twilio' } }
+		];
+		const mockCatalog = {
+			items: [
+				{ id: 1, name: 'Google Sheets' },
+				{ id: 2, name: 'Twilio' }
+			]
+		};
+
+		function mockOrgAndCatalogFetch() {
+			(global.fetch as any)
+				.mockResolvedValueOnce({ ok: true, json: async () => mockCatalog })
+				.mockResolvedValueOnce({ ok: true, json: async () => mockOrgProviders });
+		}
+
+		it('prefills the form from the matching organization provider and returns the full catalog', async () => {
+			mockOrgAndCatalogFetch();
+
+			const result = (await server.load({ params: { action: 'edit', id: '2' } } as any)) as any;
+
+			expect(result.action).toBe('edit');
+			expect(result.providers).toEqual(mockCatalog.items);
+			expect(superValidate).toHaveBeenCalledWith(
+				{ provider_id: 2, config_json: '', is_enabled: false },
+				addProviderSchema
+			);
+		});
+
+		it('requires the UPDATE_PROVIDER permission', async () => {
+			const permissions = await import('$lib/utils/permissions.js');
+			mockOrgAndCatalogFetch();
+
+			await server.load({ params: { action: 'edit', id: '2' } } as any);
+
+			expect(permissions.requirePermission).toHaveBeenCalledWith(
+				expect.objectContaining({ organization_id: 10 }),
+				'UPDATE_PROVIDER'
+			);
+		});
+
+		it('fetches the organization-scoped providers with the correct URL and Bearer token', async () => {
+			mockOrgAndCatalogFetch();
+
+			await server.load({ params: { action: 'edit', id: '2' } } as any);
+
+			expect(global.fetch).toHaveBeenCalledWith(
+				'http://fake-backend/providers/organizations/10/providers',
+				expect.objectContaining({
+					method: 'GET',
+					headers: expect.objectContaining({ Authorization: 'Bearer fake-token' })
+				})
+			);
+		});
+
+		it('throws a 404 when no organization provider matches the id', async () => {
+			mockOrgAndCatalogFetch();
+
+			await expect(
+				server.load({ params: { action: 'edit', id: '999' } } as any)
+			).rejects.toMatchObject({ status: 404 });
+		});
+
+		it('throws a load error with the backend detail when the organization providers fetch fails', async () => {
+			(global.fetch as any)
+				.mockResolvedValueOnce({ ok: true, json: async () => mockCatalog })
+				.mockResolvedValueOnce({
+					ok: false,
+					status: 502,
+					json: async () => ({ detail: 'Providers unavailable' })
+				});
+
+			await expect(
+				server.load({ params: { action: 'edit', id: '2' } } as any)
+			).rejects.toMatchObject({ status: 502, body: { message: 'Providers unavailable' } });
+		});
+
+		it('throws a load error with the backend detail when the catalog fetch fails', async () => {
+			(global.fetch as any).mockResolvedValueOnce({
+				ok: false,
+				status: 502,
+				json: async () => ({ detail: 'Catalog unavailable' })
+			});
+
+			await expect(
+				server.load({ params: { action: 'edit', id: '2' } } as any)
+			).rejects.toMatchObject({ status: 502, body: { message: 'Catalog unavailable' } });
+		});
+	});
 });
 
 describe('page.server save action', () => {
@@ -131,6 +224,7 @@ describe('page.server save action', () => {
 
 		const result = (await server.actions.save({
 			request: {},
+			params: { action: 'add', id: 'new' },
 			cookies: mockCookies
 		} as any)) as any;
 
@@ -146,7 +240,11 @@ describe('page.server save action', () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
 		try {
-			await server.actions.save({ request: {}, cookies: mockCookies } as any);
+			await server.actions.save({
+				request: {},
+				params: { action: 'add', id: 'new' },
+				cookies: mockCookies
+			} as any);
 		} catch {
 			// redirect() throws in production
 		}
@@ -165,7 +263,11 @@ describe('page.server save action', () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
 		try {
-			await server.actions.save({ request: {}, cookies: mockCookies } as any);
+			await server.actions.save({
+				request: {},
+				params: { action: 'add', id: 'new' },
+				cookies: mockCookies
+			} as any);
 		} catch {
 			// redirect() throws in production
 		}
@@ -182,7 +284,11 @@ describe('page.server save action', () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
 		try {
-			await server.actions.save({ request: {}, cookies: mockCookies } as any);
+			await server.actions.save({
+				request: {},
+				params: { action: 'add', id: 'new' },
+				cookies: mockCookies
+			} as any);
 		} catch {
 			// redirect() throws in production
 		}
@@ -195,7 +301,11 @@ describe('page.server save action', () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
 		try {
-			await server.actions.save({ request: {}, cookies: mockCookies } as any);
+			await server.actions.save({
+				request: {},
+				params: { action: 'add', id: 'new' },
+				cookies: mockCookies
+			} as any);
 		} catch {
 			// redirect() throws in production
 		}
@@ -219,6 +329,7 @@ describe('page.server save action', () => {
 
 		const result = (await server.actions.save({
 			request: {},
+			params: { action: 'add', id: 'new' },
 			cookies: mockCookies
 		} as any)) as any;
 
@@ -237,6 +348,7 @@ describe('page.server save action', () => {
 
 		const result = (await server.actions.save({
 			request: {},
+			params: { action: 'add', id: 'new' },
 			cookies: mockCookies
 		} as any)) as any;
 
@@ -245,6 +357,94 @@ describe('page.server save action', () => {
 			mockCookies
 		);
 		expect(result.status).toBe(500);
+	});
+
+	describe('edit action', () => {
+		it('requires the UPDATE_PROVIDER permission', async () => {
+			const permissions = await import('$lib/utils/permissions.js');
+			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+			try {
+				await server.actions.save({
+					request: {},
+					params: { action: 'edit', id: '2' },
+					cookies: mockCookies
+				} as any);
+			} catch {
+				// redirect() throws in production
+			}
+
+			expect(permissions.requirePermission).toHaveBeenCalledWith(
+				expect.objectContaining({ organization_id: 10 }),
+				'UPDATE_PROVIDER'
+			);
+		});
+
+		it('PUTs to the organization-scoped provider and omits config_json when blank', async () => {
+			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+			try {
+				await server.actions.save({
+					request: {},
+					params: { action: 'edit', id: '2' },
+					cookies: mockCookies
+				} as any);
+			} catch {
+				// redirect() throws in production
+			}
+
+			expect(global.fetch).toHaveBeenCalledWith(
+				'http://fake-backend/providers/organizations/10/providers/2',
+				expect.objectContaining({ method: 'PUT' })
+			);
+			const body = JSON.parse((global.fetch as any).mock.calls[0][1].body);
+			expect(body).toEqual({ is_enabled: true });
+			expect(redirect).toHaveBeenCalledWith(
+				'/organization/integrations',
+				{ type: 'success', message: 'Provider updated successfully' },
+				mockCookies
+			);
+		});
+
+		it('includes config_json in the PUT body when present', async () => {
+			(superValidate as any).mockResolvedValueOnce({
+				valid: true,
+				data: { provider_id: 2, config_json: '{"api_key":"abc"}', is_enabled: true }
+			});
+			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+			try {
+				await server.actions.save({
+					request: {},
+					params: { action: 'edit', id: '2' },
+					cookies: mockCookies
+				} as any);
+			} catch {
+				// redirect() throws in production
+			}
+
+			const body = JSON.parse((global.fetch as any).mock.calls[0][1].body);
+			expect(body).toEqual({ is_enabled: true, config_json: { api_key: 'abc' } });
+		});
+
+		it('returns fail(500) with the backend detail when the PUT fails', async () => {
+			(global.fetch as any).mockResolvedValueOnce({
+				ok: false,
+				json: async () => ({ detail: 'Update rejected' })
+			});
+
+			const result = (await server.actions.save({
+				request: {},
+				params: { action: 'edit', id: '2' },
+				cookies: mockCookies
+			} as any)) as any;
+
+			expect(setFlash).toHaveBeenCalledWith(
+				{ type: 'error', message: 'Update rejected' },
+				mockCookies
+			);
+			expect(result.status).toBe(500);
+		});
 	});
 });
 

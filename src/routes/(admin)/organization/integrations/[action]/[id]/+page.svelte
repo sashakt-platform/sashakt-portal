@@ -24,6 +24,8 @@
 		};
 	} = $props();
 
+	const isEdit = $derived(data.action === 'edit');
+
 	const form = superForm(data.form, {
 		validators: zod4Client(addProviderSchema),
 		dataType: 'json'
@@ -46,7 +48,9 @@
 					>
 						<ArrowLeft size={20} />
 					</a>
-					<h2 class="text-2xl font-bold tracking-tight">Add Provider</h2>
+					<h2 class="text-2xl font-bold tracking-tight">
+						{isEdit ? 'Edit Provider' : 'Add Provider'}
+					</h2>
 				</div>
 				<Button type="submit" class="bg-primary font-semibold" disabled={!canSave}>Save</Button>
 			</div>
@@ -73,6 +77,7 @@
 										value={$formData.provider_id ? String($formData.provider_id) : ''}
 										onValueChange={(value) => ($formData.provider_id = Number(value))}
 										name={props.name}
+										disabled={isEdit}
 									>
 										<Select.Trigger {...props} class="h-10 w-full gap-2 rounded-full px-4">
 											{#if $formData.provider_id}
@@ -101,7 +106,7 @@
 										? 'text-primary font-semibold'
 										: 'text-muted-foreground'}"
 								>
-									{$formData.is_enabled ? 'Enabled' : 'Disabled'}
+									{$formData.is_enabled ? 'Active' : 'Inactive'}
 								</span>
 								<Switch id="is_enabled" name="is_enabled" bind:checked={$formData.is_enabled} />
 							</div>
@@ -112,6 +117,11 @@
 								<Form.Control>
 									{#snippet children({ props })}
 										<Form.Label class="font-semibold">Configuration (JSON)</Form.Label>
+										{#if isEdit}
+											<p class="text-muted-foreground text-xs">
+												Leave blank to keep the existing configuration.
+											</p>
+										{/if}
 										<Textarea
 											{...props}
 											rows={10}

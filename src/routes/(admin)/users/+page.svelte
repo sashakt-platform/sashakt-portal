@@ -8,15 +8,19 @@
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
-	import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+	import { canCreate, canUpdate, canDelete, isSuperAdmin } from '$lib/utils/permissions.js';
 	import SearchInput from '$lib/components/SearchInput.svelte';
 	import { useTerms } from '$lib/nomenclature';
 	import BatchActionsToolbar from '$lib/components/data-table/BatchActionsToolbar.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import { enhance } from '$app/forms';
+	import OrganizationSelection from '$lib/components/OrganizationSelection.svelte';
+	import type { Filter } from '$lib/types/filters.js';
 
 	let { data } = $props();
 	const term = useTerms();
+
+	let filteredOrganizations: Filter[] = $state([]);
 
 	const tableData = $derived(data?.users?.items || []);
 	const totalItems = $derived(data?.users?.total || 0);
@@ -144,7 +148,21 @@
 	{/snippet}
 
 	{#snippet filters()}
-		<SearchInput placeholder={`Search ${term('users', 'lower')}...`} value={search} />
+		<div class="flex flex-col gap-4 lg:flex-row lg:items-start">
+			<SearchInput placeholder={`Search ${term('users', 'lower')}...`} value={search} />
+
+			{#if isSuperAdmin(data.user)}
+				<div class="flex flex-1 flex-wrap items-start justify-end gap-2">
+					<div>
+						<OrganizationSelection
+							bind:organizations={filteredOrganizations}
+							multiple={false}
+							filteration={true}
+						/>
+					</div>
+				</div>
+			{/if}
+		</div>
 	{/snippet}
 
 	{#snippet content()}

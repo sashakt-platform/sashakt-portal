@@ -2,10 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
 import UsersListingPage from './+page.svelte';
-import { canCreate, canUpdate, canDelete } from '$lib/utils/permissions.js';
+import { canCreate, canUpdate, canDelete, isSuperAdmin } from '$lib/utils/permissions.js';
 import { goto } from '$app/navigation';
 import { page } from '$app/state';
 import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
+import OrganizationSelection from '$lib/components/OrganizationSelection.svelte';
 
 vi.mock('$app/navigation', () => ({
 	goto: vi.fn(),
@@ -43,6 +44,10 @@ vi.mock('$lib/nomenclature', async () => {
 });
 
 vi.mock('$lib/components/data-table/BatchActionsToolbar.svelte', () => ({
+	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
+}));
+
+vi.mock('$lib/components/OrganizationSelection.svelte', () => ({
 	default: vi.fn().mockImplementation(() => ({ $$set: vi.fn(), $destroy: vi.fn(), $on: vi.fn() }))
 }));
 
@@ -269,6 +274,27 @@ describe('Users Listing Page', () => {
 		it('shows rows info text', () => {
 			render(UsersListingPage, { data: makeData() } as any);
 			expect(screen.getByText(/Showing 1 to/)).toBeInTheDocument();
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Organization filter', () => {
+		it('does not render the organization filter when the user is not a super admin', () => {
+			vi.mocked(isSuperAdmin).mockReturnValue(false);
+			render(UsersListingPage, { data: makeData() } as any);
+			expect(vi.mocked(OrganizationSelection)).not.toHaveBeenCalled();
+		});
+
+		it('renders the organization filter when the user is a super admin', () => {
+			vi.mocked(isSuperAdmin).mockReturnValue(true);
+			render(UsersListingPage, { data: makeData() } as any);
+			expect(vi.mocked(OrganizationSelection)).toHaveBeenCalled();
+		});
+
+		it('renders the organization filter exactly once when the user is a super admin', () => {
+			vi.mocked(isSuperAdmin).mockReturnValue(true);
+			render(UsersListingPage, { data: makeData() } as any);
+			expect(vi.mocked(OrganizationSelection)).toHaveBeenCalledTimes(1);
 		});
 	});
 

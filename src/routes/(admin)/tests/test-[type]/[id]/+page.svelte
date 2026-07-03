@@ -164,7 +164,6 @@
 				})
 			) || [];
 
-		// Configuration-tab fields: also inherit these from the template.
 		const configFields = [
 			'time_limit',
 			'pause_timer_when_inactive',
@@ -185,11 +184,10 @@
 			'certificate_id',
 			'start_instructions',
 			'completion_message',
-			'no_of_attempts',
-			'link'
-		] as const;
+			'no_of_attempts'
+		] as const satisfies readonly (keyof NonNullable<typeof td>)[];
 		for (const field of configFields) {
-			if ((td as any)[field] !== undefined) ($formData as any)[field] = (td as any)[field];
+			if (td[field] !== undefined) ($formData as Record<string, unknown>)[field] = td[field];
 		}
 	}
 

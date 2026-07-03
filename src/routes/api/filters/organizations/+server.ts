@@ -1,13 +1,18 @@
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
-import { getSessionTokenCookie } from '$lib/server/auth';
+import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
+import { requirePermission, isSuperAdmin, PERMISSIONS } from '$lib/utils/permissions';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url }) => {
-	const token = getSessionTokenCookie();
-	if (!token) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.READ_ORGANIZATION);
+
+	if (!isSuperAdmin(user)) {
+		throw error(403, 'Access denied: Super admin only');
 	}
+
+	const token = getSessionTokenCookie();
 	const search = url.searchParams.get('search') || '';
 
 	const queryParams = new URLSearchParams({

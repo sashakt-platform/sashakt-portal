@@ -33,7 +33,8 @@ vi.mock('$lib/constants', () => ({
 vi.mock('$lib/utils/permissions.js', () => ({
 	canCreate: vi.fn(() => false),
 	canUpdate: vi.fn(() => false),
-	canDelete: vi.fn(() => false)
+	canDelete: vi.fn(() => false),
+	isSuperAdmin: vi.fn(() => false)
 }));
 
 vi.mock('$lib/nomenclature', async () => {

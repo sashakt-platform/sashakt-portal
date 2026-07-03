@@ -25,6 +25,7 @@ vi.mock('$lib/server/auth', () => ({
 // Mock permissions
 vi.mock('$lib/utils/permissions.js', () => ({
 	requirePermission: vi.fn(),
+	isSuperAdmin: vi.fn(() => false),
 	PERMISSIONS: {
 		READ_USER: 'read_user',
 		CREATE_USER: 'create_user',
@@ -167,7 +168,8 @@ describe('Users List Route', () => {
 				size: 25,
 				search: '',
 				sortBy: '',
-				sortOrder: 'asc'
+				sortOrder: 'asc',
+				organizationId: ''
 			});
 		});
 
@@ -187,7 +189,8 @@ describe('Users List Route', () => {
 				size: 25,
 				search: '',
 				sortBy: '',
-				sortOrder: 'asc'
+				sortOrder: 'asc',
+				organizationId: ''
 			});
 		});
 

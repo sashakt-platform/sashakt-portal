@@ -899,6 +899,25 @@ describe('Test Create/Update Page', () => {
 					expect(btn.closest('button')).toBeDisabled();
 				});
 			});
+
+			it('also clears template_id when the "Select Test template" stepper label is clicked directly', async () => {
+				setupSuperFormMock();
+				render(TestCreatePage, {
+					data: baseData({ convertTemplate: true, testData: makeTemplateTestData() })
+				});
+
+				// Clicking the completed step-1 label (not the Previous button) should behave
+				// the same way: it's a separate code path that bypassed the fix initially.
+				await fireEvent.click(screen.getByText('Select Test Template'));
+
+				expect(goto).toHaveBeenCalledWith('/tests/test-session/convert', {
+					invalidateAll: true
+				});
+				const prevButtons = screen.getAllByText('Previous');
+				prevButtons.forEach((btn) => {
+					expect(btn.closest('button')).toBeDisabled();
+				});
+			});
 		});
 	});
 });

@@ -9,7 +9,7 @@
 	import Copy from '@lucide/svelte/icons/copy';
 	import Link2 from '@lucide/svelte/icons/link-2';
 	import ChartColumnDecreasing from '@lucide/svelte/icons/chart-column-decreasing';
-	import Eye from '@lucide/svelte/icons/eye';
+	import ListChecks from '@lucide/svelte/icons/list-checks';
 
 	interface CustomAction {
 		label: string;
@@ -74,8 +74,8 @@
 				return Link2;
 			case 'chart-column-decreasing':
 				return ChartColumnDecreasing;
-			case 'eye':
-				return Eye;
+			case 'list-checks':
+				return ListChecks;
 			default:
 				return undefined;
 		}

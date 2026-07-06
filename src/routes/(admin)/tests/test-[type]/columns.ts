@@ -164,7 +164,7 @@ export const createTestColumns = (
 				customActions.push({
 					label: 'View Responses',
 					href: resolve(`${baseUrl}/${test.id}/responses`),
-					icon: 'eye'
+					icon: 'list-checks'
 				});
 			}
 

@@ -11,6 +11,7 @@
 	import { getQuestionSetMandatoryLimitError, testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import {
 		applyOrgSettingsToNewTestForm,
 		type OrgSettingsPayload
@@ -86,12 +87,29 @@
 			: $formData.question_revision_ids.length
 	);
 
+	// Fields that need reshaping between the backend response and the form
+	// schema (e.g. `states` -> `state_ids`); every other schema field is copied
+	// through as-is below, since the backend already returns them under the
+	// same names (see testData.is_template/template_id/link in +page.server.ts).
+	const RELATIONAL_FIELD_KEYS = new Set([
+		'state_ids',
+		'district_ids',
+		'tag_ids',
+		'tag_type_ids',
+		'question_revision_ids',
+		'question_revisions',
+		'random_tag_count',
+		'question_sets'
+	]);
+
 	function populateFormFromTestData(td: typeof testData) {
 		if (!td) return;
-		$formData.name = (td as any)?.name || '';
-		$formData.description = (td as any)?.description || '';
-		$formData.show_marks =
-			typeof (td as any)?.show_marks === 'boolean' ? (td as any).show_marks : $formData.show_marks;
+		for (const key of Object.keys(testSchema.shape)) {
+			if (RELATIONAL_FIELD_KEYS.has(key)) continue;
+			if (key in (td as any)) {
+				($formData as any)[key] = (td as any)[key];
+			}
+		}
 		$formData.state_ids =
 			td?.states?.map((state: Filter) => ({
 				id: String(state.id),
@@ -132,7 +150,7 @@
 			})) || [];
 
 		$formData.question_sets =
-			testData?.question_sets?.map(
+			td?.question_sets?.map(
 				(questionSet: {
 					id?: number | null;
 					title: string;
@@ -201,9 +219,24 @@
 			(currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
 	);
 
+	// Drop template_id so the load function re-fetches the template list
+	// (it's only fetched when no template_id is present).
+	function goToScreen(target: number) {
+		if (
+			target === typeOfScreen.primary &&
+			convertTemplate &&
+			currentScreen !== typeOfScreen.primary
+		) {
+			currentScreen = target;
+			goto(page.url.pathname, { invalidateAll: true });
+			return;
+		}
+		currentScreen = target;
+	}
+
 	function handlePrevious() {
 		if (currentScreen > typeOfScreen.primary) {
-			currentScreen--;
+			goToScreen(currentScreen - 1);
 		}
 	}
 
@@ -225,7 +258,11 @@
 			label: convertTemplate ? `Select ${term('test_template')}` : 'Primary Details',
 			mode: typeOfScreen.primary
 		},
-		{ number: 2, label: 'Select Questions', mode: typeOfScreen.questions },
+		{
+			number: 2,
+			label: convertTemplate ? 'Review Questions' : 'Select Questions',
+			mode: typeOfScreen.questions
+		},
 		{ number: 3, label: `${term('test')} Configuration`, mode: typeOfScreen.configuration }
 	]);
 </script>
@@ -255,7 +292,7 @@
 									? 'cursor-pointer'
 									: ''}"
 								onclick={() => {
-									if (isCompleted) currentScreen = step.mode;
+									if (isCompleted) goToScreen(step.mode);
 								}}
 								disabled={!isCompleted && !isActive}
 							>
@@ -318,6 +355,7 @@
 						questions={data.questions}
 						questionParams={data.questionParams}
 						user={data.user}
+						{convertTemplate}
 					/>
 				{/if}
 			</div>

@@ -19,8 +19,15 @@
 		formData,
 		questions,
 		questionParams,
-		user = null
-	}: { formData: any; questions: any; questionParams: any; user?: User | null } = $props();
+		user = null,
+		convertTemplate = false
+	}: {
+		formData: any;
+		questions: any;
+		questionParams: any;
+		user?: User | null;
+		convertTemplate?: boolean;
+	} = $props();
 	let dialogOpen = $state(false);
 	let questionSelectionMode: 'manual' | 'tagBased' = $state('tagBased');
 	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
@@ -97,7 +104,7 @@
 				<FileQuestionIcon class="text-primary h-5 w-5" />
 			</div>
 			<div>
-				<p class="font-semibold">Select Questions</p>
+				<p class="font-semibold">{convertTemplate ? 'Review Questions' : 'Select Questions'}</p>
 				<p class="text-muted-foreground text-sm">
 					{#if isSectionedTest}
 						Review the sectioned questions included in this {$formData.is_template

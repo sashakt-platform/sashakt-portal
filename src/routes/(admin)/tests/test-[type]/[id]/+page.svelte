@@ -250,7 +250,11 @@
 			label: convertTemplate ? `Select ${term('test_template')}` : 'Primary Details',
 			mode: typeOfScreen.primary
 		},
-		{ number: 2, label: 'Select Questions', mode: typeOfScreen.questions },
+		{
+			number: 2,
+			label: convertTemplate ? 'Review Questions' : 'Select Questions',
+			mode: typeOfScreen.questions
+		},
 		{ number: 3, label: `${term('test')} Configuration`, mode: typeOfScreen.configuration }
 	]);
 </script>
@@ -343,6 +347,7 @@
 						questions={data.questions}
 						questionParams={data.questionParams}
 						user={data.user}
+						{convertTemplate}
 					/>
 				{/if}
 			</div>

@@ -219,16 +219,24 @@
 			(currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
 	);
 
+	// Drop template_id so the load function re-fetches the template list
+	// (it's only fetched when no template_id is present).
+	function goToScreen(target: number) {
+		if (
+			target === typeOfScreen.primary &&
+			convertTemplate &&
+			currentScreen !== typeOfScreen.primary
+		) {
+			currentScreen = target;
+			goto(page.url.pathname, { invalidateAll: true });
+			return;
+		}
+		currentScreen = target;
+	}
+
 	function handlePrevious() {
 		if (currentScreen > typeOfScreen.primary) {
-			if (currentScreen - 1 === typeOfScreen.primary && convertTemplate) {
-				currentScreen--;
-				// Drop template_id so the load function re-fetches the template list
-				// (it's only fetched when no template_id is present).
-				goto(page.url.pathname, { invalidateAll: true });
-				return;
-			}
-			currentScreen--;
+			goToScreen(currentScreen - 1);
 		}
 	}
 
@@ -284,7 +292,7 @@
 									? 'cursor-pointer'
 									: ''}"
 								onclick={() => {
-									if (isCompleted) currentScreen = step.mode;
+									if (isCompleted) goToScreen(step.mode);
 								}}
 								disabled={!isCompleted && !isActive}
 							>

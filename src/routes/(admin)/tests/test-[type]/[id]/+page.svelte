@@ -11,6 +11,7 @@
 	import { getQuestionSetMandatoryLimitError, testSchema, type FormSchema } from './schema';
 	import type { Filter } from '$lib/types/filters';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import {
 		applyOrgSettingsToNewTestForm,
 		type OrgSettingsPayload
@@ -220,6 +221,13 @@
 
 	function handlePrevious() {
 		if (currentScreen > typeOfScreen.primary) {
+			if (currentScreen - 1 === typeOfScreen.primary && convertTemplate) {
+				currentScreen--;
+				// Drop template_id so the load function re-fetches the template list
+				// (it's only fetched when no template_id is present).
+				goto(page.url.pathname, { invalidateAll: true });
+				return;
+			}
 			currentScreen--;
 		}
 	}

@@ -218,6 +218,31 @@ describe('QuestionList', () => {
 		});
 	});
 
+	describe('header label', () => {
+		it('shows "Select Questions" by default', () => {
+			const formData = makeFormData();
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			expect(screen.getByText('Select Questions')).toBeInTheDocument();
+		});
+
+		it('shows "Review Questions" when creating from a template', () => {
+			const formData = makeFormData();
+
+			render(QuestionList, {
+				formData,
+				questions: [],
+				questionParams: {},
+				user: null,
+				convertTemplate: true
+			});
+
+			expect(screen.getByText('Review Questions')).toBeInTheDocument();
+			expect(screen.queryByText('Select Questions')).not.toBeInTheDocument();
+		});
+	});
+
 	describe('auto selection — tags carried over from Primary screen', () => {
 		it('defaults to Auto Selection mode when tags were selected and no explicit question IDs exist', () => {
 			const formData = makeFormData({

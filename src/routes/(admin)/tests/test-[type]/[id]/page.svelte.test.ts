@@ -4,9 +4,20 @@ import { render, screen, fireEvent } from '@testing-library/svelte';
 import { get, writable } from 'svelte/store';
 import TestCreatePage from './+page.svelte';
 import { superForm } from 'sveltekit-superforms';
+import { goto } from '$app/navigation';
 import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 // ── Module mocks ─────────────────────────────────────────────────────────────
+
+vi.mock('$app/navigation', () => ({
+	goto: vi.fn()
+}));
+
+vi.mock('$app/state', () => ({
+	page: {
+		url: new URL('http://localhost/tests/test-session/convert?template_id=99')
+	}
+}));
 
 vi.mock('sveltekit-superforms', () => ({
 	superForm: vi.fn()
@@ -82,7 +93,10 @@ const defaultFormValues = {
 	completion_message: null,
 	start_instructions: null,
 	question_pagination: 0,
-	no_of_attempts: 1
+	no_of_attempts: 1,
+	bookmark: false,
+	pause_timer_when_inactive: false,
+	form_id: null
 };
 
 let mockSubmit: ReturnType<typeof vi.fn>;
@@ -764,6 +778,127 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 			expect(screen.getByText('Create Test')).toBeInTheDocument();
 			expect(screen.getByText('Test Configuration')).toBeInTheDocument();
+		});
+	});
+
+	// ── Convert-from-template flow ───────────────────────────────────────────
+
+	describe('Convert-from-template flow', () => {
+		function makeTemplateTestData(overrides: Record<string, any> = {}) {
+			return {
+				id: '99',
+				name: 'Governance Template',
+				description: 'A template description',
+				is_active: true,
+				start_time: null,
+				end_time: null,
+				pause_timer_when_inactive: true,
+				time_limit: 45,
+				marks_level: 'test',
+				marks: 10,
+				marking_scheme: { correct: 2, wrong: -0.5, skipped: 0 },
+				completion_message: 'Thanks for completing the template test.',
+				start_instructions: 'Please read carefully before starting.',
+				no_of_attempts: 3,
+				shuffle: false,
+				random_questions: false,
+				no_of_random_questions: null,
+				question_pagination: 5,
+				show_result: false,
+				show_question_palette: false,
+				bookmark: true,
+				locale: 'en-US',
+				certificate_id: 7,
+				show_feedback_on_completion: true,
+				show_feedback_immediately: true,
+				form_id: 3,
+				omr: 'ALWAYS',
+				template_id: '99',
+				link: null,
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [],
+				random_tag_counts: [],
+				...overrides
+			};
+		}
+
+		// Scenario 2: step label reflects that questions are being reviewed, not chosen
+		it('shows the "Review Questions" step label once template data has loaded', () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ convertTemplate: true, testData: makeTemplateTestData() })
+			});
+
+			expect(screen.getByText('Review Questions')).toBeInTheDocument();
+			expect(screen.queryByText('Select Questions')).not.toBeInTheDocument();
+		});
+
+		it('still shows "Select Questions" for a normal (non-template) test', () => {
+			setupSuperFormMock();
+			render(TestCreatePage, { data: baseData() });
+
+			expect(screen.getByText('Select Questions')).toBeInTheDocument();
+			expect(screen.queryByText('Review Questions')).not.toBeInTheDocument();
+		});
+
+		// Scenario 3: Configuration-page fields are populated from the selected template
+		it('copies template configuration fields (pre/post-test messages etc.) into the form store', () => {
+			const formStore = setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ convertTemplate: true, testData: makeTemplateTestData() })
+			});
+
+			const stored = get(formStore);
+			expect(stored.start_instructions).toBe('Please read carefully before starting.');
+			expect(stored.completion_message).toBe('Thanks for completing the template test.');
+			expect(stored.time_limit).toBe(45);
+			expect(stored.marks_level).toBe('test');
+			expect(stored.marking_scheme).toEqual({ correct: 2, wrong: -0.5, skipped: 0 });
+			expect(stored.no_of_attempts).toBe(3);
+			expect(stored.certificate_id).toBe(7);
+			expect(stored.omr).toBe('ALWAYS');
+			expect(stored.show_feedback_on_completion).toBe(true);
+			expect(stored.show_feedback_immediately).toBe(true);
+			expect(stored.bookmark).toBe(true);
+			expect(stored.pause_timer_when_inactive).toBe(true);
+		});
+
+		// Scenario 1: going back to the template-select step must re-fetch the template list
+		describe('navigating back to the template-select step', () => {
+			it('clears template_id from the URL so the server re-fetches the template list', async () => {
+				setupSuperFormMock();
+				render(TestCreatePage, {
+					data: baseData({ convertTemplate: true, testData: makeTemplateTestData() })
+				});
+
+				// The effect auto-advances us to step 2 (Review Questions) once template data loads.
+				expect(screen.getByText('Review Questions')).toBeInTheDocument();
+
+				const prevButtons = screen.getAllByText('Previous');
+				await fireEvent.click(prevButtons[prevButtons.length - 1]);
+
+				expect(goto).toHaveBeenCalledWith('/tests/test-session/convert', {
+					invalidateAll: true
+				});
+			});
+
+			it('returns to the template-select step (Previous becomes disabled again)', async () => {
+				setupSuperFormMock();
+				render(TestCreatePage, {
+					data: baseData({ convertTemplate: true, testData: makeTemplateTestData() })
+				});
+
+				const prevButtons = screen.getAllByText('Previous');
+				await fireEvent.click(prevButtons[prevButtons.length - 1]);
+
+				const buttonsAfter = screen.getAllByText('Previous');
+				buttonsAfter.forEach((btn) => {
+					expect(btn.closest('button')).toBeDisabled();
+				});
+			});
 		});
 	});
 });

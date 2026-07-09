@@ -58,6 +58,7 @@
 		submit
 	} = superForm(testData || data.form, {
 		applyAction: 'never',
+		resetForm: false,
 		validators: zod4Client(testSchema),
 		dataType: 'json',
 		onSubmit() {
@@ -66,6 +67,21 @@
 			}
 			if ($formData.is_template) {
 				$formData.link = null;
+			}
+		},
+		onUpdated({ form }) {
+			if (!form.valid) return;
+			if (currentScreen === typeOfScreen.primary) {
+				const redirectId = (form.message as { redirectId?: number } | undefined)?.redirectId;
+				if (redirectId) {
+					goto(page.url.pathname.replace(/\/[^/]+$/, `/${redirectId}`), {
+						replaceState: true,
+						invalidateAll: true
+					});
+				}
+				currentScreen = typeOfScreen.questions;
+			} else if (currentScreen === typeOfScreen.questions) {
+				currentScreen = typeOfScreen.configuration;
 			}
 		}
 	});
@@ -202,6 +218,13 @@
 		return isEditing ? `Edit ${term('test')}` : `Create ${term('test')}`;
 	});
 
+	const nextStepIntent = $derived.by(() => {
+		if (convertTemplate) return null;
+		if (currentScreen === typeOfScreen.primary) return 'primary';
+		if (currentScreen === typeOfScreen.questions) return 'questions';
+		return null;
+	});
+
 	const isNextDisabled = $derived(
 		(currentScreen === typeOfScreen.primary && convertTemplate && !selectedTemplateId) ||
 			(currentScreen === typeOfScreen.primary &&
@@ -215,7 +238,8 @@
 			(currentScreen === typeOfScreen.configuration &&
 				$formData.random_questions &&
 				($formData.no_of_random_questions ?? 0) <= 0) ||
-			($formData.no_of_random_questions ?? 0) > totalQuestionCount ||
+			(currentScreen === typeOfScreen.configuration &&
+				($formData.no_of_random_questions ?? 0) > totalQuestionCount) ||
 			(currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
 	);
 
@@ -243,6 +267,12 @@
 	function handleNext() {
 		if (currentScreen === typeOfScreen.primary && convertTemplate) {
 			goto(`?template_id=${selectedTemplateId}`, { invalidateAll: true });
+			return;
+		}
+		if (currentScreen === typeOfScreen.primary) {
+			return;
+		}
+		if (currentScreen === typeOfScreen.questions && !convertTemplate) {
 			return;
 		}
 		if (currentScreen === typeOfScreen.configuration) {
@@ -329,7 +359,13 @@
 				>
 					Previous
 				</Button>
-				<Button class="bg-primary" disabled={isNextDisabled} onclick={handleNext}>
+				<Button
+					class="bg-primary"
+					disabled={isNextDisabled}
+					type={nextStepIntent ? 'submit' : 'button'}
+					formaction={nextStepIntent ? `?/save&intent=${nextStepIntent}` : undefined}
+					onclick={handleNext}
+				>
 					{currentScreen === typeOfScreen.configuration ? 'Save' : 'Next'}
 				</Button>
 			</div>
@@ -381,7 +417,13 @@
 		>
 			Previous
 		</Button>
-		<Button class="bg-primary" disabled={isNextDisabled} onclick={handleNext}>
+		<Button
+			class="bg-primary"
+			disabled={isNextDisabled}
+			type={nextStepIntent ? 'submit' : 'button'}
+			formaction={nextStepIntent ? `?/save&intent=${nextStepIntent}` : undefined}
+			onclick={handleNext}
+		>
 			{currentScreen === typeOfScreen.configuration ? 'Save' : 'Next'}
 		</Button>
 	</div>

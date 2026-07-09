@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
+import { flushSync } from 'svelte';
 import { get, writable } from 'svelte/store';
 import TestCreatePage from './+page.svelte';
 import { superForm } from 'sveltekit-superforms';
@@ -145,6 +146,15 @@ function getBottomNextButton() {
 	return buttons[buttons.length - 1].closest('button')!;
 }
 
+function completePrimaryStep(message?: Record<string, unknown>) {
+	const options = vi.mocked(superForm).mock.calls.at(-1)?.[1] as {
+		onUpdated: (event: { form: { valid: boolean; message?: Record<string, unknown> } }) => void;
+	};
+	// onUpdated mutates $state (currentScreen) outside of any Svelte event handler,
+	// so flush synchronously to guarantee the DOM reflects the new screen immediately.
+	flushSync(() => options.onUpdated({ form: { valid: true, message } }));
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('Test Create/Update Page', () => {
@@ -196,6 +206,7 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 
 			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
 		});
@@ -205,7 +216,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
 
 			expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
 		});
@@ -258,7 +271,7 @@ describe('Test Create/Update Page', () => {
 	// ── Next button disabled — cross-screen condition ────────────────────────
 
 	describe('Next button — disabled when random questions exceed selected', () => {
-		it('is disabled on step 1 when no_of_random_questions > question_revision_ids count', () => {
+		it('is not disabled on step 1 when no_of_random_questions > question_revision_ids count (check only applies on Configuration step)', () => {
 			setupSuperFormMock({
 				name: 'Test Name',
 				description: 'Test Desc',
@@ -267,7 +280,7 @@ describe('Test Create/Update Page', () => {
 			});
 			render(TestCreatePage, { data: baseData() });
 
-			expect(getBottomNextButton()).toBeDisabled();
+			expect(getBottomNextButton()).not.toBeDisabled();
 		});
 
 		it('is enabled when no_of_random_questions equals question_revision_ids count', () => {
@@ -314,7 +327,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
 
 			// Now on step 3 — button shows Save
 			expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
@@ -342,7 +357,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton());
 
 			expect(mockSubmit).toHaveBeenCalledOnce();
@@ -362,6 +379,7 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
 
 			expect(mockSubmit).not.toHaveBeenCalled();
@@ -470,7 +488,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // Save
 
 			expect(mockSubmit).toHaveBeenCalledOnce();
@@ -488,7 +508,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // Save
 
 			const stored = get(formStore);
@@ -550,8 +572,10 @@ describe('Test Create/Update Page', () => {
 			setupSuperFormMock();
 			render(TestCreatePage, { data: baseData({ testData: makeTestData() }) });
 
-			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2 (PUT, no redirect)
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // Save
 
 			expect(mockSubmit).toHaveBeenCalledOnce();

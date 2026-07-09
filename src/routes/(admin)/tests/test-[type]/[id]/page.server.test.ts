@@ -559,7 +559,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(requirePermission).toHaveBeenCalledWith(
@@ -576,7 +577,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'template', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(requirePermission).toHaveBeenCalledWith(
@@ -590,7 +592,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: '42' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(requirePermission).toHaveBeenCalledWith(
@@ -607,7 +610,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'template', id: '10' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(requirePermission).toHaveBeenCalledWith(
@@ -625,11 +629,12 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(setFlash).toHaveBeenCalledWith(
-				{ type: 'error', message: 'Test not created. Please check all the details.' },
+				{ type: 'error', message: 'Test not saved. Please check all the details.' },
 				mockCookies
 			);
 		});
@@ -639,7 +644,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(fail).toHaveBeenCalledWith(400, expect.anything());
@@ -650,7 +656,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(mockFetch).not.toHaveBeenCalled();
@@ -684,7 +691,8 @@ describe('Test Create/Update Page — save action', () => {
 			const result = await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const expectedMessage =
@@ -709,7 +717,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
@@ -725,7 +734,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
@@ -743,7 +753,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(redirect).toHaveBeenCalledWith(
@@ -763,7 +774,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'template', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(redirect).toHaveBeenCalledWith(
@@ -784,7 +796,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: '42' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
@@ -800,7 +813,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: '42' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(redirect).toHaveBeenCalledWith(
@@ -821,7 +835,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -835,7 +850,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -849,7 +865,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -863,7 +880,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -880,7 +898,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(JSON.parse(mockFetch.mock.calls[0][1].body).pause_timer_when_inactive).toBe(true);
@@ -911,7 +930,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: '42' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -945,7 +965,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'convert' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -966,7 +987,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -980,7 +1002,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: '42' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -994,7 +1017,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -1008,7 +1032,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -1026,7 +1051,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -1043,7 +1069,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -1061,7 +1088,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
@@ -1083,7 +1111,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(setFlash).toHaveBeenCalledWith(
@@ -1099,6 +1128,7 @@ describe('Test Create/Update Page — save action', () => {
 			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
 			mockFetch.mockResolvedValue({
 				ok: false,
+				status: 500,
 				statusText: 'Server Error',
 				json: async () => ({ detail: 'Something went wrong' })
 			});
@@ -1106,7 +1136,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(fail).toHaveBeenCalledWith(500, expect.anything());
@@ -1123,7 +1154,8 @@ describe('Test Create/Update Page — save action', () => {
 			await actions.save({
 				request: mockRequest,
 				params: { type: 'session', id: 'new' },
-				cookies: mockCookies
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
 			} as any);
 
 			expect(setFlash).toHaveBeenCalledWith(

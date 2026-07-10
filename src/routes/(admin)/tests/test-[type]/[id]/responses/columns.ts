@@ -3,7 +3,7 @@ import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
-import { createSelectionColumn } from '$lib/components/data-table/column-helpers';
+import { createSelectionColumn, createSortableColumn } from '$lib/components/data-table/column-helpers';
 
 type CandidateStatus = 'submitted' | 'not_submitted';
 export interface CandidateResult {
@@ -28,6 +28,9 @@ export interface CandidateResponse {
 }
 
 export const createResponseColumns = (
+	currentSortBy: string,
+	currentSortOrder: string,
+	handleSort: (columnId: string) => void,
 	onDelete?: (candidateId: number) => void,
 	canDelete = true,
 	enableSelection = false
@@ -38,12 +41,17 @@ export const createResponseColumns = (
 		header: 'Candidate',
 		meta: { grow: true }
 	},
-	{
-		accessorKey: 'status',
-		header: 'Status',
-		cell: ({ row }) => renderComponent(CandidateStatusBadge, { status: row.original.status }),
-		size: 150
-	},
+	createSortableColumn(
+		'status',
+		'Status',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => renderComponent(CandidateStatusBadge, { status: row.original.status }),
+			size: 150
+		}
+	),
 	{
 		id: 'marks',
 		header: 'Marks',
@@ -55,12 +63,17 @@ export const createResponseColumns = (
 		},
 		size: 130
 	},
-	{
-		accessorKey: 'start_time',
-		header: 'Start Time',
-		cell: ({ row }) => renderComponent(DateCell, { value: row.original.start_time ?? '' }),
-		size: 180
-	},
+	createSortableColumn(
+		'start_time',
+		'Start Time',
+		currentSortBy,
+		currentSortOrder,
+		handleSort,
+		{
+			cell: ({ row }) => renderComponent(DateCell, { value: row.original.start_time ?? '' }),
+			size: 180
+		}
+	),
 	{
 		accessorKey: 'end_time',
 		header: 'End Time',

@@ -7,7 +7,8 @@
 	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
 	import { enhance } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
+	import { page } from '$app/state';
 
 	let { data } = $props();
 
@@ -16,6 +17,8 @@
 	const totalPages = $derived(data?.totalPages || 0);
 	const currentPage = $derived(data?.params?.page || 1);
 	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
+	const sortBy = $derived(data?.params?.sortBy || '');
+	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
 
 	const userCanDelete = $derived(hasPermission(data.user, PERMISSIONS.DELETE_CANDIDATE));
 
@@ -31,7 +34,21 @@
 		deleteAction = `?/deleteCandidate&candidate_id=${candidateId}`;
 	}
 
-	const columns = $derived(createResponseColumns(handleDelete, userCanDelete, userCanDelete));
+	// handle sorting
+	function handleSort(columnId: string) {
+		const url = new URL(page.url);
+		const newSortOrder = sortBy === columnId && sortOrder === 'asc' ? 'desc' : 'asc';
+
+		url.searchParams.set('sortBy', columnId);
+		url.searchParams.set('sortOrder', newSortOrder);
+		url.searchParams.set('page', '1');
+
+		goto(url.toString(), { replaceState: false });
+	}
+
+	const columns = $derived(
+		createResponseColumns(sortBy, sortOrder, handleSort, handleDelete, userCanDelete, userCanDelete)
+	);
 
 	const handleSelectionChange = (selectedRows: CandidateResponse[], selectedRowIds: string[]) => {
 		selectedCandidates = selectedRows;

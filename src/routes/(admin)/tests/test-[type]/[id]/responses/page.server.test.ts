@@ -91,7 +91,7 @@ describe('Candidate Responses Route', () => {
 			expect(result.testName).toBe('Algebra Test');
 			expect(result.responses).toEqual({ items: [{ candidate_id: 1 }], total: 1, pages: 1 });
 			expect(result.totalPages).toBe(1);
-			expect(result.params).toEqual({ page: 1, size: 25 });
+			expect(result.params).toEqual({ page: 1, size: 25, sortBy: '', sortOrder: 'asc' });
 		});
 
 		it('passes custom page/size params to the candidate-report API', async () => {
@@ -108,7 +108,7 @@ describe('Candidate Responses Route', () => {
 			const reportCallUrl = mockFetch.mock.calls[1][0];
 			expect(reportCallUrl).toContain('page=3');
 			expect(reportCallUrl).toContain('size=10');
-			expect(result.params).toEqual({ page: 3, size: 10 });
+			expect(result.params).toEqual({ page: 3, size: 10, sortBy: '', sortOrder: 'asc' });
 		});
 
 		it('uses Bearer token when fetching the test and the candidate report', async () => {

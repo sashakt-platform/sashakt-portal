@@ -14,10 +14,13 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	const page = Number(url.searchParams.get('page')) || 1;
 	const size = Number(url.searchParams.get('size')) || DEFAULT_PAGE_SIZE;
+	const sortBy = url.searchParams.get('sortBy') || '';
+	const sortOrder = url.searchParams.get('sortOrder') || 'asc';
 
 	const queryParams = new URLSearchParams({
 		page: page.toString(),
-		size: size.toString()
+		size: size.toString(),
+		...(sortBy && { sort_by: sortBy, sort_order: sortOrder })
 	});
 
 	const [testRes, reportRes] = await Promise.all([
@@ -38,7 +41,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		testName: test?.name || 'Test',
 		responses,
 		totalPages: responses.pages || 0,
-		params: { page, size }
+		params: { page, size, sortBy, sortOrder }
 	};
 };
 

@@ -260,6 +260,11 @@
 
 	function handlePrevious() {
 		if (currentScreen > typeOfScreen.primary) {
+			if (currentScreen === typeOfScreen.questions) {
+				$formData.random_tag_count = ($formData.random_tag_count ?? []).filter(
+					(t) => t.count !== undefined
+				);
+			}
 			goToScreen(currentScreen - 1);
 		}
 	}

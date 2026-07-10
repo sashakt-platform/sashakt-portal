@@ -1,5 +1,4 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import type { z } from 'zod';
 import {
 	configurationSchema,
 	getQuestionSetMandatoryLimitError,

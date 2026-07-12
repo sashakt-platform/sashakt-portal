@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { load, actions } from './+page.server';
-import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { requirePermission, PERMISSIONS, isSuperAdmin } from '$lib/utils/permissions.js';
 
 // Mock environment variables
 vi.mock('$env/static/private', () => ({
@@ -25,6 +25,7 @@ vi.mock('$lib/server/auth', () => ({
 // Mock permissions
 vi.mock('$lib/utils/permissions.js', () => ({
 	requirePermission: vi.fn(),
+	isSuperAdmin: vi.fn(() => false),
 	PERMISSIONS: {
 		READ_USER: 'read_user',
 		CREATE_USER: 'create_user',
@@ -167,7 +168,8 @@ describe('Users List Route', () => {
 				size: 25,
 				search: '',
 				sortBy: '',
-				sortOrder: 'asc'
+				sortOrder: 'asc',
+				organizationId: ''
 			});
 		});
 
@@ -187,7 +189,8 @@ describe('Users List Route', () => {
 				size: 25,
 				search: '',
 				sortBy: '',
-				sortOrder: 'asc'
+				sortOrder: 'asc',
+				organizationId: ''
 			});
 		});
 
@@ -227,6 +230,73 @@ describe('Users List Route', () => {
 			const callUrl = mockFetch.mock.calls[0][0];
 			expect(callUrl).not.toContain('sort_by');
 			expect(callUrl).not.toContain('sort_order');
+		});
+
+		describe('organization filter', () => {
+			it('includes organization_id in the backend request when the user is a super admin and organization_ids is present', async () => {
+				vi.mocked(isSuperAdmin).mockReturnValue(true);
+				const mockUrl = new URL('http://localhost/users?organization_ids=5');
+
+				mockFetch.mockResolvedValue({
+					ok: true,
+					json: async () => ({ items: [], total: 0, pages: 0 })
+				});
+
+				const result = await load({ url: mockUrl } as any);
+
+				const callUrl = mockFetch.mock.calls[0][0];
+				expect(callUrl).toContain('organization_id=5');
+				expect(result.params.organizationId).toBe('5');
+			});
+
+			it('takes only the first organization_ids value when multiple are present', async () => {
+				vi.mocked(isSuperAdmin).mockReturnValue(true);
+				const mockUrl = new URL('http://localhost/users?organization_ids=5&organization_ids=9');
+
+				mockFetch.mockResolvedValue({
+					ok: true,
+					json: async () => ({ items: [], total: 0, pages: 0 })
+				});
+
+				const result = await load({ url: mockUrl } as any);
+
+				const callUrl = mockFetch.mock.calls[0][0];
+				expect(callUrl).toContain('organization_id=5');
+				expect(callUrl).not.toContain('organization_id=9');
+				expect(result.params.organizationId).toBe('5');
+			});
+
+			it('omits organization_id from the backend request when no organization_ids param is present', async () => {
+				vi.mocked(isSuperAdmin).mockReturnValue(true);
+				const mockUrl = new URL('http://localhost/users');
+
+				mockFetch.mockResolvedValue({
+					ok: true,
+					json: async () => ({ items: [], total: 0, pages: 0 })
+				});
+
+				const result = await load({ url: mockUrl } as any);
+
+				const callUrl = mockFetch.mock.calls[0][0];
+				expect(callUrl).not.toContain('organization_id=');
+				expect(result.params.organizationId).toBe('');
+			});
+
+			it('ignores organization_ids when the user is not a super admin, even if present in the URL', async () => {
+				vi.mocked(isSuperAdmin).mockReturnValue(false);
+				const mockUrl = new URL('http://localhost/users?organization_ids=5');
+
+				mockFetch.mockResolvedValue({
+					ok: true,
+					json: async () => ({ items: [], total: 0, pages: 0 })
+				});
+
+				const result = await load({ url: mockUrl } as any);
+
+				const callUrl = mockFetch.mock.calls[0][0];
+				expect(callUrl).not.toContain('organization_id=');
+				expect(result.params.organizationId).toBe('');
+			});
 		});
 	});
 

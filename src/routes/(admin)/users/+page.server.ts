@@ -1,7 +1,7 @@
 import { BACKEND_URL } from '$env/static/private';
 import { DEFAULT_PAGE_SIZE } from '$lib/constants.js';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
-import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
+import { requirePermission, isSuperAdmin, PERMISSIONS } from '$lib/utils/permissions.js';
 import type { PageServerLoad, Actions } from './$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { fail } from '@sveltejs/kit';
@@ -18,10 +18,16 @@ export const load: PageServerLoad = async ({ url }) => {
 	const sortBy = url.searchParams.get('sortBy') || '';
 	const sortOrder = url.searchParams.get('sortOrder') || 'asc';
 
+	const organizationId =
+		isSuperAdmin(user) && url.searchParams.getAll('organization_ids').length > 0
+			? url.searchParams.getAll('organization_ids')[0]
+			: '';
+
 	// build query parameters
 	const queryParams = new URLSearchParams({
 		page: page.toString(),
 		size: size.toString(),
+		...(organizationId && { organization_id: organizationId }),
 		...(search && { search }),
 		...(sortBy && { sort_by: sortBy }),
 		...(sortBy && { sort_order: sortOrder })
@@ -37,7 +43,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (!res.ok) {
 		return {
 			users: null,
-			params: { page, size, search, sortBy, sortOrder }
+			params: { page, size, search, sortBy, sortOrder, organizationId }
 		};
 	}
 
@@ -46,7 +52,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	return {
 		users,
 		totalPages: users.pages || 0,
-		params: { page, size, search, sortBy, sortOrder }
+		params: { page, size, search, sortBy, sortOrder, organizationId }
 	};
 };
 

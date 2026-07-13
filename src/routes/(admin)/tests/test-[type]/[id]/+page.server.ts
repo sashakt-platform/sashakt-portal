@@ -228,7 +228,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	};
 };
 
-
 const PRIMARY_FIELD_KEYS = Object.keys(primarySchema.shape);
 const QUESTION_FIELD_KEYS = Object.keys(questionSchema.shape);
 const CONFIGURATION_FIELD_KEYS = Object.keys(configurationSchema.shape);
@@ -373,6 +372,7 @@ export const actions: Actions = {
 		}
 
 		if (isPrimaryStep) {
+			setFlash({ type: 'success', message: `${term(subjectKey)}  saved successfully` }, cookies);
 			if (isCreateFlow) {
 				const newTest = await response.json();
 				return message(form, { redirectId: newTest.id });
@@ -381,6 +381,7 @@ export const actions: Actions = {
 		}
 
 		if (isQuestionsStep) {
+			setFlash({ type: 'success', message: 'Questions saved successfully' }, cookies);
 			return { form };
 		}
 

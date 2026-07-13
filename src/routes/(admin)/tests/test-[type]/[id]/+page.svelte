@@ -22,6 +22,17 @@
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
 
+	const SCREEN_PARAM: Record<number, string> = {
+		[typeOfScreen.primary]: 'primary',
+		[typeOfScreen.questions]: 'questions',
+		[typeOfScreen.configuration]: 'configuration'
+	};
+	const PARAM_SCREEN: Record<string, number> = {
+		primary: typeOfScreen.primary,
+		questions: typeOfScreen.questions,
+		configuration: typeOfScreen.configuration
+	};
+
 	let {
 		data
 	}: {
@@ -44,13 +55,15 @@
 	const isEditing = $derived(!!testData);
 	const convertTemplate = $derived(data.convertTemplate);
 	let selectedTemplateId = $state<string | null>(null);
-	let currentScreen: number = $state(typeOfScreen.primary);
 
-	$effect(() => {
-		if (data.convertTemplate && data.testData) {
-			currentScreen = typeOfScreen.questions;
-		}
-	});
+	function getInitialScreen(): number {
+		const requested = PARAM_SCREEN[page.url.searchParams.get('step') ?? ''];
+		if (requested) return requested;
+		
+		if (data.convertTemplate && testData) return typeOfScreen.questions;
+		return typeOfScreen.primary;
+	}
+	let currentScreen: number = $state(getInitialScreen());
 
 	const {
 		form: formData,
@@ -73,15 +86,12 @@
 			if (!form.valid) return;
 			if (currentScreen === typeOfScreen.primary) {
 				const redirectId = (form.message as { redirectId?: number } | undefined)?.redirectId;
-				if (redirectId) {
-					goto(page.url.pathname.replace(/\/[^/]+$/, `/${redirectId}`), {
-						replaceState: true,
-						invalidateAll: true
-					});
-				}
-				currentScreen = typeOfScreen.questions;
+				const path = redirectId
+					? page.url.pathname.replace(/\/[^/]+$/, `/${redirectId}`)
+					: page.url.pathname;
+				setScreen(typeOfScreen.questions, { path, invalidateAll: true });
 			} else if (currentScreen === typeOfScreen.questions) {
-				currentScreen = typeOfScreen.configuration;
+				setScreen(typeOfScreen.configuration);
 			}
 		}
 	});
@@ -243,6 +253,19 @@
 			(currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
 	);
 
+	function setScreen(target: number, options: { path?: string; invalidateAll?: boolean } = {}) {
+		currentScreen = target;
+		const url = new URL(options.path ?? page.url.pathname, page.url.origin);
+		if (!options.path) url.search = page.url.search;
+		url.searchParams.set('step', SCREEN_PARAM[target]);
+		goto(`${url.pathname}?${url.searchParams}`, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true,
+			invalidateAll: options.invalidateAll ?? false
+		});
+	}
+
 	// Drop template_id so the load function re-fetches the template list
 	// (it's only fetched when no template_id is present).
 	function goToScreen(target: number) {
@@ -255,7 +278,11 @@
 			goto(page.url.pathname, { invalidateAll: true });
 			return;
 		}
-		currentScreen = target;
+		if (convertTemplate) {
+			currentScreen = target;
+			return;
+		}
+		setScreen(target);
 	}
 
 	function handlePrevious() {
@@ -271,7 +298,10 @@
 
 	function handleNext() {
 		if (currentScreen === typeOfScreen.primary && convertTemplate) {
-			goto(`?template_id=${selectedTemplateId}`, { invalidateAll: true });
+			setScreen(typeOfScreen.questions, {
+				path: `${page.url.pathname}?template_id=${selectedTemplateId}`,
+				invalidateAll: true
+			});
 			return;
 		}
 		if (currentScreen === typeOfScreen.primary) {
@@ -283,7 +313,7 @@
 		if (currentScreen === typeOfScreen.configuration) {
 			submit();
 		} else {
-			currentScreen++;
+			setScreen(currentScreen + 1);
 		}
 	}
 

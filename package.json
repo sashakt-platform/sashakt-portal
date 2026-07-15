@@ -43,7 +43,7 @@
 		"prettier": "3.9.5",
 		"prettier-plugin-svelte": "^4.1.1",
 		"prettier-plugin-tailwindcss": "^0.8.0",
-		"svelte": "^5.56.4",
+		"svelte": "^5.56.5",
 		"svelte-check": "^4.7.2",
 		"svelte-sonner": "^1.1.1",
 		"sveltekit-flash-message": "^2.4.6",
@@ -70,7 +70,7 @@
 		"@tiptap/extension-text-style": "^3.27.4",
 		"@tiptap/extension-underline": "^3.27.4",
 		"@tiptap/starter-kit": "^3.27.4",
-		"svelte-dnd-action": "^0.9.71",
+		"svelte-dnd-action": "^0.9.74",
 		"svelte-headless-table": "^0.18.3"
 	}
 }

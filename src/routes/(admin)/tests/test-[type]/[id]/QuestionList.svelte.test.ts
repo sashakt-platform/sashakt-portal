@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { render, screen, waitFor } from '@testing-library/svelte';
+import { render, screen, waitFor, fireEvent } from '@testing-library/svelte';
 import { get, writable } from 'svelte/store';
 import { describe, expect, it, vi } from 'vitest';
 import QuestionList from './QuestionList.svelte';
@@ -367,6 +367,91 @@ describe('QuestionList', () => {
 			// Manual mode shows the question count header, not the auto-selection description
 			expect(screen.queryByText(/Select tags and specify/)).not.toBeInTheDocument();
 			expect(screen.getByText(/2 questions added/)).toBeInTheDocument();
+		});
+	});
+
+	describe('switching selection mode with unsaved selections', () => {
+		it('warns before discarding manually selected questions when switching to Auto Selection', async () => {
+			const formData = makeFormData({
+				question_revision_ids: [101, 102],
+				question_revisions: [
+					{ id: 101, question_text: 'Q1', tags: [] },
+					{ id: 102, question_text: 'Q2', tags: [] }
+				]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await fireEvent.click(screen.getByText('Auto Selection'));
+
+			expect(screen.getByText('Switch selection mode?')).toBeInTheDocument();
+			expect(get(formData).question_revision_ids).toEqual([101, 102]);
+		});
+
+		it('keeps the current tab and selections when the switch is cancelled', async () => {
+			const formData = makeFormData({
+				question_revision_ids: [101, 102],
+				question_revisions: [
+					{ id: 101, question_text: 'Q1', tags: [] },
+					{ id: 102, question_text: 'Q2', tags: [] }
+				]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await fireEvent.click(screen.getByText('Auto Selection'));
+			await fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+			expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument();
+			expect(screen.getByText(/2 questions added/)).toBeInTheDocument();
+			expect(get(formData).question_revision_ids).toEqual([101, 102]);
+		});
+
+		it('clears manually selected questions and switches tabs when the switch is confirmed', async () => {
+			const formData = makeFormData({
+				question_revision_ids: [101, 102],
+				question_revisions: [
+					{ id: 101, question_text: 'Q1', tags: [] },
+					{ id: 102, question_text: 'Q2', tags: [] }
+				]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await fireEvent.click(screen.getByText('Auto Selection'));
+			await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+			expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument();
+			expect(get(formData).question_revision_ids).toEqual([]);
+			expect(get(formData).question_revisions).toEqual([]);
+			expect(
+				screen.getByText(/Select tags and specify how many questions to randomly pull from each/)
+			).toBeInTheDocument();
+		});
+
+		it('warns before discarding random tag rules when switching to Manual Selection', async () => {
+			const formData = makeFormData({
+				tag_ids: [{ id: '1', name: 'Science' }],
+				random_tag_count: [{ id: '1', name: 'Science', count: 5 }]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await fireEvent.click(screen.getByText('Manual Selection'));
+
+			expect(screen.getByText('Switch selection mode?')).toBeInTheDocument();
+			expect(get(formData).random_tag_count).toEqual([{ id: '1', name: 'Science', count: 5 }]);
+		});
+
+		it('switches tabs immediately when the current tab has no selections', async () => {
+			const formData = makeFormData();
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await fireEvent.click(screen.getByText('Manual Selection'));
+
+			expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument();
+			expect(screen.getByText('No questions yet')).toBeInTheDocument();
 		});
 	});
 });

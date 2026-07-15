@@ -10,6 +10,7 @@
 	import Link2 from '@lucide/svelte/icons/link-2';
 	import ChartColumnDecreasing from '@lucide/svelte/icons/chart-column-decreasing';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
+	import DownloadIcon from '@lucide/svelte/icons/download';
 
 	interface CustomAction {
 		label: string;
@@ -18,6 +19,7 @@
 		icon?: string;
 		method?: string;
 		inline?: boolean;
+		iconOnly?: boolean;
 	}
 
 	let {
@@ -76,6 +78,8 @@
 				return ChartColumnDecreasing;
 			case 'list-checks':
 				return ListChecks;
+			case 'download':
+				return DownloadIcon;
 			default:
 				return undefined;
 		}
@@ -121,6 +125,17 @@
 							{action.label}
 						</Button>
 					</a>
+				{:else if action.action && action.iconOnly}
+					<Button
+						variant="ghost"
+						size="icon"
+						aria-label={action.label}
+						onclick={action.action}
+					>
+						{#if IconComponent}
+							<IconComponent class="h-4 w-4" />
+						{/if}
+					</Button>
 				{:else if action.action}
 					<Button
 						variant="secondary"

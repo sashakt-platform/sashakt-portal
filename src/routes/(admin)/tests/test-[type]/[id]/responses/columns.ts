@@ -1,9 +1,35 @@
 import type { ColumnDef } from '@tanstack/table-core';
+import { toast } from 'svelte-sonner';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import { createSelectionColumn, createSortableColumn } from '$lib/components/data-table/column-helpers';
+
+async function downloadCertificate(certificateDownloadUrl: string, candidateUuid: string) {
+	try {
+		const response = await fetch('/api/download-certificate', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ certificate_download_url: certificateDownloadUrl })
+		});
+
+		if (!response.ok) throw new Error('Download failed');
+
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `certificate-${candidateUuid}.png`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		window.URL.revokeObjectURL(url);
+	} catch (error) {
+		console.error('Failed to download certificate:', error);
+		toast.error('Failed to download certificate');
+	}
+}
 
 type CandidateStatus = 'submitted' | 'not_submitted';
 export interface CandidateResult {
@@ -100,6 +126,18 @@ export const createResponseColumns = (
 					enableHiding: false,
 					size: 60,
 					cell: ({ row }: { row: { original: CandidateResponse } }) => {
+						const certificateUrl = row.original.result?.certificate_download_url;
+						const customActions = certificateUrl
+							? [
+									{
+										label: 'Download Certificate',
+										icon: 'download',
+										inline: true,
+										iconOnly: true,
+										action: () => downloadCertificate(certificateUrl, row.original.candidate_uuid)
+									}
+								]
+							: [];
 						return renderComponent(DataTableActions, {
 							entityName: 'Candidate',
 							editUrl: '',
@@ -107,6 +145,7 @@ export const createResponseColumns = (
 							canEdit: false,
 							canDelete: true,
 							deleteInline: true,
+							customActions,
 							onDelete: () => onDelete?.(row.original.candidate_id)
 						});
 					}

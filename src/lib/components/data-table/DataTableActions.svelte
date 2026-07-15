@@ -11,6 +11,7 @@
 	import ChartColumnDecreasing from '@lucide/svelte/icons/chart-column-decreasing';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
 	import DownloadIcon from '@lucide/svelte/icons/download';
+	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
 
 	interface CustomAction {
 		label: string;
@@ -80,6 +81,8 @@
 				return ListChecks;
 			case 'download':
 				return DownloadIcon;
+			case 'clipboard-list':
+				return ClipboardList;
 			default:
 				return undefined;
 		}

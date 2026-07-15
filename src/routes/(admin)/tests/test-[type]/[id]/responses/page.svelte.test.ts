@@ -75,6 +75,26 @@ const candidateWithCertificate: CandidateResponse = {
 	}
 };
 
+const candidateWithFormResponse: CandidateResponse = {
+	candidate_id: 4,
+	candidate_uuid: 'candidate-ddd',
+	status: 'submitted',
+	start_time: '2026-06-01T10:00:00Z',
+	end_time: '2026-06-01T10:30:00Z',
+	time_taken_seconds: 90,
+	result: {
+		correct_answer: 7,
+		incorrect_answer: 3,
+		mandatory_not_attempted: 0,
+		optional_not_attempted: 0,
+		total_questions: 10,
+		marks_obtained: 7,
+		marks_maximum: 10,
+		certificate_download_url: null
+	},
+	form_response: { feedback: 'Great experience', full_name: 'Jane Doe', middle_name: 'N/A' }
+};
+
 const sampleResponses: CandidateResponse[] = [submittedCandidate, notSubmittedCandidate];
 
 function makeData(
@@ -306,6 +326,40 @@ describe('Candidate Responses page (UI)', () => {
 				expect(toast.error).toHaveBeenCalledWith('Failed to download certificate');
 			});
 			expect(window.URL.createObjectURL).not.toHaveBeenCalled();
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Show Responses button', () => {
+		it('shows no "Show Responses" button for a candidate with no form_response', () => {
+			render(ResponsesPage, { data: makeData(sampleResponses, { canDelete: true }) } as any);
+			expect(
+				screen.queryByRole('button', { name: 'Show Responses' })
+			).not.toBeInTheDocument();
+		});
+
+		it('shows a "Show Responses" button when form_response is set', () => {
+			render(ResponsesPage, {
+				data: makeData([candidateWithFormResponse], { canDelete: true })
+			} as any);
+			expect(screen.getByRole('button', { name: 'Show Responses' })).toBeInTheDocument();
+		});
+
+		it("opens a dialog listing the candidate's answers, humanized, skipping N/A fields", async () => {
+			render(ResponsesPage, {
+				data: makeData([candidateWithFormResponse], { canDelete: true })
+			} as any);
+
+			await fireEvent.click(screen.getByRole('button', { name: 'Show Responses' }));
+
+			const dialog = await screen.findByRole('dialog');
+			expect(within(dialog).getByText('Form Responses')).toBeInTheDocument();
+			expect(within(dialog).getByText('Feedback')).toBeInTheDocument();
+			expect(within(dialog).getByText('Great experience')).toBeInTheDocument();
+			expect(within(dialog).getByText('Full Name')).toBeInTheDocument();
+			expect(within(dialog).getByText('Jane Doe')).toBeInTheDocument();
+			expect(within(dialog).queryByText('Middle Name')).not.toBeInTheDocument();
+			expect(within(dialog).queryByText('N/A')).not.toBeInTheDocument();
 		});
 	});
 

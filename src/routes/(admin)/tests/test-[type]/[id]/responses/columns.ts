@@ -51,6 +51,7 @@ export interface CandidateResponse {
 	end_time: string | null;
 	time_taken_seconds: number | null;
 	result: CandidateResult | null;
+	form_response?: Record<string, string | null> | null;
 }
 
 export const createResponseColumns = (
@@ -59,7 +60,8 @@ export const createResponseColumns = (
 	handleSort: (columnId: string) => void,
 	onDelete?: (candidateId: number) => void,
 	canDelete = true,
-	enableSelection = false
+	enableSelection = false,
+	onShowResponses?: (candidate: CandidateResponse) => void
 ): ColumnDef<CandidateResponse>[] => [
 	...(enableSelection ? [createSelectionColumn<CandidateResponse>()] : []),
 	{
@@ -127,17 +129,29 @@ export const createResponseColumns = (
 					size: 60,
 					cell: ({ row }: { row: { original: CandidateResponse } }) => {
 						const certificateUrl = row.original.result?.certificate_download_url;
-						const customActions = certificateUrl
-							? [
-									{
-										label: 'Download Certificate',
-										icon: 'download',
-										inline: true,
-										iconOnly: true,
-										action: () => downloadCertificate(certificateUrl, row.original.candidate_uuid)
-									}
-								]
-							: [];
+						const hasFormResponse = row.original.form_response != null;
+
+						const customActions = [];
+
+						if (certificateUrl) {
+							customActions.push({
+								label: 'Download Certificate',
+								icon: 'download',
+								inline: true,
+								iconOnly: true,
+								action: () => downloadCertificate(certificateUrl, row.original.candidate_uuid)
+							});
+						}
+
+						if (hasFormResponse) {
+							customActions.push({
+								label: 'Show Responses',
+								icon: 'clipboard-list',
+								inline: true,
+								iconOnly: true,
+								action: () => onShowResponses?.(row.original)
+							});
+						}
 						return renderComponent(DataTableActions, {
 							entityName: 'Candidate',
 							editUrl: '',

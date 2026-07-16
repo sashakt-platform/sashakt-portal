@@ -1,6 +1,5 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	import { Separator } from '$lib/components/ui/separator/index.js';
 
 	let {
 		open = $bindable(false),
@@ -22,26 +21,28 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="sm:max-w-lg">
-		<Dialog.Header>
+	<Dialog.Content class="gap-0 overflow-hidden bg-background p-0 sm:max-w-3xl">
+		<Dialog.Header class="bg-card rounded-t-lg border-b px-6 py-5">
 			<Dialog.Title class="text-xl font-semibold">Form Responses</Dialog.Title>
 		</Dialog.Header>
 
-		<Separator />
-
-		{#if entries.length === 0}
-			<p class="text-muted-foreground text-sm">No form responses submitted.</p>
-		{:else}
-			<dl class="flex max-h-[60vh] flex-col gap-3 overflow-y-auto">
-				{#each entries as [name, value] (name)}
-					<div class="flex flex-col gap-0.5">
-						<dt class="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
-							{humanize(name)}
-						</dt>
-						<dd class="text-sm">{value}</dd>
-					</div>
-				{/each}
-			</dl>
-		{/if}
+		<div class="p-6">
+			{#if entries.length === 0}
+				<p class="text-muted-foreground text-sm">No form responses submitted.</p>
+			{:else}
+				<dl
+					class="bg-card grid max-h-[60vh] grid-cols-1 gap-x-8 gap-y-4 overflow-y-auto rounded-lg border p-5 sm:grid-cols-2"
+				>
+					{#each entries as [name, value] (name)}
+						<div class="flex flex-col gap-0.5">
+							<dt class="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+								{humanize(name)}
+							</dt>
+							<dd class="text-sm ">{value}</dd>
+						</div>
+					{/each}
+				</dl>
+			{/if}
+		</div>
 	</Dialog.Content>
 </Dialog.Root>

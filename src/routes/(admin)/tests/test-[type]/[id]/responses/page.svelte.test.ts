@@ -123,7 +123,9 @@ describe('Candidate Responses page (UI)', () => {
 
 		it('shows a dash for marks when the candidate has no result', () => {
 			render(ResponsesPage, { data: makeData([notSubmittedCandidate]) } as any);
-			expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+			const row = screen.getByText('Not Submitted').closest('tr') as HTMLElement;
+			const cells = within(row).getAllByRole('cell');
+			expect(cells[0]).toHaveTextContent('—');
 		});
 
 		it('shows formatted start/end time for a submitted candidate', () => {
@@ -139,7 +141,10 @@ describe('Candidate Responses page (UI)', () => {
 		it('shows a dash (not "Invalid Date") for start/end time when the candidate has not submitted', () => {
 			render(ResponsesPage, { data: makeData([notSubmittedCandidate]) } as any);
 			expect(screen.queryByText(/Invalid Date/)).not.toBeInTheDocument();
-			expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+			const row = screen.getByText('Not Submitted').closest('tr') as HTMLElement;
+			const cells = within(row).getAllByRole('cell');
+			expect(cells[2]).toHaveTextContent('—');
+			expect(cells[3]).toHaveTextContent('—');
 		});
 
 		it('shows "Xm Ys" time taken for a submitted candidate', () => {
@@ -149,7 +154,9 @@ describe('Candidate Responses page (UI)', () => {
 
 		it('shows a dash for time taken when the candidate has not submitted', () => {
 			render(ResponsesPage, { data: makeData([notSubmittedCandidate]) } as any);
-			expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+			const row = screen.getByText('Not Submitted').closest('tr') as HTMLElement;
+			const cells = within(row).getAllByRole('cell');
+			expect(cells[4]).toHaveTextContent('—');
 		});
 	});
 

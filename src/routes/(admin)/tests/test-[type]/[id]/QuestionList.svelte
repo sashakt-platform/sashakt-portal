@@ -10,6 +10,7 @@
 	import type { Filter } from '$lib/types/filters';
 	import type { User } from '$lib/utils/permissions.js';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
+	import SwitchSelectionModeDialog from './SwitchSelectionModeDialog.svelte';
 	import SectionedQuestionSets from './SectionedQuestionSets.svelte';
 	import { useTerms } from '$lib/nomenclature';
 
@@ -30,6 +31,10 @@
 	} = $props();
 	let dialogOpen = $state(false);
 	let questionSelectionMode: 'manual' | 'tagBased' = $state('tagBased');
+
+	let tabsValue: 'manual' | 'tagBased' = $state('tagBased');
+	let pendingMode: 'manual' | 'tagBased' | null = $state(null);
+	const confirmSwitchOpen = $derived(pendingMode !== null);
 	const isSectionedTest = $derived(($formData.question_sets?.length ?? 0) > 0);
 	const sectionedQuestionCount = $derived(
 		($formData.question_sets || []).reduce(
@@ -81,6 +86,7 @@
 			questionSelectionMode = 'tagBased';
 			syncTagsFromTagIds();
 		}
+		tabsValue = questionSelectionMode;
 	}
 
 	const handleRemoveQuestion = (questionId: number) => {
@@ -91,10 +97,52 @@
 			(question: { id: number }) => question.id !== questionId
 		);
 	};
+
+	const applyModeSwitch = (newMode: 'manual' | 'tagBased') => {
+		if (newMode === 'manual') {
+			$formData.random_tag_count = [];
+		} else {
+			$formData.question_revision_ids = [];
+			$formData.question_revisions = [];
+			syncTagsFromTagIds();
+		}
+		questionSelectionMode = newMode;
+		tabsValue = newMode;
+	};
+
+	const handleTabChange = (newMode: 'manual' | 'tagBased') => {
+		const currentTabHasSelections =
+			questionSelectionMode === 'manual'
+				? $formData.question_revision_ids.length > 0
+				: $formData.random_tag_count.length > 0;
+
+		if (currentTabHasSelections) {
+			pendingMode = newMode;
+			tabsValue = questionSelectionMode;
+			return;
+		}
+
+		applyModeSwitch(newMode);
+	};
+
+	const confirmTabSwitch = () => {
+		if (pendingMode) applyModeSwitch(pendingMode);
+		pendingMode = null;
+	};
+
+	const cancelTabSwitch = () => {
+		pendingMode = null;
+	};
 </script>
 
 {#if !isSectionedTest}
 	<QuestionSelectionDialog bind:open={dialogOpen} {questions} {questionParams} {formData} {user} />
+
+	<SwitchSelectionModeDialog
+		open={confirmSwitchOpen}
+		onConfirm={confirmTabSwitch}
+		onCancel={cancelTabSwitch}
+	/>
 {/if}
 
 <div class="bg-card overflow-hidden rounded-xl border shadow-sm">
@@ -131,15 +179,10 @@
 			</div>
 		{:else}
 			<Tabs
-				bind:value={questionSelectionMode}
+				bind:value={tabsValue}
 				class="w-fit"
-				onValueChange={(v) => {
-					if (v === 'manual') $formData.random_tag_count = [];
-					if (v === 'tagBased') {
-						$formData.question_revision_ids = [];
-						syncTagsFromTagIds();
-					}
-				}}
+				activationMode="manual"
+				onValueChange={(newMode) => handleTabChange(newMode as 'manual' | 'tagBased')}
 			>
 				<TabsList class="bg-muted rounded-full p-1">
 					<TabsTrigger

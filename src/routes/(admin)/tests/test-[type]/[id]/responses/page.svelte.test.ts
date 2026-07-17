@@ -83,9 +83,8 @@ describe('Candidate Responses page (UI)', () => {
 
 		it('shows all table column headers', () => {
 			render(ResponsesPage, { data: makeData() } as any);
-			expect(screen.getByRole('columnheader', { name: 'Candidate' })).toBeInTheDocument();
-			expect(screen.getByRole('columnheader', { name: 'Status' })).toBeInTheDocument();
 			expect(screen.getByRole('columnheader', { name: 'Marks' })).toBeInTheDocument();
+			expect(screen.getByRole('columnheader', { name: 'Status' })).toBeInTheDocument();
 			expect(screen.getByRole('columnheader', { name: 'Start Time' })).toBeInTheDocument();
 			expect(screen.getByRole('columnheader', { name: 'End Time' })).toBeInTheDocument();
 			expect(screen.getByRole('columnheader', { name: 'Time Taken' })).toBeInTheDocument();
@@ -107,12 +106,6 @@ describe('Candidate Responses page (UI)', () => {
 
 	// ─────────────────────────────────────────────────────────────────────────
 	describe('Table row content', () => {
-		it('shows the candidate identifier', () => {
-			render(ResponsesPage, { data: makeData() } as any);
-			expect(screen.getByText('candidate-aaa')).toBeInTheDocument();
-			expect(screen.getByText('candidate-bbb')).toBeInTheDocument();
-		});
-
 		it('shows a "Submitted" badge for submitted candidates', () => {
 			render(ResponsesPage, { data: makeData() } as any);
 			expect(screen.getByText('Submitted')).toBeInTheDocument();
@@ -130,7 +123,9 @@ describe('Candidate Responses page (UI)', () => {
 
 		it('shows a dash for marks when the candidate has no result', () => {
 			render(ResponsesPage, { data: makeData([notSubmittedCandidate]) } as any);
-			expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+			const row = screen.getByText('Not Submitted').closest('tr') as HTMLElement;
+			const cells = within(row).getAllByRole('cell');
+			expect(cells[0]).toHaveTextContent('—');
 		});
 
 		it('shows formatted start/end time for a submitted candidate', () => {
@@ -146,8 +141,10 @@ describe('Candidate Responses page (UI)', () => {
 		it('shows a dash (not "Invalid Date") for start/end time when the candidate has not submitted', () => {
 			render(ResponsesPage, { data: makeData([notSubmittedCandidate]) } as any);
 			expect(screen.queryByText(/Invalid Date/)).not.toBeInTheDocument();
-			const row = screen.getByText('candidate-bbb').closest('tr') as HTMLElement;
-			expect(within(row).getAllByText('—').length).toBeGreaterThan(0);
+			const row = screen.getByText('Not Submitted').closest('tr') as HTMLElement;
+			const cells = within(row).getAllByRole('cell');
+			expect(cells[2]).toHaveTextContent('—');
+			expect(cells[3]).toHaveTextContent('—');
 		});
 
 		it('shows "Xm Ys" time taken for a submitted candidate', () => {
@@ -157,8 +154,9 @@ describe('Candidate Responses page (UI)', () => {
 
 		it('shows a dash for time taken when the candidate has not submitted', () => {
 			render(ResponsesPage, { data: makeData([notSubmittedCandidate]) } as any);
-			const row = screen.getByText('candidate-bbb').closest('tr') as HTMLElement;
-			expect(within(row).getAllByText('—').length).toBeGreaterThan(0);
+			const row = screen.getByText('Not Submitted').closest('tr') as HTMLElement;
+			const cells = within(row).getAllByRole('cell');
+			expect(cells[4]).toHaveTextContent('—');
 		});
 	});
 

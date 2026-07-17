@@ -37,9 +37,15 @@ export const createResponseColumns = (
 ): ColumnDef<CandidateResponse>[] => [
 	...(enableSelection ? [createSelectionColumn<CandidateResponse>()] : []),
 	{
-		accessorKey: 'candidate_uuid',
-		header: 'Candidate',
-		meta: { grow: true }
+		id: 'marks',
+		header: 'Marks',
+		cell: ({ row }) => {
+			const result = row.original.result;
+			if (!result || result.marks_obtained == null) return '—';
+			if (result.marks_maximum == null) return `${result.marks_obtained}`;
+			return `${result.marks_obtained} / ${result.marks_maximum}`;
+		},
+		size: 130
 	},
 	createSortableColumn(
 		'status',
@@ -52,17 +58,6 @@ export const createResponseColumns = (
 			size: 150
 		}
 	),
-	{
-		id: 'marks',
-		header: 'Marks',
-		cell: ({ row }) => {
-			const result = row.original.result;
-			if (!result || result.marks_obtained == null) return '—';
-			if (result.marks_maximum == null) return `${result.marks_obtained}`;
-			return `${result.marks_obtained} / ${result.marks_maximum}`;
-		},
-		size: 130
-	},
 	createSortableColumn(
 		'start_time',
 		'Start Time',

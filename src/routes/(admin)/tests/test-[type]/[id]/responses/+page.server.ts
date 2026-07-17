@@ -14,12 +14,14 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	const page = Number(url.searchParams.get('page')) || 1;
 	const size = Number(url.searchParams.get('size')) || DEFAULT_PAGE_SIZE;
+	const search = url.searchParams.get('search') || '';
 	const sortBy = url.searchParams.get('sortBy') || '';
 	const sortOrder = url.searchParams.get('sortOrder') || 'asc';
 
 	const queryParams = new URLSearchParams({
 		page: page.toString(),
 		size: size.toString(),
+		...(search && { search }),
 		...(sortBy && { sort_by: sortBy, sort_order: sortOrder })
 	});
 
@@ -41,7 +43,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		testName: test?.name || 'Test',
 		responses,
 		totalPages: responses.pages || 0,
-		params: { page, size, sortBy, sortOrder }
+		params: { page, size, search, sortBy, sortOrder }
 	};
 };
 

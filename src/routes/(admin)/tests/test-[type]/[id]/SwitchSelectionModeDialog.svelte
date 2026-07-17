@@ -22,7 +22,8 @@
 		<AlertDialog.Header>
 			<AlertDialog.Title>Switch selection mode?</AlertDialog.Title>
 			<AlertDialog.Description>
-				Switching selection mode will remove your currently selected questions. Continue?
+				Switching selection mode will remove your currently selected questions. Do you want to
+				continue?
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>

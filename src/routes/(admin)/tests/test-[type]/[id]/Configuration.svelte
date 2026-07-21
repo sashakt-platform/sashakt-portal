@@ -24,10 +24,12 @@
 
 	let {
 		formData,
-		orgSettings = null
+		orgSettings = null,
+		disabled = false
 	}: {
 		formData: any;
 		orgSettings?: OrgSettingsPayload | null;
+		disabled?: boolean;
 	} = $props();
 
 	const fixedTestTimings = $derived(isFixed(orgSettings, 'test_timings'));
@@ -154,7 +156,10 @@
 {#snippet selectTrigger(text: string, isSelected: boolean)}
 	<Select.Trigger class="w-full rounded-full border-border">
 		<span
-			class={['truncate', isSelected ? 'font-normal text-foreground' : 'font-light text-muted-foreground']}
+			class={[
+				'truncate',
+				isSelected ? 'font-normal text-foreground' : 'font-light text-muted-foreground'
+			]}
 		>
 			{text}
 		</span>
@@ -163,7 +168,7 @@
 <div class="flex flex-col gap-4 p-6">
 	<!-- 0. Test Schedule (tests only, not templates) -->
 	{#if !$formData.is_template}
-		<ConfigureBox title={`${term('test')} Schedule`} Icon={Settings} defaultOpen={true}>
+		<ConfigureBox title={`${term('test')} Schedule`} Icon={Settings} defaultOpen={true} {disabled}>
 			<div class="py-4 md:py-6">
 				<CalendarRange
 					rangeFromLabel="Start Time"
@@ -179,6 +184,7 @@
 		title="Candidate Experience"
 		Icon={Settings}
 		defaultOpen={$formData.is_template ? true : false}
+		{disabled}
 	>
 		<div class="grid grid-cols-1 gap-6 py-4 md:grid-cols-2 md:gap-12 md:py-6">
 			<!-- Left: textareas -->
@@ -335,7 +341,7 @@
 		</div>
 	{/snippet}
 	<!-- 2. Test Rules -->
-	<ConfigureBox title={`${term('test')} Rules`} Icon={Settings}>
+	<ConfigureBox title={`${term('test')} Rules`} Icon={Settings} {disabled}>
 		<div class="flex flex-col lg:flex-row lg:gap-12">
 			<div class="flex flex-col gap-6 py-4 md:py-6 lg:w-1/2">
 				{#if !fixedTestTimings}
@@ -495,7 +501,7 @@
 
 	<!-- 3. Marking Scheme -->
 	{#if !fixedMarking}
-		<ConfigureBox title="Marking Scheme" Icon={Settings}>
+		<ConfigureBox title="Marking Scheme" Icon={Settings} {disabled}>
 			<div class="flex flex-col gap-4 py-4 md:py-6 lg:w-1/2">
 				<RadioGroup.Root bind:value={$formData.marks_level} class="flex flex-col gap-3">
 					<label

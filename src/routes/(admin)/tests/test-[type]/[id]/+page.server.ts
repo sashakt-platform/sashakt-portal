@@ -39,6 +39,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	const token = getSessionTokenCookie();
+	let isTestLocked = false;
 
 	try {
 		if (params.id !== 'new' && params.id !== 'convert') {
@@ -60,6 +61,20 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			}
 
 			testData = await testResponse.json();
+
+			if (!is_template) {
+				try {
+					const lockRes = await fetch(`${BACKEND_URL}/test/${params.id}/has-candidate-tests`, {
+						method: 'GET',
+						headers: { Authorization: `Bearer ${token}` }
+					});
+					if (lockRes.ok) {
+						isTestLocked = await lockRes.json();
+					}
+				} catch (error) {
+					console.error('Error checking test lock status:', error);
+				}
+			}
 		} else if (params.id === 'convert' && templateID) {
 			// convert flow: template selected, prefill from it
 			const testResponse = await fetch(`${BACKEND_URL}/test/${templateID}?is_template=true`, {
@@ -224,7 +239,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		convertTemplate: params.id === 'convert',
 		questions,
 		selectedQuestions,
-		questionParams: questionPaginationParams
+		questionParams: questionPaginationParams,
+		isTestLocked
 	};
 };
 

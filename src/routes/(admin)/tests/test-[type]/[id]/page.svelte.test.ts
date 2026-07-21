@@ -142,7 +142,7 @@ function baseData(overrides: Record<string, any> = {}): any {
 
 /** Get the bottom navigation Next/Save button (the last one in the DOM). */
 function getBottomNextButton() {
-	const buttons = screen.getAllByText(/^(Next|Save)$/);
+	const buttons = screen.getAllByText(/^(Next|Save|Save & Continue|Cancel)$/);
 	return buttons[buttons.length - 1].closest('button')!;
 }
 
@@ -195,20 +195,20 @@ describe('Test Create/Update Page', () => {
 			});
 		});
 
-		it('shows Next button on step 1', () => {
+		it('shows Save & Continue button on step 1', () => {
 			render(TestCreatePage, { data: baseData() });
-			const buttons = screen.getAllByText('Next');
+			const buttons = screen.getAllByText('Save & Continue');
 			expect(buttons.length).toBeGreaterThanOrEqual(2);
 		});
 
-		it('shows Next button on step 2 after advancing', async () => {
+		it('shows Save & Continue button on step 2 after advancing', async () => {
 			setupSuperFormMock({ name: 'My Test', description: 'My Description' });
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
 			completePrimaryStep({ redirectId: 42 });
 
-			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
+			expect(screen.getAllByText('Save & Continue').length).toBeGreaterThanOrEqual(2);
 		});
 
 		it('shows Save button on step 3 after advancing twice', async () => {
@@ -317,8 +317,8 @@ describe('Test Create/Update Page', () => {
 
 			await fireEvent.click(getBottomNextButton());
 
-			// Still shows Next (not Save), confirming we are on step 2
-			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
+			// Still shows Save & Continue (not Save), confirming we are on step 2
+			expect(screen.getAllByText('Save & Continue').length).toBeGreaterThanOrEqual(2);
 			expect(screen.queryByText('Save')).not.toBeInTheDocument();
 		});
 
@@ -343,8 +343,8 @@ describe('Test Create/Update Page', () => {
 			// Button is disabled — clicking should not advance
 			await fireEvent.click(getBottomNextButton());
 
-			// Still on step 1: Next visible, Save not visible
-			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
+			// Still on step 1: Save & Continue visible, Save not visible
+			expect(screen.getAllByText('Save & Continue').length).toBeGreaterThanOrEqual(2);
 			expect(screen.queryByText('Save')).not.toBeInTheDocument();
 		});
 	});

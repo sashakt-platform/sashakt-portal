@@ -144,12 +144,15 @@
 >
 	{#snippet headerActions()}
 		{#if totalItems > 0}
-			<a href={resolve(exportHref as any)} download>
-				<Button variant="outline" class="border-primary text-primary bg-card font-semibold">
-					<Download class="h-4 w-4" />
-					Export
-				</Button>
-			</a>
+			<Button
+				href={resolve(exportHref as any)}
+				download
+				variant="outline"
+				class="border-primary text-primary bg-card font-semibold"
+			>
+				<Download class="h-4 w-4" />
+				Export
+			</Button>
 		{/if}
 	{/snippet}
 

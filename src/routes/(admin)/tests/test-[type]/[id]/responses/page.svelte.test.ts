@@ -99,14 +99,18 @@ const sampleResponses: CandidateResponse[] = [submittedCandidate, notSubmittedCa
 
 function makeData(
 	items: CandidateResponse[] = sampleResponses,
-	{ canDelete = false, testName = 'Sample Test' }: { canDelete?: boolean; testName?: string } = {}
+	{
+		canDelete = false,
+		testName = 'Sample Test',
+		params = {}
+	}: { canDelete?: boolean; testName?: string; params?: Record<string, unknown> } = {}
 ) {
 	return {
 		testId: '1',
 		testName,
 		responses: { items, total: items.length, pages: items.length > 0 ? 1 : 0 },
 		totalPages: items.length > 0 ? 1 : 0,
-		params: { page: 1, size: 25 },
+		params: { page: 1, size: 25, ...params },
 		user: { id: 1, permissions: canDelete ? ['delete_candidate'] : [] }
 	};
 }
@@ -145,6 +149,58 @@ describe('Candidate Responses page (UI)', () => {
 				'href',
 				'/tests/test-session'
 			);
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Export button (headerActions)', () => {
+		it('shows the Export button when there are responses', () => {
+			render(ResponsesPage, { data: makeData(sampleResponses) } as any);
+			expect(screen.getByRole('link', { name: /Export/ })).toBeInTheDocument();
+		});
+
+		it('does not show the Export button when there are no responses', () => {
+			render(ResponsesPage, { data: makeData([]) } as any);
+			expect(screen.queryByRole('link', { name: /Export/ })).not.toBeInTheDocument();
+			expect(screen.queryByText('Export')).not.toBeInTheDocument();
+		});
+
+		it('shows the Export button again once responses come back after being empty', async () => {
+			const { rerender } = render(ResponsesPage, { data: makeData([]) } as any);
+			expect(screen.queryByRole('link', { name: /Export/ })).not.toBeInTheDocument();
+
+			await rerender({ data: makeData(sampleResponses) } as any);
+
+			expect(screen.getByRole('link', { name: /Export/ })).toBeInTheDocument();
+		});
+
+		it('renders the Export link with a download attribute', () => {
+			render(ResponsesPage, { data: makeData(sampleResponses) } as any);
+			expect(screen.getByRole('link', { name: /Export/ })).toHaveAttribute('download');
+		});
+
+		it('points the Export link at the export endpoint for the current test', () => {
+			render(ResponsesPage, { data: makeData(sampleResponses) } as any);
+			const href = screen.getByRole('link', { name: /Export/ }).getAttribute('href');
+			expect(href).toContain('/tests/test-standard/1/responses/export');
+		});
+
+		it('includes the current sortBy and sortOrder in the Export link', () => {
+			render(ResponsesPage, {
+				data: makeData(sampleResponses, { params: { sortBy: 'marks', sortOrder: 'desc' } })
+			} as any);
+
+			const href = screen.getByRole('link', { name: /Export/ }).getAttribute('href');
+			expect(href).toContain('sortBy=marks');
+			expect(href).toContain('sortOrder=desc');
+		});
+
+		it('defaults sortOrder to asc and sortBy to empty in the Export link when unsorted', () => {
+			render(ResponsesPage, { data: makeData(sampleResponses) } as any);
+
+			const href = screen.getByRole('link', { name: /Export/ }).getAttribute('href');
+			expect(href).toContain('sortBy=');
+			expect(href).toContain('sortOrder=asc');
 		});
 	});
 

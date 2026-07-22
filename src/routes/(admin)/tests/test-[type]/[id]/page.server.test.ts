@@ -60,7 +60,8 @@ vi.mock('@sveltejs/kit', () => ({
 }));
 
 vi.mock('sveltekit-superforms', () => ({
-	superValidate: vi.fn()
+	superValidate: vi.fn(),
+	message: vi.fn((form: any, msg: unknown) => ({ ...form, message: msg }))
 }));
 
 vi.mock('sveltekit-superforms/adapters', () => ({
@@ -339,6 +340,141 @@ describe('Test Create/Update Page — load()', () => {
 			} as any);
 
 			expect(result.testData?.link).toBeNull();
+		});
+	});
+
+	// ── Test lock status (isTestLocked) ──────────────────────────────────────
+
+	describe('Test lock status (isTestLocked)', () => {
+		function mockTestLockThenQuestions(testData: any, lockValue: boolean) {
+			mockFetch
+				.mockResolvedValueOnce({ ok: true, json: async () => testData })
+				.mockResolvedValueOnce({ ok: true, json: async () => lockValue })
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ items: [], total: 0, pages: 0 }) });
+		}
+
+		it('calls has-candidate-tests when editing an existing session test', async () => {
+			mockTestLockThenQuestions({ id: '42' }, false);
+			await load({
+				params: { type: 'session', id: '42' },
+				url: makeUrl('/tests/test-session/42')
+			} as any);
+
+			const callUrl: string = mockFetch.mock.calls[1][0];
+			expect(callUrl).toBe('http://localhost:8000/test/42/has-candidate-tests');
+		});
+
+		it('sends Bearer token to has-candidate-tests', async () => {
+			mockTestLockThenQuestions({ id: '42' }, false);
+			await load({
+				params: { type: 'session', id: '42' },
+				url: makeUrl('/tests/test-session/42')
+			} as any);
+
+			expect(mockFetch).toHaveBeenNthCalledWith(
+				2,
+				expect.stringContaining('has-candidate-tests'),
+				expect.objectContaining({
+					headers: expect.objectContaining({ Authorization: 'Bearer mock-token' })
+				})
+			);
+		});
+
+		it('returns isTestLocked=true when has-candidate-tests responds true', async () => {
+			mockTestLockThenQuestions({ id: '42' }, true);
+			const result = await load({
+				params: { type: 'session', id: '42' },
+				url: makeUrl('/tests/test-session/42')
+			} as any);
+
+			expect(result.isTestLocked).toBe(true);
+		});
+
+		it('returns isTestLocked=false when has-candidate-tests responds false', async () => {
+			mockTestLockThenQuestions({ id: '42' }, false);
+			const result = await load({
+				params: { type: 'session', id: '42' },
+				url: makeUrl('/tests/test-session/42')
+			} as any);
+
+			expect(result.isTestLocked).toBe(false);
+		});
+
+		it('returns isTestLocked=false when has-candidate-tests responds with a non-ok status', async () => {
+			mockFetch
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ id: '42' }) })
+				.mockResolvedValueOnce({ ok: false, statusText: 'Internal Server Error' })
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ items: [], total: 0, pages: 0 }) });
+
+			const result = await load({
+				params: { type: 'session', id: '42' },
+				url: makeUrl('/tests/test-session/42')
+			} as any);
+
+			expect(result.isTestLocked).toBe(false);
+		});
+
+		it('returns isTestLocked=false when has-candidate-tests throws', async () => {
+			mockFetch
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ id: '42' }) })
+				.mockRejectedValueOnce(new Error('network error'))
+				.mockResolvedValueOnce({ ok: true, json: async () => ({ items: [], total: 0, pages: 0 }) });
+
+			const result = await load({
+				params: { type: 'session', id: '42' },
+				url: makeUrl('/tests/test-session/42')
+			} as any);
+
+			expect(result.isTestLocked).toBe(false);
+		});
+
+		it('does not call has-candidate-tests when editing an existing template', async () => {
+			mockTestThenQuestions({ id: '10' });
+			await load({
+				params: { type: 'template', id: '10' },
+				url: makeUrl('/tests/test-template/10')
+			} as any);
+
+			const lockFetches = mockFetch.mock.calls.filter(([url]) =>
+				url.includes('has-candidate-tests')
+			);
+			expect(lockFetches).toHaveLength(0);
+		});
+
+		it('does not call has-candidate-tests for a new test (id=new)', async () => {
+			mockQuestionsOnly();
+			await load({
+				params: { type: 'session', id: 'new' },
+				url: makeUrl('/tests/test-session/new')
+			} as any);
+
+			const lockFetches = mockFetch.mock.calls.filter(([url]) =>
+				url.includes('has-candidate-tests')
+			);
+			expect(lockFetches).toHaveLength(0);
+		});
+
+		it('does not call has-candidate-tests for the convert flow', async () => {
+			mockTestThenQuestions({ id: '5', is_template: true });
+			await load({
+				params: { type: 'session', id: 'convert' },
+				url: makeUrl('/tests/test-session/convert', 'template_id=5')
+			} as any);
+
+			const lockFetches = mockFetch.mock.calls.filter(([url]) =>
+				url.includes('has-candidate-tests')
+			);
+			expect(lockFetches).toHaveLength(0);
+		});
+
+		it('defaults isTestLocked to false for a new test', async () => {
+			mockQuestionsOnly();
+			const result = await load({
+				params: { type: 'session', id: 'new' },
+				url: makeUrl('/tests/test-session/new')
+			} as any);
+
+			expect(result.isTestLocked).toBe(false);
 		});
 	});
 
@@ -807,6 +943,177 @@ describe('Test Create/Update Page — save action', () => {
 		});
 
 		it('redirects to session list on successful update', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
+			} as any);
+
+			expect(redirect).toHaveBeenCalledWith(
+				'/tests/test-session',
+				expect.objectContaining({ type: 'success' }),
+				mockCookies
+			);
+		});
+	});
+
+	// ── Intent-based field scoping (primary / questions / configuration steps) ─
+
+	describe('Save action — intent-based field scoping', () => {
+		it('sends the full payload on create even when intent=primary', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({ id: '99' }) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=primary')
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body).toHaveProperty('marking_scheme');
+			expect(body).toHaveProperty('question_revision_ids');
+		});
+
+		it('returns message(form, { redirectId }) instead of redirecting when intent=primary on create', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({ id: '99' }) });
+
+			const result = await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=primary')
+			} as any);
+
+			expect(redirect).not.toHaveBeenCalled();
+			expect(result).toMatchObject({ message: { redirectId: '99' } });
+		});
+
+		it('sets a "saved successfully" flash message when intent=primary', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({ id: '99' }) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: 'new' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=primary')
+			} as any);
+
+			expect(setFlash).toHaveBeenCalledWith(
+				expect.objectContaining({
+					type: 'success',
+					message: expect.stringContaining('saved successfully')
+				}),
+				mockCookies
+			);
+		});
+
+		it('only sends primary fields when updating an existing test with intent=primary', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=primary')
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(Object.keys(body).sort()).toEqual(
+				['description', 'district_ids', 'is_active', 'name', 'state_ids', 'tag_ids'].sort()
+			);
+		});
+
+		it('does not redirect and does not call message() when updating with intent=primary', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			const result = await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=primary')
+			} as any);
+
+			expect(redirect).not.toHaveBeenCalled();
+			expect(result).not.toHaveProperty('message');
+			expect(mockFetch.mock.calls[0][1].method).toBe('PUT');
+		});
+
+		it('only sends question fields when updating an existing test with intent=questions', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=questions')
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(Object.keys(body).sort()).toEqual(
+				['question_revision_ids', 'random_tag_count'].sort()
+			);
+		});
+
+		it('sets a "Questions saved successfully" flash message when intent=questions', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=questions')
+			} as any);
+
+			expect(setFlash).toHaveBeenCalledWith(
+				{ type: 'success', message: 'Questions saved successfully' },
+				mockCookies
+			);
+		});
+
+		it('does not redirect when intent=questions on update', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current', 'intent=questions')
+			} as any);
+
+			expect(redirect).not.toHaveBeenCalled();
+		});
+
+		it('only sends configuration fields when updating an existing test with no intent (final save)', async () => {
+			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
+			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+			await actions.save({
+				request: mockRequest,
+				params: { type: 'session', id: '42' },
+				cookies: mockCookies,
+				url: makeUrl('/tests/test-session/current')
+			} as any);
+
+			const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+			expect(body).not.toHaveProperty('name');
+			expect(body).not.toHaveProperty('question_revision_ids');
+			expect(body).toHaveProperty('marking_scheme');
+		});
+
+		it('still redirects with a success flash when no intent is set on update (final save)', async () => {
 			(superValidate as any).mockResolvedValue({ valid: true, data: mockValidFormData });
 			mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
 

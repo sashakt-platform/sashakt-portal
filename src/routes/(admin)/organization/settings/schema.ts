@@ -80,6 +80,14 @@ const pauseTestSchema = z.object({
 	})
 });
 
+const externalLoginSchema = z.object({
+	mode: z.literal('fixed').default('fixed'),
+	value: z.object({
+		enabled: z.boolean().default(false),
+		block_anonymous_starts: z.boolean().default(false)
+	})
+});
+
 const nomenclatureLabelSchema = z
 	.string()
 	.max(MAX_NOMENCLATURE_LABEL_LEN, {
@@ -137,7 +145,7 @@ const completionMessageSchema = z.object({
 });
 
 export const organizationSettingsSchema = z.object({
-	version: z.literal(5).default(5),
+	version: z.literal(6).default(6),
 	test_timings: testTimingsSchema,
 	questions_per_page: questionsPerPageSchema,
 	marking_scheme: markingSchemeSchema,
@@ -146,6 +154,7 @@ export const organizationSettingsSchema = z.object({
 	mark_for_review: markForReviewSchema,
 	omr_mode: omrModeSchema,
 	pause_test: pauseTestSchema,
+	external_login: externalLoginSchema,
 	pre_test_instructions: preTestInstructionsSchema,
 	completion_message: completionMessageSchema,
 	platform_nomenclature: platformNomenclatureSchema,

@@ -9,7 +9,7 @@ import { MAX_NOMENCLATURE_LABEL_LEN, NOMENCLATURE_DEFAULTS } from '$lib/nomencla
 
 function validBaseSettings() {
 	return {
-		version: 5,
+		version: 6,
 		test_timings: {
 			mode: 'fixed',
 			value: { time_limit: 60, start_time: '09:00:00', end_time: '17:00:00' }
@@ -21,6 +21,7 @@ function validBaseSettings() {
 		mark_for_review: { mode: 'fixed', value: { default: true } },
 		omr_mode: { mode: 'fixed', value: { default: false } },
 		pause_test: { mode: 'fixed', value: { default: false } },
+		external_login: { mode: 'fixed', value: { enabled: false, block_anonymous_starts: false } },
 		pre_test_instructions: { value: { text: null } },
 		completion_message: { value: { text: null } },
 		platform_nomenclature: {
@@ -100,9 +101,9 @@ describe('organizationSettingsSchema — platform_nomenclature', () => {
 		expect(result.success).toBe(false);
 	});
 
-	it('pins version to literal 5', () => {
+	it('pins version to literal 6', () => {
 		const settings = validBaseSettings();
-		settings.version = 2 as 5; // wrong version
+		settings.version = 2 as 6; // wrong version
 		const result = organizationSettingsSchema.safeParse(settings);
 		expect(result.success).toBe(false);
 	});

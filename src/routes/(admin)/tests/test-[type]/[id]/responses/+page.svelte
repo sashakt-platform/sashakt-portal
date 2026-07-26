@@ -3,6 +3,7 @@
 	import { DataTable } from '$lib/components/data-table/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import BatchActionsToolbar from '$lib/components/data-table/BatchActionsToolbar.svelte';
+	import FormResponsesDialog from './FormResponsesDialog.svelte';
 	import { createResponseColumns, type CandidateResponse } from './columns.js';
 	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
 	import { DEFAULT_PAGE_SIZE } from '$lib/constants';
@@ -24,6 +25,9 @@
 
 	let deleteAction: string | null = $state(null);
 
+	let showResponsesOpen = $state(false);
+	let selectedFormResponse: Record<string, string | null> | null = $state(null);
+
 	// batch selection state
 	let selectedCandidates: CandidateResponse[] = $state([]);
 	let selectedCandidateIds: string[] = $state([]);
@@ -32,6 +36,11 @@
 
 	function handleDelete(candidateId: number) {
 		deleteAction = `?/deleteCandidate&candidate_id=${candidateId}`;
+	}
+
+	function handleShowResponses(candidate: CandidateResponse) {
+		selectedFormResponse = candidate.form_response ?? null;
+		showResponsesOpen = true;
 	}
 
 	// handle sorting
@@ -47,7 +56,15 @@
 	}
 
 	const columns = $derived(
-		createResponseColumns(sortBy, sortOrder, handleSort, handleDelete, userCanDelete, userCanDelete)
+		createResponseColumns(
+			sortBy,
+			sortOrder,
+			handleSort,
+			handleDelete,
+			userCanDelete,
+			userCanDelete,
+			handleShowResponses
+		)
 	);
 
 	const handleSelectionChange = (selectedRows: CandidateResponse[], selectedRowIds: string[]) => {
@@ -88,6 +105,8 @@
 	onBatchConfirm={handleBatchDeleteConfirm}
 	onBatchCancel={handleBatchDeleteCancel}
 />
+
+<FormResponsesDialog bind:open={showResponsesOpen} formResponse={selectedFormResponse} />
 
 <form
 	id="batch-delete-form"

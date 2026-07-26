@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, within, fireEvent, waitFor } from '@testing-library/svelte';
 import ResponsesPage from './+page.svelte';
 import type { CandidateResponse } from './columns.js';
 import { formatDatePart, formatTimePart } from '$lib/utils';
+import { toast } from 'svelte-sonner';
 
 vi.mock('$lib/constants', () => ({
 	DEFAULT_PAGE_SIZE: 25
@@ -20,6 +21,10 @@ vi.mock('$app/navigation', () => ({
 
 vi.mock('$app/state', () => ({
 	page: { url: new URL('http://localhost/tests/test-standard/1/responses?page=1') }
+}));
+
+vi.mock('svelte-sonner', () => ({
+	toast: { error: vi.fn(), success: vi.fn() }
 }));
 
 const submittedCandidate: CandidateResponse = {
@@ -49,6 +54,45 @@ const notSubmittedCandidate: CandidateResponse = {
 	end_time: null,
 	time_taken_seconds: null,
 	result: null
+};
+
+const candidateWithCertificate: CandidateResponse = {
+	candidate_id: 3,
+	candidate_uuid: 'candidate-ccc',
+	status: 'submitted',
+	start_time: '2026-06-01T10:00:00Z',
+	end_time: '2026-06-01T10:30:00Z',
+	time_taken_seconds: 90,
+	result: {
+		correct_answer: 9,
+		incorrect_answer: 1,
+		mandatory_not_attempted: 0,
+		optional_not_attempted: 0,
+		total_questions: 10,
+		marks_obtained: 9,
+		marks_maximum: 10,
+		certificate_download_url: 'https://example.com/certificates/candidate-ccc.pdf'
+	}
+};
+
+const candidateWithFormResponse: CandidateResponse = {
+	candidate_id: 4,
+	candidate_uuid: 'candidate-ddd',
+	status: 'submitted',
+	start_time: '2026-06-01T10:00:00Z',
+	end_time: '2026-06-01T10:30:00Z',
+	time_taken_seconds: 90,
+	result: {
+		correct_answer: 7,
+		incorrect_answer: 3,
+		mandatory_not_attempted: 0,
+		optional_not_attempted: 0,
+		total_questions: 10,
+		marks_obtained: 7,
+		marks_maximum: 10,
+		certificate_download_url: null
+	},
+	form_response: { feedback: 'Great experience', full_name: 'Jane Doe', middle_name: 'N/A' }
 };
 
 const sampleResponses: CandidateResponse[] = [submittedCandidate, notSubmittedCandidate];
@@ -207,6 +251,113 @@ describe('Candidate Responses page (UI)', () => {
 			await waitFor(() => {
 				expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
 			});
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Download Certificate button', () => {
+		const originalCreateObjectURL = window.URL.createObjectURL;
+		const originalRevokeObjectURL = window.URL.revokeObjectURL;
+
+		beforeEach(() => {
+			window.URL.createObjectURL = vi.fn().mockReturnValue('blob:mock-url');
+			window.URL.revokeObjectURL = vi.fn();
+		});
+
+		afterEach(() => {
+			window.URL.createObjectURL = originalCreateObjectURL;
+			window.URL.revokeObjectURL = originalRevokeObjectURL;
+			vi.unstubAllGlobals();
+		});
+
+		it('shows no download button for a candidate with no certificate_download_url', () => {
+			render(ResponsesPage, { data: makeData(sampleResponses, { canDelete: true }) } as any);
+			expect(
+				screen.queryByRole('button', { name: 'Download Certificate' })
+			).not.toBeInTheDocument();
+		});
+
+		it('shows a download button when certificate_download_url is set', () => {
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate], { canDelete: true })
+			} as any);
+			expect(
+				screen.getByRole('button', { name: 'Download Certificate' })
+			).toBeInTheDocument();
+		});
+
+		it('fetches the certificate through the download proxy and triggers a browser download on click', async () => {
+			const blob = new Blob(['pdf-bytes'], { type: 'image/png' });
+			const fetchMock = vi.fn().mockResolvedValue({ ok: true, blob: () => Promise.resolve(blob) });
+			vi.stubGlobal('fetch', fetchMock);
+
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate], { canDelete: true })
+			} as any);
+			await fireEvent.click(screen.getByRole('button', { name: 'Download Certificate' }));
+
+			await waitFor(() => {
+				expect(fetchMock).toHaveBeenCalledWith('/api/download-certificate', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						certificate_download_url: candidateWithCertificate.result!.certificate_download_url
+					})
+				});
+			});
+			await waitFor(() => {
+				expect(window.URL.createObjectURL).toHaveBeenCalledWith(blob);
+			});
+			expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
+		});
+
+		it('shows an error toast and does not throw when the download proxy fails', async () => {
+			const fetchMock = vi.fn().mockResolvedValue({ ok: false });
+			vi.stubGlobal('fetch', fetchMock);
+
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate], { canDelete: true })
+			} as any);
+			await fireEvent.click(screen.getByRole('button', { name: 'Download Certificate' }));
+
+			await waitFor(() => {
+				expect(toast.error).toHaveBeenCalledWith('Failed to download certificate');
+			});
+			expect(window.URL.createObjectURL).not.toHaveBeenCalled();
+		});
+	});
+
+	// ─────────────────────────────────────────────────────────────────────────
+	describe('Show Responses button', () => {
+		it('shows no "Show Responses" button for a candidate with no form_response', () => {
+			render(ResponsesPage, { data: makeData(sampleResponses, { canDelete: true }) } as any);
+			expect(
+				screen.queryByRole('button', { name: 'Show Responses' })
+			).not.toBeInTheDocument();
+		});
+
+		it('shows a "Show Responses" button when form_response is set', () => {
+			render(ResponsesPage, {
+				data: makeData([candidateWithFormResponse], { canDelete: true })
+			} as any);
+			expect(screen.getByRole('button', { name: 'Show Responses' })).toBeInTheDocument();
+		});
+
+		it("opens a dialog listing the candidate's answers, humanized, skipping N/A fields", async () => {
+			render(ResponsesPage, {
+				data: makeData([candidateWithFormResponse], { canDelete: true })
+			} as any);
+
+			await fireEvent.click(screen.getByRole('button', { name: 'Show Responses' }));
+
+			const dialog = await screen.findByRole('dialog');
+			expect(within(dialog).getByText('Form Responses')).toBeInTheDocument();
+			expect(within(dialog).getByText('Feedback')).toBeInTheDocument();
+			expect(within(dialog).getByText('Great experience')).toBeInTheDocument();
+			expect(within(dialog).getByText('Full Name')).toBeInTheDocument();
+			expect(within(dialog).getByText('Jane Doe')).toBeInTheDocument();
+			expect(within(dialog).queryByText('Middle Name')).not.toBeInTheDocument();
+			expect(within(dialog).queryByText('N/A')).not.toBeInTheDocument();
 		});
 	});
 

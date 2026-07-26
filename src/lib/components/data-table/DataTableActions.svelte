@@ -10,6 +10,9 @@
 	import Link2 from '@lucide/svelte/icons/link-2';
 	import ChartColumnDecreasing from '@lucide/svelte/icons/chart-column-decreasing';
 	import ListChecks from '@lucide/svelte/icons/list-checks';
+	import DownloadIcon from '@lucide/svelte/icons/download';
+	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	interface CustomAction {
 		label: string;
@@ -18,6 +21,7 @@
 		icon?: string;
 		method?: string;
 		inline?: boolean;
+		iconOnly?: boolean;
 	}
 
 	let {
@@ -76,6 +80,10 @@
 				return ChartColumnDecreasing;
 			case 'list-checks':
 				return ListChecks;
+			case 'download':
+				return DownloadIcon;
+			case 'clipboard-list':
+				return ClipboardList;
 			default:
 				return undefined;
 		}
@@ -121,6 +129,30 @@
 							{action.label}
 						</Button>
 					</a>
+				{:else if action.action && action.iconOnly}
+					<Tooltip.Provider>
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<Button
+									variant="ghost"
+									size="icon"
+									aria-label={action.label}
+									onclick={action.action}
+								>
+									{#if IconComponent}
+										<IconComponent class="h-4 w-4" />
+									{/if}
+								</Button>
+							</Tooltip.Trigger>
+							<Tooltip.Content
+								class="border-border bg-popover text-popover-foreground rounded-md border p-2 text-xs shadow-lg/20"
+								side="top"
+								sideOffset={6}
+							>
+								<p>{action.label}</p>
+							</Tooltip.Content>
+						</Tooltip.Root>
+					</Tooltip.Provider>
 				{:else if action.action}
 					<Button
 						variant="secondary"

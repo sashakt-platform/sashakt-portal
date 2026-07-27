@@ -2,6 +2,7 @@
 	import { DataTable } from '$lib/components/data-table';
 	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
 	import { createColumns } from './columns';
+	import { canUpdate } from '$lib/utils/permissions.js';
 
 	let { data } = $props();
 
@@ -11,7 +12,7 @@
 	const currentPage = 1;
 	const pageSize = $derived(Math.max(tableData.length, 1));
 
-	const columns = createColumns();
+	const columns = $derived(createColumns({ canEdit: canUpdate(data.user, 'role') }));
 </script>
 
 <ListingPageLayout title="Roles and Permission" subtitle="" showInfoIcon={false}>

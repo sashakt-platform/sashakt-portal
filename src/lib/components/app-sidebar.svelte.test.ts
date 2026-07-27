@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/svelte';
 import AppSidebar from './app-sidebar.svelte';
-import { isSuperAdmin } from '$lib/utils/permissions.js';
+import { hasPermission, isSuperAdmin } from '$lib/utils/permissions.js';
 import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 vi.mock('$app/navigation', () => ({
@@ -343,5 +343,47 @@ describe('AppSidebar - Platform Guide PDF', () => {
 		});
 
 		expect(screen.queryByText('Platform Guide PDF')).not.toBeInTheDocument();
+	});
+});
+
+describe('AppSidebar - My Organisation submenu', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(isSuperAdmin).mockReturnValue(false);
+	});
+
+	it('shows "Roles and Permission" link when the user has READ_ROLE permission', () => {
+		vi.mocked(hasPermission).mockReturnValue(true);
+
+		render(AppSidebar, { data: baseData });
+
+		const link = screen.getByText('Roles and Permission').closest('a');
+		expect(link).toHaveAttribute('href', '/organization/roles-permissions');
+	});
+
+	it('hides "Roles and Permission" link when the user lacks any My Organisation permission', () => {
+		vi.mocked(hasPermission).mockReturnValue(false);
+
+		render(AppSidebar, { data: baseData });
+
+		expect(screen.queryByText('Roles and Permission')).not.toBeInTheDocument();
+	});
+
+	it('places "Roles and Permission" after "Integrations" in the submenu', () => {
+		vi.mocked(hasPermission).mockReturnValue(true);
+
+		render(AppSidebar, { data: baseData });
+
+		const items = screen.getAllByText(/Integrations|Roles and Permission/);
+		expect(items.map((el) => el.textContent)).toEqual(['Integrations', 'Roles and Permission']);
+	});
+
+	it('does not show "Roles and Permission" for a super admin', () => {
+		vi.mocked(isSuperAdmin).mockReturnValue(true);
+		vi.mocked(hasPermission).mockReturnValue(true);
+
+		render(AppSidebar, { data: baseData });
+
+		expect(screen.queryByText('Roles and Permission')).not.toBeInTheDocument();
 	});
 });

@@ -82,6 +82,9 @@
 		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {
 			children.push({ title: 'Integrations', url: '/organization/integrations' });
 		}
+		if (hasPermission(data.user, PERMISSIONS.READ_ROLE)) {
+			children.push({ title: 'Roles and Permission', url: '/organization/roles-permissions' });
+		}
 		return children;
 	});
 

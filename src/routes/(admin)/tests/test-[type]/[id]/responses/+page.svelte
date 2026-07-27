@@ -3,6 +3,7 @@
 	import { DataTable } from '$lib/components/data-table/index.js';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import BatchActionsToolbar from '$lib/components/data-table/BatchActionsToolbar.svelte';
+	import SearchInput from '$lib/components/SearchInput.svelte';
 	import FormResponsesDialog from './FormResponsesDialog.svelte';
 	import { createResponseColumns, type CandidateResponse } from './columns.js';
 	import { hasPermission, PERMISSIONS } from '$lib/utils/permissions.js';
@@ -20,6 +21,7 @@
 	const pageSize = $derived(data?.params?.size || DEFAULT_PAGE_SIZE);
 	const sortBy = $derived(data?.params?.sortBy || '');
 	const sortOrder = $derived(data?.params?.sortOrder || 'asc');
+	const search = $derived(data?.params?.search || '');
 
 	const userCanDelete = $derived(hasPermission(data.user, PERMISSIONS.DELETE_CANDIDATE));
 
@@ -144,6 +146,10 @@
 				onClearSelection={handleClearSelection}
 			/>
 		{/if}
+	{/snippet}
+
+	{#snippet filters()}
+		<SearchInput placeholder="Search candidates..." value={search} />
 	{/snippet}
 
 	{#snippet content()}

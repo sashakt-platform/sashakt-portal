@@ -1,9 +1,35 @@
 import type { ColumnDef } from '@tanstack/table-core';
+import { toast } from 'svelte-sonner';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import { createSelectionColumn, createSortableColumn } from '$lib/components/data-table/column-helpers';
+
+async function downloadCertificate(certificateDownloadUrl: string, candidateUuid: string) {
+	try {
+		const response = await fetch('/api/download-certificate', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ certificate_download_url: certificateDownloadUrl })
+		});
+
+		if (!response.ok) throw new Error('Download failed');
+
+		const blob = await response.blob();
+		const url = window.URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `certificate-${candidateUuid}.png`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		window.URL.revokeObjectURL(url);
+	} catch (error) {
+		console.error('Failed to download certificate:', error);
+		toast.error('Failed to download certificate');
+	}
+}
 
 type CandidateStatus = 'submitted' | 'not_submitted';
 export interface CandidateResult {
@@ -25,6 +51,7 @@ export interface CandidateResponse {
 	end_time: string | null;
 	time_taken_seconds: number | null;
 	result: CandidateResult | null;
+	form_response?: Record<string, string | null> | null;
 }
 
 export const createResponseColumns = (
@@ -33,13 +60,20 @@ export const createResponseColumns = (
 	handleSort: (columnId: string) => void,
 	onDelete?: (candidateId: number) => void,
 	canDelete = true,
-	enableSelection = false
+	enableSelection = false,
+	onShowResponses?: (candidate: CandidateResponse) => void
 ): ColumnDef<CandidateResponse>[] => [
 	...(enableSelection ? [createSelectionColumn<CandidateResponse>()] : []),
 	{
-		accessorKey: 'candidate_uuid',
-		header: 'Candidate',
-		meta: { grow: true }
+		id: 'marks',
+		header: 'Marks',
+		cell: ({ row }) => {
+			const result = row.original.result;
+			if (!result || result.marks_obtained == null) return '—';
+			if (result.marks_maximum == null) return `${result.marks_obtained}`;
+			return `${result.marks_obtained} / ${result.marks_maximum}`;
+		},
+		size: 130
 	},
 	createSortableColumn(
 		'status',
@@ -52,17 +86,6 @@ export const createResponseColumns = (
 			size: 150
 		}
 	),
-	{
-		id: 'marks',
-		header: 'Marks',
-		cell: ({ row }) => {
-			const result = row.original.result;
-			if (!result || result.marks_obtained == null) return '—';
-			if (result.marks_maximum == null) return `${result.marks_obtained}`;
-			return `${result.marks_obtained} / ${result.marks_maximum}`;
-		},
-		size: 130
-	},
 	createSortableColumn(
 		'start_time',
 		'Start Time',
@@ -100,6 +123,30 @@ export const createResponseColumns = (
 					enableHiding: false,
 					size: 60,
 					cell: ({ row }: { row: { original: CandidateResponse } }) => {
+						const certificateUrl = row.original.result?.certificate_download_url;
+						const hasFormResponse = row.original.form_response != null;
+
+						const customActions = [];
+
+						if (certificateUrl) {
+							customActions.push({
+								label: 'Download Certificate',
+								icon: 'download',
+								inline: true,
+								iconOnly: true,
+								action: () => downloadCertificate(certificateUrl, row.original.candidate_uuid)
+							});
+						}
+
+						if (hasFormResponse) {
+							customActions.push({
+								label: 'Show Responses',
+								icon: 'clipboard-list',
+								inline: true,
+								iconOnly: true,
+								action: () => onShowResponses?.(row.original)
+							});
+						}
 						return renderComponent(DataTableActions, {
 							entityName: 'Candidate',
 							editUrl: '',
@@ -107,6 +154,7 @@ export const createResponseColumns = (
 							canEdit: false,
 							canDelete: true,
 							deleteInline: true,
+							customActions,
 							onDelete: () => onDelete?.(row.original.candidate_id)
 						});
 					}

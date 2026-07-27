@@ -265,4 +265,27 @@ describe('Edit Provider Page (+page.svelte)', () => {
 		render(AddProviderPage, { data: makeEditData() } as never);
 		expect(screen.getByRole('button', { name: /save/i })).toBeEnabled();
 	});
+
+	describe('Config JSON textarea', () => {
+		it('does not show the service-account JSON placeholder', () => {
+			const { container } = render(AddProviderPage, { data: makeEditData() } as never);
+			const textarea = container.querySelector('textarea');
+			expect(textarea).not.toBeNull();
+			expect(textarea).toHaveAttribute('placeholder', '');
+			expect(screen.queryByPlaceholderText(/service_account/)).not.toBeInTheDocument();
+		});
+
+		it('still allows typing a new config value with no placeholder present', async () => {
+			const { container } = render(AddProviderPage, { data: makeEditData() } as never);
+			const textarea = container.querySelector('textarea') as HTMLTextAreaElement;
+			await fireEvent.input(textarea, { target: { value: '{"a":1}' } });
+			expect(textarea).toHaveValue('{"a":1}');
+		});
+
+		it('leaves the textarea empty when config_json is not pre-filled in edit mode', () => {
+			const { container } = render(AddProviderPage, { data: makeEditData() } as never);
+			const textarea = container.querySelector('textarea');
+			expect(textarea).toHaveValue('');
+		});
+	});
 });

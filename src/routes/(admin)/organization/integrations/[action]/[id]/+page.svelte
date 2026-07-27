@@ -126,7 +126,9 @@
 											{...props}
 											rows={10}
 											class="font-mono text-xs"
-											placeholder={`{\n  "type": "service_account",\n  "project_id": "your-project-id",\n  "private_key": "...",\n  "client_email": "..."\n}`}
+											placeholder={isEdit
+											? ''
+											: `{\n  "type": "service_account",\n  "project_id": "your-project-id",\n  "private_key": "...",\n  "client_email": "..."\n}`}
 											bind:value={$formData.config_json}
 										/>
 									{/snippet}

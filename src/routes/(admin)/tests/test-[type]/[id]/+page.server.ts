@@ -1,6 +1,12 @@
 import type { PageServerLoad, Actions } from './$types.js';
-import { getQuestionSetMandatoryLimitError, testSchema } from './schema';
-import { superValidate } from 'sveltekit-superforms';
+import {
+	configurationSchema,
+	getQuestionSetMandatoryLimitError,
+	primarySchema,
+	questionSchema,
+	testSchema
+} from './schema';
+import { superValidate, message } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { fail } from '@sveltejs/kit';
@@ -33,6 +39,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	const token = getSessionTokenCookie();
+	let isTestLocked = false;
 
 	try {
 		if (params.id !== 'new' && params.id !== 'convert') {
@@ -54,6 +61,20 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			}
 
 			testData = await testResponse.json();
+
+			if (!is_template) {
+				try {
+					const lockRes = await fetch(`${BACKEND_URL}/test/${params.id}/has-candidate-tests`, {
+						method: 'GET',
+						headers: { Authorization: `Bearer ${token}` }
+					});
+					if (lockRes.ok) {
+						isTestLocked = await lockRes.json();
+					}
+				} catch (error) {
+					console.error('Error checking test lock status:', error);
+				}
+			}
 		} else if (params.id === 'convert' && templateID) {
 			// convert flow: template selected, prefill from it
 			const testResponse = await fetch(`${BACKEND_URL}/test/${templateID}?is_template=true`, {
@@ -218,20 +239,38 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		convertTemplate: params.id === 'convert',
 		questions,
 		selectedQuestions,
-		questionParams: questionPaginationParams
+		questionParams: questionPaginationParams,
+		isTestLocked
 	};
 };
 
+const PRIMARY_FIELD_KEYS = Object.keys(primarySchema.shape);
+const QUESTION_FIELD_KEYS = Object.keys(questionSchema.shape);
+const CONFIGURATION_FIELD_KEYS = Object.keys(configurationSchema.shape);
+
+function pick(obj: Record<string, any>, keys: string[]) {
+	const result: Record<string, any> = {};
+	for (const key of keys) {
+		if (key in obj) result[key] = obj[key];
+	}
+	return result;
+}
+
 export const actions: Actions = {
-	save: async ({ request, params, cookies }) => {
+	save: async ({ request, params, cookies, url }) => {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
 		const is_template = params.type === 'template';
 		const term = await serverTerms(user.organization_id);
 		const subjectKey = is_template ? 'test_template' : 'test';
 
+		const intent = url.searchParams.get('intent');
+		const isPrimaryStep = intent === 'primary';
+		const isQuestionsStep = intent === 'questions';
+		const isCreateFlow = params.id === 'new' || params.id === 'convert';
+
 		// Check permissions based on action and type
-		if (params.id === 'new') {
+		if (isCreateFlow) {
 			if (is_template) {
 				requirePermission(user, PERMISSIONS.CREATE_TEST_TEMPLATE);
 			} else {
@@ -249,7 +288,7 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: `${term(subjectKey)} not created. Please check all the details.`
+					message: `${term(subjectKey)} not saved. Please check all the details.`
 				},
 				cookies
 			);
@@ -272,16 +311,19 @@ export const actions: Actions = {
 			);
 			return fail(400, { form });
 		}
-		const isSectionedTest = (form.data.question_sets?.length ?? 0) > 0;
-		const isCreateFlow = params.id === 'new' || params.id === 'convert';
-		const transformedFormData: Record<string, any> = {
-			...form.data,
-			start_time: form.data.start_time || null,
-			end_time: form.data.end_time || null,
-			state_ids: form.data.state_ids.map((s) => s.id),
-			tag_ids: form.data.tag_ids.map((t) => t.id),
-			district_ids: form.data.district_ids.map((d) => d.id),
-			random_tag_count: form.data.random_tag_count.map((t) => ({ tag_id: t.id, count: t.count }))
+		const formData = form.data;
+		const isSectionedTest = (formData.question_sets?.length ?? 0) > 0;
+		let transformedFormData: Record<string, any> = {
+			...formData,
+			start_time: formData.start_time || null,
+			end_time: formData.end_time || null,
+			state_ids: formData.state_ids.map((s: { id: string }) => s.id),
+			tag_ids: formData.tag_ids.map((t: { id: string }) => t.id),
+			district_ids: formData.district_ids.map((d: { id: string }) => d.id),
+			random_tag_count: formData.random_tag_count.map((t: { id: string; count: number }) => ({
+				tag_id: t.id,
+				count: t.count
+			}))
 		};
 
 		// question_revisions is a client-side mirror for UI rendering (full objects with
@@ -294,7 +336,7 @@ export const actions: Actions = {
 			delete transformedFormData.question_revision_ids;
 
 			if (isCreateFlow) {
-				transformedFormData.question_sets = form.data.question_sets.map((questionSet) => ({
+				transformedFormData.question_sets = formData.question_sets.map((questionSet: any) => ({
 					...(questionSet.id ? { id: questionSet.id } : {}),
 					title: questionSet.title,
 					description: questionSet.description || null,
@@ -304,10 +346,20 @@ export const actions: Actions = {
 					question_revision_ids:
 						questionSet.question_revision_ids?.length > 0
 							? questionSet.question_revision_ids
-							: questionSet.question_revisions.map((question) => question.id)
+							: questionSet.question_revisions.map((question: any) => question.id)
 				}));
 			} else {
 				delete transformedFormData.question_sets;
+			}
+		}
+
+		if (!isCreateFlow) {
+			if (intent === 'primary') {
+				transformedFormData = pick(transformedFormData, PRIMARY_FIELD_KEYS);
+			} else if (intent === 'questions') {
+				transformedFormData = pick(transformedFormData, QUESTION_FIELD_KEYS);
+			} else {
+				transformedFormData = pick(transformedFormData, CONFIGURATION_FIELD_KEYS);
 			}
 		}
 
@@ -328,12 +380,27 @@ export const actions: Actions = {
 			setFlash(
 				{
 					type: 'error',
-					message: `${term(subjectKey)} not created. Details: ${errorMessage.detail || response.statusText}`
+					message: `${term(subjectKey)} not saved. Details: ${errorMessage.detail || response.statusText}`
 				},
 				cookies
 			);
 			return fail(500, { form });
 		}
+
+		if (isPrimaryStep) {
+			setFlash({ type: 'success', message: `${term(subjectKey)}  saved successfully` }, cookies);
+			if (isCreateFlow) {
+				const newTest = await response.json();
+				return message(form, { redirectId: newTest.id });
+			}
+			return { form };
+		}
+
+		if (isQuestionsStep) {
+			setFlash({ type: 'success', message: 'Questions saved successfully' }, cookies);
+			return { form };
+		}
+
 		redirect(
 			`/tests/test-${form.data.is_template ? 'template' : 'session'}`,
 			{

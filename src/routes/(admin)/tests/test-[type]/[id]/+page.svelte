@@ -8,7 +8,11 @@
 
 	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
-	import { getQuestionSetMandatoryLimitError, testSchema, type FormSchema } from './schema';
+	import {
+		getQuestionSetMandatoryLimitError,
+		testSchema,
+		type FormSchema
+	} from './schema';
 	import type { Filter } from '$lib/types/filters';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -21,6 +25,17 @@
 	const term = useTerms();
 
 	const typeOfScreen = { primary: 1, questions: 2, configuration: 3 };
+
+	const SCREEN_PARAM: Record<number, string> = {
+		[typeOfScreen.primary]: 'primary',
+		[typeOfScreen.questions]: 'questions',
+		[typeOfScreen.configuration]: 'configuration'
+	};
+	const PARAM_SCREEN: Record<string, number> = {
+		primary: typeOfScreen.primary,
+		questions: typeOfScreen.questions,
+		configuration: typeOfScreen.configuration
+	};
 
 	let {
 		data
@@ -37,6 +52,7 @@
 			questions: any;
 			selectedQuestions: any;
 			questionParams: any;
+			isTestLocked?: boolean;
 		};
 	} = $props();
 
@@ -44,13 +60,17 @@
 	const isEditing = $derived(!!testData);
 	const convertTemplate = $derived(data.convertTemplate);
 	let selectedTemplateId = $state<string | null>(null);
-	let currentScreen: number = $state(typeOfScreen.primary);
 
-	$effect(() => {
-		if (data.convertTemplate && data.testData) {
-			currentScreen = typeOfScreen.questions;
-		}
-	});
+	let testLocked = $state(data.isTestLocked ?? false);
+
+	function getInitialScreen(): number {
+		const requested = PARAM_SCREEN[page.url.searchParams.get('step') ?? ''];
+		if (requested) return requested;
+		
+		if (data.convertTemplate && testData) return typeOfScreen.questions;
+		return typeOfScreen.primary;
+	}
+	let currentScreen: number = $state(getInitialScreen());
 
 	const {
 		form: formData,
@@ -58,6 +78,7 @@
 		submit
 	} = superForm(testData || data.form, {
 		applyAction: 'never',
+		resetForm: false,
 		validators: zod4Client(testSchema),
 		dataType: 'json',
 		onSubmit() {
@@ -66,6 +87,18 @@
 			}
 			if ($formData.is_template) {
 				$formData.link = null;
+			}
+		},
+		onUpdated({ form }) {
+			if (!form.valid) return;
+			if (currentScreen === typeOfScreen.primary) {
+				const redirectId = (form.message as { redirectId?: number } | undefined)?.redirectId;
+				const path = redirectId
+					? page.url.pathname.replace(/\/[^/]+$/, `/${redirectId}`)
+					: page.url.pathname;
+				setScreen(typeOfScreen.questions, { path, invalidateAll: true });
+			} else if (currentScreen === typeOfScreen.questions) {
+				setScreen(typeOfScreen.configuration);
 			}
 		}
 	});
@@ -202,22 +235,56 @@
 		return isEditing ? `Edit ${term('test')}` : `Create ${term('test')}`;
 	});
 
+	const nextStepIntent = $derived.by(() => {
+		if (convertTemplate) return null;
+		if (currentScreen === typeOfScreen.primary) return 'primary';
+		if (testLocked) return null;
+		if (currentScreen === typeOfScreen.questions) return 'questions';
+		return null;
+	});
+
+	const nextButtonLabel = $derived.by(() => {
+		if (currentScreen === typeOfScreen.configuration) return testLocked ? 'Cancel' : 'Save';
+		if (currentScreen === typeOfScreen.questions && testLocked) return 'Next';
+		if (currentScreen === typeOfScreen.primary && !convertTemplate) return 'Save & Continue';
+		if (currentScreen === typeOfScreen.questions && !convertTemplate) return 'Save & Continue';
+		return 'Next';
+	});
+
 	const isNextDisabled = $derived(
 		(currentScreen === typeOfScreen.primary && convertTemplate && !selectedTemplateId) ||
 			(currentScreen === typeOfScreen.primary &&
 				!convertTemplate &&
 				($formData.name ?? '').trim() === '') ||
-			(currentScreen === typeOfScreen.questions &&
+			(!testLocked &&
+				currentScreen === typeOfScreen.questions &&
 				!isSectionedTest &&
 				($formData.question_revision_ids?.length ?? 0) === 0 &&
 				($formData.random_tag_count?.length ?? 0) > 0 &&
 				($formData.random_tag_count ?? []).some((t) => !t.count)) ||
-			(currentScreen === typeOfScreen.configuration &&
+			(!testLocked &&
+				currentScreen === typeOfScreen.configuration &&
 				$formData.random_questions &&
 				($formData.no_of_random_questions ?? 0) <= 0) ||
-			($formData.no_of_random_questions ?? 0) > totalQuestionCount ||
-			(currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
+			(!testLocked &&
+				currentScreen === typeOfScreen.configuration &&
+				($formData.no_of_random_questions ?? 0) > totalQuestionCount) ||
+			(!testLocked &&
+				currentScreen === typeOfScreen.configuration && Boolean(questionSetMandatoryLimitError))
 	);
+
+	function setScreen(target: number, options: { path?: string; invalidateAll?: boolean } = {}) {
+		currentScreen = target;
+		const url = new URL(options.path ?? page.url.pathname, page.url.origin);
+		if (!options.path) url.search = page.url.search;
+		url.searchParams.set('step', SCREEN_PARAM[target]);
+		goto(`${url.pathname}?${url.searchParams}`, {
+			replaceState: true,
+			keepFocus: true,
+			noScroll: true,
+			invalidateAll: options.invalidateAll ?? false
+		});
+	}
 
 	// Drop template_id so the load function re-fetches the template list
 	// (it's only fetched when no template_id is present).
@@ -231,24 +298,55 @@
 			goto(page.url.pathname, { invalidateAll: true });
 			return;
 		}
-		currentScreen = target;
+		if (convertTemplate) {
+			currentScreen = target;
+			return;
+		}
+		setScreen(target);
 	}
 
 	function handlePrevious() {
 		if (currentScreen > typeOfScreen.primary) {
+			if (currentScreen === typeOfScreen.questions) {
+				$formData.random_tag_count = ($formData.random_tag_count ?? []).filter(
+					(t) => t.count !== undefined
+				);
+			}
 			goToScreen(currentScreen - 1);
 		}
 	}
 
+	function handleCancel() {
+		goto(new URL('./', page.url).href);
+	}
+
 	function handleNext() {
 		if (currentScreen === typeOfScreen.primary && convertTemplate) {
-			goto(`?template_id=${selectedTemplateId}`, { invalidateAll: true });
+			setScreen(typeOfScreen.questions, {
+				path: `${page.url.pathname}?template_id=${selectedTemplateId}`,
+				invalidateAll: true
+			});
+			return;
+		}
+		if (currentScreen === typeOfScreen.primary) {
+			return;
+		}
+		
+		if (currentScreen === typeOfScreen.questions && testLocked) {
+			setScreen(typeOfScreen.configuration);
+			return;
+		}
+		if (currentScreen === typeOfScreen.questions && !convertTemplate) {
 			return;
 		}
 		if (currentScreen === typeOfScreen.configuration) {
-			submit();
+			if (testLocked) {
+				handleCancel();
+			} else {
+				submit();
+			}
 		} else {
-			currentScreen++;
+			setScreen(currentScreen + 1);
 		}
 	}
 
@@ -266,6 +364,26 @@
 		{ number: 3, label: `${term('test')} Configuration`, mode: typeOfScreen.configuration }
 	]);
 </script>
+
+{#snippet navButtons()}
+	<Button
+		variant="outline"
+		class="border-primary text-primary"
+		disabled={currentScreen === typeOfScreen.primary}
+		onclick={handlePrevious}
+	>
+		Previous
+	</Button>
+	<Button
+		class="bg-primary"
+		disabled={isNextDisabled}
+		type={nextStepIntent ? 'submit' : 'button'}
+		formaction={nextStepIntent ? `?/save&intent=${nextStepIntent}` : undefined}
+		onclick={handleNext}
+	>
+		{nextButtonLabel}
+	</Button>
+{/snippet}
 
 <form method="POST" action="?/save" use:enhance class="pb-10">
 	<!-- Page Header -->
@@ -321,20 +439,18 @@
 			</div>
 			<!-- Right: Navigation buttons -->
 			<div class="flex shrink-0 items-center gap-3">
-				<Button
-					variant="outline"
-					class="border-primary text-primary"
-					disabled={currentScreen === typeOfScreen.primary}
-					onclick={handlePrevious}
-				>
-					Previous
-				</Button>
-				<Button class="bg-primary" disabled={isNextDisabled} onclick={handleNext}>
-					{currentScreen === typeOfScreen.configuration ? 'Save' : 'Next'}
-				</Button>
+				{@render navButtons()}
 			</div>
 		</div>
 	</div>
+
+	{#if testLocked && currentScreen !== typeOfScreen.primary}
+		<div
+			class="mx-4 mt-4 rounded-lg border border-warning/20 bg-warning-subtle px-4 py-3 text-sm text-warning sm:mx-8 md:mx-10"
+		>
+			This {term('test')} is not editable because candidates have already attempted it.
+		</div>
+	{/if}
 
 	<!-- Content -->
 	{#if currentScreen === typeOfScreen.primary || currentScreen === typeOfScreen.questions}
@@ -350,13 +466,15 @@
 						bind:selectedTemplateId
 					/>
 				{:else if currentScreen === typeOfScreen.questions}
-					<QuestionList
-						{formData}
-						questions={data.questions}
-						questionParams={data.questionParams}
-						user={data.user}
-						{convertTemplate}
-					/>
+					<fieldset disabled={testLocked} class="m-0 min-w-0 border-0 p-0">
+						<QuestionList
+							{formData}
+							questions={data.questions}
+							questionParams={data.questionParams}
+							user={data.user}
+							{convertTemplate}
+						/>
+					</fieldset>
 				{/if}
 			</div>
 		</div>
@@ -368,21 +486,11 @@
 				{questionSetMandatoryLimitError}
 			</div>
 		{/if}
-		<Configuration {formData} orgSettings={data.orgSettings} />
+		<Configuration {formData} orgSettings={data.orgSettings} disabled={testLocked} />
 	{/if}
 
 	<!-- Bottom Navigation -->
 	<div class="mx-4 mt-6 flex items-center justify-end gap-3 sm:mx-8 md:mx-10">
-		<Button
-			variant="outline"
-			class="border-primary text-primary"
-			disabled={currentScreen === typeOfScreen.primary}
-			onclick={handlePrevious}
-		>
-			Previous
-		</Button>
-		<Button class="bg-primary" disabled={isNextDisabled} onclick={handleNext}>
-			{currentScreen === typeOfScreen.configuration ? 'Save' : 'Next'}
-		</Button>
+		{@render navButtons()}
 	</div>
 </form>

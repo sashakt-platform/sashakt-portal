@@ -3,7 +3,7 @@
 
 	import { untrack } from 'svelte';
 
-	let { title, Icon, children, defaultOpen = false, ...className } = $props();
+	let { title, Icon, children, defaultOpen = false, disabled = false, ...className } = $props();
 
 	let visibility: boolean = $state(untrack(() => defaultOpen));
 </script>
@@ -32,6 +32,8 @@
 			'border border-t-0 shadow'
 		]}
 	>
-		{@render children()}
+		<fieldset {disabled} class={['contents', disabled && 'pointer-events-none']}>
+			{@render children()}
+		</fieldset>
 	</div>
 </div>

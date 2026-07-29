@@ -100,11 +100,12 @@ function allFixedSettings(): OrgSettingsPayload {
 	};
 }
 
-function renderConfiguration(orgSettings: OrgSettingsPayload | null) {
+function renderConfiguration(orgSettings: OrgSettingsPayload | null, disabled = false) {
 	const formStore = writable(defaultFormValues());
 	return render(Configuration, {
 		formData: formStore,
-		orgSettings
+		orgSettings,
+		disabled
 	});
 }
 
@@ -265,5 +266,30 @@ describe('Configuration — fixed org settings hide fields', () => {
 				screen.getByText('Pause timer when candidate leaves the test window')
 			).toBeInTheDocument();
 		});
+	});
+});
+
+describe('Configuration — disabled prop (locked test)', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) });
+	});
+
+	it('renders disabled fieldsets around each section when disabled=true', () => {
+		const { container } = renderConfiguration(allFlexibleSettings(), true);
+		const fieldsets = container.querySelectorAll('fieldset[disabled]');
+		expect(fieldsets.length).toBeGreaterThan(0);
+	});
+
+	it('does not render disabled fieldsets when disabled=false', () => {
+		const { container } = renderConfiguration(allFlexibleSettings(), false);
+		const fieldsets = container.querySelectorAll('fieldset[disabled]');
+		expect(fieldsets.length).toBe(0);
+	});
+
+	it('still renders all section content when disabled=true', () => {
+		renderConfiguration(allFlexibleSettings(), true);
+		expect(screen.getByText('Maximum time limit for the test')).toBeInTheDocument();
+		expect(screen.getByText('Marking Scheme')).toBeInTheDocument();
 	});
 });

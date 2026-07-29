@@ -87,13 +87,15 @@
 			type="button"
 			onclick={(e) => {
 				e.stopPropagation();
-				const url = new URL(page.url);
-				url.searchParams.delete(itemName + '_ids', String(children.id));
+				if (filteration) {
+					const url = new URL(page.url);
+					url.searchParams.delete(itemName + '_ids', String(children.id));
 
-				// reset pagination to first page when filters removed
-				url.searchParams.set('page', '1');
+					// reset pagination to first page when filters removed
+					url.searchParams.set('page', '1');
 
-				goto(url, { keepFocus: true, invalidateAll: true });
+					goto(url, { keepFocus: true, invalidateAll: true });
+				}
 				items = items.filter((s: Filter) => s.id !== children.id);
 			}}>&times;</button
 		>

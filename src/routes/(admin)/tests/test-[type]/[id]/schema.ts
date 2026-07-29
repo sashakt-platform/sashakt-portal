@@ -67,10 +67,29 @@ export function getQuestionSetMandatoryLimitError(
 	return null;
 }
 
-export const testSchema = z.object({
+export const primarySchema = z.object({
 	name: z.string(),
 	description: z.string(),
 	is_active: z.boolean().default(true),
+	tag_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([])
+});
+
+export const questionSchema = z.object({
+	question_revision_ids: z.array(z.number()).default([]),
+	random_tag_count: z
+		.array(
+			z.object({
+				id: z.string(),
+				name: z.string(),
+				count: z.number().int().min(0)
+			})
+		)
+		.default([])
+});
+
+export const configurationSchema = z.object({
 	start_time: z.string().nullable().optional(),
 	end_time: z.string().nullable().optional(),
 	pause_timer_when_inactive: z.boolean().default(false),
@@ -85,24 +104,9 @@ export const testSchema = z.object({
 	shuffle: z.boolean().default(true),
 	random_questions: z.boolean().default(false),
 	no_of_random_questions: z.number().nullable().optional(),
-	random_tag_count: z
-		.array(
-			z.object({
-				id: z.string(),
-				name: z.string(),
-				count: z.number().int().min(0)
-			})
-		)
-		.default([]),
 	question_pagination: z.number().min(0).default(0),
 	is_template: z.boolean().default(false),
 	template_id: z.string().nullable().optional(),
-	tag_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
-	tag_type_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
-	question_revision_ids: z.array(z.number()).default([]),
-	question_sets: z.array(questionSetSchema).default([]),
-	state_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
-	district_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
 	show_marks: z.boolean().default(false),
 	show_result: z.boolean().default(true),
 	show_question_palette: z.boolean().default(true),
@@ -114,5 +118,16 @@ export const testSchema = z.object({
 	form_id: z.preprocess((v) => (!v ? null : v), z.coerce.number().nullable().optional()),
 	omr: z.enum(Object.values(OmrMode)).default(OmrMode.NEVER)
 });
+
+const displayOnlySchema = z.object({
+	tag_type_ids: z.array(z.object({ id: z.string(), name: z.string() })).default([]),
+	question_revisions: z.array(questionPreviewSchema).default([]),
+	question_sets: z.array(questionSetSchema).default([])
+});
+
+export const testSchema = primarySchema
+	.extend(questionSchema.shape)
+	.extend(configurationSchema.shape)
+	.extend(displayOnlySchema.shape);
 
 export type FormSchema = typeof testSchema;

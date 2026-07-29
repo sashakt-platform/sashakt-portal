@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { render, screen, fireEvent } from '@testing-library/svelte';
+import { flushSync } from 'svelte';
 import { get, writable } from 'svelte/store';
 import TestCreatePage from './+page.svelte';
 import { superForm } from 'sveltekit-superforms';
 import { goto } from '$app/navigation';
+import { page } from '$app/state';
 import { setCustomNomenclature, resetNomenclature } from '$lib/test-utils/nomenclature-mock';
 
 // ── Module mocks ─────────────────────────────────────────────────────────────
@@ -141,8 +143,17 @@ function baseData(overrides: Record<string, any> = {}): any {
 
 /** Get the bottom navigation Next/Save button (the last one in the DOM). */
 function getBottomNextButton() {
-	const buttons = screen.getAllByText(/^(Next|Save)$/);
+	const buttons = screen.getAllByText(/^(Next|Save|Save & Continue|Cancel)$/);
 	return buttons[buttons.length - 1].closest('button')!;
+}
+
+function completePrimaryStep(message?: Record<string, unknown>) {
+	const options = vi.mocked(superForm).mock.calls.at(-1)?.[1] as {
+		onUpdated: (event: { form: { valid: boolean; message?: Record<string, unknown> } }) => void;
+	};
+	// onUpdated mutates $state (currentScreen) outside of any Svelte event handler,
+	// so flush synchronously to guarantee the DOM reflects the new screen immediately.
+	flushSync(() => options.onUpdated({ form: { valid: true, message } }));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -185,19 +196,20 @@ describe('Test Create/Update Page', () => {
 			});
 		});
 
-		it('shows Next button on step 1', () => {
+		it('shows Save & Continue button on step 1', () => {
 			render(TestCreatePage, { data: baseData() });
-			const buttons = screen.getAllByText('Next');
+			const buttons = screen.getAllByText('Save & Continue');
 			expect(buttons.length).toBeGreaterThanOrEqual(2);
 		});
 
-		it('shows Next button on step 2 after advancing', async () => {
+		it('shows Save & Continue button on step 2 after advancing', async () => {
 			setupSuperFormMock({ name: 'My Test', description: 'My Description' });
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 
-			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
+			expect(screen.getAllByText('Save & Continue').length).toBeGreaterThanOrEqual(2);
 		});
 
 		it('shows Save button on step 3 after advancing twice', async () => {
@@ -205,7 +217,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
 
 			expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
 		});
@@ -258,7 +272,7 @@ describe('Test Create/Update Page', () => {
 	// ── Next button disabled — cross-screen condition ────────────────────────
 
 	describe('Next button — disabled when random questions exceed selected', () => {
-		it('is disabled on step 1 when no_of_random_questions > question_revision_ids count', () => {
+		it('is not disabled on step 1 when no_of_random_questions > question_revision_ids count (check only applies on Configuration step)', () => {
 			setupSuperFormMock({
 				name: 'Test Name',
 				description: 'Test Desc',
@@ -267,7 +281,7 @@ describe('Test Create/Update Page', () => {
 			});
 			render(TestCreatePage, { data: baseData() });
 
-			expect(getBottomNextButton()).toBeDisabled();
+			expect(getBottomNextButton()).not.toBeDisabled();
 		});
 
 		it('is enabled when no_of_random_questions equals question_revision_ids count', () => {
@@ -304,8 +318,8 @@ describe('Test Create/Update Page', () => {
 
 			await fireEvent.click(getBottomNextButton());
 
-			// Still shows Next (not Save), confirming we are on step 2
-			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
+			// Still shows Save & Continue (not Save), confirming we are on step 2
+			expect(screen.getAllByText('Save & Continue').length).toBeGreaterThanOrEqual(2);
 			expect(screen.queryByText('Save')).not.toBeInTheDocument();
 		});
 
@@ -314,7 +328,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
 
 			// Now on step 3 — button shows Save
 			expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
@@ -328,8 +344,8 @@ describe('Test Create/Update Page', () => {
 			// Button is disabled — clicking should not advance
 			await fireEvent.click(getBottomNextButton());
 
-			// Still on step 1: Next visible, Save not visible
-			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
+			// Still on step 1: Save & Continue visible, Save not visible
+			expect(screen.getAllByText('Save & Continue').length).toBeGreaterThanOrEqual(2);
 			expect(screen.queryByText('Save')).not.toBeInTheDocument();
 		});
 	});
@@ -342,7 +358,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton());
 
 			expect(mockSubmit).toHaveBeenCalledOnce();
@@ -362,6 +380,7 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton());
 
 			expect(mockSubmit).not.toHaveBeenCalled();
@@ -470,7 +489,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // Save
 
 			expect(mockSubmit).toHaveBeenCalledOnce();
@@ -488,7 +509,9 @@ describe('Test Create/Update Page', () => {
 			render(TestCreatePage, { data: baseData() });
 
 			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			completePrimaryStep({ redirectId: 42 });
 			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // Save
 
 			const stored = get(formStore);
@@ -550,8 +573,10 @@ describe('Test Create/Update Page', () => {
 			setupSuperFormMock();
 			render(TestCreatePage, { data: baseData({ testData: makeTestData() }) });
 
-			await fireEvent.click(getBottomNextButton()); // step 1 → step 2
+			await fireEvent.click(getBottomNextButton()); // step 1 → step 2 (PUT, no redirect)
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // step 2 → step 3
+			completePrimaryStep();
 			await fireEvent.click(getBottomNextButton()); // Save
 
 			expect(mockSubmit).toHaveBeenCalledOnce();
@@ -918,6 +943,316 @@ describe('Test Create/Update Page', () => {
 					expect(btn.closest('button')).toBeDisabled();
 				});
 			});
+		});
+	});
+
+	// ── Screen navigation via ?step= URL param ───────────────────────────────
+
+	describe('Screen navigation via ?step= URL param', () => {
+		afterEach(() => {
+			page.url.searchParams.delete('step');
+		});
+
+		it('opens directly on the questions screen when ?step=questions is present', () => {
+			page.url.searchParams.set('step', 'questions');
+			setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			render(TestCreatePage, { data: baseData() });
+
+			const prevButtons = screen.getAllByText('Previous');
+			prevButtons.forEach((btn) => expect(btn.closest('button')).not.toBeDisabled());
+			expect(screen.queryByText('Save')).not.toBeInTheDocument();
+		});
+
+		it('opens directly on the configuration screen when ?step=configuration is present', () => {
+			page.url.searchParams.set('step', 'configuration');
+			setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			render(TestCreatePage, { data: baseData() });
+
+			expect(screen.getAllByText('Save').length).toBeGreaterThanOrEqual(2);
+		});
+
+		it('falls back to the primary screen when the step param is absent', () => {
+			setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			render(TestCreatePage, { data: baseData() });
+
+			const prevButtons = screen.getAllByText('Previous');
+			prevButtons.forEach((btn) => expect(btn.closest('button')).toBeDisabled());
+		});
+
+		it('falls back to the primary screen when the step param has an unrecognised value', () => {
+			page.url.searchParams.set('step', 'not-a-real-step');
+			setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			render(TestCreatePage, { data: baseData() });
+
+			const prevButtons = screen.getAllByText('Previous');
+			prevButtons.forEach((btn) => expect(btn.closest('button')).toBeDisabled());
+		});
+
+		it('updates the URL with ?step=questions after successfully saving the primary step', async () => {
+			setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
+
+			expect(goto).toHaveBeenCalledWith(
+				expect.stringContaining('step=questions'),
+				expect.objectContaining({ replaceState: true, invalidateAll: true })
+			);
+		});
+
+		it('rewrites the URL path to the new test id when redirectId is returned from the primary save', async () => {
+			setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
+
+			expect(goto).toHaveBeenCalledWith(
+				expect.stringMatching(/^\/tests\/test-session\/42\?/),
+				expect.anything()
+			);
+		});
+
+		it('updates the URL with ?step=configuration after successfully saving the questions step', async () => {
+			setupSuperFormMock({ name: 'Test', description: 'Desc' });
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+
+			expect(goto).toHaveBeenCalledWith(
+				expect.stringContaining('step=configuration'),
+				expect.objectContaining({ replaceState: true })
+			);
+		});
+	});
+
+	// ── handlePrevious — filters incomplete random_tag_count rows ────────────
+
+	describe('handlePrevious — filters incomplete random_tag_count rows', () => {
+		it('removes random_tag_count entries with an undefined count when leaving the questions step', async () => {
+			const formStore = setupSuperFormMock({
+				name: 'Test',
+				description: 'Desc',
+				random_tag_count: [
+					{ id: '1', name: 'Science', count: 3 },
+					{ id: '2', name: 'Maths', count: undefined }
+				] as any
+			});
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
+
+			const prevButtons = screen.getAllByText('Previous');
+			await fireEvent.click(prevButtons[prevButtons.length - 1]);
+
+			expect(get(formStore).random_tag_count).toEqual([{ id: '1', name: 'Science', count: 3 }]);
+		});
+
+		it('leaves random_tag_count untouched when going back from the primary step (no-op)', async () => {
+			const formStore = setupSuperFormMock({
+				name: 'Test',
+				description: 'Desc',
+				random_tag_count: [{ id: '1', name: 'Science', count: undefined }] as any
+			});
+			render(TestCreatePage, { data: baseData() });
+
+			const prevButtons = screen.getAllByText('Previous');
+			await fireEvent.click(prevButtons[prevButtons.length - 1]);
+
+			expect(get(formStore).random_tag_count).toEqual([
+				{ id: '1', name: 'Science', count: undefined }
+			]);
+		});
+
+		it('keeps random_tag_count entries that already have a count when leaving the questions step', async () => {
+			const formStore = setupSuperFormMock({
+				name: 'Test',
+				description: 'Desc',
+				random_tag_count: [
+					{ id: '1', name: 'Science', count: 2 },
+					{ id: '2', name: 'Maths', count: 0 }
+				] as any
+			});
+			render(TestCreatePage, { data: baseData() });
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep({ redirectId: 42 });
+
+			const prevButtons = screen.getAllByText('Previous');
+			await fireEvent.click(prevButtons[prevButtons.length - 1]);
+
+			expect(get(formStore).random_tag_count).toEqual([
+				{ id: '1', name: 'Science', count: 2 },
+				{ id: '2', name: 'Maths', count: 0 }
+			]);
+		});
+	});
+
+	// ── Test lock — testLocked banner and controls ───────────────────────────
+
+	describe('Test lock — testLocked banner and controls', () => {
+		function makeTestData(overrides: Record<string, any> = {}) {
+			return {
+				id: '42',
+				name: 'Existing Test',
+				description: 'An existing description',
+				question_revisions: [],
+				question_sets: [],
+				states: [],
+				districts: [],
+				tags: [],
+				random_tag_counts: [],
+				...overrides
+			};
+		}
+
+		const lockedBannerText = /not editable because candidates have already attempted it/;
+
+		it('does not show the locked banner on the primary step even when the test is locked', () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			expect(screen.queryByText(lockedBannerText)).not.toBeInTheDocument();
+		});
+
+		it('shows the locked banner on the questions step when the test is locked', async () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton()); // step 1 -> step 2
+			completePrimaryStep();
+
+			expect(screen.getByText(lockedBannerText)).toBeInTheDocument();
+		});
+
+		it('does not show the locked banner when the test is not locked', async () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: false })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+
+			expect(screen.queryByText(lockedBannerText)).not.toBeInTheDocument();
+		});
+
+		it('shows "Next" instead of "Save & Continue" on the questions step when locked', async () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+
+			expect(screen.getAllByText('Next').length).toBeGreaterThanOrEqual(2);
+			expect(screen.queryByText('Save & Continue')).not.toBeInTheDocument();
+		});
+
+		it('shows "Cancel" instead of "Save" on the configuration step when locked', async () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+			await fireEvent.click(getBottomNextButton());
+
+			expect(screen.getAllByText('Cancel').length).toBeGreaterThanOrEqual(2);
+			expect(screen.queryByText('Save')).not.toBeInTheDocument();
+		});
+
+		it('navigates back to the listing page when Cancel is clicked on a locked test', async () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+			await fireEvent.click(getBottomNextButton());
+			await fireEvent.click(getBottomNextButton());
+
+			expect(goto).toHaveBeenCalledWith(expect.stringContaining('/tests/test-session/'));
+			expect(mockSubmit).not.toHaveBeenCalled();
+		});
+
+		it('does not submit the form when advancing past a locked questions step', async () => {
+			setupSuperFormMock();
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+			await fireEvent.click(getBottomNextButton());
+
+			expect(mockSubmit).not.toHaveBeenCalled();
+		});
+
+		it('bypasses the random-tag-count validation on the questions step when locked', async () => {
+			setupSuperFormMock({
+				random_tag_count: [{ id: '1', name: 'Science', count: undefined }] as any
+			});
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+
+			expect(getBottomNextButton()).not.toBeDisabled();
+		});
+
+		it('bypasses the random-questions-count validation on the configuration step when locked', async () => {
+			setupSuperFormMock({
+				random_questions: true,
+				no_of_random_questions: 0
+			});
+			render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+			await fireEvent.click(getBottomNextButton());
+
+			expect(getBottomNextButton()).not.toBeDisabled();
+		});
+
+		it('wraps QuestionList in a disabled fieldset when locked', async () => {
+			setupSuperFormMock();
+			const { container } = render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: true })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+
+			expect(container.querySelector('fieldset[disabled]')).not.toBeNull();
+		});
+
+		it('does not disable the QuestionList fieldset when not locked', async () => {
+			setupSuperFormMock();
+			const { container } = render(TestCreatePage, {
+				data: baseData({ testData: makeTestData(), isTestLocked: false })
+			});
+
+			await fireEvent.click(getBottomNextButton());
+			completePrimaryStep();
+
+			expect(container.querySelector('fieldset[disabled]')).toBeNull();
 		});
 	});
 });

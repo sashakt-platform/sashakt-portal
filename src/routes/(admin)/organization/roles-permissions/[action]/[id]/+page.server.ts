@@ -2,7 +2,7 @@ import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { error, fail } from '@sveltejs/kit';
-import { setFlash } from 'sveltekit-flash-message/server';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad, Actions } from './$types';
 
 type Role = {
@@ -99,7 +99,11 @@ export const actions: Actions = {
 			return fail(res.status, { message: errorMessage.detail || 'Failed to update role' });
 		}
 
-		setFlash({ type: 'success', message: 'Role updated successfully' }, cookies);
-		return { success: true };
+		redirect(
+			303,
+			`/organization/roles-permissions/edit/${params.id}`,
+			{ type: 'success', message: 'Role updated successfully' },
+			cookies
+		);
 	}
 };

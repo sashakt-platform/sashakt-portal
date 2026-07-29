@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as server from './+page.server';
-import { setFlash } from 'sveltekit-flash-message/server';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 
 vi.mock('$env/static/private', () => ({
 	BACKEND_URL: 'http://fake-backend'
@@ -19,7 +19,8 @@ vi.mock('$lib/utils/permissions.js', () => ({
 }));
 
 vi.mock('sveltekit-flash-message/server', () => ({
-	setFlash: vi.fn()
+	setFlash: vi.fn(),
+	redirect: vi.fn()
 }));
 
 const mockCookies = {
@@ -257,20 +258,21 @@ describe('page.server save action', () => {
 		expect(body.permissions).toEqual([]);
 	});
 
-	it('sets a success flash and returns success without redirecting', async () => {
+	it('redirects to the same edit page with a success flash', async () => {
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
-		const result = (await server.actions.save({
+		await server.actions.save({
 			request: makeFormData(),
 			params: { id: '2' },
 			cookies: mockCookies
-		} as any)) as any;
+		} as any);
 
-		expect(setFlash).toHaveBeenCalledWith(
+		expect(redirect).toHaveBeenCalledWith(
+			303,
+			'/organization/roles-permissions/edit/2',
 			{ type: 'success', message: 'Role updated successfully' },
 			mockCookies
 		);
-		expect(result).toEqual({ success: true });
 	});
 
 	it('returns fail with the backend detail when the PUT fails', async () => {

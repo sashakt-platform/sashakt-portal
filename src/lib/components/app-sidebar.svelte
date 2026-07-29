@@ -79,7 +79,7 @@
 		) {
 			children.push({ title: 'Organisation Settings', url: '/organization/settings' });
 		}
-		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {
+		if (hasPermission(data.user, PERMISSIONS.READ_PROVIDER)) {
 			children.push({ title: 'Integrations', url: '/organization/integrations' });
 		}
 		if (hasPermission(data.user, PERMISSIONS.READ_ROLE)) {

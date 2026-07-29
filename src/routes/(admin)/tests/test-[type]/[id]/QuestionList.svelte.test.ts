@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/svelte';
 import { get, writable } from 'svelte/store';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import QuestionList from './QuestionList.svelte';
 
 vi.mock('./question-selection/QuestionSelectionDialog.svelte', () => ({
@@ -457,6 +457,178 @@ describe('QuestionList', () => {
 
 			expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument();
 			expect(screen.getByText('No questions yet')).toBeInTheDocument();
+		});
+	});
+
+	describe('available question counts', () => {
+		afterEach(() => {
+			vi.restoreAllMocks();
+		});
+
+		function mockCountByTagsFetch(counts: { tag_id: number; question_count: number }[] = []) {
+			global.fetch = vi.fn().mockResolvedValue({
+				ok: true,
+				json: async () => counts
+			});
+		}
+
+		it('fetches and displays the available question count for each selected tag', async () => {
+			mockCountByTagsFetch([
+				{ tag_id: 1, question_count: 5 },
+				{ tag_id: 2, question_count: 0 }
+			]);
+
+			const formData = makeFormData({
+				random_tag_count: [
+					{ id: '1', name: 'Science' },
+					{ id: '2', name: 'Maths' }
+				]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(screen.getByText('5')).toBeInTheDocument();
+			});
+			expect(screen.getByText('0')).toBeInTheDocument();
+		});
+
+		it('shows "—" for a tag missing from the API response', async () => {
+			mockCountByTagsFetch([{ tag_id: 1, question_count: 5 }]);
+
+			const formData = makeFormData({
+				random_tag_count: [
+					{ id: '1', name: 'Science' },
+					{ id: '2', name: 'Maths' }
+				]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(screen.getByText('5')).toBeInTheDocument();
+			});
+			expect(screen.getByText('—')).toBeInTheDocument();
+		});
+
+		it('does not call fetch when random_tag_count is empty', () => {
+			mockCountByTagsFetch([]);
+
+			const formData = makeFormData({ tag_ids: [], random_tag_count: [] });
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			expect(global.fetch).not.toHaveBeenCalled();
+		});
+
+		it('includes every selected tag id in the request URL', async () => {
+			mockCountByTagsFetch([]);
+
+			const formData = makeFormData({
+				random_tag_count: [
+					{ id: '1', name: 'Science' },
+					{ id: '2', name: 'Maths' }
+				]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(global.fetch).toHaveBeenCalled();
+			});
+			const calledUrl = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+			expect(calledUrl).toContain('tag_ids=1');
+			expect(calledUrl).toContain('tag_ids=2');
+		});
+
+		it('refetches when a new tag is added to random_tag_count', async () => {
+			mockCountByTagsFetch([{ tag_id: 1, question_count: 5 }]);
+
+			const formData = makeFormData({
+				random_tag_count: [{ id: '1', name: 'Science' }]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(global.fetch).toHaveBeenCalledTimes(1);
+			});
+
+			formData.update((data: any) => ({
+				...data,
+				random_tag_count: [...data.random_tag_count, { id: '2', name: 'Maths' }]
+			}));
+
+			await waitFor(() => {
+				expect(global.fetch).toHaveBeenCalledTimes(2);
+			});
+			const secondUrl = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[1][0] as string;
+			expect(secondUrl).toContain('tag_ids=1');
+			expect(secondUrl).toContain('tag_ids=2');
+		});
+
+		it('does not refetch when only the requested count changes for an existing tag', async () => {
+			mockCountByTagsFetch([{ tag_id: 1, question_count: 5 }]);
+
+			const formData = makeFormData({
+				random_tag_count: [{ id: '1', name: 'Science', count: 2 }]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(global.fetch).toHaveBeenCalledTimes(1);
+			});
+
+			const input = screen.getByPlaceholderText('e.g. 5');
+			await fireEvent.input(input, { target: { value: '3' } });
+
+			expect(global.fetch).toHaveBeenCalledTimes(1);
+		});
+
+		it('shows a warning when the requested count exceeds the available count', async () => {
+			mockCountByTagsFetch([{ tag_id: 1, question_count: 3 }]);
+
+			const formData = makeFormData({
+				random_tag_count: [{ id: '1', name: 'Science', count: 5 }]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(screen.getByText('Only 3 questions available for this tag')).toBeInTheDocument();
+			});
+		});
+
+		it('does not show the warning when the requested count is within the available count', async () => {
+			mockCountByTagsFetch([{ tag_id: 1, question_count: 3 }]);
+
+			const formData = makeFormData({
+				random_tag_count: [{ id: '1', name: 'Science', count: 2 }]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(screen.getByText('3')).toBeInTheDocument();
+			});
+			expect(screen.queryByText(/available for this tag/)).not.toBeInTheDocument();
+		});
+
+		it('renders without crashing when the fetch fails', async () => {
+			global.fetch = vi.fn().mockRejectedValue(new Error('network error'));
+
+			const formData = makeFormData({
+				random_tag_count: [{ id: '1', name: 'Science' }]
+			});
+
+			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
+
+			await waitFor(() => {
+				expect(global.fetch).toHaveBeenCalled();
+			});
+			expect(screen.getByText('Science')).toBeInTheDocument();
+			expect(screen.getByText('—')).toBeInTheDocument();
 		});
 	});
 });

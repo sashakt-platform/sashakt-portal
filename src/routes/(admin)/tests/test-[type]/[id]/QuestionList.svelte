@@ -65,8 +65,17 @@
 		($formData.random_tag_count as Array<{ id: string }>).map((t) => t.id)
 	);
 
+	// $formData re-emits on every mutation (including editing a tag's count), and
+	// selectedTagIds is a freshly-mapped array each time, so this effect would otherwise
+	// refetch on every keystroke. Guard on the actual id set so it only refetches when
+	// tags are added/removed.
+	let lastFetchedIdsKey: string | null = null;
 	$effect(() => {
 		const ids = selectedTagIds;
+		const idsKey = ids.join(',');
+		if (idsKey === lastFetchedIdsKey) return;
+		lastFetchedIdsKey = idsKey;
+
 		if (ids.length === 0) {
 			tagQuestionCounts = {};
 			return;

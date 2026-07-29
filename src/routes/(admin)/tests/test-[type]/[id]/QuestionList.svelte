@@ -7,7 +7,7 @@
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import type { Filter } from '$lib/types/filters';
+	import type { Filter, TagQuestionCount } from '$lib/types/filters';
 	import type { User } from '$lib/utils/permissions.js';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import SwitchSelectionModeDialog from './SwitchSelectionModeDialog.svelte';
@@ -59,6 +59,30 @@
 				? $formData.question_revision_ids.length
 				: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
+
+	let tagQuestionCounts = $state<Record<string, number>>({});
+	const selectedTagIds = $derived(
+		($formData.random_tag_count as Array<{ id: string }>).map((t) => t.id)
+	);
+
+	$effect(() => {
+		const ids = selectedTagIds;
+		if (ids.length === 0) {
+			tagQuestionCounts = {};
+			return;
+		}
+		const params = ids.map((id) => `tag_ids=${encodeURIComponent(id)}`).join('&');
+		fetch(`/api/questions/count-by-tags?${params}`)
+			.then((res) => (res.ok ? res.json() : []))
+			.then((data: TagQuestionCount[]) => {
+				tagQuestionCounts = Object.fromEntries(
+					data.map((c) => [String(c.tag_id), c.question_count])
+				);
+			})
+			.catch(() => {
+				tagQuestionCounts = {};
+			});
+	});
 
 	// Seeds random_tag_count from tag_ids as a one-time default, only when nothing has
 	// been picked yet. Once the user has any tags here (added or removed directly on
@@ -265,18 +289,23 @@
 
 				<div class="bg-background mx-auto w-full max-w-2xl overflow-hidden rounded-xl border">
 					<div
-						class="text-muted-foreground bg-muted grid grid-cols-2 px-6 py-4 text-xs font-semibold tracking-wide uppercase"
+						class="text-muted-foreground bg-muted grid grid-cols-3 gap-4 px-6 py-4 text-xs font-semibold tracking-wide uppercase"
 					>
 						<div>Tags</div>
-						<div>No. of Questions</div>
+						<div>Available Questions</div>
+						<div>Questions Required</div>
 					</div>
 
 					{#each $formData.random_tag_count as tag (tag.id)}
-						<div class="bg-card grid grid-cols-2 items-center gap-4 border-t px-6 py-4">
+						{@const available = tagQuestionCounts[tag.id]}
+						<div class="bg-card grid grid-cols-3 items-center gap-4 border-t px-6 py-4">
 							<span
 								class="bg-muted text-foreground inline-flex w-fit items-center rounded-full px-3 py-1 text-sm"
 							>
 								{tag.name}
+							</span>
+							<span class="text-muted-foreground text-sm">
+								{available ?? '—'}
 							</span>
 							<div>
 								<Input
@@ -287,6 +316,10 @@
 								/>
 								{#if tag.count !== undefined && tag.count <= 0}
 									<small class="text-destructive mt-1 block">Enter a positive integer</small>
+								{:else if available !== undefined && tag.count !== undefined && tag.count > available}
+									<small class="text-destructive mt-1 block">
+										Only {available} question{available === 1 ? '' : 's'} available for this tag
+									</small>
 								{/if}
 							</div>
 						</div>

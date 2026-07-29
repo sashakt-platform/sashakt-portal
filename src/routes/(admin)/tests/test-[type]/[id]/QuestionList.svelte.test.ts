@@ -283,7 +283,7 @@ describe('QuestionList', () => {
 			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
 
 			expect(screen.getByText('Tags')).toBeInTheDocument();
-			expect(screen.getByText('No. of Questions')).toBeInTheDocument();
+			expect(screen.getByText('Questions Required')).toBeInTheDocument();
 		});
 
 		it('shows the auto-selection description text', () => {

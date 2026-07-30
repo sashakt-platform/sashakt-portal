@@ -98,37 +98,40 @@
 						</div>
 					{:else}
 						<div class="bg-card border-border overflow-hidden rounded-2xl border">
+							<div
+								class="bg-muted text-muted-foreground flex items-center justify-between px-6 py-5 text-xs font-bold tracking-wide uppercase"
+							>
+								<p>Permission</p>
+								<div class="flex gap-8">
+									{#each ACTIONS as action (action)}
+										<span class="w-14 text-center">{action}</span>
+									{/each}
+								</div>
+							</div>
 							{#each permissionGroups as permissionGroup, groupIndex (permissionGroup.resource)}
-								<div class={groupIndex > 0 ? 'border-border border-t' : ''}>
-									<div class="flex items-center justify-between px-6 py-4">
-										<p class="font-semibold">{permissionGroup.label}</p>
-										<div
-											class="text-muted-foreground flex gap-8 text-xs font-bold tracking-wide uppercase"
-										>
-											{#each ACTIONS as action (action)}
-												<span class="w-14 text-center">{action}</span>
-											{/each}
-										</div>
-									</div>
-									<div class="border-border flex items-center justify-between border-t px-6 py-4">
-										<p class="text-sm">{permissionGroup.label}</p>
-										<div class="flex gap-8">
-											{#each ACTIONS as action (action)}
-												<div class="flex w-14 justify-center">
-													{#if permissionGroup.permissionsByAction[action]}
-														<Switch
-															checked={selectedIds.has(
-																permissionGroup.permissionsByAction[action]!.id
-															)}
-															onCheckedChange={(checked) =>
-																toggle(permissionGroup.permissionsByAction[action]!.id, checked)}
-														/>
-													{:else}
-														<span class="text-muted-foreground">—</span>
-													{/if}
-												</div>
-											{/each}
-										</div>
+								<div
+									class={[
+										'flex items-center justify-between px-6 py-4',
+										groupIndex > 0 && 'border-border border-t'
+									]}
+								>
+									<p class="text-sm">{permissionGroup.label}</p>
+									<div class="flex gap-8">
+										{#each ACTIONS as action (action)}
+											<div class="flex w-14 justify-center">
+												{#if permissionGroup.permissionsByAction[action]}
+													<Switch
+														checked={selectedIds.has(
+															permissionGroup.permissionsByAction[action]!.id
+														)}
+														onCheckedChange={(checked) =>
+															toggle(permissionGroup.permissionsByAction[action]!.id, checked)}
+													/>
+												{:else}
+													<span class="text-muted-foreground">—</span>
+												{/if}
+											</div>
+										{/each}
 									</div>
 								</div>
 							{/each}

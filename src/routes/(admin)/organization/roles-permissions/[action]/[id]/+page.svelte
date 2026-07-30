@@ -20,6 +20,30 @@
 			.join(' ');
 	}
 
+	const HIDDEN_RESOURCES = new Set([
+		'user_me',
+		'question_location',
+		'question_revision',
+		'question_tag',
+		'organization',
+		'organization_settings',
+		'candidate_test',
+		'candidate_test_answer',
+		'form_response',
+		'location'
+	]);
+
+	const PARTIAL_HIDDEN_ACTIONS: Partial<Record<string, Action[]>> = {
+		candidate: ['create', 'read', 'update'],
+		user: ['read']
+	};
+
+	const RESOURCE_LABEL_OVERRIDES: Record<string, string> = {
+		provider: 'Integrations',
+		my_organization: 'Organization',
+		my_organization_settings: 'Organization Settings'
+	};
+
 	const permissionGroups = $derived.by(() => {
 		const permissionsByResource: Record<string, Partial<Record<Action, Permission>>> = {};
 
@@ -27,6 +51,8 @@
 			const match = permission.name.match(/^(create|read|update|delete)_(.+)$/);
 			if (!match) continue;
 			const [, action, resource] = match;
+			if (HIDDEN_RESOURCES.has(resource)) continue;
+			if (PARTIAL_HIDDEN_ACTIONS[resource]?.includes(action as Action)) continue;
 			permissionsByResource[resource] ??= {};
 			permissionsByResource[resource][action as Action] = permission;
 		}
@@ -34,7 +60,7 @@
 		return Object.entries(permissionsByResource)
 			.map(([resource, permissionsByAction]) => ({
 				resource,
-				label: humanize(resource),
+				label: RESOURCE_LABEL_OVERRIDES[resource] ?? humanize(resource),
 				permissionsByAction
 			}))
 			.sort((firstGroup, secondGroup) => firstGroup.label.localeCompare(secondGroup.label));

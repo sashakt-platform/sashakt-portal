@@ -11,7 +11,13 @@ import { DataTableActions } from '$lib/components/data-table/index.js';
 import TagCell from '$lib/components/data-table/TagCell.svelte';
 import TruncatedTextCell from '$lib/components/data-table/TruncatedTextCell.svelte';
 import TestStatusBadge from '$lib/components/data-table/TestStatusBadge.svelte';
-import { getUserDistrict, isOwnEntity, type User } from '$lib/utils/permissions.js';
+import {
+	canDelete,
+	canUpdate,
+	getUserDistrict,
+	isOwnEntity,
+	type User
+} from '$lib/utils/permissions.js';
 import { resolve } from '$app/paths';
 import type { NomenclatureKey } from '$lib/nomenclature';
 import type { TestStatus } from '$lib/types/test.js';
@@ -169,6 +175,9 @@ export const createTestColumns = (
 			}
 
 			const isOwner = isOwnEntity(user ?? null, test.created_by_id);
+			const entityKey = isTemplate ? 'test-template' : 'test';
+			const canEditTest = canUpdate(user ?? null, entityKey) && isOwner;
+			const canDeleteTest = canDelete(user ?? null, entityKey) && isOwner;
 
 			return renderComponent(DataTableActions, {
 				id: test.id,
@@ -177,8 +186,8 @@ export const createTestColumns = (
 				deleteUrl: resolve(`${baseUrl}/${test.id}?/delete`),
 				customActions,
 				onDelete: () => onDelete(test.id),
-				canEdit: isOwner,
-				canDelete: isOwner,
+				canEdit: canEditTest,
+				canDelete: canDeleteTest,
 				editInline: true
 			});
 		}

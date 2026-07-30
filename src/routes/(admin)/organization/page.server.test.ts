@@ -46,9 +46,17 @@ vi.mock('sveltekit-superforms', () => ({
 
 // Mock auth functions
 vi.mock('$lib/server/auth.js', () => ({
+	requireLogin: vi.fn(() => ({ id: 1, organization_id: 10, permissions: ['update_my_organization'] })),
 	getSessionTokenCookie: vi.fn(() => 'mock-token'),
 	organizationCookieName: 'sashakt-organization',
 	setOrganizationCookie: vi.fn()
+}));
+
+vi.mock('$lib/utils/permissions.js', () => ({
+	requirePermission: vi.fn(),
+	PERMISSIONS: {
+		UPDATE_MY_ORGANIZATION: 'update_my_organization'
+	}
 }));
 
 // Mock organization cache

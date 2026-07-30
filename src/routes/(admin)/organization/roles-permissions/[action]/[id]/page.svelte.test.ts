@@ -15,7 +15,7 @@ const mockPermissionCatalog = [
 	{ id: 1, name: 'create_test', description: null, is_active: true },
 	{ id: 2, name: 'read_test', description: null, is_active: true },
 	{ id: 3, name: 'update_test', description: null, is_active: true },
-	{ id: 4, name: 'read_candidate', description: null, is_active: true }
+	{ id: 4, name: 'read_tag', description: null, is_active: true }
 ];
 
 function makeData(overrides: Record<string, unknown> = {}) {
@@ -84,7 +84,7 @@ describe('Edit Role Page (+page.svelte)', () => {
 		it('groups permissions by resource and renders humanized module labels', () => {
 			render(EditRolePage, { data: makeData() } as never);
 			expect(screen.getAllByText('Test').length).toBeGreaterThanOrEqual(1);
-			expect(screen.getAllByText('Candidate').length).toBeGreaterThanOrEqual(1);
+			expect(screen.getAllByText('Tag').length).toBeGreaterThanOrEqual(1);
 		});
 
 		it('shows a dash for actions that have no matching permission', () => {

@@ -60,23 +60,15 @@
 				: $formData.random_tag_count.reduce((sum, t) => sum + (Number(t.count ?? 0) || 0), 0)
 	);
 
-	// Syncs random_tag_count with tag_ids: drops entries whose tag was removed,
-	// appends new tags, and preserves existing counts. Called on mount and when
-	// switching back to tagBased — not reactive.
+	// Seeds random_tag_count from tag_ids as a one-time default, only when nothing has
+	// been picked yet. Once the user has any tags here (added or removed directly on
+	// this page), later Primary-tab tag changes are never auto-applied — otherwise a
+	// tag intentionally removed here would keep reappearing as long as it stays in
+	// tag_ids. Called on mount and when switching back to tagBased — not reactive.
 	const syncTagsFromTagIds = () => {
-		const current = $formData.random_tag_count as Array<{
-			id: string;
-			name: string;
-			count?: number;
-		}>;
+		if ($formData.random_tag_count.length > 0) return;
 		const tagIds = $formData.tag_ids as Filter[];
-		const tagIdMap = new Map(tagIds.map((t) => [t.id, t.name]));
-		const kept = current
-			.filter((t) => tagIdMap.has(t.id))
-			.map((t) => ({ ...t, name: tagIdMap.get(t.id) as string }));
-		const keptIds = new Set(kept.map((t) => t.id));
-		const added = tagIds.filter((t) => !keptIds.has(t.id));
-		$formData.random_tag_count = [...kept, ...added.map((t) => ({ id: t.id, name: t.name }))];
+		$formData.random_tag_count = tagIds.map((t) => ({ id: t.id, name: t.name }));
 	};
 
 	if (!isSectionedTest) {

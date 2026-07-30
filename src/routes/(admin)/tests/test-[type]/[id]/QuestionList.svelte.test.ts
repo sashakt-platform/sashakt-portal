@@ -300,10 +300,11 @@ describe('QuestionList', () => {
 			).toBeInTheDocument();
 		});
 
-		it('shows a tag added to tag_ids after save when random_tag_count already has entries', async () => {
+		it('does not auto-add a new tag_ids tag once random_tag_count already has entries', async () => {
 			// Simulates editing a saved test where the user added a third tag on the Primary
-			// page before navigating to Questions. On mount, syncTagsFromTagIds runs once and
-			// adds History (present in tag_ids but absent from random_tag_count) to the table.
+			// page before navigating to Questions. random_tag_count already has entries (the
+			// user has taken ownership of this list), so History is not auto-applied — otherwise
+			// a tag intentionally removed here would keep reappearing as long as it stays in tag_ids.
 			const formData = makeFormData({
 				tag_ids: [
 					{ id: '1', name: 'Science' },
@@ -319,19 +320,20 @@ describe('QuestionList', () => {
 
 			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
 
-			await waitFor(() => {
-				expect(screen.getByText('History')).toBeInTheDocument();
-			});
-
-			// Existing tags and their counts remain untouched
 			expect(screen.getByText('Science')).toBeInTheDocument();
 			expect(screen.getByText('Maths')).toBeInTheDocument();
+			expect(screen.queryByText('History')).not.toBeInTheDocument();
+			expect(get(formData).random_tag_count).toEqual([
+				{ id: '1', name: 'Science', count: 5 },
+				{ id: '2', name: 'Maths', count: 3 }
+			]);
 		});
 
-		it('drops a tag from random_tag_count when it has been removed from tag_ids', async () => {
+		it('keeps a tag in random_tag_count even after it has been removed from tag_ids', async () => {
 			// Simulates editing a saved test where the user removed Maths on the Primary
-			// page before navigating to Questions. On mount, syncTagsFromTagIds should
-			// prune random_tag_count so the stale tag is not submitted to the backend.
+			// page before navigating to Questions. Maths was picked directly on the
+			// Questions page (independent of tag_ids), so it must survive the mount-time
+			// sync rather than being silently dropped along with its count.
 			const formData = makeFormData({
 				tag_ids: [{ id: '1', name: 'Science' }],
 				random_tag_count: [
@@ -344,11 +346,14 @@ describe('QuestionList', () => {
 			render(QuestionList, { formData, questions: [], questionParams: {}, user: null });
 
 			await waitFor(() => {
-				expect(screen.queryByText('Maths')).not.toBeInTheDocument();
+				expect(screen.getByText('Science')).toBeInTheDocument();
 			});
 
-			expect(screen.getByText('Science')).toBeInTheDocument();
-			expect(get(formData).random_tag_count).toEqual([{ id: '1', name: 'Science', count: 5 }]);
+			expect(screen.getByText('Maths')).toBeInTheDocument();
+			expect(get(formData).random_tag_count).toEqual([
+				{ id: '1', name: 'Science', count: 5 },
+				{ id: '2', name: 'Maths', count: 3 }
+			]);
 		});
 
 		it('uses Manual Selection mode when explicit question IDs exist, even if tags are set', () => {

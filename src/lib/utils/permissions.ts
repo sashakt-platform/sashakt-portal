@@ -152,13 +152,13 @@ export const PERMISSIONS = {
 
 	// Candidate permissions
 	DELETE_CANDIDATE: 'delete_candidate',
+	READ_CANDIDATE: 'read_candidate',
 
 	// Form permissions
 	CREATE_FORM: 'create_form',
 	UPDATE_FORM: 'update_form',
 	DELETE_FORM: 'delete_form',
-	READ_FORM: 'read_form',
-	READ_FORM_RESPONSE: 'read_form_response'
+	READ_FORM: 'read_form'
 } as const;
 
 /**

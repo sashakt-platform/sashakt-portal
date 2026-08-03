@@ -12,10 +12,8 @@ export const load: PageServerLoad = async ({ params }) => {
 	const user = requireLogin();
 	const token = getSessionTokenCookie();
 
-	if (params.action === 'add') {
-		requirePermission(user, PERMISSIONS.CREATE_PROVIDER);
-	} else if (params.action === 'edit') {
-		requirePermission(user, PERMISSIONS.UPDATE_PROVIDER);
+	if (params.action === 'add' || params.action === 'edit') {
+		requirePermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
 	}
 
 	const catalogRes = await fetch(`${BACKEND_URL}/providers/?page=1&size=100`, {
@@ -77,10 +75,8 @@ export const actions: Actions = {
 		const user = requireLogin();
 		const token = getSessionTokenCookie();
 
-		if (params.action === 'edit') {
-			requirePermission(user, PERMISSIONS.UPDATE_PROVIDER);
-		} else if (params.action === 'add') {
-			requirePermission(user, PERMISSIONS.CREATE_PROVIDER);
+		if (params.action === 'edit' || params.action === 'add') {
+			requirePermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
 		}
 
 		const form = await superValidate(request, zod4(addProviderSchema));
@@ -164,7 +160,7 @@ export const actions: Actions = {
 
 	delete: async ({ params, cookies }) => {
 		const user = requireLogin();
-		requirePermission(user, PERMISSIONS.DELETE_PROVIDER);
+		requirePermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
 		const token = getSessionTokenCookie();
 
 		const res = await fetch(

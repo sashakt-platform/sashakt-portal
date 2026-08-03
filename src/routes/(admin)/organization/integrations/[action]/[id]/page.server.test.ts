@@ -17,9 +17,7 @@ vi.mock('$lib/server/auth', () => ({
 vi.mock('$lib/utils/permissions.js', () => ({
 	requirePermission: vi.fn(),
 	PERMISSIONS: {
-		CREATE_PROVIDER: 'CREATE_PROVIDER',
-		UPDATE_PROVIDER: 'UPDATE_PROVIDER',
-		DELETE_PROVIDER: 'DELETE_PROVIDER'
+		UPDATE_MY_ORGANIZATION: 'UPDATE_MY_ORGANIZATION'
 	}
 }));
 
@@ -65,7 +63,7 @@ describe('page.server load function', () => {
 		expect(result.form).toBeDefined();
 	});
 
-	it('requires the CREATE_PROVIDER permission', async () => {
+	it('requires the UPDATE_MY_ORGANIZATION permission', async () => {
 		const permissions = await import('$lib/utils/permissions.js');
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({ items: [] }) });
 
@@ -73,7 +71,7 @@ describe('page.server load function', () => {
 
 		expect(permissions.requirePermission).toHaveBeenCalledWith(
 			expect.objectContaining({ organization_id: 10 }),
-			'CREATE_PROVIDER'
+			'UPDATE_MY_ORGANIZATION'
 		);
 	});
 
@@ -154,7 +152,7 @@ describe('page.server load function', () => {
 			);
 		});
 
-		it('requires the UPDATE_PROVIDER permission', async () => {
+		it('requires the UPDATE_MY_ORGANIZATION permission', async () => {
 			const permissions = await import('$lib/utils/permissions.js');
 			mockOrgAndCatalogFetch();
 
@@ -162,7 +160,7 @@ describe('page.server load function', () => {
 
 			expect(permissions.requirePermission).toHaveBeenCalledWith(
 				expect.objectContaining({ organization_id: 10 }),
-				'UPDATE_PROVIDER'
+				'UPDATE_MY_ORGANIZATION'
 			);
 		});
 
@@ -235,7 +233,7 @@ describe('page.server save action', () => {
 		expect(result.status).toBe(400);
 	});
 
-	it('requires the CREATE_PROVIDER permission', async () => {
+	it('requires the UPDATE_MY_ORGANIZATION permission', async () => {
 		const permissions = await import('$lib/utils/permissions.js');
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
@@ -251,7 +249,7 @@ describe('page.server save action', () => {
 
 		expect(permissions.requirePermission).toHaveBeenCalledWith(
 			expect.objectContaining({ organization_id: 10 }),
-			'CREATE_PROVIDER'
+			'UPDATE_MY_ORGANIZATION'
 		);
 	});
 
@@ -360,7 +358,7 @@ describe('page.server save action', () => {
 	});
 
 	describe('edit action', () => {
-		it('requires the UPDATE_PROVIDER permission', async () => {
+		it('requires the UPDATE_MY_ORGANIZATION permission', async () => {
 			const permissions = await import('$lib/utils/permissions.js');
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
@@ -376,7 +374,7 @@ describe('page.server save action', () => {
 
 			expect(permissions.requirePermission).toHaveBeenCalledWith(
 				expect.objectContaining({ organization_id: 10 }),
-				'UPDATE_PROVIDER'
+				'UPDATE_MY_ORGANIZATION'
 			);
 		});
 
@@ -451,7 +449,7 @@ describe('page.server save action', () => {
 describe('page.server delete action', () => {
 	beforeEach(() => vi.resetAllMocks());
 
-	it('requires the DELETE_PROVIDER permission', async () => {
+	it('requires the UPDATE_MY_ORGANIZATION permission', async () => {
 		const permissions = await import('$lib/utils/permissions.js');
 		(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
@@ -463,7 +461,7 @@ describe('page.server delete action', () => {
 
 		expect(permissions.requirePermission).toHaveBeenCalledWith(
 			expect.objectContaining({ organization_id: 10 }),
-			'DELETE_PROVIDER'
+			'UPDATE_MY_ORGANIZATION'
 		);
 	});
 

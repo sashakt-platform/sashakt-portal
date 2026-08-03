@@ -74,7 +74,7 @@
 		if (
 			hasAnyPermission(data.user, [
 				PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
-				PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
+				PERMISSIONS.UPDATE_MY_ORGANIZATION
 			])
 		) {
 			children.push({ title: 'Organisation Settings', url: '/organization/settings' });

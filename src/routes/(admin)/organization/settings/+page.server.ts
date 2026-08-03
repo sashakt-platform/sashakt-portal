@@ -61,7 +61,7 @@ function normalizeSettingsForBackend(input: OrganizationSettings): OrganizationS
 export const load: PageServerLoad = async ({ fetch, locals }) => {
 	requireAnyPermission(locals.user, [
 		PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
-		PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
+		PERMISSIONS.UPDATE_MY_ORGANIZATION
 	]);
 
 	const token = getSessionTokenCookie();
@@ -92,7 +92,7 @@ export const actions: Actions = {
 	save: async ({ request, fetch, cookies, locals }) => {
 		requireAnyPermission(locals.user, [
 			PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
-			PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
+			PERMISSIONS.UPDATE_MY_ORGANIZATION
 		]);
 
 		const token = getSessionTokenCookie();

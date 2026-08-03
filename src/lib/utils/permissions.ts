@@ -99,7 +99,6 @@ export const PERMISSIONS = {
 	UPDATE_USER: 'update_user',
 	DELETE_USER: 'delete_user',
 	READ_USER: 'read_user',
-	UPDATE_USER_ME: 'update_user_me',
 
 	// Question permissions
 	CREATE_QUESTION: 'create_question',
@@ -126,7 +125,6 @@ export const PERMISSIONS = {
 	READ_ORGANIZATION: 'read_organization',
 	UPDATE_MY_ORGANIZATION: 'update_my_organization',
 	UPDATE_ORGANIZATION_SETTINGS: 'update_organization_settings',
-	UPDATE_MY_ORGANIZATION_SETTINGS: 'update_my_organization_settings',
 
 	// Certificate permissions
 	CREATE_CERTIFICATE: 'create_certificate',

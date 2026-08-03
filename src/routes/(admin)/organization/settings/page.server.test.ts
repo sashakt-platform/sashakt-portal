@@ -31,7 +31,7 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	requireAnyPermission: (...args: any[]) => requireAnyPermissionMock(...args),
 	PERMISSIONS: {
 		UPDATE_ORGANIZATION_SETTINGS: 'update_organization_settings',
-		UPDATE_MY_ORGANIZATION_SETTINGS: 'update_my_organization_settings'
+		UPDATE_MY_ORGANIZATION: 'update_my_organization'
 	}
 }));
 
@@ -132,7 +132,7 @@ describe('Organization Settings - load()', () => {
 
 		expect(requireAnyPermissionMock).toHaveBeenCalledWith(
 			expect.objectContaining({ organization_id: 42 }),
-			['update_organization_settings', 'update_my_organization_settings']
+			['update_organization_settings', 'update_my_organization']
 		);
 	});
 

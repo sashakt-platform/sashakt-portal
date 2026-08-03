@@ -11,6 +11,9 @@
 	import { enhance } from '$app/forms';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import Download from '@lucide/svelte/icons/download';
 
 	let { data } = $props();
 
@@ -24,6 +27,10 @@
 	const search = $derived(data?.params?.search || '');
 
 	const userCanDelete = $derived(hasPermission(data.user, PERMISSIONS.DELETE_CANDIDATE));
+
+	const exportHref = $derived(
+		`${page.url.pathname}/export?sortBy=${encodeURIComponent(sortBy)}&sortOrder=${encodeURIComponent(sortOrder)}`
+	);
 
 	let deleteAction: string | null = $state(null);
 
@@ -135,6 +142,20 @@
 	backHref="/tests/test-session"
 	showInfoIcon={false}
 >
+	{#snippet headerActions()}
+		{#if totalItems > 0}
+			<Button
+				href={resolve(exportHref as any)}
+				download
+				variant="outline"
+				class="border-primary text-primary bg-card font-semibold"
+			>
+				<Download class="h-4 w-4" />
+				Export
+			</Button>
+		{/if}
+	{/snippet}
+
 	{#snippet toolbar()}
 		{#if userCanDelete}
 			<BatchActionsToolbar

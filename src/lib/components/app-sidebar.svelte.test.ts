@@ -14,7 +14,6 @@ vi.mock('$lib/utils/permissions.js', () => ({
 	canCreate: vi.fn(() => false),
 	canUpdate: vi.fn(() => false),
 	hasPermission: vi.fn(() => false),
-	hasAnyPermission: vi.fn(() => false),
 	isSuperAdmin: vi.fn(() => false),
 	PERMISSIONS: {}
 }));

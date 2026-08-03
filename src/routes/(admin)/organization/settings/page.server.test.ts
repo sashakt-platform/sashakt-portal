@@ -26,11 +26,10 @@ vi.mock('$lib/server/auth.js', () => ({
 	getSessionTokenCookie: vi.fn(() => 'fake-token')
 }));
 
-const requireAnyPermissionMock = vi.fn();
+const requirePermissionMock = vi.fn();
 vi.mock('$lib/utils/permissions.js', () => ({
-	requireAnyPermission: (...args: any[]) => requireAnyPermissionMock(...args),
+	requirePermission: (...args: any[]) => requirePermissionMock(...args),
 	PERMISSIONS: {
-		UPDATE_ORGANIZATION_SETTINGS: 'update_organization_settings',
 		UPDATE_MY_ORGANIZATION: 'update_my_organization'
 	}
 }));
@@ -122,7 +121,7 @@ describe('Organization Settings - load()', () => {
 		expect(result.form.data.test_timings.value.end_time).toBe('18:45');
 	});
 
-	it('calls requireAnyPermission with both settings permissions', async () => {
+	it('calls requirePermission with the update_my_organization permission', async () => {
 		const fetchMock = vi.fn().mockResolvedValueOnce({
 			ok: true,
 			json: async () => ({ settings: defaultSettings() })
@@ -130,14 +129,14 @@ describe('Organization Settings - load()', () => {
 
 		await load(mockEvent({ fetch: fetchMock }));
 
-		expect(requireAnyPermissionMock).toHaveBeenCalledWith(
+		expect(requirePermissionMock).toHaveBeenCalledWith(
 			expect.objectContaining({ organization_id: 42 }),
-			['update_organization_settings', 'update_my_organization']
+			'update_my_organization'
 		);
 	});
 
-	it('throws 403 when requireAnyPermission rejects', async () => {
-		requireAnyPermissionMock.mockImplementationOnce(() => {
+	it('throws 403 when requirePermission rejects', async () => {
+		requirePermissionMock.mockImplementationOnce(() => {
 			throw { status: 403, body: 'Access denied' };
 		});
 
@@ -265,8 +264,8 @@ describe('Organization Settings - actions.save', () => {
 		expect(result?.status).toBe(422);
 	});
 
-	it('enforces permissions via requireAnyPermission', async () => {
-		requireAnyPermissionMock.mockImplementationOnce(() => {
+	it('enforces permissions via requirePermission', async () => {
+		requirePermissionMock.mockImplementationOnce(() => {
 			throw { status: 403 };
 		});
 

@@ -2,6 +2,7 @@ import { BACKEND_URL } from '$env/static/private';
 import {
 	getSessionTokenCookie,
 	organizationCookieName,
+	requireLogin,
 	setOrganizationCookie
 } from '$lib/server/auth.js';
 import { invalidateOrganizationCache } from '$lib/server/organization-cache.js';
@@ -11,6 +12,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import type { Actions, PageServerLoad } from './$types.js';
 import { editOrganizationSchema } from './schema.js';
+import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 
 async function fetchOrganizationSettings(
 	fetchFn: typeof fetch,
@@ -46,6 +48,9 @@ function deriveFilename(url: string | null): string | null {
 }
 
 export const load: PageServerLoad = async ({ fetch, locals }) => {
+	const user = requireLogin();
+	requirePermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
+
 	const token = getSessionTokenCookie();
 	let organizationData = null;
 
@@ -90,6 +95,9 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 
 export const actions: Actions = {
 	save: async ({ request, fetch, cookies, locals }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
+
 		const token = getSessionTokenCookie();
 
 		const form = await superValidate(request, zod4(editOrganizationSchema));

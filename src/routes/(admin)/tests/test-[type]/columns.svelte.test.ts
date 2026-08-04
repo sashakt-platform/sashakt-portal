@@ -56,10 +56,10 @@ function getActionProps(user: User | null, test: Test) {
 }
 
 describe('createTestColumns — edit/delete visibility based on ownership', () => {
-	const currentUser = makeUser('1');
+	const currentUser = makeUser('1', ['update_test', 'delete_test']);
 	const otherUser = makeUser('99');
-	const superAdminUser = makeUser('99', ['create_organization']);
-	const systemAdminUser = makeUser('99', ['update_my_organization']);
+	const superAdminUser = makeUser('99', ['create_organization', 'update_test', 'delete_test']);
+	const systemAdminUser = makeUser('99', ['update_my_organization', 'update_test', 'delete_test']);
 
 	beforeEach(() => {
 		vi.clearAllMocks();

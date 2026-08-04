@@ -9,8 +9,7 @@
 	import Briefcase from '@lucide/svelte/icons/briefcase';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import {
-		canCreate,
-		canUpdate,
+		canRead,
 		hasAnyPermission,
 		hasPermission,
 		isSuperAdmin,
@@ -79,8 +78,11 @@
 		) {
 			children.push({ title: 'Organisation Settings', url: '/organization/settings' });
 		}
-		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {
+		if (hasPermission(data.user, PERMISSIONS.READ_PROVIDER)) {
 			children.push({ title: 'Integrations', url: '/organization/integrations' });
+		}
+		if (hasPermission(data.user, PERMISSIONS.READ_ROLE)) {
+			children.push({ title: 'Roles and Permission', url: '/organization/roles-permissions' });
 		}
 		return children;
 	});
@@ -138,7 +140,7 @@
 			<Sidebar.GroupContent class="text-base leading-1">
 				<Sidebar.Menu>
 					{#each menu_items as item (item.url)}
-						{#if (!item.entity || canCreate(data.user, item.entity) || canUpdate(data.user, item.entity)) && (!superAdmin || item.entity === 'user' || item.entity === 'organization')}
+						{#if (!item.entity || canRead(data.user, item.entity)) && (!superAdmin || item.entity === 'user' || item.entity === 'organization')}
 							{@render sidebaritems(item)}
 						{/if}
 					{/each}

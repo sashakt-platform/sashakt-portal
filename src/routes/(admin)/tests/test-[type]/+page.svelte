@@ -240,7 +240,7 @@
 				</Button>
 			</a>
 		{/if}
-		{#if !data?.is_template && canReadTestTemplate}
+		{#if !data?.is_template && canReadTestTemplate && canCreate(data.user, 'test')}
 			<a href={page.url.pathname + '/convert'}
 				><Button class="font-semibold"><Plus />Create from {term('test_template')}</Button></a
 			>

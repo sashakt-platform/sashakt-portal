@@ -8,7 +8,7 @@ vi.mock('$env/static/private', () => ({
 const requireLoginMock = vi.fn(() => ({
 	id: 1,
 	organization_id: 10,
-	permissions: ['read_provider']
+	permissions: ['update_my_organization']
 }));
 
 vi.mock('$lib/server/auth', () => ({
@@ -20,7 +20,7 @@ const requirePermissionMock = vi.fn();
 vi.mock('$lib/utils/permissions.js', () => ({
 	requirePermission: (...args: unknown[]) => requirePermissionMock(...args),
 	PERMISSIONS: {
-		READ_PROVIDER: 'read_provider'
+		UPDATE_MY_ORGANIZATION: 'update_my_organization'
 	}
 }));
 
@@ -48,7 +48,7 @@ describe('load', () => {
 		expect(result.providers).toEqual(fakeProviders);
 	});
 
-	it('requires the READ_PROVIDER permission', async () => {
+	it('requires the UPDATE_MY_ORGANIZATION permission', async () => {
 		(global.fetch as any).mockResolvedValueOnce({
 			ok: true,
 			json: async () => []
@@ -58,7 +58,7 @@ describe('load', () => {
 
 		expect(requirePermissionMock).toHaveBeenCalledWith(
 			expect.objectContaining({ organization_id: 10 }),
-			'read_provider'
+			'update_my_organization'
 		);
 	});
 

@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	const user = requireLogin();
-	requirePermission(user, PERMISSIONS.READ_PROVIDER);
+	requirePermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
 	const token = getSessionTokenCookie();
 	const orgId = user.organization_id;
 

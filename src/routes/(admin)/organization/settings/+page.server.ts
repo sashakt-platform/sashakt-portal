@@ -1,6 +1,6 @@
 import { BACKEND_URL } from '$env/static/private';
 import { getSessionTokenCookie } from '$lib/server/auth.js';
-import { PERMISSIONS, requireAnyPermission } from '$lib/utils/permissions.js';
+import { PERMISSIONS, requirePermission } from '$lib/utils/permissions.js';
 import { error, fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
@@ -59,10 +59,7 @@ function normalizeSettingsForBackend(input: OrganizationSettings): OrganizationS
 }
 
 export const load: PageServerLoad = async ({ fetch, locals }) => {
-	requireAnyPermission(locals.user, [
-		PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
-		PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
-	]);
+	requirePermission(locals.user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
 
 	const token = getSessionTokenCookie();
 	const orgId = locals.user.organization_id;
@@ -90,10 +87,7 @@ export const load: PageServerLoad = async ({ fetch, locals }) => {
 
 export const actions: Actions = {
 	save: async ({ request, fetch, cookies, locals }) => {
-		requireAnyPermission(locals.user, [
-			PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
-			PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
-		]);
+		requirePermission(locals.user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
 
 		const token = getSessionTokenCookie();
 		const orgId = locals.user.organization_id;

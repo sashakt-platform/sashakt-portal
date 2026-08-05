@@ -99,7 +99,6 @@ export const PERMISSIONS = {
 	UPDATE_USER: 'update_user',
 	DELETE_USER: 'delete_user',
 	READ_USER: 'read_user',
-	UPDATE_USER_ME: 'update_user_me',
 
 	// Question permissions
 	CREATE_QUESTION: 'create_question',
@@ -125,8 +124,6 @@ export const PERMISSIONS = {
 	DELETE_ORGANIZATION: 'delete_organization',
 	READ_ORGANIZATION: 'read_organization',
 	UPDATE_MY_ORGANIZATION: 'update_my_organization',
-	UPDATE_ORGANIZATION_SETTINGS: 'update_organization_settings',
-	UPDATE_MY_ORGANIZATION_SETTINGS: 'update_my_organization_settings',
 
 	// Certificate permissions
 	CREATE_CERTIFICATE: 'create_certificate',
@@ -154,19 +151,13 @@ export const PERMISSIONS = {
 
 	// Candidate permissions
 	DELETE_CANDIDATE: 'delete_candidate',
+	READ_CANDIDATE: 'read_candidate',
 
 	// Form permissions
 	CREATE_FORM: 'create_form',
 	UPDATE_FORM: 'update_form',
 	DELETE_FORM: 'delete_form',
-	READ_FORM: 'read_form',
-	READ_FORM_RESPONSE: 'read_form_response',
-
-	// Provider permissions
-	CREATE_PROVIDER: 'create_provider',
-	UPDATE_PROVIDER: 'update_provider',
-	DELETE_PROVIDER: 'delete_provider',
-	READ_PROVIDER: 'read_provider'
+	READ_FORM: 'read_form'
 } as const;
 
 /**
@@ -280,10 +271,10 @@ export const ENTITY_PERMISSIONS = {
 		delete: PERMISSIONS.DELETE_FORM
 	},
 	provider: {
-		create: PERMISSIONS.CREATE_PROVIDER,
-		read: PERMISSIONS.READ_PROVIDER,
-		update: PERMISSIONS.UPDATE_PROVIDER,
-		delete: PERMISSIONS.DELETE_PROVIDER
+		create: PERMISSIONS.UPDATE_MY_ORGANIZATION,
+		read: PERMISSIONS.UPDATE_MY_ORGANIZATION,
+		update: PERMISSIONS.UPDATE_MY_ORGANIZATION,
+		delete: PERMISSIONS.UPDATE_MY_ORGANIZATION
 	}
 } as const;
 

@@ -11,7 +11,6 @@
 	import {
 		canCreate,
 		canUpdate,
-		hasAnyPermission,
 		hasPermission,
 		isSuperAdmin,
 		PERMISSIONS
@@ -71,12 +70,7 @@
 		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {
 			children.push({ title: 'Organisation Details', url: '/organization' });
 		}
-		if (
-			hasAnyPermission(data.user, [
-				PERMISSIONS.UPDATE_ORGANIZATION_SETTINGS,
-				PERMISSIONS.UPDATE_MY_ORGANIZATION_SETTINGS
-			])
-		) {
+		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {
 			children.push({ title: 'Organisation Settings', url: '/organization/settings' });
 		}
 		if (hasPermission(data.user, PERMISSIONS.UPDATE_MY_ORGANIZATION)) {

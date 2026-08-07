@@ -12,6 +12,7 @@
 	import ListChecks from '@lucide/svelte/icons/list-checks';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import ClipboardList from '@lucide/svelte/icons/clipboard-list';
+	import Loader2 from '@lucide/svelte/icons/loader-2';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 
 	interface CustomAction {
@@ -22,6 +23,7 @@
 		method?: string;
 		inline?: boolean;
 		iconOnly?: boolean;
+		loading?: boolean;
 	}
 
 	let {
@@ -137,9 +139,12 @@
 									variant="ghost"
 									size="icon"
 									aria-label={action.label}
+									disabled={action.loading}
 									onclick={action.action}
 								>
-									{#if IconComponent}
+									{#if action.loading}
+										<Loader2 class="h-4 w-4 animate-spin" />
+									{:else if IconComponent}
 										<IconComponent class="h-4 w-4" />
 									{/if}
 								</Button>

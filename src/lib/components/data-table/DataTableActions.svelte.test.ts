@@ -480,6 +480,57 @@ describe('DataTableActions', () => {
 
 			expect(customAction).toHaveBeenCalledTimes(1);
 		});
+
+		it('should disable inline icon-only custom action and show a spinner when loading', async () => {
+			const customAction = vi.fn();
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					canEdit: false,
+					canDelete: false,
+					customActions: [
+						{
+							label: 'Download Certificate',
+							action: customAction,
+							icon: 'download',
+							inline: true,
+							iconOnly: true,
+							loading: true
+						}
+					]
+				}
+			});
+
+			const actionButton = screen.getByRole('button', { name: 'Download Certificate' });
+			expect(actionButton).toBeDisabled();
+		});
+
+		it('should enable inline icon-only custom action and call it when not loading', async () => {
+			const customAction = vi.fn();
+			render(DataTableActions, {
+				props: {
+					...defaultProps,
+					canEdit: false,
+					canDelete: false,
+					customActions: [
+						{
+							label: 'Download Certificate',
+							action: customAction,
+							icon: 'download',
+							inline: true,
+							iconOnly: true,
+							loading: false
+						}
+					]
+				}
+			});
+
+			const actionButton = screen.getByRole('button', { name: 'Download Certificate' });
+			expect(actionButton).not.toBeDisabled();
+
+			await fireEvent.click(actionButton);
+			expect(customAction).toHaveBeenCalledTimes(1);
+		});
 	});
 
 	describe('View Report action', () => {

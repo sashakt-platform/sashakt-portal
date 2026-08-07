@@ -201,8 +201,7 @@ export function isOwnEntity(
 	entityCreatedById: string | number | null | undefined
 ): boolean {
 	if (!user) return false;
-	if (isSuperAdmin(user) || isSystemAdmin(user) || hasPermission(user, PERMISSIONS.ACCESS_ALL_TESTS))
-		return true;
+	if (hasPermission(user, PERMISSIONS.ACCESS_ALL_TESTS)) return true;
 	if (entityCreatedById == null) return false;
 	return String(user.id) === String(entityCreatedById);
 }

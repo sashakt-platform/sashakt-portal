@@ -64,10 +64,13 @@ export const load: PageServerLoad = async ({ params }) => {
 
 		const { data: roleData } = await roleResponse.json();
 
-		formattedRoles = roleData.map((role: { id: string; label: string }) => ({
-			id: role.id,
-			label: role.label
-		}));
+		formattedRoles = roleData.map(
+			(role: { id: string; label: string; location_scope: 'state' | 'district' | null }) => ({
+				id: role.id,
+				label: role.label,
+				location_scope: role.location_scope
+			})
+		);
 	} catch (error) {
 		console.error('Error fetching role data:', error);
 	}

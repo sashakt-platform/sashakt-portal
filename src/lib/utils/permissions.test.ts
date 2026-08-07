@@ -284,16 +284,6 @@ describe('permissions', () => {
 	describe('isOwnEntity()', () => {
 		const owner = { ...mockUser, id: '42' } as User;
 		const otherUser = { ...mockUser, id: '99' } as User;
-		const superAdminUser = {
-			...mockUser,
-			id: '99',
-			permissions: [PERMISSIONS.CREATE_ORGANIZATION]
-		} as User;
-		const systemAdminUser = {
-			...mockUser,
-			id: '99',
-			permissions: [PERMISSIONS.UPDATE_MY_ORGANIZATION]
-		} as User;
 		const accessAllTestsUser = {
 			...mockUser,
 			id: '99',
@@ -324,12 +314,13 @@ describe('permissions', () => {
 			expect(isOwnEntity(null, '42')).toBe(false);
 		});
 
-		it('should return true for a super admin even when entity belongs to a different user', () => {
-			expect(isOwnEntity(superAdminUser, '42')).toBe(true);
-		});
-
-		it('should return true for a system admin even when entity belongs to a different user', () => {
-			expect(isOwnEntity(systemAdminUser, '42')).toBe(true);
+		it('should return false for a user with org-level permissions but no access_all_tests', () => {
+			const orgAdminUser = {
+				...mockUser,
+				id: '99',
+				permissions: [PERMISSIONS.CREATE_ORGANIZATION]
+			} as User;
+			expect(isOwnEntity(orgAdminUser, '42')).toBe(false);
 		});
 
 		it('should return true for a user with access_all_tests even when entity belongs to a different user', () => {

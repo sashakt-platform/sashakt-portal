@@ -14,6 +14,7 @@
 	import { resolve } from '$app/paths';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Download from '@lucide/svelte/icons/download';
+	import { toast } from 'svelte-sonner';
 
 	let { data } = $props();
 
@@ -52,6 +53,40 @@
 		showResponsesOpen = true;
 	}
 
+	let downloadingCandidateId: number | null = $state(null);
+
+	async function handleDownloadCertificate(
+		candidateId: number,
+		certificateDownloadUrl: string,
+		candidateUuid: string
+	) {
+		downloadingCandidateId = candidateId;
+		try {
+			const response = await fetch('/api/download-certificate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ certificate_download_url: certificateDownloadUrl })
+			});
+
+			if (!response.ok) throw new Error('Download failed');
+
+			const blob = await response.blob();
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `certificate-${candidateUuid}.png`;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			window.URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error('Failed to download certificate:', error);
+			toast.error('Failed to download certificate');
+		} finally {
+			downloadingCandidateId = null;
+		}
+	}
+
 	// handle sorting
 	function handleSort(columnId: string) {
 		const url = new URL(page.url);
@@ -72,7 +107,9 @@
 			handleDelete,
 			userCanDelete,
 			userCanDelete,
-			handleShowResponses
+			handleShowResponses,
+			downloadingCandidateId,
+			handleDownloadCertificate
 		)
 	);
 

@@ -381,6 +381,50 @@ describe('Candidate Responses page (UI)', () => {
 			});
 			expect(window.URL.createObjectURL).not.toHaveBeenCalled();
 		});
+
+		it('disables the button and shows a loading spinner while the certificate is generating, then re-enables it on success', async () => {
+			const blob = new Blob(['pdf-bytes'], { type: 'image/png' });
+			let resolveFetch: (value: { ok: boolean; blob: () => Promise<Blob> }) => void;
+			const fetchMock = vi.fn(
+				() =>
+					new Promise((resolve) => {
+						resolveFetch = resolve;
+					})
+			);
+			vi.stubGlobal('fetch', fetchMock);
+
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate], { canDelete: true })
+			} as any);
+
+			const downloadButton = screen.getByRole('button', { name: 'Download Certificate' });
+			expect(downloadButton).not.toBeDisabled();
+
+			await fireEvent.click(downloadButton);
+			expect(downloadButton).toBeDisabled();
+
+			resolveFetch!({ ok: true, blob: () => Promise.resolve(blob) });
+
+			await waitFor(() => {
+				expect(downloadButton).not.toBeDisabled();
+			});
+		});
+
+		it('re-enables the button after a failed download', async () => {
+			const fetchMock = vi.fn().mockResolvedValue({ ok: false });
+			vi.stubGlobal('fetch', fetchMock);
+
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate], { canDelete: true })
+			} as any);
+
+			const downloadButton = screen.getByRole('button', { name: 'Download Certificate' });
+			await fireEvent.click(downloadButton);
+
+			await waitFor(() => {
+				expect(downloadButton).not.toBeDisabled();
+			});
+		});
 	});
 
 	// ─────────────────────────────────────────────────────────────────────────

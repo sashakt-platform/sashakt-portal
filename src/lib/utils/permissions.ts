@@ -111,6 +111,7 @@ export const PERMISSIONS = {
 	UPDATE_TEST: 'update_test',
 	DELETE_TEST: 'delete_test',
 	READ_TEST: 'read_test',
+	ACCESS_ALL_TESTS: 'access_all_tests',
 
 	// Tag permissions
 	CREATE_TAG: 'create_tag',
@@ -200,7 +201,8 @@ export function isOwnEntity(
 	entityCreatedById: string | number | null | undefined
 ): boolean {
 	if (!user) return false;
-	if (isSuperAdmin(user) || isSystemAdmin(user)) return true;
+	if (isSuperAdmin(user) || isSystemAdmin(user) || hasPermission(user, PERMISSIONS.ACCESS_ALL_TESTS))
+		return true;
 	if (entityCreatedById == null) return false;
 	return String(user.id) === String(entityCreatedById);
 }

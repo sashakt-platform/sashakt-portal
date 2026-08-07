@@ -294,6 +294,11 @@ describe('permissions', () => {
 			id: '99',
 			permissions: [PERMISSIONS.UPDATE_MY_ORGANIZATION]
 		} as User;
+		const accessAllTestsUser = {
+			...mockUser,
+			id: '99',
+			permissions: [PERMISSIONS.ACCESS_ALL_TESTS]
+		} as User;
 
 		it('should return true when user.id matches entityCreatedById (both strings)', () => {
 			expect(isOwnEntity(owner, '42')).toBe(true);
@@ -325,6 +330,10 @@ describe('permissions', () => {
 
 		it('should return true for a system admin even when entity belongs to a different user', () => {
 			expect(isOwnEntity(systemAdminUser, '42')).toBe(true);
+		});
+
+		it('should return true for a user with access_all_tests even when entity belongs to a different user', () => {
+			expect(isOwnEntity(accessAllTestsUser, '42')).toBe(true);
 		});
 	});
 

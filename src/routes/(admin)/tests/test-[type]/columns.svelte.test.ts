@@ -60,6 +60,7 @@ describe('createTestColumns — edit/delete visibility based on ownership', () =
 	const otherUser = makeUser('99');
 	const superAdminUser = makeUser('99', ['create_organization']);
 	const systemAdminUser = makeUser('99', ['update_my_organization']);
+	const accessAllTestsUser = makeUser('99', ['access_all_tests']);
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -85,6 +86,12 @@ describe('createTestColumns — edit/delete visibility based on ownership', () =
 
 	it("shows edit and delete for a system admin even on another user's test", () => {
 		const props = getActionProps(systemAdminUser, makeTest('1'));
+		expect(props.canEdit).toBe(true);
+		expect(props.canDelete).toBe(true);
+	});
+
+	it("shows edit and delete for a user with access_all_tests even on another user's test", () => {
+		const props = getActionProps(accessAllTestsUser, makeTest('1'));
 		expect(props.canEdit).toBe(true);
 		expect(props.canDelete).toBe(true);
 	});

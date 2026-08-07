@@ -113,8 +113,8 @@ describe('User CRUD Route', () => {
 
 		it('should fetch roles and organizations for add action', async () => {
 			const mockRoles = [
-				{ id: '1', label: 'Admin' },
-				{ id: '2', label: 'User' }
+				{ id: '1', label: 'Admin', location_scope: null },
+				{ id: '2', label: 'User', location_scope: 'state' }
 			];
 			const mockOrganizations = [
 				{ id: '1', name: 'Org 1' },
@@ -174,7 +174,7 @@ describe('User CRUD Route', () => {
 				full_name: 'John Doe',
 				email: 'john@example.com'
 			};
-			const mockRoles = [{ id: '1', label: 'Admin' }];
+			const mockRoles = [{ id: '1', label: 'Admin', location_scope: null }];
 			const mockOrganizations = [{ id: '1', name: 'Org 1' }];
 
 			mockFetch

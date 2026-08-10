@@ -15,7 +15,8 @@
 		isStateAdmin,
 		getUserState,
 		getUserDistrict,
-		hasAssignedDistricts
+		hasAssignedDistricts,
+		type LocationScope
 	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
@@ -60,7 +61,7 @@
 		}));
 	}
 
-	const selectedRoleLocationScope = $derived.by(
+	const selectedRoleLocationScope: LocationScope = $derived.by(
 		() => data.roles.find((role: any) => role.id === $formData.role_id)?.location_scope ?? null
 	);
 

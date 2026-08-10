@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 
 export type User = NonNullable<App.Locals['user']>;
 export type Permission = string;
+export type LocationScope = 'state' | 'district' | null;
 
 /**
  * Check if user is a State Admin (has only one state assigned)

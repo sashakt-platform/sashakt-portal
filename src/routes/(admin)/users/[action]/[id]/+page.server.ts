@@ -6,7 +6,12 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { createUserSchema, editUserSchema } from './schema';
 import { getSessionTokenCookie, requireLogin } from '$lib/server/auth.js';
 import { redirect } from 'sveltekit-flash-message/server';
-import { requirePermission, isSuperAdmin, PERMISSIONS } from '$lib/utils/permissions.js';
+import {
+	requirePermission,
+	isSuperAdmin,
+	PERMISSIONS,
+	type LocationScope
+} from '$lib/utils/permissions.js';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const user = requireLogin();
@@ -65,7 +70,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		const { data: roleData } = await roleResponse.json();
 
 		formattedRoles = roleData.map(
-			(role: { id: string; label: string; location_scope: 'state' | 'district' | null }) => ({
+			(role: { id: string; label: string; location_scope: LocationScope }) => ({
 				id: role.id,
 				label: role.label,
 				location_scope: role.location_scope

@@ -15,7 +15,8 @@
 		isStateAdmin,
 		getUserState,
 		getUserDistrict,
-		hasAssignedDistricts
+		hasAssignedDistricts,
+		type LocationScope
 	} from '$lib/utils/permissions.js';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import DistrictSelection from '$lib/components/DistrictSelection.svelte';
@@ -60,33 +61,26 @@
 		}));
 	}
 
-	const showLocationFields = $derived.by(() => {
-		const label =
-			data.roles.find((role: any) => role.id === $formData.role_id)?.label?.toLowerCase() ?? '';
-		return label.includes('state') || label.includes('test');
-	});
+	const selectedRoleLocationScope: LocationScope = $derived.by(
+		() => data.roles.find((role: any) => role.id === $formData.role_id)?.location_scope ?? null
+	);
 
-	const isSelectedRoleStateAdmin = $derived.by(() => {
-		const label =
-			data.roles.find((role: any) => role.id === $formData.role_id)?.label?.toLowerCase() ?? '';
-		return label.includes('state');
-	});
+	const showLocationFields = $derived(selectedRoleLocationScope !== null);
+
+	const isSelectedRoleStateScoped = $derived(selectedRoleLocationScope === 'state');
 
 	$effect(() => {
-		if (isSelectedRoleStateAdmin) {
+		if (isSelectedRoleStateScoped) {
 			selectedDistricts = [];
 		}
 	});
 
-	// if state admin is creating a user with state admin or test admin role,
+	// if state admin is creating a user with a location-scoped role (state or district admin),
 	// then we should auto-assign current state admin's state and state admin's districts
 	$effect(() => {
-		const selectedRole = data.roles.find((role: any) => role.id === $formData.role_id);
-		const selectedRoleLabel = selectedRole?.label?.toLowerCase() ?? '';
-		const isStateRole = selectedRoleLabel.includes('state');
-		const isTestRole = selectedRoleLabel.includes('test');
+		const isLocationScopedRole = selectedRoleLocationScope !== null;
 
-		if (currentUserIsStateAdmin && (isStateRole || isTestRole)) {
+		if (currentUserIsStateAdmin && isLocationScopedRole) {
 			if (selectedStates.length === 0) {
 				const userState = getUserState(data.currentUser);
 				if (userState) {
@@ -94,7 +88,7 @@
 				}
 			}
 		}
-		if (currentUserHasAssignedDistricts && (isStateRole || isTestRole)) {
+		if (currentUserHasAssignedDistricts && isLocationScopedRole) {
 			if (selectedDistricts.length === 0) {
 				const userDistrict = getUserDistrict(data.currentUser);
 				if (userDistrict?.length) {
@@ -228,7 +222,7 @@
 							<Form.FieldErrors />
 						</Form.Field>
 					{/if}
-					{#if !currentUserHasAssignedDistricts && !isSelectedRoleStateAdmin}
+					{#if !currentUserHasAssignedDistricts && !isSelectedRoleStateScoped}
 						<Form.Field {form} name="district_ids">
 							<Form.Control>
 								{#snippet children({ props })}

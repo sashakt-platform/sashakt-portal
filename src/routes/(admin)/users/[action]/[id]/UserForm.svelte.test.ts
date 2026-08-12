@@ -36,9 +36,9 @@ vi.mock('$lib/utils/permissions.js', async (importOriginal) => {
 
 describe('UserForm Component', () => {
 	const mockRoles = [
-		{ id: '1', label: 'Admin' },
-		{ id: '2', label: 'State User' },
-		{ id: '3', label: 'Regular User' }
+		{ id: '1', label: 'Admin', location_scope: null },
+		{ id: '2', label: 'State User', location_scope: 'state' },
+		{ id: '3', label: 'Regular User', location_scope: null }
 	];
 
 	const mockOrganizations = [
@@ -255,10 +255,10 @@ describe('UserForm Component', () => {
 
 	describe('State Admin creating Test Admin - District Assignment', () => {
 		const mockRolesWithTestAdmin = [
-			{ id: '1', label: 'Admin' },
-			{ id: '2', label: 'State User' },
-			{ id: '3', label: 'Regular User' },
-			{ id: '4', label: 'Test Admin' }
+			{ id: '1', label: 'Admin', location_scope: null },
+			{ id: '2', label: 'State User', location_scope: 'state' },
+			{ id: '3', label: 'Regular User', location_scope: null },
+			{ id: '4', label: 'Test Admin', location_scope: 'district' }
 		];
 
 		const stateAdminWithoutDistricts = {
@@ -330,8 +330,7 @@ describe('UserForm Component', () => {
 			expect(screen.queryByText('District')).not.toBeInTheDocument();
 		});
 
-		it('should hide location section when state admin selects a non-state/test role', () => {
-			// 'Admin' role label does not include 'state' or 'test'
+		it('should hide location section when state admin selects a role with no location_scope', () => {
 			const data = createLocationTestData('1', stateAdminWithoutDistricts);
 
 			render(UserForm, { data });

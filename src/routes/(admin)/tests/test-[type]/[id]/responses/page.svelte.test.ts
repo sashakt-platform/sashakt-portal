@@ -381,6 +381,108 @@ describe('Candidate Responses page (UI)', () => {
 			});
 			expect(window.URL.createObjectURL).not.toHaveBeenCalled();
 		});
+
+		it('disables the button and shows a loading spinner while the certificate is generating, then re-enables it on success', async () => {
+			const blob = new Blob(['pdf-bytes'], { type: 'image/png' });
+			let resolveFetch: (value: { ok: boolean; blob: () => Promise<Blob> }) => void;
+			const fetchMock = vi.fn(
+				() =>
+					new Promise((resolve) => {
+						resolveFetch = resolve;
+					})
+			);
+			vi.stubGlobal('fetch', fetchMock);
+
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate], { canDelete: true })
+			} as any);
+
+			const downloadButton = screen.getByRole('button', { name: 'Download Certificate' });
+			expect(downloadButton).not.toBeDisabled();
+
+			await fireEvent.click(downloadButton);
+			expect(downloadButton).toBeDisabled();
+
+			resolveFetch!({ ok: true, blob: () => Promise.resolve(blob) });
+
+			await waitFor(() => {
+				expect(downloadButton).not.toBeDisabled();
+			});
+		});
+
+		it('re-enables the button after a failed download', async () => {
+			const fetchMock = vi.fn().mockResolvedValue({ ok: false });
+			vi.stubGlobal('fetch', fetchMock);
+
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate], { canDelete: true })
+			} as any);
+
+			const downloadButton = screen.getByRole('button', { name: 'Download Certificate' });
+			await fireEvent.click(downloadButton);
+
+			await waitFor(() => {
+				expect(downloadButton).not.toBeDisabled();
+			});
+		});
+
+		it('keeps each row disabled independently when two downloads resolve in reverse order', async () => {
+			const secondCandidate: CandidateResponse = {
+				candidate_id: 99,
+				candidate_uuid: 'candidate-zzz',
+				status: 'submitted',
+				start_time: '2026-06-01T11:00:00Z',
+				end_time: '2026-06-01T11:30:00Z',
+				time_taken_seconds: 120,
+				result: {
+					correct_answer: 8,
+					incorrect_answer: 2,
+					mandatory_not_attempted: 0,
+					optional_not_attempted: 0,
+					total_questions: 10,
+					marks_obtained: 8,
+					marks_maximum: 10,
+					certificate_download_url: 'https://example.com/certificates/candidate-zzz.pdf'
+				}
+			};
+
+			const blob = new Blob(['pdf-bytes'], { type: 'image/png' });
+			let resolveFirst: (value: { ok: boolean; blob: () => Promise<Blob> }) => void;
+			let resolveSecond: (value: { ok: boolean; blob: () => Promise<Blob> }) => void;
+
+			const fetchMock = vi
+				.fn()
+				.mockImplementationOnce(
+					() => new Promise((resolve) => { resolveFirst = resolve; })
+				)
+				.mockImplementationOnce(
+					() => new Promise((resolve) => { resolveSecond = resolve; })
+				);
+			vi.stubGlobal('fetch', fetchMock);
+
+			render(ResponsesPage, {
+				data: makeData([candidateWithCertificate, secondCandidate], { canDelete: true })
+			} as any);
+
+			const [firstButton, secondButton] = screen.getAllByRole('button', {
+				name: 'Download Certificate'
+			});
+
+			await fireEvent.click(firstButton);
+			await fireEvent.click(secondButton);
+
+			expect(firstButton).toBeDisabled();
+			expect(secondButton).toBeDisabled();
+
+			// second resolves first
+			resolveSecond!({ ok: true, blob: () => Promise.resolve(blob) });
+			await waitFor(() => expect(secondButton).not.toBeDisabled());
+			expect(firstButton).toBeDisabled();
+
+			// first resolves after
+			resolveFirst!({ ok: true, blob: () => Promise.resolve(blob) });
+			await waitFor(() => expect(firstButton).not.toBeDisabled());
+		});
 	});
 
 	// ─────────────────────────────────────────────────────────────────────────

@@ -1,35 +1,9 @@
 import type { ColumnDef } from '@tanstack/table-core';
-import { toast } from 'svelte-sonner';
 import { renderComponent } from '$lib/components/ui/data-table/index.js';
 import DateCell from '$lib/components/data-table/DateCell.svelte';
 import CandidateStatusBadge from '$lib/components/data-table/CandidateStatusBadge.svelte';
 import { DataTableActions } from '$lib/components/data-table/index.js';
 import { createSelectionColumn, createSortableColumn } from '$lib/components/data-table/column-helpers';
-
-async function downloadCertificate(certificateDownloadUrl: string, candidateUuid: string) {
-	try {
-		const response = await fetch('/api/download-certificate', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ certificate_download_url: certificateDownloadUrl })
-		});
-
-		if (!response.ok) throw new Error('Download failed');
-
-		const blob = await response.blob();
-		const url = window.URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = `certificate-${candidateUuid}.png`;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		window.URL.revokeObjectURL(url);
-	} catch (error) {
-		console.error('Failed to download certificate:', error);
-		toast.error('Failed to download certificate');
-	}
-}
 
 type CandidateStatus = 'submitted' | 'not_submitted';
 export interface CandidateResult {
@@ -61,7 +35,13 @@ export const createResponseColumns = (
 	onDelete?: (candidateId: number) => void,
 	canDelete = true,
 	enableSelection = false,
-	onShowResponses?: (candidate: CandidateResponse) => void
+	onShowResponses?: (candidate: CandidateResponse) => void,
+	downloadingCandidateIds: Set<number> = new Set(),
+	onDownloadCertificate?: (
+		candidateId: number,
+		certificateDownloadUrl: string,
+		candidateUuid: string
+	) => void
 ): ColumnDef<CandidateResponse>[] => [
 	...(enableSelection ? [createSelectionColumn<CandidateResponse>()] : []),
 	{
@@ -134,7 +114,13 @@ export const createResponseColumns = (
 								icon: 'download',
 								inline: true,
 								iconOnly: true,
-								action: () => downloadCertificate(certificateUrl, row.original.candidate_uuid)
+								loading: downloadingCandidateIds.has(row.original.candidate_id),
+								action: () =>
+									onDownloadCertificate?.(
+										row.original.candidate_id,
+										certificateUrl,
+										row.original.candidate_uuid
+									)
 							});
 						}
 

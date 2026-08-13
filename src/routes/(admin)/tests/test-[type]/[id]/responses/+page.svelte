@@ -53,14 +53,14 @@
 		showResponsesOpen = true;
 	}
 
-	let downloadingCandidateId: number | null = $state(null);
+	let downloadingCandidateIds = $state(new Set<number>());
 
 	async function handleDownloadCertificate(
 		candidateId: number,
 		certificateDownloadUrl: string,
 		candidateUuid: string
 	) {
-		downloadingCandidateId = candidateId;
+		downloadingCandidateIds = new Set([...downloadingCandidateIds, candidateId]);
 		try {
 			const response = await fetch('/api/download-certificate', {
 				method: 'POST',
@@ -83,7 +83,7 @@
 			console.error('Failed to download certificate:', error);
 			toast.error('Failed to download certificate');
 		} finally {
-			downloadingCandidateId = null;
+			downloadingCandidateIds = new Set([...downloadingCandidateIds].filter((id) => id !== candidateId));
 		}
 	}
 
@@ -108,7 +108,7 @@
 			userCanDelete,
 			userCanDelete,
 			handleShowResponses,
-			downloadingCandidateId,
+			downloadingCandidateIds,
 			handleDownloadCertificate
 		)
 	);

@@ -36,7 +36,7 @@ export const createResponseColumns = (
 	canDelete = true,
 	enableSelection = false,
 	onShowResponses?: (candidate: CandidateResponse) => void,
-	downloadingCandidateId: number | null = null,
+	downloadingCandidateIds: Set<number> = new Set(),
 	onDownloadCertificate?: (
 		candidateId: number,
 		certificateDownloadUrl: string,
@@ -114,7 +114,7 @@ export const createResponseColumns = (
 								icon: 'download',
 								inline: true,
 								iconOnly: true,
-								loading: downloadingCandidateId === row.original.candidate_id,
+								loading: downloadingCandidateIds.has(row.original.candidate_id),
 								action: () =>
 									onDownloadCertificate?.(
 										row.original.candidate_id,

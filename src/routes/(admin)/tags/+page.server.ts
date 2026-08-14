@@ -71,6 +71,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const name = formData.get('name')?.toString().trim();
 		const description = formData.get('description')?.toString() || null;
+		const show_to_candidate = formData.get('show_to_candidate') === 'true';
 
 		if (!name) {
 			setFlash({ type: 'error', message: `${term('tag_type')} name is required.` }, cookies);
@@ -83,7 +84,12 @@ export const actions: Actions = {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`
 			},
-			body: JSON.stringify({ name, description, organization_id: user.organization_id })
+			body: JSON.stringify({
+				name,
+				description,
+				show_to_candidate,
+				organization_id: user.organization_id
+			})
 		});
 
 		if (!response.ok) {
@@ -105,6 +111,7 @@ export const actions: Actions = {
 		const id = formData.get('id');
 		const name = formData.get('name')?.toString().trim();
 		const description = formData.get('description')?.toString() || null;
+		const show_to_candidate = formData.get('show_to_candidate') === 'true';
 
 		if (!id || !name) {
 			setFlash({ type: 'error', message: `${term('tag_type')} name is required.` }, cookies);
@@ -117,7 +124,12 @@ export const actions: Actions = {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${token}`
 			},
-			body: JSON.stringify({ name, description, organization_id: user.organization_id })
+			body: JSON.stringify({
+				name,
+				description,
+				show_to_candidate,
+				organization_id: user.organization_id
+			})
 		});
 
 		if (!response.ok) {

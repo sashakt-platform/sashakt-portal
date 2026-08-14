@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Pencil from '@lucide/svelte/icons/pencil';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Eye from '@lucide/svelte/icons/eye';
 	import { useTerms } from '$lib/nomenclature';
 
 	const term = useTerms();
@@ -16,6 +17,7 @@
 			id: number | string;
 			name: string;
 			description?: string;
+			show_to_candidate?: boolean;
 			tags?: { id: number | string; name: string }[];
 		};
 		canEdit?: boolean;
@@ -32,6 +34,14 @@
 			{#if tagType.tags !== undefined}
 				<span class="ml-1 text-muted-foreground font-normal">
 					({tagType.tags.length})
+				</span>
+			{/if}
+			{#if tagType.show_to_candidate}
+				<span
+					class="ml-1 inline-flex align-middle text-muted-foreground"
+					title="Visible to candidates"
+				>
+					<Eye class="h-3.5 w-3.5" />
 				</span>
 			{/if}
 		</div>

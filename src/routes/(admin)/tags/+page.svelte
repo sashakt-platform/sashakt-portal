@@ -36,8 +36,12 @@
 	// Tag Type Dialog state
 	let tagTypeDialogOpen = $state(false);
 	let tagTypeDialogMode: 'create' | 'edit' = $state('create');
-	let editingTagType: { id: number; name: string; description?: string | null } | null =
-		$state(null);
+	let editingTagType: {
+		id: number;
+		name: string;
+		description?: string | null;
+		show_to_candidate?: boolean | null;
+	} | null = $state(null);
 
 	// Tag inline edit state
 	let editingTagId: number | string | null = $state(null);
@@ -66,12 +70,18 @@
 		tagTypeDialogOpen = true;
 	}
 
-	function openEditTagType(tagType: { id: number | string; name: string; description?: string }) {
+	function openEditTagType(tagType: {
+		id: number | string;
+		name: string;
+		description?: string;
+		show_to_candidate?: boolean;
+	}) {
 		tagTypeDialogMode = 'edit';
 		editingTagType = {
 			id: tagType.id as number,
 			name: tagType.name,
-			description: tagType.description
+			description: tagType.description,
+			show_to_candidate: tagType.show_to_candidate
 		};
 		tagTypeDialogOpen = true;
 	}

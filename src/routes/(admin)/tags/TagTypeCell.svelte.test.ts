@@ -24,7 +24,13 @@ const defaultTagType = {
 
 function renderCell(
 	props: {
-		tagType?: { id: number | string; name: string; description?: string; tags?: { id: number | string; name: string }[] };
+		tagType?: {
+			id: number | string;
+			name: string;
+			description?: string;
+			show_to_candidate?: boolean;
+			tags?: { id: number | string; name: string }[];
+		};
 		canEdit?: boolean;
 		canDelete?: boolean;
 		onEdit?: (tagType: { id: number | string; name: string; description?: string }) => void;
@@ -97,6 +103,23 @@ describe('TagTypeCell', () => {
 		it('does not render a description element when description is an empty string', () => {
 			renderCell({ tagType: { id: 1, name: 'Difficulty', description: '' } });
 			expect(document.querySelector('.text-sm')).toBeNull();
+		});
+	});
+
+	describe('show_to_candidate indicator', () => {
+		it('shows "Visible to candidates" eye icon when show_to_candidate is true', () => {
+			renderCell({ tagType: { ...defaultTagType, show_to_candidate: true } });
+			expect(screen.getByTitle('Visible to candidates')).toBeInTheDocument();
+		});
+
+		it('does not show the indicator when show_to_candidate is false', () => {
+			renderCell({ tagType: { ...defaultTagType, show_to_candidate: false } });
+			expect(screen.queryByTitle('Visible to candidates')).not.toBeInTheDocument();
+		});
+
+		it('does not show the indicator when show_to_candidate is undefined', () => {
+			renderCell({ tagType: { id: 1, name: 'Difficulty' } });
+			expect(screen.queryByTitle('Visible to candidates')).not.toBeInTheDocument();
 		});
 	});
 

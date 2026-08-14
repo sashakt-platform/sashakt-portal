@@ -138,7 +138,11 @@ describe('actions', () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
 			await actions.createTagType({
-				request: mockRequest({ name: 'Difficulty', description: 'How hard' }),
+				request: mockRequest({
+					name: 'Difficulty',
+					description: 'How hard',
+					show_to_candidate: 'true'
+				}),
 				cookies: {}
 			});
 
@@ -153,7 +157,21 @@ describe('actions', () => {
 			const body = JSON.parse(fetchCall[1].body);
 			expect(body.name).toBe('Difficulty');
 			expect(body.description).toBe('How hard');
+			expect(body.show_to_candidate).toBe(true);
 			expect(body.organization_id).toBe(10);
+		});
+
+		it('defaults show_to_candidate to false when not provided', async () => {
+			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+
+			await actions.createTagType({
+				request: mockRequest({ name: 'Difficulty' }),
+				cookies: {}
+			});
+
+			const fetchCall = (global.fetch as any).mock.calls[0];
+			const body = JSON.parse(fetchCall[1].body);
+			expect(body.show_to_candidate).toBe(false);
 		});
 
 		it('returns fail(400) when name is empty', async () => {
@@ -191,7 +209,12 @@ describe('actions', () => {
 			(global.fetch as any).mockResolvedValueOnce({ ok: true, json: async () => ({}) });
 
 			await actions.updateTagType({
-				request: mockRequest({ id: '5', name: 'Updated', description: 'New desc' }),
+				request: mockRequest({
+					id: '5',
+					name: 'Updated',
+					description: 'New desc',
+					show_to_candidate: 'true'
+				}),
 				cookies: {}
 			});
 
@@ -203,6 +226,8 @@ describe('actions', () => {
 			const fetchCall = (global.fetch as any).mock.calls[0];
 			expect(fetchCall[0]).toBe('http://fake-backend.com/tagtype/5');
 			expect(fetchCall[1].method).toBe('PUT');
+			const body = JSON.parse(fetchCall[1].body);
+			expect(body.show_to_candidate).toBe(true);
 		});
 
 		it('returns fail(400) when name is missing', async () => {

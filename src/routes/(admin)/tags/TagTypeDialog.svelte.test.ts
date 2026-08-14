@@ -4,9 +4,10 @@ import { render, screen, fireEvent, within } from '@testing-library/svelte';
 import TagTypeDialog from './TagTypeDialog.svelte';
 
 vi.mock('$lib/nomenclature', () => ({
-	useTerms: () => (key: string) => {
-		const map: Record<string, string> = { tag_type: 'Tag Type' };
-		return map[key] ?? key;
+	useTerms: () => (key: string, modifier?: string) => {
+		const map: Record<string, string> = { tag_type: 'Tag Type', tag: 'Tag', tags: 'Tags' };
+		const val = map[key] ?? key;
+		return modifier === 'lower' ? val.toLowerCase() : val;
 	}
 }));
 
@@ -14,7 +15,12 @@ vi.mock('$app/forms', () => ({
 	enhance: vi.fn(() => ({ destroy: vi.fn() }))
 }));
 
-const defaultTagType = { id: 42, name: 'Difficulty Level', description: 'How hard the question is' };
+const defaultTagType = {
+	id: 42,
+	name: 'Difficulty Level',
+	description: 'How hard the question is',
+	show_to_candidate: true
+};
 
 function renderDialog(
 	props: { open?: boolean; mode?: 'create' | 'edit'; tagType?: typeof defaultTagType | null } = {}
@@ -254,6 +260,78 @@ describe('TagTypeDialog', () => {
 		});
 	});
 
+	describe('Show to candidate toggle', () => {
+		it('renders the label text', async () => {
+			renderDialog({ mode: 'create' });
+			await screen.findByRole('dialog');
+			expect(screen.getByText('Make tag visible to candidates')).toBeInTheDocument();
+		});
+
+		it('renders a tooltip trigger next to the label', async () => {
+			renderDialog({ mode: 'create' });
+			await screen.findByRole('dialog');
+			const dialog = screen.getByRole('dialog');
+			expect(dialog.querySelector('[data-slot="tooltip-trigger"]')).toBeInTheDocument();
+		});
+
+		it('renders unchecked by default in create mode', async () => {
+			renderDialog({ mode: 'create' });
+			await screen.findByRole('dialog');
+			expect(screen.getByRole('switch')).not.toBeChecked();
+		});
+
+		it('sets the hidden input to "false" by default in create mode', async () => {
+			renderDialog({ mode: 'create' });
+			await screen.findByRole('dialog');
+			const form = screen.getByRole('dialog').querySelector('form');
+			const hiddenInput = form!.querySelector(
+				'input[name="show_to_candidate"]'
+			) as HTMLInputElement;
+			expect(hiddenInput.value).toBe('false');
+		});
+
+		it('is checked when tagType.show_to_candidate is true in edit mode', async () => {
+			renderDialog({ mode: 'edit', tagType: defaultTagType });
+			await screen.findByRole('dialog');
+			expect(screen.getByRole('switch')).toBeChecked();
+		});
+
+		it('is unchecked when tagType.show_to_candidate is false in edit mode', async () => {
+			renderDialog({ mode: 'edit', tagType: { ...defaultTagType, show_to_candidate: false } });
+			await screen.findByRole('dialog');
+			expect(screen.getByRole('switch')).not.toBeChecked();
+		});
+
+		it('is unchecked when tagType.show_to_candidate is undefined in edit mode', async () => {
+			const { show_to_candidate, ...tagTypeWithoutFlag } = defaultTagType;
+			renderDialog({ mode: 'edit', tagType: tagTypeWithoutFlag });
+			await screen.findByRole('dialog');
+			expect(screen.getByRole('switch')).not.toBeChecked();
+		});
+
+		it('updates the hidden input value to "true" when toggled on', async () => {
+			renderDialog({ mode: 'create' });
+			await screen.findByRole('dialog');
+			await fireEvent.click(screen.getByRole('switch'));
+			const form = screen.getByRole('dialog').querySelector('form');
+			const hiddenInput = form!.querySelector(
+				'input[name="show_to_candidate"]'
+			) as HTMLInputElement;
+			expect(hiddenInput.value).toBe('true');
+		});
+
+		it('updates the hidden input value back to "false" when toggled off again', async () => {
+			renderDialog({ mode: 'edit', tagType: defaultTagType });
+			await screen.findByRole('dialog');
+			await fireEvent.click(screen.getByRole('switch'));
+			const form = screen.getByRole('dialog').querySelector('form');
+			const hiddenInput = form!.querySelector(
+				'input[name="show_to_candidate"]'
+			) as HTMLInputElement;
+			expect(hiddenInput.value).toBe('false');
+		});
+	});
+
 	describe('Dialog resets on reopen', () => {
 		it('resets name and description to empty when reopening in create mode', async () => {
 			const { rerender } = renderDialog({ mode: 'create', open: false });
@@ -269,6 +347,14 @@ describe('TagTypeDialog', () => {
 			await screen.findByRole('dialog');
 			expect(screen.getByLabelText('Name')).toHaveValue('Difficulty Level');
 			expect(screen.getByLabelText('Description')).toHaveValue('How hard the question is');
+			expect(screen.getByRole('switch')).toBeChecked();
+		});
+
+		it('resets show_to_candidate to unchecked when reopening in create mode', async () => {
+			const { rerender } = renderDialog({ mode: 'edit', tagType: defaultTagType, open: false });
+			await rerender({ open: true, mode: 'create', tagType: null });
+			await screen.findByRole('dialog');
+			expect(screen.getByRole('switch')).not.toBeChecked();
 		});
 	});
 

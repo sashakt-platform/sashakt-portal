@@ -1,5 +1,21 @@
 <script lang="ts">
 	import ListingPageLayout from '$lib/components/ListingPageLayout.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
+	import { resolve } from '$app/paths';
+	import { canCreate } from '$lib/utils/permissions.js';
+	import Plus from '@lucide/svelte/icons/plus';
+
+	const { data } = $props();
+
+	const userCanCreate = $derived(canCreate(data.user, 'role'));
 </script>
 
-<ListingPageLayout title="Roles and Permission" subtitle="" showInfoIcon={false}></ListingPageLayout>
+<ListingPageLayout title="Roles and Permission" subtitle="" showInfoIcon={false}>
+	{#snippet headerActions()}
+		{#if userCanCreate}
+			<a href={resolve('/organization/roles-permissions/add/new')}>
+				<Button class="font-semibold"><Plus />Create Role</Button>
+			</a>
+		{/if}
+	{/snippet}
+</ListingPageLayout>

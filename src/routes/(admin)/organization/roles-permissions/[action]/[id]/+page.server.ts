@@ -50,6 +50,14 @@ export const load: PageServerLoad = async ({ params }) => {
 		roleData = null;
 	}
 
+	const rolesResponse = await fetch(`${BACKEND_URL}/roles/?limit=200`, {
+		headers: { Authorization: `Bearer ${token}` }
+	});
+	const roles = rolesResponse.ok ? (await rolesResponse.json()).data : [];
+	const availableRoles = roles
+		.map((role: { name: string; label: string }) => ({ name: role.name, label: role.label }))
+		.sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label));
+
 	const schema = params.action === 'edit' ? editRoleSchema : createRoleSchema;
 
 	return {
@@ -57,7 +65,8 @@ export const load: PageServerLoad = async ({ params }) => {
 			? await superValidate(roleData, zod4(schema))
 			: await superValidate(zod4(schema)),
 		action: params.action,
-		id: params.id
+		id: params.id,
+		availableRoles
 	};
 };
 

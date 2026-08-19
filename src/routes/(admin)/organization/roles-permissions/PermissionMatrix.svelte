@@ -12,17 +12,14 @@
 		location_scope: 'state' | 'district' | null;
 		allowed_roles: string[];
 		permissions: number[];
-		visible_to_roles: string[];
 	};
 
 	const {
 		roles,
-		permissions,
-		canUpdate = false
+		permissions
 	}: {
 		roles: Role[];
 		permissions: { id: number; name: string; label: string }[];
-		canUpdate?: boolean;
 	} = $props();
 
 	let pendingKey = $state<string | null>(null);
@@ -48,7 +45,6 @@
 				is_active: role.is_active,
 				location_scope: role.location_scope,
 				allowed_roles: role.allowed_roles,
-				visible_to_roles: role.visible_to_roles,
 				permissions: updatedPermissions
 			})
 		);
@@ -56,6 +52,7 @@
 		try {
 			const response = await fetch('?/updateRolePermissions', { method: 'POST', body: formData });
 			if (!response.ok) throw new Error('Request failed');
+			toast.success('Permission updated');
 		} catch {
 			role.permissions = previousPermissions;
 			toast.error('Failed to update permission');
@@ -91,7 +88,7 @@
 							<div class="flex justify-center">
 								<Checkbox
 									checked={role.permissions.includes(permission.id)}
-									disabled={!canUpdate || pendingKey === `${role.id}-${permission.id}`}
+									disabled={pendingKey === `${role.id}-${permission.id}`}
 									onCheckedChange={(checked) => togglePermission(role, permission.id, checked)}
 								/>
 							</div>

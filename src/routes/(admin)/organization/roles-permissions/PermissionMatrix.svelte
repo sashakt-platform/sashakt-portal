@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 
@@ -12,6 +14,7 @@
 		location_scope: 'state' | 'district' | null;
 		allowed_roles: string[];
 		permissions: number[];
+		is_restricted: boolean;
 	};
 
 	const {
@@ -23,6 +26,13 @@
 	} = $props();
 
 	let pendingKey = $state<string | null>(null);
+	let deleteAction = $state<string | null>(null);
+	let deletingRoleLabel = $state('');
+
+	function requestDeleteRole(role: Role) {
+		deletingRoleLabel = role.label;
+		deleteAction = `?/deleteRole&role_id=${role.id}`;
+	}
 
 	async function togglePermission(role: Role, permissionId: number, checked: boolean) {
 		const key = `${role.id}-${permissionId}`;
@@ -63,6 +73,8 @@
 	}
 </script>
 
+<DeleteDialog bind:action={deleteAction} elementName={deletingRoleLabel || 'Role'} />
+
 <div class="overflow-x-auto rounded-2xl border border-border">
 	<table class="w-full border-collapse text-sm">
 		<thead>
@@ -74,7 +86,19 @@
 				</th>
 				{#each roles as role (role.id)}
 					<th class="min-w-30 p-4 text-center text-sm font-semibold">
-						{role.label}
+						<div class="group flex items-center justify-center gap-1.5">
+							<span>{role.label}</span>
+							{#if !role.is_restricted}
+								<button
+									type="button"
+									class="text-muted-foreground hover:text-destructive opacity-0 transition-opacity group-hover:opacity-100"
+									aria-label={`Delete ${role.label}`}
+									onclick={() => requestDeleteRole(role)}
+								>
+									<Trash2 class="h-4 w-4" />
+								</button>
+							{/if}
+						</div>
 					</th>
 				{/each}
 			</tr>

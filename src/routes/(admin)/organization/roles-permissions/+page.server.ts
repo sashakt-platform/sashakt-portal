@@ -2,7 +2,7 @@ import { fail } from '@sveltejs/kit';
 import { BACKEND_URL } from '$env/static/private';
 import { requireLogin, getSessionTokenCookie } from '$lib/server/auth.js';
 import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
-import { setFlash } from 'sveltekit-flash-message/server';
+import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad, Actions } from './$types';
 
 function titleCase(value: string): string {
@@ -73,5 +73,37 @@ export const actions: Actions = {
 		}
 
 		return { success: true };
+	},
+
+	deleteRole: async ({ url, cookies }) => {
+		const user = requireLogin();
+		requirePermission(user, PERMISSIONS.DELETE_ROLE);
+		const token = getSessionTokenCookie();
+
+		const roleId = url.searchParams.get('role_id');
+
+		const response = await fetch(`${BACKEND_URL}/roles/${roleId}`, {
+			method: 'DELETE',
+			headers: { Authorization: `Bearer ${token}` }
+		});
+
+		if (!response.ok) {
+			const errorMessage = await response.json();
+			setFlash(
+				{
+					type: 'error',
+					message: errorMessage.detail || 'Failed to delete role'
+				},
+				cookies
+			);
+			return fail(response.status === 400 ? 400 : 500);
+		}
+
+		throw redirect(
+			303,
+			'/organization/roles-permissions',
+			{ type: 'success', message: 'Role deleted successfully' },
+			cookies
+		);
 	}
 };

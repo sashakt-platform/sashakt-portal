@@ -2,8 +2,10 @@
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 	import DeleteDialog from '$lib/components/DeleteDialog.svelte';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import Pencil from '@lucide/svelte/icons/pencil';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
+	import { resolve } from '$app/paths';
 
 	type Role = {
 		id: number;
@@ -88,6 +90,13 @@
 					<th class="min-w-30 p-4 text-center text-sm font-semibold">
 						<div class="group flex items-center justify-center gap-1.5">
 							<span>{role.label}</span>
+							<a
+								href={resolve(`/organization/roles-permissions/edit/${role.id}`)}
+								class="text-muted-foreground hover:text-primary opacity-0 transition-opacity group-hover:opacity-100"
+								aria-label={`Edit ${role.label}`}
+							>
+								<Pencil class="h-4 w-4" />
+							</a>
 							{#if !role.is_restricted}
 								<button
 									type="button"

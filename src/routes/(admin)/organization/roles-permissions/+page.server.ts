@@ -27,7 +27,6 @@ export const load: PageServerLoad = async () => {
 	]);
 
 	const roles = rolesResponse.ok ? (await rolesResponse.json()).data : [];
-	roles.sort((a: { id: number }, b: { id: number }) => a.id - b.id);
 	const permissions = permissionsResponse.ok ? (await permissionsResponse.json()).data : [];
 
 	const permissionList = permissions.map((permission: { id: number; name: string }) => ({

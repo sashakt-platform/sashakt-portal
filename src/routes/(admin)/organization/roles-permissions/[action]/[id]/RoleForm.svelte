@@ -1,20 +1,27 @@
 <script lang="ts">
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import Shield from '@lucide/svelte/icons/shield';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import Check from '@lucide/svelte/icons/check';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import * as Command from '$lib/components/ui/command/index.js';
+	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zod4Client } from 'sveltekit-superforms/adapters';
 	import { createRoleSchema, editRoleSchema } from './schema.js';
 	import { resolve } from '$app/paths';
+	import { cn } from '$lib/utils.js';
 
 	const { data }: { data: any } = $props();
 
 	const isEditMode = $derived(data.action === 'edit');
+	const availableRoles: { name: string; label: string }[] = data.availableRoles ?? [];
 
 	const locationScopeOptions = [
 		{ value: 'none', label: 'None (organization-wide)' },
@@ -32,6 +39,20 @@
 	});
 
 	const canSave = $derived(($formData.label?.trim() ?? '') !== '');
+
+	let allowedRolesOpen = $state(false);
+	let visibleToRolesOpen = $state(false);
+
+	function toggleRole(field: 'allowed_roles' | 'visible_to_roles', roleName: string) {
+		const current = $formData[field] ?? [];
+		$formData[field] = current.includes(roleName)
+			? current.filter((name: string) => name !== roleName)
+			: [...current, roleName];
+	}
+
+	function roleLabel(roleName: string): string {
+		return availableRoles.find((role) => role.name === roleName)?.label ?? roleName;
+	}
 </script>
 
 <form method="POST" action="?/save" use:enhance>
@@ -112,6 +133,122 @@
 									{/each}
 								</Select.Content>
 							</Select.Root>
+						</div>
+
+						<div class="flex flex-col gap-2">
+							<Label for="allowed_roles">Allowed Roles</Label>
+							<Popover.Root bind:open={allowedRolesOpen}>
+								<Popover.Trigger>
+									{#snippet child({ props })}
+										<Button
+											{...props}
+											id="allowed_roles"
+											type="button"
+											variant="outline"
+											class="bg-card h-auto min-h-10 w-full justify-start rounded-full text-muted-foreground"
+											role="combobox"
+											aria-expanded={allowedRolesOpen}
+										>
+											{#if !$formData.allowed_roles || $formData.allowed_roles.length === 0}
+												Select allowed roles
+											{:else}
+												<span class="flex flex-wrap gap-1 text-start">
+													{#each $formData.allowed_roles as roleName (roleName)}
+														<Badge
+															variant="outline"
+															class="border-primary/20 bg-secondary text-primary rounded-full border font-semibold"
+														>
+															{roleLabel(roleName)}
+														</Badge>
+													{/each}
+												</span>
+											{/if}
+											<ChevronDown class="ml-auto shrink-0 opacity-50" />
+										</Button>
+									{/snippet}
+								</Popover.Trigger>
+								<Popover.Content class="w-(--radix-popover-trigger-width) min-w-50 max-w-100 p-0">
+									<Command.Root>
+										<Command.Input placeholder="Search roles..." />
+										<Command.List>
+											<Command.Empty>No roles found.</Command.Empty>
+											{#each availableRoles as role (role.name)}
+												<Command.Item
+													value={role.label}
+													onSelect={() => toggleRole('allowed_roles', role.name)}
+												>
+													<Check
+														class={cn(
+															'shrink-0',
+															!($formData.allowed_roles ?? []).includes(role.name) &&
+																'text-transparent'
+														)}
+													/>
+													<span class="min-w-0 truncate" title={role.label}>{role.label}</span>
+												</Command.Item>
+											{/each}
+										</Command.List>
+									</Command.Root>
+								</Popover.Content>
+							</Popover.Root>
+						</div>
+
+						<div class="flex flex-col gap-2">
+							<Label for="visible_to_roles">Visible To Roles</Label>
+							<Popover.Root bind:open={visibleToRolesOpen}>
+								<Popover.Trigger>
+									{#snippet child({ props })}
+										<Button
+											{...props}
+											id="visible_to_roles"
+											type="button"
+											variant="outline"
+											class="bg-card h-auto min-h-10 w-full justify-start rounded-full text-muted-foreground"
+											role="combobox"
+											aria-expanded={visibleToRolesOpen}
+										>
+											{#if !$formData.visible_to_roles || $formData.visible_to_roles.length === 0}
+												Select visible to roles
+											{:else}
+												<span class="flex flex-wrap gap-1 text-start">
+													{#each $formData.visible_to_roles as roleName (roleName)}
+														<Badge
+															variant="outline"
+															class="border-primary/20 bg-secondary text-primary rounded-full border font-semibold"
+														>
+															{roleLabel(roleName)}
+														</Badge>
+													{/each}
+												</span>
+											{/if}
+											<ChevronDown class="ml-auto shrink-0 opacity-50" />
+										</Button>
+									{/snippet}
+								</Popover.Trigger>
+								<Popover.Content class="w-(--radix-popover-trigger-width) min-w-50 max-w-100 p-0">
+									<Command.Root>
+										<Command.Input placeholder="Search roles..." />
+										<Command.List>
+											<Command.Empty>No roles found.</Command.Empty>
+											{#each availableRoles as role (role.name)}
+												<Command.Item
+													value={role.label}
+													onSelect={() => toggleRole('visible_to_roles', role.name)}
+												>
+													<Check
+														class={cn(
+															'shrink-0',
+															!($formData.visible_to_roles ?? []).includes(role.name) &&
+																'text-transparent'
+														)}
+													/>
+													<span class="min-w-0 truncate" title={role.label}>{role.label}</span>
+												</Command.Item>
+											{/each}
+										</Command.List>
+									</Command.Root>
+								</Popover.Content>
+							</Popover.Root>
 						</div>
 
 						<div class="flex items-center justify-between">

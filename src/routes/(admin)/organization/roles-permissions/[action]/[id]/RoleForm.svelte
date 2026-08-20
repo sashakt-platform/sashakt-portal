@@ -112,7 +112,7 @@
 						</div>
 
 						<div class="flex flex-col gap-2">
-							<Label for="location_scope">Location Scope</Label>
+							<Label for="location_scope">Location Level</Label>
 							<Select.Root
 								type="single"
 								value={$formData.location_scope ?? 'none'}
@@ -136,7 +136,7 @@
 						</div>
 
 						<div class="flex flex-col gap-2">
-							<Label for="allowed_roles">Allowed Roles</Label>
+							<Label for="allowed_roles">Can Manage These Roles</Label>
 							<Popover.Root bind:open={allowedRolesOpen}>
 								<Popover.Trigger>
 									{#snippet child({ props })}
@@ -150,7 +150,7 @@
 											aria-expanded={allowedRolesOpen}
 										>
 											{#if !$formData.allowed_roles || $formData.allowed_roles.length === 0}
-												Select allowed roles
+												Choose the roles this role controls
 											{:else}
 												<span class="flex flex-wrap gap-1 text-start">
 													{#each $formData.allowed_roles as roleName (roleName)}
@@ -194,7 +194,7 @@
 						</div>
 
 						<div class="flex flex-col gap-2">
-							<Label for="visible_to_roles">Visible To Roles</Label>
+							<Label for="visible_to_roles">Visible To These Admin Roles</Label>
 							<Popover.Root bind:open={visibleToRolesOpen}>
 								<Popover.Trigger>
 									{#snippet child({ props })}
@@ -208,7 +208,7 @@
 											aria-expanded={visibleToRolesOpen}
 										>
 											{#if !$formData.visible_to_roles || $formData.visible_to_roles.length === 0}
-												Select visible to roles
+												Select admin roles that can see and manage this role
 											{:else}
 												<span class="flex flex-wrap gap-1 text-start">
 													{#each $formData.visible_to_roles as roleName (roleName)}

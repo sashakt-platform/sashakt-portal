@@ -54,7 +54,7 @@ describe('load', () => {
 			.mockResolvedValueOnce({ ok: true, json: async () => ({ data: [] }) })
 			.mockResolvedValueOnce({ ok: true, json: async () => ({ data: [] }) });
 
-		await load({} as any);
+		await load();
 
 		expect(requirePermissionMock).toHaveBeenCalledWith(
 			expect.objectContaining({ organization_id: 10 }),
@@ -73,7 +73,7 @@ describe('load', () => {
 				json: async () => ({ data: [{ id: 1, name: 'read_user' }] })
 			});
 
-		const result = await load({} as any);
+		const result = await load();
 
 		expect(result.roles).toEqual([{ id: 1, name: 'system_admin', label: 'System Admin' }]);
 		expect(result.permissions).toEqual([{ id: 1, name: 'read_user', label: 'Read User' }]);
@@ -84,7 +84,7 @@ describe('load', () => {
 			.mockResolvedValueOnce({ ok: false })
 			.mockResolvedValueOnce({ ok: false });
 
-		const result = await load({} as any);
+		const result = await load();
 
 		expect(result.roles).toEqual([]);
 		expect(result.permissions).toEqual([]);
@@ -95,7 +95,7 @@ describe('load', () => {
 			.mockResolvedValueOnce({ ok: true, json: async () => ({ data: [] }) })
 			.mockResolvedValueOnce({ ok: true, json: async () => ({ data: [] }) });
 
-		await load({} as any);
+		await load();
 
 		const [rolesCall, permissionsCall] = (global.fetch as any).mock.calls;
 		expect(rolesCall[0]).toBe('http://fake-backend.com/roles/?limit=200');

@@ -99,8 +99,10 @@
 				</div>
 				<div class="flex items-center gap-3">
 					<Switch id="tag-type-show-to-candidate" bind:checked={showToCandidate} />
-					<Label for="tag-type-show-to-candidate" class="flex cursor-pointer items-center gap-1.5">
-						Make {term('tag', 'lower')} visible to candidates
+					<div class="flex items-center gap-1.5">
+						<Label for="tag-type-show-to-candidate" class="cursor-pointer">
+							Make {term('tag', 'lower')} visible to candidates
+						</Label>
 						<Tooltip.Provider>
 							<Tooltip.Root>
 								<Tooltip.Trigger>
@@ -119,7 +121,7 @@
 								</Tooltip.Content>
 							</Tooltip.Root>
 						</Tooltip.Provider>
-					</Label>
+					</div>
 				</div>
 				<Button type="submit" class="mt-4 w-full" disabled={!name.trim() || submitting}>
 					{buttonText}

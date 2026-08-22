@@ -9,6 +9,7 @@ export interface TagType {
 	id: number | string;
 	name: string;
 	description?: string;
+	show_to_candidate?: boolean;
 	tags: { id: number | string; name: string }[];
 }
 

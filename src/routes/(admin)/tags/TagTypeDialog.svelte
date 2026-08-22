@@ -101,7 +101,7 @@
 					<Switch id="tag-type-show-to-candidate" bind:checked={showToCandidate} />
 					<div class="flex items-center gap-1.5">
 						<Label for="tag-type-show-to-candidate" class="cursor-pointer">
-							Make {term('tag', 'lower')} visible to candidates
+							Make this {term('tag_type', 'lower')} and its {term('tags', 'lower')} visible to candidates
 						</Label>
 						<Tooltip.Provider>
 							<Tooltip.Root>
@@ -113,10 +113,10 @@
 									side="top"
 								>
 									<p>
-										Candidates will be able to see {term('tags', 'lower')} of this {term(
-											'tag_type',
+										Candidates will be able to see this {term('tag_type', 'lower')} and its {term(
+											'tags',
 											'lower'
-										)} during answer review
+										)} during answer review.
 									</p>
 								</Tooltip.Content>
 							</Tooltip.Root>

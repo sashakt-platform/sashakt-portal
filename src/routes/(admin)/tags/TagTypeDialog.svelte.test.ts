@@ -264,7 +264,9 @@ describe('TagTypeDialog', () => {
 		it('renders the label text', async () => {
 			renderDialog({ mode: 'create' });
 			await screen.findByRole('dialog');
-			expect(screen.getByText('Make tag visible to candidates')).toBeInTheDocument();
+			expect(
+				screen.getByText('Make this tag type and its tags visible to candidates')
+			).toBeInTheDocument();
 		});
 
 		it('renders a tooltip trigger next to the label', async () => {

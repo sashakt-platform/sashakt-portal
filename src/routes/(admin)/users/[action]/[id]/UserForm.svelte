@@ -45,6 +45,42 @@
 	let selectedStates = $state<Filter[]>([]);
 	let selectedDistricts = $state<Filter[]>([]);
 
+	let roles = $state<{ id: string; label: string; location_scope: LocationScope }[]>(data.roles);
+	let previousOrganizationId = '';
+
+	async function loadRoles(organizationId: string) {
+		try {
+			const params = new URLSearchParams();
+			if (organizationId) {
+				params.set('organization_id', organizationId);
+			}
+			const response = await fetch(`/api/filters/roles?${params.toString()}`);
+			if (response.ok) {
+				const { data: roleData } = await response.json();
+				roles = (roleData ?? []).map(
+					(role: { id: string; label: string; location_scope: LocationScope }) => ({
+						id: role.id,
+						label: role.label,
+						location_scope: role.location_scope
+					})
+				);
+				if ($formData.role_id && !roles.some((role) => role.id === $formData.role_id)) {
+					$formData.role_id = undefined as unknown as typeof $formData.role_id;
+				}
+			}
+		} catch (error) {
+			console.error('Failed to fetch roles:', error);
+		}
+	}
+
+	$effect(() => {
+		const organizationId = $formData.organization_id ? String($formData.organization_id) : '';
+		if (organizationId !== previousOrganizationId) {
+			previousOrganizationId = organizationId;
+			loadRoles(organizationId);
+		}
+	});
+
 	// check if the current user is a state admin
 	const currentUserIsStateAdmin = isStateAdmin(data.currentUser);
 
@@ -62,7 +98,7 @@
 	}
 
 	const selectedRoleLocationScope: LocationScope = $derived.by(
-		() => data.roles.find((role: any) => role.id === $formData.role_id)?.location_scope ?? null
+		() => roles.find((role) => role.id === $formData.role_id)?.location_scope ?? null
 	);
 
 	const showLocationFields = $derived(selectedRoleLocationScope !== null);
@@ -192,14 +228,13 @@
 						<Select.Root type="single" bind:value={$formData.role_id} name={props.name}>
 							<Select.Trigger {...props} class="h-10 w-full gap-2 rounded-full px-4">
 								{#if $formData.role_id}
-									{data.roles.find((role: any) => role.id === $formData.role_id)?.label ||
-										'Select Role'}
+									{roles.find((role) => role.id === $formData.role_id)?.label || 'Select Role'}
 								{:else}
 									Select Role
 								{/if}
 							</Select.Trigger>
 							<Select.Content>
-								{#each data.roles as role (role.id)}
+								{#each roles as role (role.id)}
 									<Select.Item value={role.id} label={role.label} />
 								{/each}
 							</Select.Content>

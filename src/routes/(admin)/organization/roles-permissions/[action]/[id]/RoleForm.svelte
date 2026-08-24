@@ -43,7 +43,19 @@
 	let allowedRolesOpen = $state(false);
 	let visibleToRolesOpen = $state(false);
 
+	const SYSTEM_ADMIN_ROLE_NAME = 'system_admin';
+
+	if (!($formData.visible_to_roles ?? []).includes(SYSTEM_ADMIN_ROLE_NAME)) {
+		$formData.visible_to_roles = [
+			...($formData.visible_to_roles ?? []),
+			SYSTEM_ADMIN_ROLE_NAME
+		].sort();
+	}
+
 	function toggleRole(field: 'allowed_roles' | 'visible_to_roles', roleName: string) {
+		if (field === 'visible_to_roles' && roleName === SYSTEM_ADMIN_ROLE_NAME) {
+			return;
+		}
 		const current = $formData[field] ?? [];
 		$formData[field] = current.includes(roleName)
 			? current.filter((name: string) => name !== roleName)
@@ -233,6 +245,7 @@
 											{#each availableRoles as role (role.name)}
 												<Command.Item
 													value={role.label}
+													disabled={role.name === SYSTEM_ADMIN_ROLE_NAME}
 													onSelect={() => toggleRole('visible_to_roles', role.name)}
 												>
 													<Check
@@ -243,6 +256,11 @@
 														)}
 													/>
 													<span class="min-w-0 truncate" title={role.label}>{role.label}</span>
+													{#if role.name === SYSTEM_ADMIN_ROLE_NAME}
+														<span class="text-muted-foreground ml-auto shrink-0 text-xs"
+															>Required</span
+														>
+													{/if}
 												</Command.Item>
 											{/each}
 										</Command.List>

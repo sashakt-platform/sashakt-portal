@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ params }: any) => {
 
 	try {
 		if (params.id && params.id !== 'new') {
-			const questionResponse = await fetch(`${BACKEND_URL}/questions/${params.id}/`, {
+			const questionResponse = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	try {
 		if (params.id && params.id !== 'new') {
 			const questionRevisionsResponse = await fetch(
-				`${BACKEND_URL}/questions/${params.id}/revisions/`,
+				`${BACKEND_URL}/questions/${params.id}/revisions`,
 				{
 					method: 'GET',
 					headers: {
@@ -156,7 +156,7 @@ export const actions: Actions = {
 			// Fetch existing question to preserve media on the revision
 			let existingQuestion: any = null;
 			try {
-				const existingRes = await fetch(`${BACKEND_URL}/questions/${params.id}/`, {
+				const existingRes = await fetch(`${BACKEND_URL}/questions/${params.id}`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',

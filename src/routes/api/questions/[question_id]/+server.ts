@@ -6,7 +6,7 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ params }) => {
 	const token = getSessionTokenCookie();
 	try {
-		const res = await fetch(`${BACKEND_URL}/questions/${params.question_id}/`, {
+		const res = await fetch(`${BACKEND_URL}/questions/${params.question_id}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

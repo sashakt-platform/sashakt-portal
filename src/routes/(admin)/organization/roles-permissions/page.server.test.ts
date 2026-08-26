@@ -76,7 +76,7 @@ describe('load', () => {
 		const result = await load();
 
 		expect(result.roles).toEqual([{ id: 1, name: 'system_admin', label: 'System Admin' }]);
-		expect(result.permissions).toEqual([{ id: 1, name: 'read_user', label: 'Read User' }]);
+		expect(result.permissions).toEqual([{ id: 1, name: 'read_user', label: 'View User' }]);
 	});
 
 	it('returns empty lists when the roles and permissions requests fail', async () => {

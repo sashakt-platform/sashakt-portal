@@ -5,9 +5,14 @@ import { requirePermission, PERMISSIONS } from '$lib/utils/permissions.js';
 import { redirect, setFlash } from 'sveltekit-flash-message/server';
 import type { PageServerLoad, Actions } from './$types';
 
+const ACTION_LABEL_OVERRIDES: Record<string, string> = {
+	read: 'view'
+};
+
 function titleCase(value: string): string {
 	return value
 		.split('_')
+		.map((word) => ACTION_LABEL_OVERRIDES[word] ?? word)
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ');
 }

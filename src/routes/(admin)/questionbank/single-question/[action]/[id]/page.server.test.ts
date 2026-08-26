@@ -147,7 +147,7 @@ describe('Single Question Route', () => {
 				const result = await load({ params: { action: 'edit', id: '42' } } as any);
 
 				expect(mockFetch).toHaveBeenCalledWith(
-					'http://fake-backend.com/questions/42/',
+					'http://fake-backend.com/questions/42',
 					expect.objectContaining({ method: 'GET', headers: expect.objectContaining({ Authorization: 'Bearer fake-token' }) })
 				);
 				expect(result.questionData).toEqual({ id: '42', question_text: 'Q1' });
@@ -240,7 +240,7 @@ describe('Single Question Route', () => {
 				const result = await load({ params: { action: 'edit', id: '5' } } as any);
 
 				expect(mockFetch).toHaveBeenCalledWith(
-					'http://fake-backend.com/questions/5/revisions/',
+					'http://fake-backend.com/questions/5/revisions',
 					expect.objectContaining({ method: 'GET' })
 				);
 				expect(result.questionRevisions).toEqual(mockRevisions);
@@ -493,7 +493,7 @@ describe('Single Question Route', () => {
 			} catch {}
 
 			const firstCall = mockFetch.mock.calls[0];
-			expect(firstCall[0]).toBe('http://fake-backend.com/questions/10/');
+			expect(firstCall[0]).toBe('http://fake-backend.com/questions/10');
 			expect(firstCall[1].method).toBe('GET');
 		});
 

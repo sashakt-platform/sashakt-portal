@@ -44,7 +44,7 @@ describe('GET /api/questions/[question_id]', () => {
 		expect(response.status).toBe(200);
 		expect(body).toEqual(questionData);
 		expect(fetch).toHaveBeenCalledWith(
-			`${BACKEND_URL}/questions/42/`,
+			`${BACKEND_URL}/questions/42`,
 			expect.objectContaining({
 				method: 'GET',
 				headers: expect.objectContaining({

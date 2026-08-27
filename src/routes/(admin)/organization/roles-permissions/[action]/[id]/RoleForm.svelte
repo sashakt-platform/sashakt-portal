@@ -3,12 +3,14 @@
 	import Shield from '@lucide/svelte/icons/shield';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import Check from '@lucide/svelte/icons/check';
+	import Info from '@lucide/svelte/icons/info';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import Textarea from '$lib/components/ui/textarea/textarea.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import * as Command from '$lib/components/ui/command/index.js';
+	import * as Tooltip from '$lib/components/ui/tooltip/index.js';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Switch } from '$lib/components/ui/switch/index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
@@ -67,6 +69,26 @@
 	}
 </script>
 
+{#snippet labelWithTooltip(forId: string, text: string, tooltip: string)}
+	<div class="flex items-center gap-1.5">
+		<Label for={forId}>{text}</Label>
+		<Tooltip.Provider>
+			<Tooltip.Root>
+				<Tooltip.Trigger type="button" aria-label={`About ${text}`}>
+					<Info class="text-muted-foreground h-3.5 w-3.5" />
+				</Tooltip.Trigger>
+				<Tooltip.Content
+					class="border-border bg-popover text-popover-foreground max-w-xs rounded-md border p-3 text-xs shadow-lg/20"
+					side="top"
+					sideOffset={8}
+				>
+					<p>{tooltip}</p>
+				</Tooltip.Content>
+			</Tooltip.Root>
+		</Tooltip.Provider>
+	</div>
+{/snippet}
+
 <form method="POST" action="?/save" use:enhance>
 	<div>
 		<div class="bg-card">
@@ -124,7 +146,11 @@
 						</div>
 
 						<div class="flex flex-col gap-2">
-							<Label for="location_scope">Location Level</Label>
+							{@render labelWithTooltip(
+								'location_scope',
+								'Location Scope',
+								'Defines the geographic level at which users with this role operate.'
+							)}
 							<Select.Root
 								type="single"
 								value={$formData.location_scope ?? 'none'}
@@ -148,7 +174,11 @@
 						</div>
 
 						<div class="flex flex-col gap-2">
-							<Label for="allowed_roles">Can Manage These Roles</Label>
+							{@render labelWithTooltip(
+								'allowed_roles',
+								'Roles This Role Can Create',
+								'Defines which user roles can be created by users with this role.'
+							)}
 							<Popover.Root bind:open={allowedRolesOpen}>
 								<Popover.Trigger>
 									{#snippet child({ props })}
@@ -206,7 +236,11 @@
 						</div>
 
 						<div class="flex flex-col gap-2">
-							<Label for="visible_to_roles">Visible To These Admin Roles</Label>
+							{@render labelWithTooltip(
+								'visible_to_roles',
+								'Roles That Can Create This Role',
+								'Defines which admin roles are allowed to create users with this role.'
+							)}
 							<Popover.Root bind:open={visibleToRolesOpen}>
 								<Popover.Trigger>
 									{#snippet child({ props })}

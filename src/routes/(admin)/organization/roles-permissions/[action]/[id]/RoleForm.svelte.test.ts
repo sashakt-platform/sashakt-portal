@@ -164,7 +164,7 @@ describe('RoleForm', () => {
 
 		it('shows placeholder text when no roles are selected', () => {
 			render(RoleForm, { data: createData({ availableRoles, formData: { allowed_roles: [] } }) });
-			expect(screen.getByText('Choose the roles this role controls')).toBeInTheDocument();
+			expect(screen.getByText('Select valid roles')).toBeInTheDocument();
 		});
 
 		it('shows a badge with the resolved label for a selected role', () => {
@@ -172,7 +172,7 @@ describe('RoleForm', () => {
 				data: createData({ availableRoles, formData: { allowed_roles: ['state_admin'] } })
 			});
 			expect(screen.getByText('State Admin')).toBeInTheDocument();
-			expect(screen.queryByText('Choose the roles this role controls')).not.toBeInTheDocument();
+			expect(screen.queryByText('Select valid roles')).not.toBeInTheDocument();
 		});
 
 		it('falls back to the raw role name when it is not in availableRoles', () => {
@@ -194,7 +194,7 @@ describe('RoleForm', () => {
 			await fireEvent.click(option);
 
 			expect(within(trigger).getByText('State Admin')).toBeInTheDocument();
-			expect(screen.queryByText('Choose the roles this role controls')).not.toBeInTheDocument();
+			expect(screen.queryByText('Select valid roles')).not.toBeInTheDocument();
 		});
 	});
 

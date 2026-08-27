@@ -192,7 +192,7 @@
 											aria-expanded={allowedRolesOpen}
 										>
 											{#if !$formData.allowed_roles || $formData.allowed_roles.length === 0}
-												Choose the roles this role controls
+												Select valid roles
 											{:else}
 												<span class="flex flex-wrap gap-1 text-start">
 													{#each $formData.allowed_roles as roleName (roleName)}

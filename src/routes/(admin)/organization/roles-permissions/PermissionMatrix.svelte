@@ -21,10 +21,14 @@
 
 	const {
 		roles,
-		permissions
+		permissions,
+		canUpdate = false,
+		canDelete = false
 	}: {
 		roles: Role[];
 		permissions: { id: number; name: string; label: string }[];
+		canUpdate?: boolean;
+		canDelete?: boolean;
 	} = $props();
 
 	let pendingKey = $state<string | null>(null);
@@ -37,6 +41,8 @@
 	}
 
 	async function togglePermission(role: Role, permissionId: number, checked: boolean) {
+		if (!canUpdate) return;
+
 		const key = `${role.id}-${permissionId}`;
 		const previousPermissions = role.permissions;
 		const updatedPermissions = checked
@@ -90,14 +96,16 @@
 					<th class="min-w-30 p-4 text-center text-sm font-semibold">
 						<div class="group flex items-center justify-center gap-1.5">
 							<span>{role.label}</span>
-							<a
-								href={resolve(`/organization/roles-permissions/edit/${role.id}`)}
-								class="text-muted-foreground hover:text-primary opacity-0 transition-opacity group-hover:opacity-100"
-								aria-label={`Edit ${role.label}`}
-							>
-								<Pencil class="h-4 w-4" />
-							</a>
-							{#if !role.is_restricted}
+							{#if canUpdate}
+								<a
+									href={resolve(`/organization/roles-permissions/edit/${role.id}`)}
+									class="text-muted-foreground hover:text-primary opacity-0 transition-opacity group-hover:opacity-100"
+									aria-label={`Edit ${role.label}`}
+								>
+									<Pencil class="h-4 w-4" />
+								</a>
+							{/if}
+							{#if canDelete && !role.is_restricted}
 								<button
 									type="button"
 									class="text-muted-foreground hover:text-destructive opacity-0 transition-opacity group-hover:opacity-100"
@@ -121,7 +129,7 @@
 							<div class="flex justify-center">
 								<Checkbox
 									checked={role.permissions.includes(permission.id)}
-									disabled={pendingKey === `${role.id}-${permission.id}`}
+									disabled={!canUpdate || pendingKey === `${role.id}-${permission.id}`}
 									onCheckedChange={(checked) => togglePermission(role, permission.id, checked)}
 								/>
 							</div>

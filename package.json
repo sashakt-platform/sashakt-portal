@@ -61,7 +61,7 @@
 	"dependencies": {
 		"@fontsource/open-sans": "^5.3.0",
 		"@sentry/sveltekit": "10.73.0",
-		"@tanstack/table-core": "^9.2.4",
+		"@tanstack/table-core": "^8.21.3",
 		"@tiptap/core": "^3.31.0",
 		"@tiptap/extension-color": "^3.31.0",
 		"@tiptap/extension-highlight": "^3.31.0",

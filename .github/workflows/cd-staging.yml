@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@master
         env:
           BACKEND_URL: ${{ vars.BACKEND_URL }}
           TEST_TAKER_URL: ${{ vars.TEST_TAKER_URL }}

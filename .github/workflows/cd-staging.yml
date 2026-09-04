@@ -68,7 +68,7 @@ jobs:
             } > .env
 
             corepack enable
-            sudo corepack prepare pnpm@latest --activate
+            sudo corepack prepare pnpm@11.25.0 --activate
             
             # --- build -------------------------------------------------------
             pnpm install --frozen-lockfile

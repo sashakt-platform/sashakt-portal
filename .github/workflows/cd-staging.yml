@@ -67,6 +67,9 @@ jobs:
               echo "PUBLIC_APP_ENV=staging"
             } > .env
 
+            corepack enable
+            corepack prepare --activate
+            
             # --- build -------------------------------------------------------
             pnpm install --frozen-lockfile
             pnpm run build

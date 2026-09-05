@@ -344,3 +344,54 @@ describe('AppSidebar - Platform Guide PDF', () => {
 		expect(screen.queryByText('Platform Guide PDF')).not.toBeInTheDocument();
 	});
 });
+
+describe('AppSidebar - My Organisation menu', () => {
+	beforeEach(async () => {
+		vi.clearAllMocks();
+		const permissions = await import('$lib/utils/permissions.js');
+		vi.mocked(permissions.isSuperAdmin).mockReturnValue(false);
+	});
+
+	it('should not show My Organisation menu when user lacks UPDATE_MY_ORGANIZATION permission', async () => {
+		const permissions = await import('$lib/utils/permissions.js');
+		vi.mocked(permissions.hasPermission).mockReturnValue(false);
+
+		render(AppSidebar, { data: baseData });
+
+		expect(screen.queryByText('My Organisation')).not.toBeInTheDocument();
+	});
+
+	it('should show My Organisation menu with all children when user has UPDATE_MY_ORGANIZATION permission', async () => {
+		const permissions = await import('$lib/utils/permissions.js');
+		vi.mocked(permissions.hasPermission).mockReturnValue(true);
+
+		render(AppSidebar, { data: baseData });
+
+		expect(screen.getByText('My Organisation')).toBeInTheDocument();
+		expect(screen.getByText('Organisation Details')).toBeInTheDocument();
+		expect(screen.getByText('Organisation Settings')).toBeInTheDocument();
+		expect(screen.getByText('Integrations')).toBeInTheDocument();
+		expect(screen.getByText('Roles and Permission')).toBeInTheDocument();
+	});
+
+	it('should link Roles and Permission to /organization/roles-permissions', async () => {
+		const permissions = await import('$lib/utils/permissions.js');
+		vi.mocked(permissions.hasPermission).mockReturnValue(true);
+
+		render(AppSidebar, { data: baseData });
+
+		const link = screen.getByText('Roles and Permission').closest('a');
+		expect(link).toHaveAttribute('href', '/organization/roles-permissions');
+	});
+
+	it('should not show My Organisation menu for superAdmin even when hasPermission is true', async () => {
+		const permissions = await import('$lib/utils/permissions.js');
+		vi.mocked(permissions.hasPermission).mockReturnValue(true);
+		vi.mocked(permissions.isSuperAdmin).mockReturnValue(true);
+
+		render(AppSidebar, { data: baseData });
+
+		expect(screen.queryByText('My Organisation')).not.toBeInTheDocument();
+		expect(screen.queryByText('Roles and Permission')).not.toBeInTheDocument();
+	});
+});

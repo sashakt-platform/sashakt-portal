@@ -8,9 +8,7 @@ if (!BACKEND_URL) {
 	throw new Error('BACKEND_URL is required for e2e tests — set it in .env');
 }
 if (!E2E_USERNAME || !E2E_PASSWORD) {
-	throw new Error(
-		'E2E_USERNAME and E2E_PASSWORD are required for e2e tests — set them in .env'
-	);
+	throw new Error('E2E_USERNAME and E2E_PASSWORD are required for e2e tests — set them in .env');
 }
 
 // Must stay in sync with src/lib/server/auth.ts
@@ -32,6 +30,7 @@ let cachedTokens: TokenResponse | null = null;
 
 export function resetTokenCache() {
 	cachedTokens = null;
+	cachedRoles = null;
 }
 
 export async function getAccessToken(
@@ -102,7 +101,51 @@ export type ApiUser = {
 	is_active: boolean;
 };
 
+export type ApiRole = {
+	id: number;
+	name: string;
+	label: string;
+	location_scope: string | null;
+	organization_id: number;
+};
+
 export const E2E_EMAIL_PREFIX = 'e2e-mutation-';
+
+let cachedRoles: ApiRole[] | null = null;
+
+async function apiGetRoles(request: APIRequestContext): Promise<ApiRole[]> {
+	if (cachedRoles) return cachedRoles;
+	const response = await request.get(`${BACKEND_URL}/roles/?limit=200`, {
+		headers: await authHeader(request)
+	});
+	if (!response.ok()) {
+		throw new Error(`apiGetRoles failed (${response.status()}): ${await response.text()}`);
+	}
+	const { data = [] } = (await response.json()) as { data?: ApiRole[] };
+	cachedRoles = data;
+	return cachedRoles;
+}
+
+export async function apiGetRoleId(
+	request: APIRequestContext,
+	roleName = 'system_admin',
+	organizationId?: number
+): Promise<number> {
+	const roles = await apiGetRoles(request);
+	const matchedRole = roles.find(
+		(role) =>
+			role.name === roleName &&
+			(organizationId === undefined || role.organization_id === organizationId)
+	);
+	if (!matchedRole) {
+		const availableRoles =
+			roles.map((role) => `${role.name}(org ${role.organization_id})`).join(', ') || '(none)';
+		throw new Error(
+			`Role "${roleName}" not found for organization ${organizationId ?? 'any'} — available: ${availableRoles}`
+		);
+	}
+	return matchedRole.id;
+}
 
 /** Returns a unique-enough suffix for emails/names so parallel CI runs don't collide. */
 export function uniqueSuffix(): string {
@@ -127,13 +170,14 @@ export async function apiCreateUser(
 ): Promise<ApiUser> {
 	const suffix = uniqueSuffix();
 	const me = await apiGetMe(request);
+	const organizationId = overrides.organization_id ?? me.organization_id;
 	const body = {
 		full_name: overrides.full_name ?? `E2E User ${suffix}`,
 		email: overrides.email ?? `${E2E_EMAIL_PREFIX}${suffix}@example.com`,
 		password: overrides.password ?? 'ChangeMe123!',
 		phone: overrides.phone ?? '',
-		role_id: overrides.role_id ?? 2, // System Admin — avoids state/district requirements
-		organization_id: overrides.organization_id ?? me.organization_id,
+		role_id: overrides.role_id ?? (await apiGetRoleId(request, 'system_admin', organizationId)),
+		organization_id: organizationId,
 		state_ids: [],
 		district_ids: [],
 		is_active: true

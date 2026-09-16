@@ -30,7 +30,7 @@ let cachedTokens: TokenResponse | null = null;
 
 export function resetTokenCache() {
 	cachedTokens = null;
-	cachedRoles = null;
+	cachedSystemAdminRoleIds.clear();
 }
 
 export async function getAccessToken(
@@ -101,50 +101,42 @@ export type ApiUser = {
 	is_active: boolean;
 };
 
-export type ApiRole = {
-	id: number;
-	name: string;
-	label: string;
-	location_scope: string | null;
-	organization_id: number;
-};
-
 export const E2E_EMAIL_PREFIX = 'e2e-mutation-';
 
-let cachedRoles: ApiRole[] | null = null;
+const cachedSystemAdminRoleIds = new Map<number, number>();
 
-async function apiGetRoles(request: APIRequestContext): Promise<ApiRole[]> {
-	if (cachedRoles) return cachedRoles;
+/**
+ * Role ids are generated per organization, so look system_admin up by name.
+ */
+async function apiGetSystemAdminRoleId(
+	request: APIRequestContext,
+	organizationId: number
+): Promise<number> {
+	const cached = cachedSystemAdminRoleIds.get(organizationId);
+	if (cached !== undefined) return cached;
+
 	const response = await request.get(`${BACKEND_URL}/roles/?limit=200`, {
 		headers: await authHeader(request)
 	});
 	if (!response.ok()) {
-		throw new Error(`apiGetRoles failed (${response.status()}): ${await response.text()}`);
-	}
-	const { data = [] } = (await response.json()) as { data?: ApiRole[] };
-	cachedRoles = data;
-	return cachedRoles;
-}
-
-export async function apiGetRoleId(
-	request: APIRequestContext,
-	roleName = 'system_admin',
-	organizationId?: number
-): Promise<number> {
-	const roles = await apiGetRoles(request);
-	const matchedRole = roles.find(
-		(role) =>
-			role.name === roleName &&
-			(organizationId === undefined || role.organization_id === organizationId)
-	);
-	if (!matchedRole) {
-		const availableRoles =
-			roles.map((role) => `${role.name}(org ${role.organization_id})`).join(', ') || '(none)';
 		throw new Error(
-			`Role "${roleName}" not found for organization ${organizationId ?? 'any'} — available: ${availableRoles}`
+			`apiGetSystemAdminRoleId failed (${response.status()}): ${await response.text()}`
 		);
 	}
-	return matchedRole.id;
+	const { data = [] } = (await response.json()) as {
+		data?: { id: number; name: string; organization_id: number }[];
+	};
+	const role = data.find(
+		(role) => role.name === 'system_admin' && role.organization_id === organizationId
+	);
+	if (!role) {
+		const available = data.map((r) => `${r.name}(org ${r.organization_id})`).join(', ') || '(none)';
+		throw new Error(
+			`system_admin role not found for organization ${organizationId} — available: ${available}`
+		);
+	}
+	cachedSystemAdminRoleIds.set(organizationId, role.id);
+	return role.id;
 }
 
 /** Returns a unique-enough suffix for emails/names so parallel CI runs don't collide. */
@@ -176,7 +168,7 @@ export async function apiCreateUser(
 		email: overrides.email ?? `${E2E_EMAIL_PREFIX}${suffix}@example.com`,
 		password: overrides.password ?? 'ChangeMe123!',
 		phone: overrides.phone ?? '',
-		role_id: overrides.role_id ?? (await apiGetRoleId(request, 'system_admin', organizationId)),
+		role_id: overrides.role_id ?? (await apiGetSystemAdminRoleId(request, organizationId)),
 		organization_id: organizationId,
 		state_ids: [],
 		district_ids: [],

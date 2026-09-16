@@ -8,9 +8,7 @@ if (!BACKEND_URL) {
 	throw new Error('BACKEND_URL is required for e2e tests — set it in .env');
 }
 if (!E2E_USERNAME || !E2E_PASSWORD) {
-	throw new Error(
-		'E2E_USERNAME and E2E_PASSWORD are required for e2e tests — set them in .env'
-	);
+	throw new Error('E2E_USERNAME and E2E_PASSWORD are required for e2e tests — set them in .env');
 }
 
 // Must stay in sync with src/lib/server/auth.ts
@@ -32,6 +30,7 @@ let cachedTokens: TokenResponse | null = null;
 
 export function resetTokenCache() {
 	cachedTokens = null;
+	cachedSystemAdminRoleIds.clear();
 }
 
 export async function getAccessToken(
@@ -104,6 +103,42 @@ export type ApiUser = {
 
 export const E2E_EMAIL_PREFIX = 'e2e-mutation-';
 
+const cachedSystemAdminRoleIds = new Map<number, number>();
+
+/**
+ * Role ids are generated per organization, so look system_admin up by name.
+ */
+async function apiGetSystemAdminRoleId(
+	request: APIRequestContext,
+	organizationId: number
+): Promise<number> {
+	const cached = cachedSystemAdminRoleIds.get(organizationId);
+	if (cached !== undefined) return cached;
+
+	const response = await request.get(`${BACKEND_URL}/roles/?limit=200`, {
+		headers: await authHeader(request)
+	});
+	if (!response.ok()) {
+		throw new Error(
+			`apiGetSystemAdminRoleId failed (${response.status()}): ${await response.text()}`
+		);
+	}
+	const { data = [] } = (await response.json()) as {
+		data?: { id: number; name: string; organization_id: number }[];
+	};
+	const role = data.find(
+		(role) => role.name === 'system_admin' && role.organization_id === organizationId
+	);
+	if (!role) {
+		const available = data.map((r) => `${r.name}(org ${r.organization_id})`).join(', ') || '(none)';
+		throw new Error(
+			`system_admin role not found for organization ${organizationId} — available: ${available}`
+		);
+	}
+	cachedSystemAdminRoleIds.set(organizationId, role.id);
+	return role.id;
+}
+
 /** Returns a unique-enough suffix for emails/names so parallel CI runs don't collide. */
 export function uniqueSuffix(): string {
 	return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -127,13 +162,14 @@ export async function apiCreateUser(
 ): Promise<ApiUser> {
 	const suffix = uniqueSuffix();
 	const me = await apiGetMe(request);
+	const organizationId = overrides.organization_id ?? me.organization_id;
 	const body = {
 		full_name: overrides.full_name ?? `E2E User ${suffix}`,
 		email: overrides.email ?? `${E2E_EMAIL_PREFIX}${suffix}@example.com`,
 		password: overrides.password ?? 'ChangeMe123!',
 		phone: overrides.phone ?? '',
-		role_id: overrides.role_id ?? 2, // System Admin — avoids state/district requirements
-		organization_id: overrides.organization_id ?? me.organization_id,
+		role_id: overrides.role_id ?? (await apiGetSystemAdminRoleId(request, organizationId)),
+		organization_id: organizationId,
 		state_ids: [],
 		district_ids: [],
 		is_active: true

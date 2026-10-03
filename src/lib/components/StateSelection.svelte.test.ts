@@ -117,14 +117,6 @@ describe('StateSelection', () => {
 		});
 
 		it('should handle missing page data gracefully', () => {
-			// Mock missing states data
-			vi.mock('$app/state', () => ({
-				page: {
-					data: {},
-					url: new URL('http://localhost')
-				}
-			}));
-
 			const { container } = render(StateSelection, {
 				props: {
 					states: []

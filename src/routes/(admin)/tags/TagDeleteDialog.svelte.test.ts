@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen, fireEvent, within } from '@testing-library/svelte';
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/svelte';
 import TagDeleteDialog from './TagDeleteDialog.svelte';
 
 vi.mock('$app/forms', () => ({
@@ -195,7 +195,7 @@ describe('TagDeleteDialog', () => {
 			const xButton = buttons.find((b) => !b.textContent?.trim())!;
 			await fireEvent.click(xButton);
 			await rerender({ open: false, elementName: 'Easy', elementId: 10, elementType: 'tag' });
-			expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+			await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 		});
 
 		it('closes dialog when Cancel button is clicked', async () => {
@@ -203,7 +203,7 @@ describe('TagDeleteDialog', () => {
 			await screen.findByRole('alertdialog');
 			await fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 			await rerender({ open: false, elementName: 'Easy', elementId: 10, elementType: 'tag' });
-			expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+			await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 		});
 	});
 

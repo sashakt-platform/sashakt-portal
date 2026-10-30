@@ -12,7 +12,7 @@
 		selectedItems = [],
 		onBatchConfirm,
 		onBatchCancel
-	} = $props<{
+	}: {
 		action: string | null;
 		elementName?: string;
 		batchMode?: boolean;
@@ -20,7 +20,7 @@
 		selectedItems?: any[];
 		onBatchConfirm?: () => void;
 		onBatchCancel?: () => void;
-	}>();
+	} = $props();
 
 	let open = $state(false);
 

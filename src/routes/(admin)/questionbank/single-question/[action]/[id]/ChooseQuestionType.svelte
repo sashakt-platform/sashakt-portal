@@ -8,10 +8,13 @@
 	import CircleDot from '@lucide/svelte/icons/circle-dot';
 	import { QuestionTypeEnum, QUESTION_TYPE_LABELS } from '$lib/types/question';
 
-	let { open = $bindable(false), onSelect } = $props<{
+	let {
+		open = $bindable(false),
+		onSelect
+	}: {
 		open: boolean;
 		onSelect: (type: QuestionTypeEnum) => void;
-	}>();
+	} = $props();
 
 	const commonTypes = [
 		{ icon: ListChecks, type: QuestionTypeEnum.SingleChoice },

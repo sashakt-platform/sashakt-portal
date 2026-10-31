@@ -5,6 +5,3 @@ allowBuilds:
 onlyBuiltDependencies:
   - '@sentry/cli'
   - esbuild
-
-overrides:
-  '@sentry/sveltekit@>=10.64.0 <11.0.0-0': 10.65.0

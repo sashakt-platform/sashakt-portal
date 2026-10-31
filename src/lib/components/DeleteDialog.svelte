@@ -4,6 +4,14 @@
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import X from '@lucide/svelte/icons/x';
 
+	type DeleteItem = {
+		id?: number | string;
+		question_text?: string | null;
+		full_name?: string | null;
+		name?: string | null;
+		candidate_uuid?: string | null;
+	};
+
 	let {
 		action = $bindable(),
 		elementName = 'Element',
@@ -12,21 +20,17 @@
 		selectedItems = [],
 		onBatchConfirm,
 		onBatchCancel
-	} = $props<{
+	}: {
 		action: string | null;
 		elementName?: string;
 		batchMode?: boolean;
 		selectedCount?: number;
-		selectedItems?: any[];
+		selectedItems?: DeleteItem[];
 		onBatchConfirm?: () => void;
 		onBatchCancel?: () => void;
-	}>();
+	} = $props();
 
-	let open = $state(false);
-
-	$effect(() => {
-		open = (action ? true : false) || (batchMode && selectedCount > 0);
-	});
+	let open = $derived((action ? true : false) || (batchMode && selectedCount > 0));
 
 	function handleClose() {
 		if (batchMode) {
@@ -74,7 +78,7 @@
 						<div class="mt-3">
 							<p class="text-sm font-medium">Items to be deleted:</p>
 							<ul class="text-muted-foreground mt-1 list-inside list-disc text-sm">
-								{#each selectedItems.slice(0, 5) as item}
+								{#each selectedItems.slice(0, 5) as item (item.id ?? item.candidate_uuid)}
 									<li>
 										{item.question_text ||
 											item.full_name ||

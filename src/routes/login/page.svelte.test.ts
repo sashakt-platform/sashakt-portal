@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/svelte';
 import LoginPage from './+page.svelte';
 
 vi.mock('$app/state', () => ({
+	navigating: { to: null },
 	page: {
 		data: { flash: null },
 		url: new URL('http://localhost/login')

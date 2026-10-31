@@ -407,7 +407,9 @@ describe('QuestionList', () => {
 			await fireEvent.click(screen.getByText('Auto Selection'));
 			await fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-			expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument();
+			await waitFor(() =>
+				expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument()
+			);
 			expect(screen.getByText(/2 questions added/)).toBeInTheDocument();
 			expect(get(formData).question_revision_ids).toEqual([101, 102]);
 		});
@@ -426,7 +428,9 @@ describe('QuestionList', () => {
 			await fireEvent.click(screen.getByText('Auto Selection'));
 			await fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
 
-			expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument();
+			await waitFor(() =>
+				expect(screen.queryByText('Switch selection mode?')).not.toBeInTheDocument()
+			);
 			expect(get(formData).question_revision_ids).toEqual([]);
 			expect(get(formData).question_revisions).toEqual([]);
 			expect(

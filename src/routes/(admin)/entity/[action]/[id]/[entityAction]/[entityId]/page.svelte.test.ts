@@ -13,6 +13,7 @@ vi.mock('$app/navigation', () => ({
 }));
 
 vi.mock('$app/state', () => ({
+	navigating: { to: null },
 	page: {
 		url: new URL('http://localhost/entity/view/1/add/new'),
 		data: {}

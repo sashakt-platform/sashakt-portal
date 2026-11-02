@@ -144,7 +144,7 @@ describe('OrganizationSelection', () => {
 			const option = await screen.findByText('Org 1');
 			await fireEvent.click(option);
 
-			expect(screen.getByRole('combobox')).toHaveTextContent('Org 1');
+			await waitFor(() => expect(screen.getByRole('combobox')).toHaveTextContent('Org 1'));
 		});
 
 		it('keeps Org 2 available in the dropdown after Org 1 has been selected', async () => {
@@ -163,7 +163,7 @@ describe('OrganizationSelection', () => {
 			const org1Option = await screen.findByText('Org 1');
 			await fireEvent.click(org1Option);
 
-			expect(screen.getByRole('combobox')).toHaveTextContent('Org 1');
+			await waitFor(() => expect(screen.getByRole('combobox')).toHaveTextContent('Org 1'));
 
 			await fireEvent.click(screen.getByRole('combobox'));
 			expect(await screen.findByText('Org 2')).toBeInTheDocument();

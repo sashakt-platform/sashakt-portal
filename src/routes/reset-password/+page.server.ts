@@ -21,7 +21,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const res = await fetch(`${BACKEND_URL}/reset-password/`, {
+		const res = await fetch(`${BACKEND_URL}/reset-password`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

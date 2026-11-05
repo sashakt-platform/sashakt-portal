@@ -19,7 +19,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	});
 
 	try {
-		const response = await fetch(`${BACKEND_URL}/entity/?${params.toString()}`, {
+		const response = await fetch(`${BACKEND_URL}/entity?${params.toString()}`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`

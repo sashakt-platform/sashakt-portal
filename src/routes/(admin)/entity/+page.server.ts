@@ -29,7 +29,7 @@ export const load = async ({ url }) => {
 		...(isActive && { is_active: isActive })
 	});
 
-	const res = await fetch(`${BACKEND_URL}/entitytype/?${queryParams}`, {
+	const res = await fetch(`${BACKEND_URL}/entitytype?${queryParams}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -60,7 +60,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/entitytype/`, {
+			const response = await fetch(`${BACKEND_URL}/entitytype`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

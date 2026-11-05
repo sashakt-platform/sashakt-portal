@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		...(sortBy && { sort_order: sortOrder })
 	});
 
-	const res = await fetch(`${BACKEND_URL}/users/?${queryParams}`, {
+	const res = await fetch(`${BACKEND_URL}/users?${queryParams}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -64,7 +64,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/users/`, {
+			const response = await fetch(`${BACKEND_URL}/users`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		...(isActive && { is_active: isActive })
 	});
 
-	const res = await fetch(`${BACKEND_URL}/certificate/?${queryParams}`, {
+	const res = await fetch(`${BACKEND_URL}/certificate?${queryParams}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -68,7 +68,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/certificate/`, {
+			const response = await fetch(`${BACKEND_URL}/certificate`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

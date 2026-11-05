@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ params }: any) => {
 	}
 	let tagTypes = [];
 	try {
-		const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype/?page=1&size=100`, {
+		const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype?page=1&size=100`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ export const actions: Actions = {
 		delete transformedFormData.tag_type_ids;
 
 		if (params.id === 'new') {
-			const response = await fetch(`${BACKEND_URL}/questions/`, {
+			const response = await fetch(`${BACKEND_URL}/questions`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

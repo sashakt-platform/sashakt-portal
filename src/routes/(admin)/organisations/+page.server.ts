@@ -25,7 +25,7 @@ export const load = async ({ url }) => {
 		...(isActive && { is_active: isActive })
 	});
 
-	const res = await fetch(`${BACKEND_URL}/organization/?${queryParams}`, {
+	const res = await fetch(`${BACKEND_URL}/organization?${queryParams}`, {
 		headers: { Authorization: `Bearer ${token}` }
 	});
 

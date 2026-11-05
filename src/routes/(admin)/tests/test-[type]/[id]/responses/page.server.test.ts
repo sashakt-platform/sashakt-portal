@@ -298,7 +298,7 @@ describe('Candidate Responses Route', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://fake-backend.com/candidate/',
+				'http://fake-backend.com/candidate',
 				expect.objectContaining({
 					method: 'DELETE',
 					headers: expect.objectContaining({ Authorization: 'Bearer fake-token' }),

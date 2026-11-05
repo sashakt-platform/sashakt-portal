@@ -143,7 +143,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		for (const id of tDistrictIds) tParams.append('district_ids', id);
 
 		try {
-			const templatesRes = await fetch(`${BACKEND_URL}/test/?${tParams}`, {
+			const templatesRes = await fetch(`${BACKEND_URL}/test?${tParams}`, {
 				headers: { Authorization: `Bearer ${token}` }
 			});
 			if (templatesRes.ok) templates = await templatesRes.json();
@@ -179,7 +179,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const stateIds = questionStates ? questionStates.split(',').filter(Boolean) : [];
 	for (const id of stateIds) questionParams.append('state_ids', id);
 
-	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?${questionParams.toString()}`, {
+	const responseQuestions = await fetch(`${BACKEND_URL}/questions?${questionParams.toString()}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -364,7 +364,7 @@ export const actions: Actions = {
 		}
 
 		const response = await fetch(
-			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : '/'}`,
+			`${BACKEND_URL}/test${params.id !== 'new' && params.id !== 'convert' ? `/${params.id}` : ''}`,
 			{
 				method: `${params.id !== 'new' && params.id !== 'convert' ? 'PUT' : 'POST'}`,
 				headers: {

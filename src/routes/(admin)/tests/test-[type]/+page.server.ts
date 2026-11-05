@@ -68,7 +68,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 		.join('&');
 
 	const token = getSessionTokenCookie();
-	const res = await fetch(`${BACKEND_URL}/test/?${queryString}`, {
+	const res = await fetch(`${BACKEND_URL}/test?${queryString}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -97,7 +97,7 @@ export const load: PageServerLoad = async ({ params, url, cookies }) => {
 
 	// fetch questions (might be needed for test creation)
 	let questions = [];
-	const responseQuestions = await fetch(`${BACKEND_URL}/questions/?skip=0&limit=100`, {
+	const responseQuestions = await fetch(`${BACKEND_URL}/questions?skip=0&limit=100`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -129,7 +129,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/test/`, {
+			const response = await fetch(`${BACKEND_URL}/test`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

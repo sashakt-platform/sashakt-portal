@@ -183,7 +183,7 @@ describe('Single Question Route', () => {
 				await load({ params: { action: 'add', id: 'new' } } as any);
 
 				const urls: string[] = mockFetch.mock.calls.map((c) => c[0]);
-				expect(urls.some((u) => u.includes('/tagtype/') && u.includes('page=1') && u.includes('size=100'))).toBe(true);
+				expect(urls.some((u) => u.includes('/tagtype?') && u.includes('page=1') && u.includes('size=100'))).toBe(true);
 			});
 
 			it('returns tagTypes from items array', async () => {
@@ -227,7 +227,7 @@ describe('Single Question Route', () => {
 				await load({ params: { action: 'add', id: 'new' } } as any);
 
 				const urls: string[] = mockFetch.mock.calls.map((c) => c[0]);
-				expect(urls.every((u) => !u.includes('/revisions/'))).toBe(true);
+				expect(urls.every((u) => !u.includes('/revisions'))).toBe(true);
 			});
 
 			it('fetches revisions when id is a real id', async () => {
@@ -351,7 +351,7 @@ describe('Single Question Route', () => {
 			} as any);
 
 			const [url, options] = mockFetch.mock.calls[0];
-			expect(url).toBe('http://fake-backend.com/questions/');
+			expect(url).toBe('http://fake-backend.com/questions');
 			expect(options.method).toBe('POST');
 			expect(options.headers).toMatchObject({ Authorization: 'Bearer fake-token', 'Content-Type': 'application/json' });
 		});

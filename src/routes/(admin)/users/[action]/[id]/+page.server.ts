@@ -54,7 +54,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	// get roles from the backend
 	let formattedRoles = [];
 	try {
-		const roleResponse = await fetch(`${BACKEND_URL}/roles/`, {
+		const roleResponse = await fetch(`${BACKEND_URL}/roles`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	let formattedOrganizations = [];
 	try {
 		const organizationResponse = await fetch(
-			`${BACKEND_URL}/organization/?page=1&size=100&order_by=name`,
+			`${BACKEND_URL}/organization?page=1&size=100&order_by=name`,
 			{
 				method: 'GET',
 				headers: {
@@ -182,7 +182,7 @@ export const actions: Actions = {
 				body: JSON.stringify(updateData)
 			});
 		} else if (params.action === 'add') {
-			res = await fetch(`${BACKEND_URL}/users/`, {
+			res = await fetch(`${BACKEND_URL}/users`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

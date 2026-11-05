@@ -265,7 +265,7 @@ describe('Login Route', () => {
 			}
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/login/access-token/',
+				'http://localhost:8000/login/access-token',
 				expect.objectContaining({
 					method: 'POST',
 					headers: { 'Content-Type': 'application/x-www-form-urlencoded' }

@@ -98,9 +98,9 @@ describe('load', () => {
 		await load();
 
 		const [rolesCall, permissionsCall] = (global.fetch as any).mock.calls;
-		expect(rolesCall[0]).toBe('http://fake-backend.com/roles/?limit=200');
+		expect(rolesCall[0]).toBe('http://fake-backend.com/roles?limit=200');
 		expect(rolesCall[1].headers.Authorization).toBe('Bearer fake-token');
-		expect(permissionsCall[0]).toBe('http://fake-backend.com/permissions/?limit=200');
+		expect(permissionsCall[0]).toBe('http://fake-backend.com/permissions?limit=200');
 		expect(permissionsCall[1].headers.Authorization).toBe('Bearer fake-token');
 	});
 });

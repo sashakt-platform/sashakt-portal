@@ -50,7 +50,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		roleData = null;
 	}
 
-	const rolesResponse = await fetch(`${BACKEND_URL}/roles/?limit=200`, {
+	const rolesResponse = await fetch(`${BACKEND_URL}/roles?limit=200`, {
 		headers: { Authorization: `Bearer ${token}` }
 	});
 	const roles = rolesResponse.ok ? (await rolesResponse.json()).data : [];
@@ -106,7 +106,7 @@ export const actions: Actions = {
 		};
 
 		if (params.action === 'add') {
-			const response = await fetch(`${BACKEND_URL}/roles/`, {
+			const response = await fetch(`${BACKEND_URL}/roles`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

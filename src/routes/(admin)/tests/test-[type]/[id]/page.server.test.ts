@@ -489,7 +489,7 @@ describe('Test Create/Update Page — load()', () => {
 			} as any);
 
 			const callUrl: string = mockFetch.mock.calls[0][0];
-			expect(callUrl).toContain('/questions/');
+			expect(callUrl).toContain('/questions?');
 			expect(callUrl).toContain('page=1');
 			expect(callUrl).toContain('size=25');
 		});
@@ -594,7 +594,7 @@ describe('Test Create/Update Page — load()', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/questions/'),
+				expect.stringContaining('/questions?'),
 				expect.objectContaining({
 					headers: { Authorization: 'Bearer mock-token' }
 				})
@@ -858,7 +858,7 @@ describe('Test Create/Update Page — save action', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/test/',
+				'http://localhost:8000/test',
 				expect.objectContaining({ method: 'POST' })
 			);
 		});

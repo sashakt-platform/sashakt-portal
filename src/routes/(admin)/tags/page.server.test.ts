@@ -152,7 +152,7 @@ describe('actions', () => {
 			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
-			expect(fetchCall[0]).toBe('http://fake-backend.com/tagtype/');
+			expect(fetchCall[0]).toBe('http://fake-backend.com/tagtype');
 			expect(fetchCall[1].method).toBe('POST');
 			const body = JSON.parse(fetchCall[1].body);
 			expect(body.name).toBe('Difficulty');
@@ -268,7 +268,7 @@ describe('actions', () => {
 			);
 
 			const fetchCall = (global.fetch as any).mock.calls[0];
-			expect(fetchCall[0]).toBe('http://fake-backend.com/tag/');
+			expect(fetchCall[0]).toBe('http://fake-backend.com/tag');
 			expect(fetchCall[1].method).toBe('POST');
 			const body = JSON.parse(fetchCall[1].body);
 			expect(body.name).toBe('Delhi');

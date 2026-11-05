@@ -85,7 +85,7 @@ export const actions: Actions = {
 				formData.append('logo', form.data.logo);
 			}
 
-			res = await fetch(`${BACKEND_URL}/organization/`, {
+			res = await fetch(`${BACKEND_URL}/organization`, {
 				method: 'POST',
 				headers: {
 					Authorization: `Bearer ${token}`

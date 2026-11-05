@@ -152,7 +152,7 @@ describe('actions.addField — fixed token names', () => {
 		} as any);
 
 		expect(mockFetch).toHaveBeenCalledWith(
-			'http://localhost:8000/form/42/field/',
+			'http://localhost:8000/form/42/field',
 			expect.objectContaining({
 				method: 'POST',
 				body: expect.stringContaining('"test_name"')
@@ -179,7 +179,7 @@ describe('actions.addField — fixed token names', () => {
 		} as any);
 
 		expect(mockFetch).toHaveBeenCalledWith(
-			'http://localhost:8000/form/42/field/',
+			'http://localhost:8000/form/42/field',
 			expect.objectContaining({
 				method: 'POST',
 				body: expect.stringContaining('"score"')
@@ -358,7 +358,7 @@ describe('actions.save', () => {
 			}
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/form/',
+				'http://localhost:8000/form',
 				expect.objectContaining({ method: 'POST' })
 			);
 		});

@@ -327,7 +327,7 @@ describe('User CRUD Route', () => {
 			}
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/users/',
+				'http://localhost:8000/users',
 				expect.objectContaining({
 					method: 'POST',
 					headers: expect.objectContaining({

@@ -104,7 +104,7 @@ describe('Users List Route', () => {
 			await load({ url: mockUrl } as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/users/?'),
+				expect.stringContaining('/users?'),
 				expect.objectContaining({
 					method: 'GET',
 					headers: {
@@ -335,7 +335,7 @@ describe('Users List Route', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/users/'),
+				expect.stringContaining('/users'),
 				expect.objectContaining({
 					method: 'DELETE',
 					headers: expect.objectContaining({ Authorization: 'Bearer mock-token' }),

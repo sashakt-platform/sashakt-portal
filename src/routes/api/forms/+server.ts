@@ -10,7 +10,7 @@ export const GET: RequestHandler = async () => {
 	const token = getSessionTokenCookie();
 
 	try {
-		const response = await fetch(`${BACKEND_URL}/form/?is_active=true&size=100`, {
+		const response = await fetch(`${BACKEND_URL}/form?is_active=true&size=100`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`

@@ -23,10 +23,10 @@ export const load: PageServerLoad = async () => {
 	const token = getSessionTokenCookie();
 
 	const [rolesResponse, permissionsResponse] = await Promise.all([
-		fetch(`${BACKEND_URL}/roles/?limit=200`, {
+		fetch(`${BACKEND_URL}/roles?limit=200`, {
 			headers: { Authorization: `Bearer ${token}` }
 		}),
-		fetch(`${BACKEND_URL}/permissions/?limit=200`, {
+		fetch(`${BACKEND_URL}/permissions?limit=200`, {
 			headers: { Authorization: `Bearer ${token}` }
 		})
 	]);

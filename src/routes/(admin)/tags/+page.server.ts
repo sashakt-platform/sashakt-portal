@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		...(sortBy && { sort_by: sortBy, sort_order: sortOrder })
 	});
 
-	const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype/?${tagTypesQueryParams}`, {
+	const tagTypesResponse = await fetch(`${BACKEND_URL}/tagtype?${tagTypesQueryParams}`, {
 		method: 'GET',
 		headers: { Authorization: `Bearer ${token}` }
 	});
@@ -78,7 +78,7 @@ export const actions: Actions = {
 			return fail(400);
 		}
 
-		const response = await fetch(`${BACKEND_URL}/tagtype/`, {
+		const response = await fetch(`${BACKEND_URL}/tagtype`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ export const actions: Actions = {
 			return fail(400);
 		}
 
-		const response = await fetch(`${BACKEND_URL}/tag/`, {
+		const response = await fetch(`${BACKEND_URL}/tag`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

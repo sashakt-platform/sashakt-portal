@@ -39,7 +39,7 @@ export async function getAccessToken(
 	password = E2E_PASSWORD
 ): Promise<TokenResponse> {
 	if (cachedTokens) return cachedTokens;
-	const res = await request.post(`${BACKEND_URL}/login/access-token/`, {
+	const res = await request.post(`${BACKEND_URL}/login/access-token`, {
 		form: { username: username!, password: password! }
 	});
 	if (!res.ok()) {
@@ -115,7 +115,7 @@ async function apiGetSystemAdminRoleId(
 	const cached = cachedSystemAdminRoleIds.get(organizationId);
 	if (cached !== undefined) return cached;
 
-	const response = await request.get(`${BACKEND_URL}/roles/?limit=200`, {
+	const response = await request.get(`${BACKEND_URL}/roles?limit=200`, {
 		headers: await authHeader(request)
 	});
 	if (!response.ok()) {
@@ -175,7 +175,7 @@ export async function apiCreateUser(
 		is_active: true
 	};
 
-	const res = await request.post(`${BACKEND_URL}/users/`, {
+	const res = await request.post(`${BACKEND_URL}/users`, {
 		headers: await authHeader(request),
 		data: body
 	});
@@ -213,7 +213,7 @@ export async function apiFindUserByEmail(
 	email: string
 ): Promise<ApiUser | null> {
 	const res = await request.get(
-		`${BACKEND_URL}/users/?page=1&size=10&search=${encodeURIComponent(email)}`,
+		`${BACKEND_URL}/users?page=1&size=10&search=${encodeURIComponent(email)}`,
 		{ headers: await authHeader(request) }
 	);
 	if (!res.ok()) {
@@ -229,7 +229,7 @@ export async function apiFindUserByEmail(
  */
 export async function apiCleanupTestUsers(request: APIRequestContext): Promise<void> {
 	const res = await request.get(
-		`${BACKEND_URL}/users/?page=1&size=100&search=${encodeURIComponent(E2E_EMAIL_PREFIX)}`,
+		`${BACKEND_URL}/users?page=1&size=100&search=${encodeURIComponent(E2E_EMAIL_PREFIX)}`,
 		{ headers: await authHeader(request) }
 	);
 	if (!res.ok()) return;

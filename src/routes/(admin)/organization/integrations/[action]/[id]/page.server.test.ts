@@ -89,7 +89,7 @@ describe('page.server load function', () => {
 		await server.load({ params: { action: 'add', id: 'new' } } as any);
 
 		expect(global.fetch).toHaveBeenCalledWith(
-			'http://fake-backend/providers/?page=1&size=100',
+			'http://fake-backend/providers?page=1&size=100',
 			expect.objectContaining({
 				method: 'GET',
 				headers: expect.objectContaining({ Authorization: 'Bearer fake-token' })

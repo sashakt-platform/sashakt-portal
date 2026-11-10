@@ -322,7 +322,7 @@ describe('Users List Route', () => {
 			);
 		});
 
-		it('should send DELETE request to /users/ with userIds body', async () => {
+		it('should send DELETE request to /users with userIds body', async () => {
 			const userIds = [1, 2, 3];
 			mockFetch.mockResolvedValue({
 				ok: true,

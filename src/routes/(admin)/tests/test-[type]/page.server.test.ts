@@ -109,7 +109,7 @@ describe('Test Management Listing — load()', () => {
 			} as any);
 
 			const callUrl: string = mockFetch.mock.calls[0][0];
-			expect(callUrl).toContain('/test/?');
+			expect(callUrl).toContain('/test?');
 			expect(callUrl).toContain('is_template=false');
 			expect(callUrl).toContain('page=1');
 			expect(callUrl).toContain('size=25');
@@ -274,7 +274,7 @@ describe('Test Management Listing — load()', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/test/?'),
+				expect.stringContaining('/test?'),
 				expect.objectContaining({
 					headers: { Authorization: 'Bearer mock-token' }
 				})
@@ -520,7 +520,7 @@ describe('Test Management Listing — batchDelete action', () => {
 			mockBackendSuccess(2);
 			await actions.batchDelete(makeEvent('session', ['id1', 'id2']) as any);
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/test/',
+				'http://localhost:8000/test',
 				expect.objectContaining({ method: 'DELETE' })
 			);
 		});

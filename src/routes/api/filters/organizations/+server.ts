@@ -22,7 +22,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	});
 
 	try {
-		const response = await fetch(`${BACKEND_URL}/organization/?${queryParams}`, {
+		const response = await fetch(`${BACKEND_URL}/organization?${queryParams}`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`

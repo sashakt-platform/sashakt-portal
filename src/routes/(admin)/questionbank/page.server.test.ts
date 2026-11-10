@@ -215,7 +215,7 @@ describe('Question Bank Route', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/questions/'),
+				expect.stringContaining('/questions?'),
 				expect.objectContaining({
 					method: 'GET',
 					headers: { Authorization: 'Bearer fake-token' }
@@ -298,7 +298,7 @@ describe('Question Bank Route', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://fake-backend.com/questions/',
+				'http://fake-backend.com/questions',
 				expect.objectContaining({
 					method: 'DELETE',
 					headers: expect.objectContaining({ Authorization: 'Bearer fake-token' }),

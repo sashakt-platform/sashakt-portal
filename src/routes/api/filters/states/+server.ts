@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	try {
 		const response = await fetch(
-			`${BACKEND_URL}/location/state/?name=${encodeURIComponent(search)}`,
+			`${BACKEND_URL}/location/state?name=${encodeURIComponent(search)}`,
 			{
 				method: 'GET',
 				headers: {

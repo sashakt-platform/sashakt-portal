@@ -46,7 +46,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			...(isActive && { is_active: isActive })
 		});
 
-		const entitiesRes = await fetch(`${BACKEND_URL}/entity/?${queryParams}`, {
+		const entitiesRes = await fetch(`${BACKEND_URL}/entity?${queryParams}`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`
@@ -155,7 +155,7 @@ export const actions: Actions = {
 		}
 
 		if (params.action === 'add') {
-			const response = await fetch(`${BACKEND_URL}/entitytype/`, {
+			const response = await fetch(`${BACKEND_URL}/entitytype`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/entity/`, {
+			const response = await fetch(`${BACKEND_URL}/entity`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

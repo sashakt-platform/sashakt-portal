@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		requirePermission(user, PERMISSIONS.UPDATE_MY_ORGANIZATION);
 	}
 
-	const catalogRes = await fetch(`${BACKEND_URL}/providers/?page=1&size=100`, {
+	const catalogRes = await fetch(`${BACKEND_URL}/providers?page=1&size=100`, {
 		method: 'GET',
 		headers: { Authorization: `Bearer ${token}` }
 	});

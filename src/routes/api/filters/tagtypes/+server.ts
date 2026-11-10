@@ -8,7 +8,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const search = url.searchParams.get('search') || '';
 
 	try {
-		const response = await fetch(`${BACKEND_URL}/tagtype/?name=${encodeURIComponent(search)}`, {
+		const response = await fetch(`${BACKEND_URL}/tagtype?name=${encodeURIComponent(search)}`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`

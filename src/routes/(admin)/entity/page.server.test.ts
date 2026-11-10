@@ -77,17 +77,17 @@ describe('Entity Listing — load()', () => {
 
 	// ── API call — query parameters ───────────────────────────────────────────
 	describe('API call — query parameters', () => {
-		it('calls the /entitytype/ endpoint', async () => {
+		it('calls the /entitytype endpoint', async () => {
 			mockSuccess();
 			await load({ url: makeUrl('/entity') } as any);
-			expect(mockFetch.mock.calls[0][0]).toContain('/entitytype/');
+			expect(mockFetch.mock.calls[0][0]).toContain('/entitytype?');
 		});
 
 		it('sends Bearer token in Authorization header', async () => {
 			mockSuccess();
 			await load({ url: makeUrl('/entity') } as any);
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/entitytype/'),
+				expect.stringContaining('/entitytype?'),
 				expect.objectContaining({ headers: { Authorization: 'Bearer mock-token' } })
 			);
 		});
@@ -282,7 +282,7 @@ describe('Entity Listing — batchDelete action', () => {
 			mockBackendSuccess(2);
 			await actions.batchDelete(makeEvent([1, 2]) as any);
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/entitytype/',
+				'http://localhost:8000/entitytype',
 				expect.objectContaining({ method: 'DELETE' })
 			);
 		});

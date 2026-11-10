@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			...(search && { name: search })
 		});
 
-		const response = await fetch(`${BACKEND_URL}/entitytype/?${queryParams}`, {
+		const response = await fetch(`${BACKEND_URL}/entitytype?${queryParams}`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`

@@ -164,7 +164,7 @@ describe('Reset Password Route', () => {
 			}
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				'http://localhost:8000/reset-password/',
+				'http://localhost:8000/reset-password',
 				expect.objectContaining({
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' }

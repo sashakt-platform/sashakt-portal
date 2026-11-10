@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 		...(isActive && { is_active: isActive })
 	});
 
-	const res = await fetch(`${BACKEND_URL}/form/?${queryParams}`, {
+	const res = await fetch(`${BACKEND_URL}/form?${queryParams}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Bearer ${token}`
@@ -82,7 +82,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/form/`, {
+			const response = await fetch(`${BACKEND_URL}/form`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

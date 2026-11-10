@@ -302,7 +302,7 @@ describe('actions.batchDelete', () => {
 		} as any);
 
 		const [fetchUrl, fetchOptions] = (global.fetch as any).mock.calls[0];
-		expect(fetchUrl).toBe('http://fake-backend.com/form/');
+		expect(fetchUrl).toBe('http://fake-backend.com/form');
 		expect(fetchOptions.method).toBe('DELETE');
 		expect(fetchOptions.headers.Authorization).toBe('Bearer fake-token');
 	});

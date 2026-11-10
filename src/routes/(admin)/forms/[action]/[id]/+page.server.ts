@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	// Fetch entity types for entity field selection (non-fatal)
 	try {
-		const entityTypesRes = await fetch(`${BACKEND_URL}/entitytype/?size=100`, {
+		const entityTypesRes = await fetch(`${BACKEND_URL}/entitytype?size=100`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export const actions: Actions = {
 		}
 
 		if (params.id === 'new') {
-			const response = await fetch(`${BACKEND_URL}/form/`, {
+			const response = await fetch(`${BACKEND_URL}/form`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -202,7 +202,7 @@ export const actions: Actions = {
 			return fail(400, { errors: validationResult.error.flatten() });
 		}
 
-		const response = await fetch(`${BACKEND_URL}/form/${params.id}/field/`, {
+		const response = await fetch(`${BACKEND_URL}/form/${params.id}/field`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

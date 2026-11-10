@@ -110,7 +110,7 @@ export const actions: Actions = {
 		}
 
 		if (params.entityAction === 'add') {
-			const response = await fetch(`${BACKEND_URL}/entity/`, {
+			const response = await fetch(`${BACKEND_URL}/entity`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

@@ -11,7 +11,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	try {
 		const response = await fetch(
-			`${BACKEND_URL}/tag/?name=${encodeURIComponent(search)}${tagTypeParams}`,
+			`${BACKEND_URL}/tag?name=${encodeURIComponent(search)}${tagTypeParams}`,
 			{
 				method: 'GET',
 				headers: {

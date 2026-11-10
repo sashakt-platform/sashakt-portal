@@ -89,7 +89,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		try {
-			const response = await fetch(`${BACKEND_URL}/candidate/`, {
+			const response = await fetch(`${BACKEND_URL}/candidate`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',

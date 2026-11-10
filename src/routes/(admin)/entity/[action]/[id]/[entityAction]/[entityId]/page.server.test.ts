@@ -210,7 +210,7 @@ describe('page.server save action', () => {
 		}
 
 		expect(global.fetch).toHaveBeenCalledWith(
-			'http://fake-backend/entity/',
+			'http://fake-backend/entity',
 			expect.objectContaining({ method: 'POST' })
 		);
 		expect(redirect).toHaveBeenCalledWith(

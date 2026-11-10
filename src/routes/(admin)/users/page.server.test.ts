@@ -104,7 +104,7 @@ describe('Users List Route', () => {
 			await load({ url: mockUrl } as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/users/?'),
+				expect.stringContaining('/users?'),
 				expect.objectContaining({
 					method: 'GET',
 					headers: {
@@ -322,7 +322,7 @@ describe('Users List Route', () => {
 			);
 		});
 
-		it('should send DELETE request to /users/ with userIds body', async () => {
+		it('should send DELETE request to /users with userIds body', async () => {
 			const userIds = [1, 2, 3];
 			mockFetch.mockResolvedValue({
 				ok: true,
@@ -335,7 +335,7 @@ describe('Users List Route', () => {
 			} as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining('/users/'),
+				expect.stringContaining('/users'),
 				expect.objectContaining({
 					method: 'DELETE',
 					headers: expect.objectContaining({ Authorization: 'Bearer mock-token' }),

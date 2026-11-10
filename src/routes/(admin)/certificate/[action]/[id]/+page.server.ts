@@ -87,7 +87,7 @@ export const actions: Actions = {
 		}
 
 		if (params.id === 'new') {
-			const response = await fetch(`${BACKEND_URL}/certificate/`, {
+			const response = await fetch(`${BACKEND_URL}/certificate`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

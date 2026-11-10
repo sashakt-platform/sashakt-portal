@@ -52,7 +52,7 @@ describe('auth', () => {
 
 			const result = await refreshAccessToken('old-refresh-token');
 
-			expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/login/refresh-token/', {
+			expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/login/refresh-token', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -244,7 +244,7 @@ describe('auth', () => {
 
 			const result = await logoutFromBackend('access-token');
 
-			expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/login/logout/', {
+			expect(mockFetch).toHaveBeenCalledWith('http://localhost:8000/login/logout', {
 				method: 'POST',
 				headers: {
 					Authorization: 'Bearer access-token'

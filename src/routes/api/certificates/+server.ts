@@ -7,7 +7,7 @@ export const GET: RequestHandler = async () => {
 	const token = getSessionTokenCookie();
 
 	try {
-		const response = await fetch(`${BACKEND_URL}/certificate/`, {
+		const response = await fetch(`${BACKEND_URL}/certificate`, {
 			method: 'GET',
 			headers: {
 				Authorization: `Bearer ${token}`
